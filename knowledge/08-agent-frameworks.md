@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.
+**TL;DR.** Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.
 
 **Key points.**
 
@@ -13,14 +13,14 @@
 - Tool registry + control loop.
 - Streaming, tracing, guardrails.
 
-**General.** A raw API call is request → response. A framework adds the machinery around it: a session/state object that survives across turns, a context manager that trims and compresses history, a tool registry that turns functions into model-facing schemas and dispatches calls, a provider-agnostic model client, a loop with stop conditions, error handling, and observability. You do not re-implement conversation state, schema extraction, provider quirks, and tracing for every app.
+**Concept.** A raw API call is request → response. A framework adds the machinery around it: a session/state object that survives across turns, a context manager that trims and compresses history, a tool registry that turns functions into model-facing schemas and dispatches calls, a provider-agnostic model client, a loop with stop conditions, error handling, and observability. You do not re-implement conversation state, schema extraction, provider quirks, and tracing for every app.
 
 ![diagram](assets/diagrams/aea232e6af6d05b3fcb089107150e84828984a0d.png)
 
-**Jiuwen.** The reusable pieces are concrete classes, not a monolith: a session owns state, streaming, tracing, and interaction lifecycle; a model client wraps providers behind one invoke/stream surface; a context engine owns windowing and compression; an ability manager owns tool registration and execution; and rails provide the loop's guardrails. Together they are the plumbing you would otherwise rebuild.
+**In Jiuwen.** The reusable pieces are concrete classes, not a monolith: a session owns state, streaming, tracing, and interaction lifecycle; a model client wraps providers behind one invoke/stream surface; a context engine owns windowing and compression; an ability manager owns tool registration and execution; and rails provide the loop's guardrails. Together they are the plumbing you would otherwise rebuild.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -55,7 +55,7 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).
+**TL;DR.** Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).
 
 **Key points.**
 
@@ -63,14 +63,14 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 - Role: agents with roles that collaborate.
 - Trade control for flexibility.
 
-**General.** Graph-based frameworks make control flow an explicit graph of nodes and edges over shared state; routing is deterministic, inspectable, and easy to persist. Role-based frameworks make the unit an agent with a role/persona and let agents collaborate through messages and a task board; control flow is emergent and driven by the model plus a manager. Graph = you author the topology; role = you author the team.
+**Concept.** Graph-based frameworks make control flow an explicit graph of nodes and edges over shared state; routing is deterministic, inspectable, and easy to persist. Role-based frameworks make the unit an agent with a role/persona and let agents collaborate through messages and a task board; control flow is emergent and driven by the model plus a manager. Graph = you author the topology; role = you author the team.
 
 ![diagram](assets/diagrams/aa708d9c67a3edf602db0d462bc96f21cfe039a9.png)
 
-**Jiuwen.** Jiuwen contains both archetypes as separate subsystems: the graph side is a real Pregel engine where components compile into a graph, edges become channels, and a loop drives super-steps with static and conditional routers, barriers, and OR-groups; the role side is the agent-teams stack with members, a supervisor, and message routing. So it is not graph versus role — it has both.
+**In Jiuwen.** Jiuwen contains both archetypes as separate subsystems: the graph side is a real Pregel engine where components compile into a graph, edges become channels, and a loop drives super-steps with static and conditional routers, barriers, and OR-groups; the role side is the agent-teams stack with members, a supervisor, and message routing. So it is not graph versus role — it has both.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -101,7 +101,7 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.
+**TL;DR.** Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.
 
 **Key points.**
 
@@ -110,14 +110,14 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 - Managed agent SDK for hosted agents.
 - Match the framework to the control shape.
 
-**General.** Pick by the shape of control and the state model you need. Explicit graph/routing with durable state → LangGraph. Role/team collaboration with fast multi-agent setup → CrewAI. A managed coding/agent harness with strong tool and sandbox defaults, and you accept the vendor → the Anthropic Agent SDK (or an equivalent). Weigh state model, persistence, provider lock-in, tool ecosystem, and team familiarity.
+**Concept.** Pick by the shape of control and the state model you need. Explicit graph/routing with durable state → LangGraph. Role/team collaboration with fast multi-agent setup → CrewAI. A managed coding/agent harness with strong tool and sandbox defaults, and you accept the vendor → the Anthropic Agent SDK (or an equivalent). Weigh state model, persistence, provider lock-in, tool ecosystem, and team familiarity.
 
 ![diagram](assets/diagrams/3cd3b22fcf456d3737dd78da5c074a1f3b7dbc29.png)
 
-**Jiuwen.** Jiuwen's design center is deterministic graphs when the flow is known (a Pregel workflow with persistence) and role-based teams when work assignment is emergent (a leader with teammates on a task board). Its answer to framework choice is: use the graph path for known control flow and the team path for flexible collaboration, rather than adopting a specific external framework.
+**In Jiuwen.** Jiuwen's design center is deterministic graphs when the flow is known (a Pregel workflow with persistence) and role-based teams when work assignment is emergent (a leader with teammates on a task board). Its answer to framework choice is: use the graph path for known control flow and the team path for flexible collaboration, rather than adopting a specific external framework.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -151,7 +151,7 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.
+**TL;DR.** Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.
 
 **Key points.**
 
@@ -159,14 +159,14 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 - Light: transparent, you build plumbing.
 - Choose by team size, rate of change, control needs.
 
-**General.** Heavy frameworks give you batteries — tools, memory, permissions, teams, observability — at the cost of startup time, learning curve, config surface, and update churn. Light custom code is transparent and fast but you rebuild context management, retries, tracing, and safety. Choose by how much of the battery you would otherwise write yourself.
+**Concept.** Heavy frameworks give you batteries — tools, memory, permissions, teams, observability — at the cost of startup time, learning curve, config surface, and update churn. Light custom code is transparent and fast but you rebuild context management, retries, tracing, and safety. Choose by how much of the battery you would otherwise write yourself.
 
 ![diagram](assets/diagrams/64ac3c0f67bdb91080ff59c7729e14f460ccd374.png)
 
-**Jiuwen.** The light path is the core SDK: a base agent with a ReAct loop, an ability manager, optional rails, and workflow graphs — no workspace, permission engine, task loop, or teams. The heavy path is the harness: a factory assembles a deep agent with default rails, workspace, permissions, and teams. So you can start light and opt into the heavy layer.
+**In Jiuwen.** The light path is the core SDK: a base agent with a ReAct loop, an ability manager, optional rails, and workflow graphs — no workspace, permission engine, task loop, or teams. The heavy path is the harness: a factory assembles a deep agent with default rails, workspace, permissions, and teams. So you can start light and opt into the heavy layer.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -199,7 +199,7 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.
+**TL;DR.** The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.
 
 **Key points.**
 
@@ -207,14 +207,14 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 - Forcing business logic into nodes/agents is a smell.
 - A straight line disguised as a graph.
 
-**General.** When the app is a single model call, when the framework's node/agent/state model forces you to reshape business logic to fit, or when the graph is actually a straight line. Warning signs: you fight the state schema, wrap everything in adapters, or need an escape hatch on the happy path. The abstraction pays for itself only when you actually need the loop, state, tools, and observability.
+**Concept.** When the app is a single model call, when the framework's node/agent/state model forces you to reshape business logic to fit, or when the graph is actually a straight line. Warning signs: you fight the state schema, wrap everything in adapters, or need an escape hatch on the happy path. The abstraction pays for itself only when you actually need the loop, state, tools, and observability.
 
 ![diagram](assets/diagrams/e5366b79547cc52462a56cbca17a98850515423c.png)
 
-**Jiuwen.** The base layer is deliberately thin and elective: the ReAct agent auto-creates a session when none is passed, so a minimal loop runs without the runner; the legacy base agent still offers add-tools plus invoke; and a workflow is just a graph of executables. So you can avoid the heavy abstractions when they do not fit.
+**In Jiuwen.** The base layer is deliberately thin and elective: the ReAct agent auto-creates a session when none is passed, so a minimal loop runs without the runner; the legacy base agent still offers add-tools plus invoke; and a workflow is just a graph of executables. So you can avoid the heavy abstractions when they do not fit.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -248,7 +248,7 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.
+**TL;DR.** Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.
 
 **Key points.**
 
@@ -256,14 +256,14 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 - Call the primitive (model/tool) without the wrapper.
 - Override hooks or replace a component.
 
-**General.** Prefer escape hatches: implement the base interface directly, call the primitive (model/tool) without the high-level wrapper, override hooks, or replace a component. If the framework has no seam, you fork it or drop it. Good frameworks make the low-level primitive reachable from the high-level API.
+**Concept.** Prefer escape hatches: implement the base interface directly, call the primitive (model/tool) without the high-level wrapper, override hooks, or replace a component. If the framework has no seam, you fork it or drop it. Good frameworks make the low-level primitive reachable from the high-level API.
 
 ![diagram](assets/diagrams/85a07b6f7a10e6b6fe113c5a56b4fb61043941bc.png)
 
-**Jiuwen.** There are multiple escape hatches: at the graph level you can implement the executable interface with full IO control and bypass schemas; at the model level you can call the model directly without an agent or runner; at the tool level you can wrap any function; and rails and hooks can be overridden. So mismatched abstractions can usually be bypassed rather than fought.
+**In Jiuwen.** There are multiple escape hatches: at the graph level you can implement the executable interface with full IO control and bypass schemas; at the model level you can call the model directly without an agent or runner; at the tool level you can wrap any function; and rails and hooks can be overridden. So mismatched abstractions can usually be bypassed rather than fought.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -298,7 +298,7 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.
+**TL;DR.** A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.
 
 **Key points.**
 
@@ -306,14 +306,14 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 - Run ready nodes concurrently.
 - Route outputs; repeat until quiescent.
 
-**General.** In a graph framework, a scheduler activates every node whose input channels are ready, runs them (often concurrently), then routes their outputs to successors; the loop repeats until no node is active. In an agent framework, the model decides the next action by emitting tool calls. Frameworks that have both use each at its level.
+**Concept.** In a graph framework, a scheduler activates every node whose input channels are ready, runs them (often concurrently), then routes their outputs to successors; the loop repeats until no node is active. In an agent framework, the model decides the next action by emitting tool calls. Frameworks that have both use each at its level.
 
 ![diagram](assets/diagrams/e890d2a486b06d896fe46a96d3e370047becebc6.png)
 
-**Jiuwen.** Next-node selection is Pregel super-step scheduling: each step asks the channel manager for nodes whose trigger/barrier channels are satisfied, submits them to a task executor pool, collects their router outputs, flushes messages into channels, and repeats until nothing is ready. Barriers and OR-groups gate joins of mutually exclusive branches.
+**In Jiuwen.** Next-node selection is Pregel super-step scheduling: each step asks the channel manager for nodes whose trigger/barrier channels are satisfied, submits them to a task executor pool, collects their router outputs, flushes messages into channels, and repeats until nothing is ready. Barriers and OR-groups gate joins of mutually exclusive branches.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -346,7 +346,7 @@ Workflow next-node selection is Pregel super-step scheduling: each step `Channel
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.
+**TL;DR.** Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.
 
 **Key points.**
 
@@ -354,14 +354,14 @@ Workflow next-node selection is Pregel super-step scheduling: each step `Channel
 - Immutable versions + content hash.
 - Activate/list/rollback atomically.
 
-**General.** Treat the agent/workflow definition as a versioned artifact: store immutable versions with a content hash, activate one, list history, and roll back atomically. Prompts are only a subset — the topology and config change too. Most frameworks do not do this for you.
+**Concept.** Treat the agent/workflow definition as a versioned artifact: store immutable versions with a content hash, activate one, list history, and roll back atomically. Prompts are only a subset — the topology and config change too. Most frameworks do not do this for you.
 
 ![diagram](assets/diagrams/97ab35245a76ec31868a9af220821dcae9d61640.png)
 
-**Jiuwen.** In the core framework this is essentially absent: a workflow card has a free-form version string and a key helper, but there is no registry, version history, graph serializer, or rollback API — the version is only part of a composite key. Real versioning and rollback exist at the product's RSI harness-package level, not for arbitrary workflow definitions.
+**In Jiuwen.** In the core framework this is essentially absent: a workflow card has a free-form version string and a key helper, but there is no registry, version history, graph serializer, or rollback API — the version is only part of a composite key. Real versioning and rollback exist at the product's RSI harness-package level, not for arbitrary workflow definitions.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -392,7 +392,7 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.
+**TL;DR.** Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.
 
 **Key points.**
 
@@ -401,14 +401,14 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 - Provider/config abstraction.
 - Schema'd config + docs.
 
-**General.** Look for declarative registration and plugins, stable extension contracts, provider and config abstraction, schema'd configuration, and real documentation. Be wary of frameworks where every change means patching internals. Prototype speed is not the same as team-scale maintainability.
+**Concept.** Look for declarative registration and plugins, stable extension contracts, provider and config abstraction, schema'd configuration, and real documentation. Be wary of frameworks where every change means patching internals. Prototype speed is not the same as team-scale maintainability.
 
 ![diagram](assets/diagrams/760b6fa06927d5faa409ba04f26bb0b05a6cee8d.png)
 
-**Jiuwen.** Extension is registry and manifest based rather than patch based. Provider modules declare element descriptors that a catalog registration converts into class registrations, and the deep agent can hot-load plugin, agent-template, and harness-config packages through one builder. Extension is by registration, not by patching internals.
+**In Jiuwen.** Extension is registry and manifest based rather than patch based. Provider modules declare element descriptors that a catalog registration converts into class registrations, and the deep agent can hot-load plugin, agent-template, and harness-config packages through one builder. Extension is by registration, not by patching internals.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

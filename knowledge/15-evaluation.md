@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.
+**TL;DR.** Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.
 
 **Key points.**
 
@@ -13,14 +13,14 @@
 - Human review on a sample.
 - Held-out set + regression tracking.
 
-**General.** Combine automatic metrics (exact match, F1, ROUGE/BLEU where applicable, functional/tests for code), an LLM-as-judge with a rubric for open-ended quality, and human review for a sample. Build a held-out eval set with representative and adversarial cases, score consistently, and track regressions across changes. The judge itself must be validated against human agreement; a single metric rarely captures "quality".
+**Concept.** Combine automatic metrics (exact match, F1, ROUGE/BLEU where applicable, functional/tests for code), an LLM-as-judge with a rubric for open-ended quality, and human review for a sample. Build a held-out eval set with representative and adversarial cases, score consistently, and track regressions across changes. The judge itself must be validated against human agreement; a single metric rarely captures "quality".
 
 ![diagram](assets/diagrams/070bfc3c5df8ace56cfc7b9798c08ce88070aa3f.png)
 
-**Jiuwen.** Jiuwen has several eval layers: the agent-evolution evaluator provides a base evaluator plus exact-match and LLM-judge metrics; the RSI judge uses a structured rubric with per-behavior scores, evidence, and penalties; the online RL judge scores turns with voting; and an example harness scores with a judge. There is no retrieval metric, no golden set, and the judges do not see retrieved context.
+**In Jiuwen.** Jiuwen has several eval layers: the agent-evolution evaluator provides a base evaluator plus exact-match and LLM-judge metrics; the RSI judge uses a structured rubric with per-behavior scores, evidence, and penalties; the online RL judge scores turns with voting; and an example harness scores with a judge. There is no retrieval metric, no golden set, and the judges do not see retrieved context.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -50,7 +50,7 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.
+**TL;DR.** An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.
 
 **Key points.**
 
@@ -58,14 +58,14 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 - A retrieval miss can't be fixed by the generator.
 - Retrieved-but-wrong = generation/grounding.
 
-**General.** An end-to-end score tells you "the answer was wrong" but not why. If retrieval missed the document, no generator can fix it; if the document was retrieved but the answer is wrong, the generator (or grounding) is at fault. Stage-level metrics — Recall@k / precision@k / NDCG for retrieval, faithfulness / correctness for generation — let you attribute the failure and fix the right component. End-to-end stays as the final acceptance check.
+**Concept.** An end-to-end score tells you "the answer was wrong" but not why. If retrieval missed the document, no generator can fix it; if the document was retrieved but the answer is wrong, the generator (or grounding) is at fault. Stage-level metrics — Recall@k / precision@k / NDCG for retrieval, faithfulness / correctness for generation — let you attribute the failure and fix the right component. End-to-end stays as the final acceptance check.
 
 ![diagram](assets/diagrams/c991db3a87cf489e85ffa4e522236ad73667c887.png)
 
-**Jiuwen.** In Jiuwen the two stages are structurally separate but also separately un-instrumented: retrieval has no quality metric (no recall, precision, MRR, or NDCG), and the answer-level judges never receive the retrieved context. So it can produce an end-to-end score but cannot attribute a failure to retrieval versus generation.
+**In Jiuwen.** In Jiuwen the two stages are structurally separate but also separately un-instrumented: retrieval has no quality metric (no recall, precision, MRR, or NDCG), and the answer-level judges never receive the retrieved context. So it can produce an end-to-end score but cannot attribute a failure to retrieval versus generation.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -93,7 +93,7 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.
+**TL;DR.** Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.
 
 **Key points.**
 
@@ -101,14 +101,14 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 - Brittle to wording, articles, ordering.
 - Use only on constrained answers; judge for paraphrase.
 
-**General.** Exact match requires the output string to equal the reference, so "Paris" vs "The capital is Paris" both fail even when correct. It is brittle to wording, formatting, articles, and ordering. Use it only for tasks with a canonical form (classification labels, IDs, single tokens); otherwise use semantic/normalized metrics (LLM judge, embedding similarity, or task-specific parsers).
+**Concept.** Exact match requires the output string to equal the reference, so "Paris" vs "The capital is Paris" both fail even when correct. It is brittle to wording, formatting, articles, and ordering. Use it only for tasks with a canonical form (classification labels, IDs, single tokens); otherwise use semantic/normalized metrics (LLM judge, embedding similarity, or task-specific parsers).
 
 ![diagram](assets/diagrams/eff1fc98d63abea84a80b8376b012a06b5d33403.png)
 
-**Jiuwen.** There are two exact-match implementations: one normalizes case and whitespace but still requires full-string equality, and the RSI judge is strict equality with no normalization. Paraphrase is covered only by the LLM judges, so exact match should be reserved for constrained answers.
+**In Jiuwen.** There are two exact-match implementations: one normalizes case and whitespace but still requires full-string equality, and the RSI judge is strict equality with no normalization. Paraphrase is covered only by the LLM judges, so exact match should be reserved for constrained answers.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -136,7 +136,7 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.
+**TL;DR.** Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.
 
 **Key points.**
 
@@ -144,14 +144,14 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 - Low → retrieval (embedding/chunking/query) is failing.
 - Distinguishes missing content from ranking issues.
 
-**General.** Recall@k is the fraction of a query's relevant documents that are retrieved in the top-k, averaged over queries (when each query has exactly one relevant document this reduces to hit-rate/success@k). A low score means retrieval (not generation) is the failure: relevant content is missing from the candidate set, so no reranker or prompt can recover it. Diagnose by checking chunking (answer split/lost), embedding fit, whether the query and index use the same model, and whether exact-match terms need a sparse leg.
+**Concept.** Recall@k is the fraction of a query's relevant documents that are retrieved in the top-k, averaged over queries (when each query has exactly one relevant document this reduces to hit-rate/success@k). A low score means retrieval (not generation) is the failure: relevant content is missing from the candidate set, so no reranker or prompt can recover it. Diagnose by checking chunking (answer split/lost), embedding fit, whether the query and index use the same model, and whether exact-match terms need a sparse leg.
 
 ![diagram](assets/diagrams/68b2a2c38f5c7b57e3faf375d076f3acebab1555.png)
 
-**Jiuwen.** Jiuwen has no Recall@k implementation. The only recall-looking code is a classification evaluator for the proactive-memory gate in an example, which is not ranked retrieval against gold documents. Recall must be computed externally with your own labeled set.
+**In Jiuwen.** Jiuwen has no Recall@k implementation. The only recall-looking code is a classification evaluator for the proactive-memory gate in an example, which is not ranked retrieval against gold documents. Recall must be computed externally with your own labeled set.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -178,7 +178,7 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.
+**TL;DR.** Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.
 
 **Key points.**
 
@@ -186,14 +186,14 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 - Higher k → recall up, precision usually down.
 - Both can look fine while real quality is poor.
 
-**General.** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant documents that were retrieved. They trade off: raising k raises recall but usually lowers precision.
+**Concept.** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant documents that were retrieved. They trade off: raising k raises recall but usually lowers precision.
 
 ![diagram](assets/diagrams/56c1c00f9a8a4a86115c8e9abaf3120da3b06b08.png)
 
-**Jiuwen.** Precision@k is absent; the only precision present is classification/answer precision in an example and a gate test. The retrieval stack returns an ordered candidate list but never scores how many of the top-k were relevant, so retrieval precision must be measured externally.
+**In Jiuwen.** Precision@k is absent; the only precision present is classification/answer precision in an example and a gate test. The retrieval stack returns an ordered candidate list but never scores how many of the top-k were relevant, so retrieval precision must be measured externally.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -220,7 +220,7 @@ Precision@k is **absent**. The only precision present is classification/answer p
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.
+**TL;DR.** Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.
 
 **Key points.**
 
@@ -228,14 +228,14 @@ Precision@k is **absent**. The only precision present is classification/answer p
 - Corpus lacks the answer → nothing to retrieve.
 - Plausible output is not quality; measure it.
 
-**General.** Both can be low even when the outputs look plausible: if the embedding or chunking is wrong, nothing relevant is ranked highly; and if the corpus simply lacks the answer, no retriever can find it. A plausible top-3 can still be mostly irrelevant — which is exactly why you need numbers, not vibes.
+**Concept.** Both can be low even when the outputs look plausible: if the embedding or chunking is wrong, nothing relevant is ranked highly; and if the corpus simply lacks the answer, no retriever can find it. A plausible top-3 can still be mostly irrelevant — which is exactly why you need numbers, not vibes.
 
 ![diagram](assets/diagrams/00ecc4062fc27e339a3e96893f686699d002877f.png)
 
-**Jiuwen.** The retrieval stack ranks and can re-sort candidates, but never compares the ordering to graded relevance, and the evaluator zips predictions/labels without a relevance-per-rank notion — so the gap stays invisible.
+**In Jiuwen.** The retrieval stack ranks and can re-sort candidates, but never compares the ordering to graded relevance, and the evaluator zips predictions/labels without a relevance-per-rank notion — so the gap stays invisible.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -260,7 +260,7 @@ The retrieval stack produces an ordered candidate list — and a cross-encoder c
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.
+**TL;DR.** Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.
 
 **Key points.**
 
@@ -268,14 +268,14 @@ The retrieval stack produces an ordered candidate list — and a cross-encoder c
 - Best when one strong hit is needed (lookup/FAQ).
 - Complements recall/NDCG.
 
-**General.** MRR is the mean of `1/rank` of the first relevant result. It matters when the user/system mostly needs the single best hit and the position of the first correct answer is what counts (FAQ lookup, "open the right doc", navigation). Recall@k matters when a set of results is consumed together (context stuffing). MRR ignores everything after the first relevant hit, so it is blind to recall.
+**Concept.** MRR is the mean of `1/rank` of the first relevant result. It matters when the user/system mostly needs the single best hit and the position of the first correct answer is what counts (FAQ lookup, "open the right doc", navigation). Recall@k matters when a set of results is consumed together (context stuffing). MRR ignores everything after the first relevant hit, so it is blind to recall.
 
 ![diagram](assets/diagrams/9eb6d7f8332f5d17c4be68e85d856aa08e318f44.png)
 
-**Jiuwen.** MRR is not implemented. The retrieval stack uses reciprocal rank fusion to merge candidate lists and a weighted score combination in the graph store — those are rank-fusion algorithms, not an evaluation metric — so MRR must be computed externally.
+**In Jiuwen.** MRR is not implemented. The retrieval stack uses reciprocal rank fusion to merge candidate lists and a weighted score combination in the graph store — those are rank-fusion algorithms, not an evaluation metric — so MRR must be computed externally.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -302,7 +302,7 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.
+**TL;DR.** Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.
 
 **Key points.**
 
@@ -310,14 +310,14 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 - Normalize by the ideal ranking.
 - Supports graded relevance.
 
-**General.** NDCG discounts each relevant result by `log2(rank+1)` and normalizes by the ideal (best-possible) ordering, so it rewards putting the most relevant documents at the top and supports graded relevance (not just binary). It matters when ranking quality — not just presence — drives the user experience, and is the standard metric for reranker comparisons. Recall@k treats all positions within k equally; NDCG does not.
+**Concept.** NDCG discounts each relevant result by `log2(rank+1)` and normalizes by the ideal (best-possible) ordering, so it rewards putting the most relevant documents at the top and supports graded relevance (not just binary). It matters when ranking quality — not just presence — drives the user experience, and is the standard metric for reranker comparisons. Recall@k treats all positions within k equally; NDCG does not.
 
 ![diagram](assets/diagrams/0bbb023c69ad0bdb455774db4317c72cd77bbc74.png)
 
-**Jiuwen.** NDCG is absent: there is no discounted cumulative gain, no gain/discount term, and no graded relevance. Ranking code produces cross-encoder and fusion scores used to sort, but never evaluates an ordering against relevance grades.
+**In Jiuwen.** NDCG is absent: there is no discounted cumulative gain, no gain/discount term, and no graded relevance. Ranking code produces cross-encoder and fusion scores used to sort, but never evaluates an ordering against relevance grades.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -344,7 +344,7 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.
+**TL;DR.** Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.
 
 **Key points.**
 
@@ -352,14 +352,14 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 - Faithfulness: answer vs context.
 - Both are needed; they fail differently.
 
-**General.** Relevance asks whether retrieved passages are on-topic for the query (context precision/recall). Faithfulness/groundedness asks whether the answer's claims are actually supported by the retrieved context (does it hallucinate beyond the evidence). A system can retrieve relevant context and still be unfaithful, or be faithful to irrelevant context. Measuring faithfulness requires giving the judge the context and checking claim support/citations, not just answer-vs-reference correctness.
+**Concept.** Relevance asks whether retrieved passages are on-topic for the query (context precision/recall). Faithfulness/groundedness asks whether the answer's claims are actually supported by the retrieved context (does it hallucinate beyond the evidence). A system can retrieve relevant context and still be unfaithful, or be faithful to irrelevant context. Measuring faithfulness requires giving the judge the context and checking claim support/citations, not just answer-vs-reference correctness.
 
 ![diagram](assets/diagrams/00fc1adee631d63d0410b83517928da3105d8bc0.png)
 
-**Jiuwen.** There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest is an accuracy evaluator that judges factual correctness with a rubric but never receives the retrieved context, so it cannot detect unsupported claims; faithfulness must be measured externally.
+**In Jiuwen.** There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest is an accuracy evaluator that judges factual correctness with a rubric but never receives the retrieved context, so it cannot detect unsupported claims; faithfulness must be measured externally.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -386,7 +386,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.
+**TL;DR.** Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.
 
 **Key points.**
 
@@ -394,14 +394,14 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 - Verify each against the retrieved source.
 - Average → faithfulness score.
 
-**General.** Faithfulness = supported claims / total claims. Decompose the answer into atomic, verifiable claims; for each, ask an NLI model or LLM judge whether the retrieved source entails it; average. It needs the source context and is claim-level, not answer-level. Low faithfulness with high relevance points at the generator skipping or distorting retrieved evidence.
+**Concept.** Faithfulness = supported claims / total claims. Decompose the answer into atomic, verifiable claims; for each, ask an NLI model or LLM judge whether the retrieved source entails it; average. It needs the source context and is claim-level, not answer-level. Low faithfulness with high relevance points at the generator skipping or distorting retrieved evidence.
 
 ![diagram](assets/diagrams/9c7fd574e97a0b0d7317268347b7a8b727360532.png)
 
-**Jiuwen.** Absent. No judge receives a retrieved source context for faithfulness: the agent-evolution judge template has question, expected answer, and model response but no context slot; the RSI judge carries task, reference, rubric, and evidence artifacts but no retrieved context. Faithfulness is not computable in-repo.
+**In Jiuwen.** Absent. No judge receives a retrieved source context for faithfulness: the agent-evolution judge template has question, expected answer, and model response but no context slot; the RSI judge carries task, reference, rubric, and evidence artifacts but no retrieved context. Faithfulness is not computable in-repo.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -429,7 +429,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).
+**TL;DR.** Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).
 
 **Key points.**
 
@@ -437,14 +437,14 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 - Verify each against retrieved context.
 - Rate = unsupported / total claims.
 
-**General.** Extract atomic claims from the answer, then verify each against the retrieved context (LLM-judge or NLI). Hallucination rate = unsupported claims / total claims (or fraction of answers with any unsupported claim). This is stricter than "is the answer correct": it catches answers that are plausible but not grounded, and it requires passing the retrieved context to the checker.
+**Concept.** Extract atomic claims from the answer, then verify each against the retrieved context (LLM-judge or NLI). Hallucination rate = unsupported claims / total claims (or fraction of answers with any unsupported claim). This is stricter than "is the answer correct": it catches answers that are plausible but not grounded, and it requires passing the retrieved context to the checker.
 
 ![diagram](assets/diagrams/daac185ecc4dad44d3b302de925949a29aebe676.png)
 
-**Jiuwen.** Claim extraction and verification are absent: there is no atomic-claim decomposition, entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is told to cite concrete evidence and not invent observations, but it grades a supplied rubric rather than retrieved context.
+**In Jiuwen.** Claim extraction and verification are absent: there is no atomic-claim decomposition, entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is told to cite concrete evidence and not invent observations, but it grades a supplied rubric rather than retrieved context.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -471,7 +471,7 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.
+**TL;DR.** Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.
 
 **Key points.**
 
@@ -479,14 +479,14 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 - Lower = more predictable; compare on the same text.
 - Not a task/quality metric.
 
-**General.** Perplexity is the exponentiated average negative log-likelihood the model assigns to a token sequence: `exp(-(1/N)·Σ log p(token_i))`. Lower means the model finds the text more predictable — useful for comparing language models on the same data or detecting distribution shift/overfitting. It does not measure factuality, reasoning, instruction-following, or usefulness, and it is only comparable across models that share a tokenizer and data.
+**Concept.** Perplexity is the exponentiated average negative log-likelihood the model assigns to a token sequence: `exp(-(1/N)·Σ log p(token_i))`. Lower means the model finds the text more predictable — useful for comparing language models on the same data or detecting distribution shift/overfitting. It does not measure factuality, reasoning, instruction-following, or usefulness, and it is only comparable across models that share a tokenizer and data.
 
 ![diagram](assets/diagrams/f44deee57ac92814cdd9ba39a83d2e5b3d4f7f99.png)
 
-**Jiuwen.** Perplexity is absent: no perplexity or loss-based language-modeling metric is computed. The nearest primitives are token log-probabilities and a softmax over candidate logits used for retrieval or trie selection, not a perplexity score.
+**In Jiuwen.** Perplexity is absent: no perplexity or loss-based language-modeling metric is computed. The nearest primitives are token log-probabilities and a softmax over candidate logits used for retrieval or trie selection, not a perplexity score.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -514,7 +514,7 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.
+**TL;DR.** Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.
 
 **Key points.**
 
@@ -522,14 +522,14 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 - Noisy, non-deterministic, gameable.
 - Mitigate: swap positions, vote, calibrate with humans.
 
-**General.** LLM judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and can be gamed or prompt-injected. They need position-swapping, multiple votes, agreement reporting, human calibration on a golden set, and must distinguish "judge failed" from "answer wrong". A single unvalidated judge score is a weak signal.
+**Concept.** LLM judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and can be gamed or prompt-injected. They need position-swapping, multiple votes, agreement reporting, human calibration on a golden set, and must distinguish "judge failed" from "answer wrong". A single unvalidated judge score is a weak signal.
 
 ![diagram](assets/diagrams/76fbb9e96c1e3c7e88444c8bb680395ac7bda46f.png)
 
-**Jiuwen.** Jiuwen has four judge implementations. One is a single call that parses to true/false and converts exceptions to zero (conflating judge failure with a wrong answer); the RSI judge does one format retry on frozen evidence and guards against injecting prior output; the online judge uses voting. Bias mitigations are partial.
+**In Jiuwen.** Jiuwen has four judge implementations. One is a single call that parses to true/false and converts exceptions to zero (conflating judge failure with a wrong answer); the RSI judge does one format retry on frozen evidence and guards against injecting prior output; the online judge uses voting. Bias mitigations are partial.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -558,7 +558,7 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.
+**TL;DR.** Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.
 
 **Key points.**
 
@@ -566,14 +566,14 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 - LLM judge with a rubric.
 - Pairwise / few-shot judging.
 
-**General.** Bootstraps without gold labels: (a) generate synthetic queries from known documents and treat the source document as the gold retrieval target (cheap, works well for retrieval metrics); (b) use an LLM to answer and treat cited passages as relevant (RAGAS-style); (c) judge faithfulness against the retrieved context rather than a reference answer; (d) sample and label by hand a small set to calibrate. The key is that retrieval can be graded with synthetic (query, source-doc) pairs even when answers are unlabeled.
+**Concept.** Bootstraps without gold labels: (a) generate synthetic queries from known documents and treat the source document as the gold retrieval target (cheap, works well for retrieval metrics); (b) use an LLM to answer and treat cited passages as relevant (RAGAS-style); (c) judge faithfulness against the retrieved context rather than a reference answer; (d) sample and label by hand a small set to calibrate. The key is that retrieval can be graded with synthetic (query, source-doc) pairs even when answers are unlabeled.
 
 ![diagram](assets/diagrams/d69282f8cf361fc39dd683bb5292643df40a0e11.png)
 
-**Jiuwen.** Synthetic dataset generation is largely not runnable: the advertised dataset generator exists only as compiled bytecode, and its components are stubs that raise NotImplementedError. The one runnable label-free path is an example harness that generates and judges proactive-memory data.
+**In Jiuwen.** Synthetic dataset generation is largely not runnable: the advertised dataset generator exists only as compiled bytecode, and its components are stubs that raise NotImplementedError. The one runnable label-free path is an example harness that generates and judges proactive-memory data.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -600,7 +600,7 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.
+**TL;DR.** Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.
 
 **Key points.**
 
@@ -608,14 +608,14 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 - Synthetic queries (doc = gold).
 - Or LLM answers with citations as gold.
 
-**General.** Mine queries from real logs or user questions, then label relevance by (a) synthetic queries generated from known documents (the document is the gold target), (b) LLM answering and treating cited chunks as relevant, or (c) a small hand-labeled calibration set. Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate. For retrieval you can bootstrap (query, source-doc) pairs with no answer labels at all.
+**Concept.** Mine queries from real logs or user questions, then label relevance by (a) synthetic queries generated from known documents (the document is the gold target), (b) LLM answering and treating cited chunks as relevant, or (c) a small hand-labeled calibration set. Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate. For retrieval you can bootstrap (query, source-doc) pairs with no answer labels at all.
 
 ![diagram](assets/diagrams/6f3750f6d968767791c5f8c6c6c4fe0285ae49cf.png)
 
-**Jiuwen.** The advertised dataset generator is not runnable source: the class exists only as bytecode and its helpers are stubs, and the harness never generates a dataset. The only runnable label-free approach is an example that generates and scores proactive-memory moments, so you must build the dataset yourself.
+**In Jiuwen.** The advertised dataset generator is not runnable source: the class exists only as bytecode and its helpers are stubs, and the harness never generates a dataset. The only runnable label-free approach is an example that generates and scores proactive-memory moments, so you must build the dataset yourself.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -642,7 +642,7 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.
+**TL;DR.** Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.
 
 **Key points.**
 
@@ -650,14 +650,14 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 - Comparing systems needs power for the effect size.
 - Report confidence/variance, not a bare mean.
 
-**General.** It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.
+**Concept.** It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.
 
 ![diagram](assets/diagrams/300e07924c2551cd180a53fc27a76f7f6a268f09.png)
 
-**Jiuwen.** There is no statistical reasoning. The closest is a confidence helper that buckets sample counts into qualitative labels (none, low, normal, high), a hard-coded heuristic rather than a confidence interval; aggregation reports sample counts and pass rates with no significance testing.
+**In Jiuwen.** There is no statistical reasoning. The closest is a confidence helper that buckets sample counts into qualitative labels (none, low, normal, high), a hard-coded heuristic rather than a confidence interval; aggregation reports sample counts and pass rates with no significance testing.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -684,7 +684,7 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.
+**TL;DR.** Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.
 
 **Key points.**
 
@@ -692,14 +692,14 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 - Task-appropriate metrics.
 - Compare accuracy + latency + cost.
 
-**General.** Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.
+**Concept.** Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.
 
 ![diagram](assets/diagrams/f5fbc32f049faedcafcd2e35fbad802d3ede88dc.png)
 
-**Jiuwen.** Model selection here is infrastructure routing, not benchmark comparison: the models config defines a router across endpoints and model names with allocation strategies chosen by name, and routing scores health, rate, and latency — not task accuracy. So A/B model comparison must be done externally.
+**In Jiuwen.** Model selection here is infrastructure routing, not benchmark comparison: the models config defines a router across endpoints and model names with allocation strategies chosen by name, and routing scores health, rate, and latency — not task accuracy. So A/B model comparison must be done externally.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -728,7 +728,7 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.
+**TL;DR.** Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.
 
 **Key points.**
 
@@ -736,14 +736,14 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 - Quality eval on a fixed dataset.
 - Baseline + fail on regression.
 
-**General.** Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.
+**Concept.** Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.
 
 ![diagram](assets/diagrams/bb23b220eafd924d3e1e6e3f0be59549d456c665.png)
 
-**Jiuwen.** Tests split into fast deterministic unit tests (CI) and end-to-end system tests (usually skipped), with markers for smoke/happy-path versus deeper tests — there is no quality-regression gate in CI. Quality evaluation exists but offline and separate, without a baseline threshold.
+**In Jiuwen.** Tests split into fast deterministic unit tests (CI) and end-to-end system tests (usually skipped), with markers for smoke/happy-path versus deeper tests — there is no quality-regression gate in CI. Quality evaluation exists but offline and separate, without a baseline threshold.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -771,7 +771,7 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.
+**TL;DR.** Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.
 
 **Key points.**
 
@@ -779,14 +779,14 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 - Alert on quality drops, not just errors.
 - Watch drift in queries and hit rates.
 
-**General.** Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.
+**Concept.** Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.
 
 ![diagram](assets/diagrams/8099424a1d62e91f65b7bc75a6eb5c7630ba000b.png)
 
-**Jiuwen.** There is a live capture-and-score path, but it feeds online RL training, not quality monitoring: it stages each production completion and a judge attaches a score or user reward persisted to a trajectory store. Observability is span, error, and latency based, so there is no production quality monitoring or drift detection.
+**In Jiuwen.** There is a live capture-and-score path, but it feeds online RL training, not quality monitoring: it stages each production completion and a judge attaches a score or user reward persisted to a trajectory store. Observability is span, error, and latency based, so there is no production quality monitoring or drift detection.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -819,7 +819,7 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.
+**TL;DR.** Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.
 
 **Key points.**
 
@@ -827,14 +827,14 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 - Periodic re-run of a frozen set.
 - Slice per query type/language.
 
-**General.** Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.
+**Concept.** Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.
 
 ![diagram](assets/diagrams/65c2bd2586a7ef7b5c121df26f9affe40b7e7330.png)
 
-**Jiuwen.** There is no retrieval-quality monitoring and no drift detection: production observability is span-based (error flag, per-session trajectory, cost and usage), i.e., error, latency, and trajectory rather than quality. Offline evaluation exists but does not track retrieval over time, so you would build this monitoring yourself.
+**In Jiuwen.** There is no retrieval-quality monitoring and no drift detection: production observability is span-based (error flag, per-session trajectory, cost and usage), i.e., error, latency, and trajectory rather than quality. Offline evaluation exists but does not track retrieval over time, so you would build this monitoring yourself.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -861,7 +861,7 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.
+**TL;DR.** The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.
 
 **Key points.**
 
@@ -869,14 +869,14 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 - Missing adversarial/long-tail/slices.
 - Metric rewards the wrong thing.
 
-**General.** The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.
+**Concept.** The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.
 
 ![diagram](assets/diagrams/d2e26afd1cdcd6655070b212d4506bb79d047632.png)
 
-**Jiuwen.** Feedback capture is partial, so the gap is not detectable in-product: explicit like/dislike exists only for proactive recommendations, and for normal chat feedback is inferred (a classifier judging whether a message is corrective and whether tasks succeeded). There is no in-product signal tying eval scores to user satisfaction.
+**In Jiuwen.** Feedback capture is partial, so the gap is not detectable in-product: explicit like/dislike exists only for proactive recommendations, and for normal chat feedback is inferred (a classifier judging whether a message is corrective and whether tasks succeeded). There is no in-product signal tying eval scores to user satisfaction.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -904,7 +904,7 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.
+**TL;DR.** Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.
 
 **Key points.**
 
@@ -912,14 +912,14 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 - Correlate the offline metric to the proxy.
 - Use the offline metric as the fast proxy.
 
-**General.** Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.
+**Concept.** Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.
 
 ![diagram](assets/diagrams/165148484c024008f2a8da8a93ca91b2a2bb6b63.png)
 
-**Jiuwen.** Metrics here are engineering and task-completion, not business KPIs: a goal evaluator scores whether an objective is complete or blocked, a success detector maps a task to success, partial, or fail, and the pipeline aggregates pass rate and average score. The only business-adjacent tracking is infrastructure cost and usage, not outcomes.
+**In Jiuwen.** Metrics here are engineering and task-completion, not business KPIs: a goal evaluator scores whether an objective is complete or blocked, a success detector maps a task to success, partial, or fail, and the pipeline aggregates pass rate and average score. The only business-adjacent tracking is infrastructure cost and usage, not outcomes.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -947,7 +947,7 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** 'How do you know it's working' tests evaluation depth, not confidence.
+**TL;DR.** 'How do you know it's working' tests evaluation depth, not confidence.
 
 **Key points.**
 
@@ -956,14 +956,14 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 - No faithfulness/claim scoring.
 - No CI quality gate.
 
-**General.** "It looked good to me" ends the conversation. They want a fixed eval set, faithfulness scoring on generated claims, and how you'd catch silent degradation after an unflagged prompt change. The real trap is "how would you know if it got *worse*", not "how do you know it works now". A strong answer includes: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
+**Concept.** "It looked good to me" ends the conversation. They want a fixed eval set, faithfulness scoring on generated claims, and how you'd catch silent degradation after an unflagged prompt change. The real trap is "how would you know if it got *worse*", not "how do you know it works now". A strong answer includes: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
 
 ![diagram](assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png)
 
-**Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).
+**In Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -987,7 +987,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** 'How do you know it's working' is testing evaluation depth.
+**TL;DR.** 'How do you know it's working' is testing evaluation depth.
 
 **Key points.**
 
@@ -996,14 +996,14 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 - No retrieval metric layer.
 - No CI quality gate.
 
-**General.** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. A strong answer includes: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
+**Concept.** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. A strong answer includes: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
 
 ![diagram](assets/diagrams/89f2dff7d52788034ab87f32c69f65269f39ba6d.png)
 
-**Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, rubric, pipeline pass rate), but there is no faithfulness or relevance metric (the judges lack the retrieved context), no retrieval metric layer, and no CI quality gate (the gate is lint and type-check).
+**In Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, rubric, pipeline pass rate), but there is no faithfulness or relevance metric (the judges lack the retrieved context), no retrieval metric layer, and no CI quality gate (the gate is lint and type-check).
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

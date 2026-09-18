@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Start from rate/SLA, then pick components: ingestion, hybrid retrieval, reranking, generation, caching, observability. 100k/day is ~1.2 QPS average with bursts.
+**TL;DR.** Start from rate/SLA, then pick components: ingestion, hybrid retrieval, reranking, generation, caching, observability. 100k/day is ~1.2 QPS average with bursts.
 
 **Key points.**
 
@@ -13,14 +13,14 @@
 - Hybrid retrieval + reranker + generation + cache.
 - Observability and per-session cost caps.
 
-**General.** Start from the request rate and SLA, then choose components: ingestion (parse → chunk → embed → index), retrieval (hybrid dense+sparse), a reranker, a generation layer, caching, and observability. 100k/day is ~1.2 QPS average (bursts higher), so a single server-class vector DB is fine; the real work is cache hit rate, top-k tuning, guardrails, and a feedback loop. Size context and cost per query, then multiply.
+**Concept.** Start from the request rate and SLA, then choose components: ingestion (parse → chunk → embed → index), retrieval (hybrid dense+sparse), a reranker, a generation layer, caching, and observability. 100k/day is ~1.2 QPS average (bursts higher), so a single server-class vector DB is fine; the real work is cache hit rate, top-k tuning, guardrails, and a feedback loop. Size context and cost per query, then multiply.
 
 ![diagram](assets/diagrams/c180eea0b7e6e6c7e19c99cbaa313c1ce991d578.png)
 
-**Jiuwen.** Jiuwen provides the ingestion pipeline, hybrid retrieval with rank fusion, optional rerankers (wired only into the graph store), and the context-plus-generation path through its workflow components; the product adds session cost tracking and a per-session cost cap. What a design must add on top: caching, autoscaling, reranking in the knowledge-base path, and production monitoring.
+**In Jiuwen.** Jiuwen provides the ingestion pipeline, hybrid retrieval with rank fusion, optional rerankers (wired only into the graph store), and the context-plus-generation path through its workflow components; the product adds session cost tracking and a per-session cost cap. What a design must add on top: caching, autoscaling, reranking in the knowledge-base path, and production monitoring.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -48,7 +48,7 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Make re-indexing incremental and event-driven: stable IDs per file/chunk, delete-by-ID on change, append new chunks, and trigger on commit/CI — avoid full re-embeds except on model/index changes.
+**TL;DR.** Make re-indexing incremental and event-driven: stable IDs per file/chunk, delete-by-ID on change, append new chunks, and trigger on commit/CI — avoid full re-embeds except on model/index changes.
 
 **Key points.**
 
@@ -57,14 +57,14 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 - Trigger into indexing from commit/CI.
 - Structure-aware chunks (function boundaries).
 
-**General.** Make re-indexing incremental and event-driven: a stable ID per file/chunk, delete-by-ID on change, append new chunks, and a trigger on commit/CI. Avoid full re-embeds except on model/index changes. Keep chunk boundaries structure-aware (functions/classes) and include file paths/branches as metadata so the assistant can cite and filter.
+**Concept.** Make re-indexing incremental and event-driven: a stable ID per file/chunk, delete-by-ID on change, append new chunks, and a trigger on commit/CI. Avoid full re-embeds except on model/index changes. Keep chunk boundaries structure-aware (functions/classes) and include file paths/branches as metadata so the assistant can cite and filter.
 
 ![diagram](assets/diagrams/2f835705d3e958755c5e99d55ff9b49c76595b79.png)
 
-**Jiuwen.** The contract is delete-by-document-id plus rebuild: indexers scan a document's chunk ids, delete them, then re-chunk, re-embed, and write (Milvus flushes in between to defeat eventual consistency); new documents append into the existing ANN index with no full re-index. The document id is a first-class scalar-indexed field. There is no code-aware or function-boundary chunker, so a codebase assistant would need to add that.
+**In Jiuwen.** The contract is delete-by-document-id plus rebuild: indexers scan a document's chunk ids, delete them, then re-chunk, re-embed, and write (Milvus flushes in between to defeat eventual consistency); new documents append into the existing ANN index with no full re-index. The document id is a first-class scalar-indexed field. There is no code-aware or function-boundary chunker, so a codebase assistant would need to add that.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -91,7 +91,7 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Access control dominates, then scale: every chunk carries an ACL and every query is filtered by the caller's permissions inside the vector search (pre-filter), not after.
+**TL;DR.** Access control dominates, then scale: every chunk carries an ACL and every query is filtered by the caller's permissions inside the vector search (pre-filter), not after.
 
 **Key points.**
 
@@ -100,14 +100,14 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 - Per-tenant/matter isolation + audit logging.
 - Then scale: ANN, quantization, sharding.
 
-**General.** The dominant requirement is access control, then scale. Every chunk must carry an ACL (owner, matter, tenant) and every query must be filtered by the caller's permissions *inside* the vector search (pre-filter), not after. Combine that with hybrid retrieval, a reranker, encryption at rest, audit logging, and per-matter isolation. Confidentiality also means no cross-matter leakage in the prompt context.
+**Concept.** The dominant requirement is access control, then scale. Every chunk must carry an ACL (owner, matter, tenant) and every query must be filtered by the caller's permissions *inside* the vector search (pre-filter), not after. Combine that with hybrid retrieval, a reranker, encryption at rest, audit logging, and per-matter isolation. Confidentiality also means no cross-matter leakage in the prompt context.
 
 ![diagram](assets/diagrams/ca7688916a26423d2ca83d5edb3f44a7ddf62614.png)
 
-**Jiuwen.** Jiuwen supports metadata filtering at the store layer (Milvus expressions, Chroma where-clauses, PG JSONB), per-knowledge-base collections, a permission engine, and audit logging. But the retriever layer drops the configured filters — concrete retrievers hardcode filters to None — so permission-aware retrieval is not reachable through the knowledge-base path; you would have to re-plumb filters through the retriever.
+**In Jiuwen.** Jiuwen supports metadata filtering at the store layer (Milvus expressions, Chroma where-clauses, PG JSONB), per-knowledge-base collections, a permission engine, and audit logging. But the retriever layer drops the configured filters — concrete retrievers hardcode filters to None — so permission-aware retrieval is not reachable through the knowledge-base path; you would have to re-plumb filters through the retriever.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -135,7 +135,7 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 
 <span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Small scale: a local index (Chroma/FAISS). Large scale: a dedicated vector DB with tuned ANN (HNSW/IVF/quantization), sharding/replication, and batch ingestion — and you tune recall vs latency.
+**TL;DR.** Small scale: a local index (Chroma/FAISS). Large scale: a dedicated vector DB with tuned ANN (HNSW/IVF/quantization), sharding/replication, and batch ingestion — and you tune recall vs latency.
 
 **Key points.**
 
@@ -144,14 +144,14 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 - Sharding/partitioning, replication, batch ingest.
 - Tune recall vs latency per query.
 
-**General.** At small scale, a local in-process index (FAISS/Chroma) is fine. At large scale you need a dedicated vector DB with tuned ANN indexes (HNSW/IVF/quantization), sharding/partitioning, replication, and batch ingestion; you also start caring about memory, index build time, and recall/latency tuning per query. The interface stays the same but the operational envelope changes.
+**Concept.** At small scale, a local in-process index (FAISS/Chroma) is fine. At large scale you need a dedicated vector DB with tuned ANN indexes (HNSW/IVF/quantization), sharding/partitioning, replication, and batch ingestion; you also start caring about memory, index build time, and recall/latency tuning per query. The interface stays the same but the operational envelope changes.
 
 ![diagram](assets/diagrams/3b9f1857c79d75a702bb45896ac4120181ce24cf.png)
 
-**Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no sharding, partitioning, replication, or multi-collection fan-out in the repo — those are the backend's job.
+**In Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no sharding, partitioning, replication, or multi-collection fan-out in the repo — those are the backend's job.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -180,7 +180,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Options: partition by key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate and route by collection. Plan for metadata routing and rebalancing.
+**TL;DR.** Options: partition by key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate and route by collection. Plan for metadata routing and rebalancing.
 
 **Key points.**
 
@@ -188,14 +188,14 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 - Hash/range shard across nodes.
 - Route queries; plan rebalancing.
 
-**General.** Options: partition by a key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate + route by collection. Most vector DBs expose partition keys or collections; plan for metadata routing and rebalancing. Sharding trades query fan-out for per-shard size.
+**Concept.** Options: partition by a key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate + route by collection. Most vector DBs expose partition keys or collections; plan for metadata routing and rebalancing. Sharding trades query fan-out for per-shard size.
 
 ![diagram](assets/diagrams/52da94a6c67396e77b955a671bd23d36461e82d7.png)
 
-**Jiuwen.** Jiuwen has no sharding or hash/range partitioning. The only partition-like unit is a per-knowledge-base collection plus a database-name field; there are no Milvus partition keys, no shard config, and no tenant-hash routing. So sharding would be handled entirely by the chosen backend, not by this code.
+**In Jiuwen.** Jiuwen has no sharding or hash/range partitioning. The only partition-like unit is a per-knowledge-base collection plus a database-name field; there are no Milvus partition keys, no shard config, and no tenant-hash routing. So sharding would be handled entirely by the chosen backend, not by this code.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -221,7 +221,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Append-only incremental indexing into a pre-built ANN index avoids rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters tune recall vs latency without reindexing.
+**TL;DR.** Append-only incremental indexing into a pre-built ANN index avoids rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters tune recall vs latency without reindexing.
 
 **Key points.**
 
@@ -229,14 +229,14 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 - Scalar/inverted indexes for fast deletes/filters.
 - Search-time params (ef/nprobe) tune the dial.
 
-**General.** Append-only incremental indexing into a pre-built ANN index avoids full rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters (efSearch, nprobe) tune the recall/latency dial without reindexing. At some point you need compaction/merge of segments and periodic index rebuilds — that is an operational concern, not a query-time one.
+**Concept.** Append-only incremental indexing into a pre-built ANN index avoids full rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters (efSearch, nprobe) tune the recall/latency dial without reindexing. At some point you need compaction/merge of segments and periodic index rebuilds — that is an operational concern, not a query-time one.
 
 ![diagram](assets/diagrams/b24cf20b5b45d890fe76ad074732769d2589dfe4.png)
 
-**Jiuwen.** Growth is handled by append-only batched writes into a pre-existing ANN index, so adding documents does not trigger a full re-index. Fast deletes and filters use a Milvus inverted scalar index on document and chunk ids, and a search-time recall knob scales with top-k. There is no query result cache and no reindex or compaction trigger.
+**In Jiuwen.** Growth is handled by append-only batched writes into a pre-existing ANN index, so adding documents does not trigger a full re-index. Fast deletes and filters use a Milvus inverted scalar index on document and chunk ids, and a search-time recall knob scales with top-k. There is no query result cache and no reindex or compaction trigger.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -264,7 +264,7 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Choose by scale and features: local/embedded for prototypes; a managed vector DB for scale and hybrid; pgvector when you already run Postgres and want one datastore.
+**TL;DR.** Choose by scale and features: local/embedded for prototypes; a managed vector DB for scale and hybrid; pgvector when you already run Postgres and want one datastore.
 
 **Key points.**
 
@@ -273,14 +273,14 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 - pgvector for one relational datastore + joins.
 - Evaluate hybrid, filtering, ops cost, lock-in.
 
-**General.** Choose by scale and features, not familiarity: local/embedded (FAISS/Chroma) for prototypes; a managed vector DB (Pinecone / Zilliz Cloud) for scale and hybrid search; or pgvector when you already run Postgres and want one datastore, transactions, and metadata joins. Evaluate hybrid support, filtering, operational cost, and lock-in.
+**Concept.** Choose by scale and features, not familiarity: local/embedded (FAISS/Chroma) for prototypes; a managed vector DB (Pinecone / Zilliz Cloud) for scale and hybrid search; or pgvector when you already run Postgres and want one datastore, transactions, and metadata joins. Evaluate hybrid support, filtering, operational cost, and lock-in.
 
 ![diagram](assets/diagrams/af3792c357578b7ab32fafc8019deeaa7226a1d8.png)
 
-**Jiuwen.** Three backends sit behind one factory: Chroma (local, vector-only — sparse and hybrid are rejected), Milvus (server, native BM25 and hybrid with rank fusion), and PostgreSQL plus pgvector (server, full-text sparse plus vector). The knowledge base selects the index type (hybrid by default), so hybrid requires Milvus or PG; Chroma is the small local choice.
+**In Jiuwen.** Three backends sit behind one factory: Chroma (local, vector-only — sparse and hybrid are rejected), Milvus (server, native BM25 and hybrid with rank fusion), and PostgreSQL plus pgvector (server, full-text sparse plus vector). The knowledge base selects the index type (hybrid by default), so hybrid requires Milvus or PG; Chroma is the small local choice.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -311,7 +311,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.
+**TL;DR.** Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.
 
 **Key points.**
 
@@ -319,14 +319,14 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 - Self-managed: control, cost, residency, you run it.
 - Decide by ops capacity, sensitivity, volume.
 
-**General.** Hosted (Pinecone/Zilliz Cloud): less ops, elastic scaling, predictable latency, but cost scales with data/queries and there is vendor lock-in. Self-managed (Milvus/Qdrant/pgvector): control, cost at steady state, data residency, but you own scaling, backups, upgrades, and on-call. Decide by team ops capacity, data sensitivity, query volume, and elasticity needs — not by the library API.
+**Concept.** Hosted (Pinecone/Zilliz Cloud): less ops, elastic scaling, predictable latency, but cost scales with data/queries and there is vendor lock-in. Self-managed (Milvus/Qdrant/pgvector): control, cost at steady state, data residency, but you own scaling, backups, upgrades, and on-call. Decide by team ops capacity, data sensitivity, query volume, and elasticity needs — not by the library API.
 
 ![diagram](assets/diagrams/3fd4013499fb4f4287982fc5915ad97a2f0a3d15.png)
 
-**Jiuwen.** The factory can create Chroma (local), Milvus (server, which fits hosted or self-managed), and PostgreSQL plus pgvector (self-managed relational). The choice is pure config; the repo provides no autoscaling, managed-service integration, or ops tooling, so the operational side is entirely on you.
+**In Jiuwen.** The factory can create Chroma (local), Milvus (server, which fits hosted or self-managed), and PostgreSQL plus pgvector (self-managed relational). The choice is pure config; the repo provides no autoscaling, managed-service integration, or ops tooling, so the operational side is entirely on you.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -353,7 +353,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.
+**TL;DR.** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.
 
 **Key points.**
 
@@ -362,14 +362,14 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 - Disable retrieval and answer with a caveat.
 - Add circuit breaker + health checks.
 
-**General.** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/BM25 or a replica), or disable retrieval and answer from parametric knowledge with a caveat. Add a circuit breaker, health checks, and timeouts so one dependency cannot hang the request. Replicate the index so a single node is not a SPOF.
+**Concept.** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/BM25 or a replica), or disable retrieval and answer from parametric knowledge with a caveat. Add a circuit breaker, health checks, and timeouts so one dependency cannot hang the request. Replicate the index so a single node is not a SPOF.
 
 ![diagram](assets/diagrams/920b5eccbe59e2a8f181458cc29514ef439fc99d.png)
 
-**Jiuwen.** There is no availability fallback for a down vector database: dense search does not catch exceptions, so a store failure propagates and fails the workflow node. Sparse searches silently return empty on error, hybrid has a same-database split-search fallback, and multi-KB retrieval swallows per-KB errors. There is no circuit breaker, health probe, or result cache.
+**In Jiuwen.** There is no availability fallback for a down vector database: dense search does not catch exceptions, so a store failure propagates and fails the workflow node. Sparse searches silently return empty on error, hybrid has a same-database split-search fallback, and multi-KB retrieval swallows per-KB errors. There is no circuit breaker, health probe, or result cache.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -396,7 +396,7 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.
+**TL;DR.** Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.
 
 **Key points.**
 
@@ -405,14 +405,14 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 - Chunk ids tied to the doc id.
 - Atomicity and consistency are the hard parts.
 
-**General.** You need a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids must be derived from the document id so all chunks of a document can be found and removed atomically. The hard parts are atomicity (a crash between delete and reinsert loses the doc) and eventual consistency in the vector store.
+**Concept.** You need a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids must be derived from the document id so all chunks of a document can be found and removed atomically. The hard parts are atomicity (a crash between delete and reinsert loses the doc) and eventual consistency in the vector store.
 
 ![diagram](assets/diagrams/77b75853fb855035ff58e3db81c0fbb9a8d3257f.png)
 
-**Jiuwen.** The contract is delete-by-document-id plus rebuild: the Chroma and Milvus indexers do not upsert — they find a document's chunk ids, delete them, then re-chunk, re-embed, and write, flushing Milvus in between. The document id is a first-class scalar-indexed field enabling filter deletes. Postgres is the only store with native upsert, but no indexer wraps it, and a crash between delete and rebuild loses the document.
+**In Jiuwen.** The contract is delete-by-document-id plus rebuild: the Chroma and Milvus indexers do not upsert — they find a document's chunk ids, delete them, then re-chunk, re-embed, and write, flushing Milvus in between. The document id is a first-class scalar-indexed field enabling filter deletes. Postgres is the only store with native upsert, but no indexer wraps it, and a crash between delete and rebuild loses the document.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -441,7 +441,7 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.
+**TL;DR.** Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.
 
 **Key points.**
 
@@ -450,14 +450,14 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 - Tombstone superseded versions; propagate deletes.
 - Surface recency to the generator.
 
-**General.** Attach timestamps/versions to documents, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, and surface recency to the generator. Propagate deletes promptly from the source (event-driven) so the index matches source-of-truth, and reconcile periodically.
+**Concept.** Attach timestamps/versions to documents, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, and surface recency to the generator. Propagate deletes promptly from the source (event-driven) so the index matches source-of-truth, and reconcile periodically.
 
 ![diagram](assets/diagrams/45fa9015ca8e3383a1911f1faa6e01f49391da3d.png)
 
-**Jiuwen.** The retrieval layer has no notion of document time: results carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins; there is no freshness mechanism in RAG, so staleness handling would have to be added.
+**In Jiuwen.** The retrieval layer has no notion of document time: results carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins; there is no freshness mechanism in RAG, so staleness handling would have to be added.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -484,7 +484,7 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.
+**TL;DR.** Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.
 
 **Key points.**
 
@@ -492,14 +492,14 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 - Abstain or ask a clarifying question.
 - Optional fallbacks: sparse, graph hop.
 
-**General.** Detect it (score threshold or answerability) and abstain: return "I don't have enough information" or ask a clarifying question, rather than answering from noise. Optionally fall back to a broader retrieval (sparse), a knowledge-graph hop, or parametric knowledge with a caveat. Log zero-result queries — they signal coverage gaps.
+**Concept.** Detect it (score threshold or answerability) and abstain: return "I don't have enough information" or ask a clarifying question, rather than answering from noise. Optionally fall back to a broader retrieval (sparse), a knowledge-graph hop, or parametric knowledge with a caveat. Log zero-result queries — they signal coverage gaps.
 
 ![diagram](assets/diagrams/17db60bc25fc9aed7e287cecf6ba937e97593577.png)
 
-**Jiuwen.** The knowledge-base path implements a dense-empty-to-sparse fallback but has no abstention: when both are empty it returns an empty list and the workflow component concatenates an empty context with no 'no answer' signal. Explicit abstention exists only in a separate retrieval subsystem, not in the KB RAG path.
+**In Jiuwen.** The knowledge-base path implements a dense-empty-to-sparse fallback but has no abstention: when both are empty it returns an empty list and the workflow component concatenates an empty context with no 'no answer' signal. Explicit abstention exists only in a separate retrieval subsystem, not in the KB RAG path.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -526,7 +526,7 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.
+**TL;DR.** Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.
 
 **Key points.**
 
@@ -535,14 +535,14 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 - Cache embeddings/results; parallelize tools.
 - Skip rerank when latency-bound.
 
-**General.** Budget roughly: embedding + vector search tens of ms, rerank tens–low-hundreds of ms, generation the rest (and generation dominates when you stream, because TTFT is what the user perceives). To hit 500ms: stream tokens, cache embeddings/results, keep top-k small, rerank only when it pays, route to a fast model, and parallelize independent steps. Measure TTFT, not total.
+**Concept.** Budget roughly: embedding + vector search tens of ms, rerank tens–low-hundreds of ms, generation the rest (and generation dominates when you stream, because TTFT is what the user perceives). To hit 500ms: stream tokens, cache embeddings/results, keep top-k small, rerank only when it pays, route to a fast model, and parallelize independent steps. Measure TTFT, not total.
 
 ![diagram](assets/diagrams/b2bcc02499551c48df7d499518bb1aa70cd97f62.png)
 
-**Jiuwen.** Jiuwen provides streaming with per-call TTFT, parallel tool execution with resource lanes, KV/prefix cache affinity, a model failover rail, and an endpoint router. Reranking is optional and absent from the default knowledge-base path, so the rerank budget line is effectively zero unless you enable it; query-result caching is not provided.
+**In Jiuwen.** Jiuwen provides streaming with per-call TTFT, parallel tool execution with resource lanes, KV/prefix cache affinity, a model failover rail, and an endpoint router. Reranking is optional and absent from the default knowledge-base path, so the rerank budget line is effectively zero unless you enable it; query-result caching is not provided.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

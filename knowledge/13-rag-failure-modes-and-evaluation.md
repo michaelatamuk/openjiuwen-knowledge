@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Use a labeled (query, relevant docs) set and ranked metrics — Recall@k, Precision@k, MRR, NDCG — and track zero-result rate.
+**TL;DR.** Use a labeled (query, relevant docs) set and ranked metrics — Recall@k, Precision@k, MRR, NDCG — and track zero-result rate.
 
 **Key points.**
 
@@ -13,14 +13,14 @@
 - Track zero-result rate and score distributions in production.
 - Judge retrieval separately from generation.
 
-**General.** Use retrieval metrics against a labeled set of (query, relevant docs): Recall@k (did the relevant docs appear in top-k?), Precision@k (of the top-k, how many are relevant?), MRR (mean of 1/rank of the first relevant hit, averaged over queries), and NDCG (position-weighted with graded relevance). Track zero-result rate and score distributions in production, and check that a reranker actually improves NDCG rather than just reordering.
+**Concept.** Use retrieval metrics against a labeled set of (query, relevant docs): Recall@k (did the relevant docs appear in top-k?), Precision@k (of the top-k, how many are relevant?), MRR (mean of 1/rank of the first relevant hit, averaged over queries), and NDCG (position-weighted with graded relevance). Track zero-result rate and score distributions in production, and check that a reranker actually improves NDCG rather than just reordering.
 
 ![diagram](assets/diagrams/ae5df7ae57a5371a7947f4c3960c8b27678cf23e.png)
 
-**Jiuwen.** Jiuwen does not ship retrieval metrics — there is no recall/precision/MRR/NDCG and no gold-relevance set; its metric interface is pairwise (prediction vs label), not ranked-list. The reranker ships only a demo score-delta script. So measuring retrieval here means bringing your own labeled set and tooling; in-repo you can only observe retrieval scores and whether results came back.
+**In Jiuwen.** Jiuwen does not ship retrieval metrics — there is no recall/precision/MRR/NDCG and no gold-relevance set; its metric interface is pairwise (prediction vs label), not ranked-list. The reranker ships only a demo score-delta script. So measuring retrieval here means bringing your own labeled set and tooling; in-repo you can only observe retrieval scores and whether results came back.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -47,7 +47,7 @@ None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** 'Looked relevant' isn't 'contains the answer': read the chunk and confirm the answer span is present; if not, retrieval failed; if yes, generation failed.
+**TL;DR.** 'Looked relevant' isn't 'contains the answer': read the chunk and confirm the answer span is present; if not, retrieval failed; if yes, generation failed.
 
 **Key points.**
 
@@ -55,14 +55,14 @@ None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG
 - No → retrieval failure (chunking, index, query mismatch).
 - Yes → generation/grounding failure.
 
-**General.** "Looked relevant" is not "contains the answer". The first diagnostic is to read the retrieved chunks and confirm the answer span is actually present — if it is not, retrieval failed (bad chunking, wrong index, query mismatch); if it is present but the answer is wrong, the problem is generation or grounding. This is why faithfulness evaluation needs the retrieved context, not just answer-vs-reference.
+**Concept.** "Looked relevant" is not "contains the answer". The first diagnostic is to read the retrieved chunks and confirm the answer span is actually present — if it is not, retrieval failed (bad chunking, wrong index, query mismatch); if it is present but the answer is wrong, the problem is generation or grounding. This is why faithfulness evaluation needs the retrieved context, not just answer-vs-reference.
 
 ![diagram](assets/diagrams/fa3c0b58efe93dd6d59304c4a05f3a0c27905417.png)
 
-**Jiuwen.** There is no tooling to check whether a retrieved chunk contains the answer. The nearest signals are weak: no score threshold by default, only lexical relevance checks, and judges that never see the retrieved context — so they cannot tell a chunk that contains the answer from one that merely looks similar. You would diagnose this manually.
+**In Jiuwen.** There is no tooling to check whether a retrieved chunk contains the answer. The nearest signals are weak: no score threshold by default, only lexical relevance checks, and judges that never see the retrieved context — so they cannot tell a chunk that contains the answer from one that merely looks similar. You would diagnose this manually.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -90,7 +90,7 @@ There is no tooling for "does the retrieved chunk contain the answer". The close
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Detect that the context is insufficient, then answer only from what's supported: gate on retrieval score/answerability, allow explicit 'I don't know', and verify claims against the context.
+**TL;DR.** Detect that the context is insufficient, then answer only from what's supported: gate on retrieval score/answerability, allow explicit 'I don't know', and verify claims against the context.
 
 **Key points.**
 
@@ -98,14 +98,14 @@ There is no tooling for "does the retrieved chunk contain the answer". The close
 - Allow explicit abstention ('I don't know').
 - Ground/verify claims against the context.
 
-**General.** First detect that the context is insufficient, then answer only from what is supported: gate on retrieval score/answerability, allow an explicit "I don't know" abstention, and verify claims against the context (citations/groundedness). Without an answerability gate, a model will still produce a fluent answer from irrelevant context. The failure mode is under-specified retrieval, not just a bad generator.
+**Concept.** First detect that the context is insufficient, then answer only from what is supported: gate on retrieval score/answerability, allow an explicit "I don't know" abstention, and verify claims against the context (citations/groundedness). Without an answerability gate, a model will still produce a fluent answer from irrelevant context. The failure mode is under-specified retrieval, not just a bad generator.
 
 ![diagram](assets/diagrams/1fb40e44675023e0dda24aa674a435684520539a.png)
 
-**Jiuwen.** There is a score filter, but it defaults to off, so out-of-scope chunks are normally returned. The only 'answerable?' logic is in the agentic retriever, which asks whether the facts are sufficient — and 'not sufficient' only triggers a follow-up query, never a user-facing abstention. So in the default path there is no grounded 'I don't know'.
+**In Jiuwen.** There is a score filter, but it defaults to off, so out-of-scope chunks are normally returned. The only 'answerable?' logic is in the agentic retriever, which asks whether the facts are sufficient — and 'not sufficient' only triggers a follow-up query, never a user-facing abstention. So in the default path there is no grounded 'I don't know'.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -137,7 +137,7 @@ There is a retrieval score filter (`score_threshold`) but its default is `None`,
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Apply precedence before generation — recency, source authority, or an explicit priority field; dedupe/reconcile; and surface the conflict (or abstain).
+**TL;DR.** Apply precedence before generation — recency, source authority, or an explicit priority field; dedupe/reconcile; and surface the conflict (or abstain).
 
 **Key points.**
 
@@ -145,14 +145,14 @@ There is a retrieval score filter (`score_threshold`) but its default is `None`,
 - Dedupe and reconcile conflicting facts.
 - Surface the conflict or abstain rather than guess.
 
-**General.** Prefer precedence rules before generation: recency (timestamp), source authority, or an explicit priority field; dedupe/reconcile; and either surface the conflict to the model with the metadata or abstain. Outdated facts are usually handled by recency-weighted ranking or by versioning/tombstoning superseded documents. Unchecked, the model picks the first or most fluent version.
+**Concept.** Prefer precedence rules before generation: recency (timestamp), source authority, or an explicit priority field; dedupe/reconcile; and either surface the conflict to the model with the metadata or abstain. Outdated facts are usually handled by recency-weighted ranking or by versioning/tombstoning superseded documents. Unchecked, the model picks the first or most fluent version.
 
 ![diagram](assets/diagrams/85fa033d53d4ed03343e0f85e181d0c1c93fea26.png)
 
-**Jiuwen.** The retrieval layer has no notion of document time: chunks carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or 'outdated' filter. Conflict handling exists only at the memory layer (newest wins), not in retrieval, so conflicting documents are not reconciled during RAG.
+**In Jiuwen.** The retrieval layer has no notion of document time: chunks carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or 'outdated' filter. Conflict handling exists only at the memory layer (newest wins), not in retrieval, so conflicting documents are not reconciled during RAG.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -181,7 +181,7 @@ The retrieval layer has no notion of document time at all: `RetrievalResult`/`Te
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.
+**TL;DR.** When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.
 
 **Key points.**
 
@@ -189,14 +189,14 @@ The retrieval layer has no notion of document time at all: `RetrievalResult`/`Te
 - Abstain or ask a clarifying question.
 - Don't generate from out-of-scope chunks.
 
-**General.** When retrieval returns nothing relevant, the system should abstain rather than answer from noise: gate on a retrieval-score threshold or an explicit answerability check, and return "not enough information" (or ask a clarifying question). Without this, the model will still produce a fluent answer from irrelevant context.
+**Concept.** When retrieval returns nothing relevant, the system should abstain rather than answer from noise: gate on a retrieval-score threshold or an explicit answerability check, and return "not enough information" (or ask a clarifying question). Without this, the model will still produce a fluent answer from irrelevant context.
 
 ![diagram](assets/diagrams/06db4ee27ec51d635b2a5843869b738cbf6d94a3.png)
 
-**Jiuwen.** There is a score filter, but its default is off, so out-of-scope chunks are normally returned. The agentic retriever's sufficiency check only triggers another query, never a user-facing abstention. A real abstention path exists only in a separate retrieval subsystem, not in the knowledge-base RAG path.
+**In Jiuwen.** There is a score filter, but its default is off, so out-of-scope chunks are normally returned. The agentic retriever's sufficiency check only triggers another query, never a user-facing abstention. A real abstention path exists only in a separate retrieval subsystem, not in the knowledge-base RAG path.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -223,7 +223,7 @@ There is a retrieval score filter but its default is `None`, so out-of-scope chu
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).
+**TL;DR.** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).
 
 **Key points.**
 
@@ -231,14 +231,14 @@ There is a retrieval score filter but its default is `None`, so out-of-scope chu
 - Remote rerankers may be non-deterministic.
 - Embedding drift: fingerprint the model and re-index on change.
 
-**General.** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (the provider updates the embedding model behind the same name, or you change models). Remedies: pin temperature/seed, store a model/version fingerprint with the index, and re-index when the fingerprint changes. Identical inputs should otherwise be reproducible.
+**Concept.** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (the provider updates the embedding model behind the same name, or you change models). Remedies: pin temperature/seed, store a model/version fingerprint with the index, and re-index when the fingerprint changes. Identical inputs should otherwise be reproducible.
 
 ![diagram](assets/diagrams/7da7678e27bf0d222732d9842361acacf983481d.png)
 
-**Jiuwen.** Determinism is partial: the chat reranker and the agentic rewrite use temperature 0, but the standard rerankers send no temperature or seed (the remote model decides) and the query rewriter uses the configured temperature, which defaults to unset. There is no model fingerprint on the index, so embedding drift is undetectable at the retrieval level.
+**In Jiuwen.** Determinism is partial: the chat reranker and the agentic rewrite use temperature 0, but the standard rerankers send no temperature or seed (the remote model decides) and the query rewriter uses the configured temperature, which defaults to unset. There is no model fingerprint on the index, so embedding drift is undetectable at the retrieval level.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -271,7 +271,7 @@ Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRe
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.
+**TL;DR.** The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.
 
 **Key points.**
 
@@ -280,14 +280,14 @@ Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRe
 - HyDE: retrieve with a generated hypothetical answer.
 - Hybrid search catches exact terms.
 
-**General.** The document says "myocardial infarction", the user says "heart attack". Mitigations: better embeddings (semantic match), query expansion/synonyms, HyDE (generate a hypothetical answer and retrieve with it), and hybrid search so exact terms still match. Pure dense handles paraphrase but not rare terms; pure sparse handles rare terms but not paraphrase.
+**Concept.** The document says "myocardial infarction", the user says "heart attack". Mitigations: better embeddings (semantic match), query expansion/synonyms, HyDE (generate a hypothetical answer and retrieve with it), and hybrid search so exact terms still match. Pure dense handles paraphrase but not rare terms; pure sparse handles rare terms but not paraphrase.
 
 ![diagram](assets/diagrams/e92462ee6d6a158c719fc7e80f60f1492ebd2b6e.png)
 
-**Jiuwen.** Jiuwen's query rewriter targets coreference/ellipsis and semantic gaps, not synonyms — it produces a self-contained query and records typos, missing items, and references, but does no synonym expansion or HyDE. Semantic bridging relies on the vector/hybrid retrievers and graph-memory name embeddings, not on explicit expansion.
+**In Jiuwen.** Jiuwen's query rewriter targets coreference/ellipsis and semantic gaps, not synonyms — it produces a self-contained query and records typos, missing items, and references, but does no synonym expansion or HyDE. Semantic bridging relies on the vector/hybrid retrievers and graph-memory name embeddings, not on explicit expansion.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -314,7 +314,7 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.
+**TL;DR.** Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.
 
 **Key points.**
 
@@ -322,14 +322,14 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 - Explicit fallbacks (empty result, pre-rerank order).
 - Degrade, don't abort the whole pipeline.
 
-**General.** Isolate each stage so one failure degrades rather than aborts: retrieval returns an empty/flagged result, reranking falls back to the pre-rerank order, generation surfaces a structured error. Use typed errors per stage, explicit fallbacks, retries only for transient failures, and a top-level handler that converts failure into a model-readable message instead of a crash.
+**Concept.** Isolate each stage so one failure degrades rather than aborts: retrieval returns an empty/flagged result, reranking falls back to the pre-rerank order, generation surfaces a structured error. Use typed errors per stage, explicit fallbacks, retries only for transient failures, and a top-level handler that converts failure into a model-readable message instead of a crash.
 
 ![diagram](assets/diagrams/c997a9e6913cfd5c2b4c9e8d740b94013300a188.png)
 
-**Jiuwen.** Failures are mostly contained per stage: the vector retriever falls back to sparse when the vector search is empty, the hybrid retriever falls back to sparse when dense is empty (in vector mode), and the graph retriever falls back to sparse in its sparse branch. Model failures are handled by rails with retry/backoff, and tool exceptions become error messages the model can read.
+**In Jiuwen.** Failures are mostly contained per stage: the vector retriever falls back to sparse when the vector search is empty, the hybrid retriever falls back to sparse when dense is empty (in vector mode), and the graph retriever falls back to sparse in its sparse branch. Model failures are handled by rails with retry/backoff, and tool exceptions become error messages the model can read.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -361,7 +361,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
+**TL;DR.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
 
 **Key points.**
 
@@ -369,14 +369,14 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 - Label via LLM judge or a strong model's citations.
 - Or synthesize queries from known documents (doc = gold).
 
-**General.** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
+**Concept.** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
 
 ![diagram](assets/diagrams/d8d020da2a0703d725bd5e991703c39309fd0b48.png)
 
-**Jiuwen.** There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.
+**In Jiuwen.** There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -404,7 +404,7 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** 'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.
+**TL;DR.** 'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.
 
 **Key points.**
 
@@ -413,14 +413,14 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 - KB path never reranks.
 - Metadata filters dropped at the retriever.
 
-**General.** Drawing embed → retrieve → rerank → generate is table stakes. The real follow-up is "retrieval returned the wrong chunk — why?", expecting chunk-size mismatch, embedding drift, or a query that doesn't semantically match the source wording. Naming failure points unprompted separates a memorized diagram from someone who has debugged one. A strong answer includes: point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
+**Concept.** Drawing embed → retrieve → rerank → generate is table stakes. The real follow-up is "retrieval returned the wrong chunk — why?", expecting chunk-size mismatch, embedding drift, or a query that doesn't semantically match the source wording. Naming failure points unprompted separates a memorized diagram from someone who has debugged one. A strong answer includes: point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
 
 ![diagram](assets/diagrams/72c5aa00ecbd3b58619ea524d274ca8fe1fef893.png)
 
-**Jiuwen.** The failure points are concrete: dense retrieval falls back to sparse only when it returns empty, not when it is wrong; score threshold defaults to none so weak chunks pass; the knowledge-base path never reranks; and metadata filters are dropped at the retriever boundary.
+**In Jiuwen.** The failure points are concrete: dense retrieval falls back to sparse only when it returns empty, not when it is wrong; score threshold defaults to none so weak chunks pass; the knowledge-base path never reranks; and metadata filters are dropped at the retriever boundary.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -443,7 +443,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** 'The model made something up' is testing hallucination handling, not model quality.
+**TL;DR.** 'The model made something up' is testing hallucination handling, not model quality.
 
 **Key points.**
 
@@ -452,14 +452,14 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 - No answerability gate/abstention.
 - No faithfulness judge with context.
 
-**General.** how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. The interviewer wants a system answer, not "the model isn't good enough". A strong answer includes: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
+**Concept.** how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. The interviewer wants a system answer, not "the model isn't good enough". A strong answer includes: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
 
 ![diagram](assets/diagrams/9ee27d6e7e8ccce7160b58e54ce6ef5eeef44b31.png)
 
-**Jiuwen.** Grounding is a separate, non-blocking layer: a verification agent (read-only evidence, PASS/FAIL/PARTIAL) and a reviewer correctness dimension. But score threshold defaults to none, there is no answerability gate or abstention in the knowledge-base path, and no judge receives the retrieved context.
+**In Jiuwen.** Grounding is a separate, non-blocking layer: a verification agent (read-only evidence, PASS/FAIL/PARTIAL) and a reviewer correctness dimension. But score threshold defaults to none, there is no answerability gate or abstention in the knowledge-base path, and no judge receives the retrieved context.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

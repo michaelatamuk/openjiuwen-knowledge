@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.
+**TL;DR.** Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.
 
 **Key points.**
 
@@ -13,14 +13,14 @@
 - Delimit/label untrusted content.
 - Enforce privilege outside the model.
 
-**General.** Untrusted input containing instructions that hijack the model. It is **direct** when the user types the malicious instruction, and **indirect** when it arrives inside retrieved documents, tool results, or any content the model reads.
+**Concept.** Untrusted input containing instructions that hijack the model. It is **direct** when the user types the malicious instruction, and **indirect** when it arrives inside retrieved documents, tool results, or any content the model reads.
 
 ![diagram](assets/diagrams/7541896f017731df954e0976d07cb54e3f063ec0.png)
 
-**Jiuwen.** Jiuwen separates prompt-level from enforced defenses. Prompt-level: a safety rail injects a bilingual safety section before each call (instruction, not control). Enforced: shell command and process substitution is blocked before execution, and the permission engine merges tool policy, file guard, and net guard by strictest. Enforcement exists for actions, while content framing is weak.
+**In Jiuwen.** Jiuwen separates prompt-level from enforced defenses. Prompt-level: a safety rail injects a bilingual safety section before each call (instruction, not control). Enforced: shell command and process substitution is blocked before execution, and the permission engine merges tool policy, file guard, and net guard by strictest. Enforcement exists for actions, while content framing is weak.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -50,7 +50,7 @@ Detection-side support exists but is not wired in: `core/security/guardrail/` pr
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.
+**TL;DR.** Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.
 
 **Key points.**
 
@@ -58,14 +58,14 @@ Detection-side support exists but is not wired in: `core/security/guardrail/` pr
 - Re-check permissions before privileged actions.
 - Enforce controls outside the model (shell/permission).
 
-**General.** Treat content as data, not instructions; delimit and label untrusted content; never let it trigger privileged actions without a permission re-check; and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
+**Concept.** Treat content as data, not instructions; delimit and label untrusted content; never let it trigger privileged actions without a permission re-check; and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
 
 ![diagram](assets/diagrams/a3975b70c370b1562d3f9b22381902cc0b67a01b.png)
 
-**Jiuwen.** Prompt-level defense is SafetyPromptRail (advice only). Enforced controls live in the shell/permission layer: substitution blocking, a tiered tool policy merged by strictest with an ASK floor for risky shell structures, and builtin deny rules for reverse shells, disk writes, shutdown, and sensitive paths.
+**In Jiuwen.** Prompt-level defense is SafetyPromptRail (advice only). Enforced controls live in the shell/permission layer: substitution blocking, a tiered tool policy merged by strictest with an ASK floor for risky shell structures, and builtin deny rules for reverse shells, disk writes, shutdown, and sensitive paths.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -92,7 +92,7 @@ The codebase separates prompt-level from enforced defenses. Prompt-level: `Safet
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.
+**TL;DR.** Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.
 
 **Key points.**
 
@@ -101,14 +101,14 @@ The codebase separates prompt-level from enforced defenses. Prompt-level: `Safet
 - Strip control/escape sequences.
 - Re-check permissions before privileged actions.
 
-**General.** Treat tool output and retrieved documents as untrusted data, never as instructions. Delimit and label them as data, strip control/escape sequences, and never let them silently trigger privileged actions without re-checking permissions. Prompt injection via tool output is a real threat because it flows straight into the model context.
+**Concept.** Treat tool output and retrieved documents as untrusted data, never as instructions. Delimit and label them as data, strip control/escape sequences, and never let them silently trigger privileged actions without re-checking permissions. Prompt injection via tool output is a real threat because it flows straight into the model context.
 
 ![diagram](assets/diagrams/fbd5a3f9f6f760c4548e2dbb976a9314fb593e9b.png)
 
-**Jiuwen.** This is the weakest area. Tool results are rendered through the tool's own renderer and wrapped in a plain tool message with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist but have no production callers.
+**In Jiuwen.** This is the weakest area. Tool results are rendered through the tool's own renderer and wrapped in a plain tool message with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist but have no production callers.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -139,7 +139,7 @@ Weakest area. Tool results are rendered through the tool's own `render_for_llm` 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.
+**TL;DR.** Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.
 
 **Key points.**
 
@@ -148,14 +148,14 @@ Weakest area. Tool results are rendered through the tool's own `render_for_llm` 
 - Permission-check privileged actions.
 - Sandbox and log.
 
-**General.** Assume the model can be talked around, so enforce outside it: detect and block known jailbreak/injection patterns at input, keep privileged actions behind a permission check that the model cannot bypass, sandbox tools, and log/rate-limit repeated attempts. No single regex is sufficient (paraphrase, encoding, multi-turn role-play evade it), so detection is a signal, not the control.
+**Concept.** Assume the model can be talked around, so enforce outside it: detect and block known jailbreak/injection patterns at input, keep privileged actions behind a permission check that the model cannot bypass, sandbox tools, and log/rate-limit repeated attempts. No single regex is sufficient (paraphrase, encoding, multi-turn role-play evade it), so detection is a signal, not the control.
 
 ![diagram](assets/diagrams/0176bf5c85813ee89de5b270fdf191badc649bd5.png)
 
-**Jiuwen.** There is no dedicated jailbreak subsystem, but four independent mechanisms. A rule-based injection detector matches ignore/disregard-previous-instructions and role-change patterns, but the guardrail is unregistered in production. The auto-harness permission engine and shell blocking are enforced. Pattern detection exists but is not wired in.
+**In Jiuwen.** There is no dedicated jailbreak subsystem, but four independent mechanisms. A rule-based injection detector matches ignore/disregard-previous-instructions and role-change patterns, but the guardrail is unregistered in production. The auto-harness permission engine and shell blocking are enforced. Pattern detection exists but is not wired in.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -188,7 +188,7 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.
+**TL;DR.** Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.
 
 **Key points.**
 
@@ -196,14 +196,14 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 - Mandatory identity-derived filter.
 - Pre-filter in the store, not post-hoc.
 
-**General.** Enforce authorization inside retrieval: every chunk carries ACL metadata (owner/group/tenant), and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), never post-hoc. Prefer the strongest isolation you can afford (per-tenant index/collection), use row-level security where available, and audit.
+**Concept.** Enforce authorization inside retrieval: every chunk carries ACL metadata (owner/group/tenant), and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), never post-hoc. Prefer the strongest isolation you can afford (per-tenant index/collection), use row-level security where available, and audit.
 
 ![diagram](assets/diagrams/f861c94b6b67903e019f6116065e56c850f1c925.png)
 
-**Jiuwen.** The store layer supports metadata filters (Milvus expressions, Chroma where, PG JSONB), plus a permission engine and audit logging. But retrieval filters are dropped at the retriever boundary: concrete retrievers hardcode no filters and the abstract retrieve has no filter argument. Authorization filters are not enforced in retrieval.
+**In Jiuwen.** The store layer supports metadata filters (Milvus expressions, Chroma where, PG JSONB), plus a permission engine and audit logging. But retrieval filters are dropped at the retriever boundary: concrete retrievers hardcode no filters and the abstract retrieve has no filter argument. Authorization filters are not enforced in retrieval.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -230,7 +230,7 @@ The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.
+**TL;DR.** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.
 
 **Key points.**
 
@@ -239,14 +239,14 @@ The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB
 - Approve the ambiguous middle.
 - Prefer reversible ops; fail closed.
 
-**General.** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations (dry-run, snapshot, sandbox) over hard blocks alone. Fail closed — unknown should mean "ask", not "allow".
+**Concept.** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations (dry-run, snapshot, sandbox) over hard blocks alone. Fail closed — unknown should mean "ask", not "allow".
 
 ![diagram](assets/diagrams/44cc82c8434775e9564a0a842be3fa4064f71348.png)
 
-**Jiuwen.** A layered permission engine returns allow, ask, or deny, merging tool policy, file guard, and net guard by strictest. Tool policy is tiered and falls back to ask when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ask. Destructive actions can be gated by approval.
+**In Jiuwen.** A layered permission engine returns allow, ask, or deny, merging tool policy, file guard, and net guard by strictest. Tool policy is tiered and falls back to ask when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ask. Destructive actions can be gated by approval.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -275,7 +275,7 @@ A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.
+**TL;DR.** Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.
 
 **Key points.**
 
@@ -284,14 +284,14 @@ A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + 
 - Policy filters on output.
 - Red-team refusal behavior.
 
-**General.** Layer defenses: a safety instruction in the system prompt, input and output content classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. Because a prompt is advice not a control, real safety needs an enforced output filter. Bias specifically needs measurement (bias probes, disaggregated evals) and mitigation, not just a "be safe" instruction.
+**Concept.** Layer defenses: a safety instruction in the system prompt, input and output content classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. Because a prompt is advice not a control, real safety needs an enforced output filter. Bias specifically needs measurement (bias probes, disaggregated evals) and mitigation, not just a "be safe" instruction.
 
 ![diagram](assets/diagrams/1b7f967cab1b0c14523f3000daba12275c2c86dc.png)
 
-**Jiuwen.** Two layers. Prompt-level (advisory): a safety rail is production-registered and appends a static bilingual safety section to the system prompt on each call, then always allows — it never inspects or rewrites content. Enforced-but-unwired: a guardrail package provides base guardrails. Output moderation is not active.
+**In Jiuwen.** Two layers. Prompt-level (advisory): a safety rail is production-registered and appends a static bilingual safety section to the system prompt on each call, then always allows — it never inspects or rewrites content. Enforced-but-unwired: a guardrail package provides base guardrails. Output moderation is not active.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -324,7 +324,7 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.
+**TL;DR.** Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.
 
 **Key points.**
 
@@ -333,14 +333,14 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 - Gate secret-like egress.
 - Provider zero-retention.
 
-**General.** Detect and redact secrets before they reach the model or the logs: scrub known patterns (API keys, tokens, PII) from tool results and prompts, redact log fields (don't just drop whole fields), gate egress of secret-like payloads, and keep a path to audit without storing the secret. Detection alone is not redaction.
+**Concept.** Detect and redact secrets before they reach the model or the logs: scrub known patterns (API keys, tokens, PII) from tool results and prompts, redact log fields (don't just drop whole fields), gate egress of secret-like payloads, and keep a path to audit without storing the secret. Detection alone is not redaction.
 
 ![diagram](assets/diagrams/3fafea3ab450953ebbd7ba20fd146495c7050b14.png)
 
-**Jiuwen.** Actual model-context redaction exists only as a demo rail that regex-redacts keys, tokens, and bearer strings in history and responses. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, and a security demo has its own redaction. Model-context redaction is not production-wide.
+**In Jiuwen.** Actual model-context redaction exists only as a demo rail that regex-redacts keys, tokens, and bearer strings in history and responses. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, and a security demo has its own redaction. Model-context redaction is not production-wide.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -368,7 +368,7 @@ Actual model-context redaction exists only as a demo rail: `Sensitivedatasanitiz
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
-**Summary.** Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.
+**TL;DR.** Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.
 
 **Key points.**
 
@@ -377,14 +377,14 @@ Actual model-context redaction exists only as a demo rail: `Sensitivedatasanitiz
 - Row-level security.
 - Filter inside the store.
 
-**General.** Isolation choices, strongest first: a separate index/collection (or DB) per tenant; a tenant partition key with mandatory pre-filtering; or row-level security in a relational store. The key is that the tenant filter is applied inside the vector search and cannot be forgotten by a caller. Also isolate embeddings, caches, and logs per tenant, and audit cross-tenant access.
+**Concept.** Isolation choices, strongest first: a separate index/collection (or DB) per tenant; a tenant partition key with mandatory pre-filtering; or row-level security in a relational store. The key is that the tenant filter is applied inside the vector search and cannot be forgotten by a caller. Also isolate embeddings, caches, and logs per tenant, and audit cross-tenant access.
 
 ![diagram](assets/diagrams/2242858c563d307667cf8fc82a8307ae55b0c1ec.png)
 
-**Jiuwen.** The only separation primitive is the collection name derived from the knowledge-base id plus a configurable database name — this isolates knowledge bases, not tenants. If tenants share a knowledge-base id, their chunks land in the same collection with no tenant column. Multi-tenant isolation is not enforced by default.
+**In Jiuwen.** The only separation primitive is the collection name derived from the knowledge-base id plus a configurable database name — this isolates knowledge bases, not tenants. If tenants share a knowledge-base id, their chunks land in the same collection with no tenant column. Multi-tenant isolation is not enforced by default.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -411,7 +411,7 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Security-adjacent questions are disguised as normal engineering questions.
+**TL;DR.** Security-adjacent questions are disguised as normal engineering questions.
 
 **Key points.**
 
@@ -420,14 +420,14 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 - Prompt safety is advisory.
 - Real control is the shell/permission layer.
 
-**General.** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
+**Concept.** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
 
 ![diagram](assets/diagrams/bd23a2c582f0d84607fa39f87399c2cd80d3fe7e.png)
 
-**Jiuwen.** This is the weakest area. Tool results are returned as a plain tool message with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory, while the enforced controls live in the shell and permission layers.
+**In Jiuwen.** This is the weakest area. Tool results are returned as a plain tool message with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory, while the enforced controls live in the shell and permission layers.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -455,7 +455,7 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**Summary.** Any question about untrusted input is testing prompt-injection awareness.
+**TL;DR.** Any question about untrusted input is testing prompt-injection awareness.
 
 **Key points.**
 
@@ -464,14 +464,14 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 - Safety rail is advisory.
 - Real control: shell/permission layer.
 
-**General.** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
+**Concept.** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
 
 ![diagram](assets/diagrams/d8e7aec4eea44ece4306dd59b3cfb07cf003a653.png)
 
-**Jiuwen.** Weakest area. Tool results are plain messages with no untrusted-data framing, the sanitizer has no production callers, the injection detector is unregistered, and the safety rail is advisory. The real controls are in the shell and permission layer (substitution blocking, AST ask floor).
+**In Jiuwen.** Weakest area. Tool results are plain messages with no untrusted-data framing, the sanitizer has no production callers, the injection detector is unregistered, and the safety rail is advisory. The real controls are in the shell and permission layer (substitution blocking, AST ask floor).
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

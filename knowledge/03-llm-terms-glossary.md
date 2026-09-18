@@ -4,7 +4,7 @@
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** The smallest sub-word unit of text a model processes.
+**TL;DR.** The smallest sub-word unit of text a model processes.
 
 **Key points.**
 
@@ -12,12 +12,12 @@
 - Count tokens, not words.
 - Drives context limits and cost.
 
-**General.** the smallest unit of text a model processes — usually a sub-word piece, not a full word.
+**Concept.** the smallest unit of text a model processes — usually a sub-word piece, not a full word.
 
-**Jiuwen.** Jiuwen counts tokens via a token counter: a tiktoken counter maps model names to encodings with fallback heuristics, and a tokenizer manager downloads the model's own artifacts. Counts drive context limits and cost.
+**In Jiuwen.** Jiuwen counts tokens via a token counter: a tiktoken counter maps model names to encodings with fallback heuristics, and a tokenizer manager downloads the model's own artifacts. Counts drive context limits and cost.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -39,7 +39,7 @@ Counts tokens, never words, via a `TokenCounter`. `TiktokenCounter` maps model n
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** A numeric vector representing the meaning of text, used for similarity search.
+**TL;DR.** A numeric vector representing the meaning of text, used for similarity search.
 
 **Key points.**
 
@@ -47,12 +47,12 @@ Counts tokens, never words, via a `TokenCounter`. `TiktokenCounter` maps model n
 - Used for similarity search.
 - One per query or document.
 
-**General.** a numerical vector that represents the meaning of text, used for similarity search.
+**Concept.** a numerical vector that represents the meaning of text, used for similarity search.
 
-**Jiuwen.** An embedding interface defines embed-query, embed-documents, and dimension, with providers including OpenAI, DashScope, and vLLM. Indexers compute embeddings when building the index, and the model identity is not stored with the index.
+**In Jiuwen.** An embedding interface defines embed-query, embed-documents, and dimension, with providers including OpenAI, DashScope, and vLLM. Indexers compute embeddings when building the index, and the model identity is not stored with the index.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -74,7 +74,7 @@ An `Embedding` ABC defines `embed_query`/`embed_documents`/`dimension`; provider
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** The maximum amount of text a model can process in a single request.
+**TL;DR.** The maximum amount of text a model can process in a single request.
 
 **Key points.**
 
@@ -82,12 +82,12 @@ An `Embedding` ABC defines `embed_query`/`embed_documents`/`dimension`; provider
 - Bounds prompt + history + output.
 - Exceeding it forces trimming/compaction.
 
-**General.** the maximum amount of text a model can process in a single request.
+**Concept.** the maximum amount of text a model can process in a single request.
 
-**Jiuwen.** The context engine budgets the window (effective budget is the strictest of window, call, and model), offloads large tool results, compacts at thresholds, and falls back to a FIFO drop beyond the max context message count.
+**In Jiuwen.** The context engine budgets the window (effective budget is the strictest of window, call, and model), offloads large tool results, compacts at thresholds, and falls back to a FIFO drop beyond the max context message count.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -109,7 +109,7 @@ The context engine budgets the window (`effective_context_budget` = strictest of
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Controls sampling randomness; lower values produce more deterministic output.
+**TL;DR.** Controls sampling randomness; lower values produce more deterministic output.
 
 **Key points.**
 
@@ -117,12 +117,12 @@ The context engine budgets the window (`effective_context_budget` = strictest of
 - Lower = more deterministic.
 - 0 ≈ greedy.
 
-**General.** controls output randomness at sampling; lower values produce more deterministic output.
+**Concept.** controls output randomness at sampling; lower values produce more deterministic output.
 
-**Jiuwen.** Temperature is a passthrough request param; the local HF/vLLM path implements softmax over logits divided by temperature, and temperature <= 0 becomes argmax. Some calls default to the provider default while the local generation default is 0.0.
+**In Jiuwen.** Temperature is a passthrough request param; the local HF/vLLM path implements softmax over logits divided by temperature, and temperature <= 0 becomes argmax. Some calls default to the provider default while the local generation default is 0.0.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -144,7 +144,7 @@ A passthrough request param; the local HF/vLLM path implements `softmax(logits/T
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Limits token selection to the smallest set whose cumulative probability exceeds p.
+**TL;DR.** Limits token selection to the smallest set whose cumulative probability exceeds p.
 
 **Key points.**
 
@@ -152,12 +152,12 @@ A passthrough request param; the local HF/vLLM path implements `softmax(logits/T
 - Nucleus sampling.
 - Alternative to top-k.
 
-**General.** limits token selection to the smallest set of tokens whose combined probability exceeds `p`.
+**Concept.** limits token selection to the smallest set of tokens whose combined probability exceeds `p`.
 
-**Jiuwen.** Top-p is implemented locally with a default of 1.0; top-k sampling is absent from the local sampler (Anthropic's top-k is only a passthrough). Note that top-k elsewhere in the codebase means retrieval result count, not sampling.
+**In Jiuwen.** Top-p is implemented locally with a default of 1.0; top-k sampling is absent from the local sampler (Anthropic's top-k is only a passthrough). Note that top-k elsewhere in the codebase means retrieval result count, not sampling.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -179,7 +179,7 @@ Top-p is implemented locally (`top_p` default `1.0`); **top-k sampling is absent
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Giving a model external data by retrieving relevant passages and putting them in the prompt before generation.
+**TL;DR.** Giving a model external data by retrieving relevant passages and putting them in the prompt before generation.
 
 **Key points.**
 
@@ -187,14 +187,14 @@ Top-p is implemented locally (`top_p` default `1.0`); **top-k sampling is absent
 - Put them in the prompt.
 - Grounds generation in external data.
 
-**General.** giving a model access to external data by retrieving relevant passages and putting them in the prompt before generation.
+**Concept.** giving a model access to external data by retrieving relevant passages and putting them in the prompt before generation.
 
 ![diagram](assets/diagrams/7d4c89309308bcb3042a4b6dcc74e2c6b4e7bca0.png)
 
-**Jiuwen.** Ingestion runs parse files, chunk documents, and build index; query-time retrieval runs retrieve then vector store search, wired through a knowledge-retrieval component and an LLM component.
+**In Jiuwen.** Ingestion runs parse files, chunk documents, and build index; query-time retrieval runs retrieve then vector store search, wired through a knowledge-retrieval component and an LLM component.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -216,7 +216,7 @@ Ingestion (`parse_files` → `chunk_documents` → `build_index`) plus query-tim
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Splitting documents into smaller pieces before embedding so retrieval returns relevant sections.
+**TL;DR.** Splitting documents into smaller pieces before embedding so retrieval returns relevant sections.
 
 **Key points.**
 
@@ -224,12 +224,12 @@ Ingestion (`parse_files` → `chunk_documents` → `build_index`) plus query-tim
 - Size and overlap matter.
 - Affects retrieval granularity.
 
-**General.** splitting documents into smaller pieces before embedding so retrieval returns relevant sections.
+**Concept.** splitting documents into smaller pieces before embedding so retrieval returns relevant sections.
 
-**Jiuwen.** There are char, token, and hybrid chunkers with validation (chunk size > 0, overlap < size), tokenizer-length clamping, and sentence-boundary packing on the token path; the hybrid chunker keeps table rows and columns whole. No header or code-aware chunker.
+**In Jiuwen.** There are char, token, and hybrid chunkers with validation (chunk size > 0, overlap < size), tokenizer-length clamping, and sentence-boundary packing on the token path; the hybrid chunker keeps table rows and columns whole. No header or code-aware chunker.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -251,7 +251,7 @@ Char/token/hybrid chunkers with validation (`chunk_size>0`, `overlap<size`), tok
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** A database built for similarity search over embeddings rather than exact-match queries.
+**TL;DR.** A database built for similarity search over embeddings rather than exact-match queries.
 
 **Key points.**
 
@@ -259,12 +259,12 @@ Char/token/hybrid chunkers with validation (`chunk_size>0`, `overlap<size`), tok
 - Stores embeddings + metadata.
 - Supports ANN indexes.
 
-**General.** a database built for similarity search over embeddings rather than exact-match queries.
+**Concept.** a database built for similarity search over embeddings rather than exact-match queries.
 
-**Jiuwen.** Chroma (local, vector-only), Milvus (server, BM25, hybrid, quantized indexes), and PGVector sit behind one factory. Metadata filters are supported at the store level but dropped at the retriever.
+**In Jiuwen.** Chroma (local, vector-only), Milvus (server, BM25, hybrid, quantized indexes), and PGVector sit behind one factory. Metadata filters are supported at the store level but dropped at the retriever.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -286,7 +286,7 @@ Chroma (local, vector-only), Milvus (server, BM25 + hybrid + quantized indexes),
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Reordering retrieved documents by actual relevance (often a cross-encoder) after a broad initial retrieval.
+**TL;DR.** Reordering retrieved documents by actual relevance (often a cross-encoder) after a broad initial retrieval.
 
 **Key points.**
 
@@ -294,12 +294,12 @@ Chroma (local, vector-only), Milvus (server, BM25 + hybrid + quantized indexes),
 - Usually a cross-encoder.
 - Retrieve many, keep few.
 
-**General.** reordering retrieved documents by actual relevance (via a cross-encoder) after an initial broad retrieval.
+**Concept.** reordering retrieved documents by actual relevance (via a cross-encoder) after an initial broad retrieval.
 
-**Jiuwen.** A reranker interface with cross-encoder and LLM variants exists, but it is wired only into the graph store; the default knowledge-base path never reranks, so retrieve-20-rerank-to-5 is not available out of the box.
+**In Jiuwen.** A reranker interface with cross-encoder and LLM variants exists, but it is wired only into the graph store; the default knowledge-base path never reranks, so retrieve-20-rerank-to-5 is not available out of the box.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -322,7 +322,7 @@ A `Reranker` ABC with cross-encoder/LLM variants exists, but it is wired only in
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Confident but factually incorrect or unsupported output.
+**TL;DR.** Confident but factually incorrect or unsupported output.
 
 **Key points.**
 
@@ -330,12 +330,12 @@ A `Reranker` ABC with cross-encoder/LLM variants exists, but it is wired only in
 - Not grounded in source.
 - Mitigate with grounding and checks.
 
-**General.** confident but factually incorrect or unsupported output.
+**Concept.** confident but factually incorrect or unsupported output.
 
-**Jiuwen.** There is no hallucination or attribution detector. Mitigations exist separately: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer correctness dimension, and an evidence-citation rubric — but none receives the retrieved context as a faithfulness check.
+**In Jiuwen.** There is no hallucination or attribution detector. Mitigations exist separately: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer correctness dimension, and an evidence-citation rubric — but none receives the retrieved context as a faithfulness check.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -358,7 +358,7 @@ No hallucination/attribution detector. Mitigations exist separately: a verificat
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Further training a model on a specific dataset to adjust its behavior or style.
+**TL;DR.** Further training a model on a specific dataset to adjust its behavior or style.
 
 **Key points.**
 
@@ -366,12 +366,12 @@ No hallucination/attribution detector. Mitigations exist separately: a verificat
 - Needs task data.
 - Changes behavior, not just knowledge.
 
-**General.** further training a model on a specific dataset to adjust its behavior or style.
+**Concept.** further training a model on a specific dataset to adjust its behavior or style.
 
-**Jiuwen.** Real SFT and PPO run via the RL framework, exporting versioned LoRA/PEFT adapters (no full fine-tuning, no pretraining). Automatic prompt optimization is the default alternative.
+**In Jiuwen.** Real SFT and PPO run via the RL framework, exporting versioned LoRA/PEFT adapters (no full fine-tuning, no pretraining). Automatic prompt optimization is the default alternative.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -393,7 +393,7 @@ Real SFT + PPO via veRL, exporting versioned **LoRA/PEFT** adapters (no full fin
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Structuring input to get a reliable, specific output without changing the model.
+**TL;DR.** Structuring input to get a reliable, specific output without changing the model.
 
 **Key points.**
 
@@ -401,12 +401,12 @@ Real SFT + PPO via veRL, exporting versioned **LoRA/PEFT** adapters (no full fin
 - Improve reliability/format.
 - Cheap and fast to iterate.
 
-**General.** structuring input to get a reliable, specific output without changing the model.
+**Concept.** structuring input to get a reliable, specific output without changing the model.
 
-**Jiuwen.** System prompts are assembled from priority-ordered prompt sections that rails can add or remove per call. There is no native JSON mode; structured output is done by exposing a schema as a tool.
+**In Jiuwen.** System prompts are assembled from priority-ordered prompt sections that rails can add or remove per call. There is no native JSON mode; structured output is done by exposing a schema as a tool.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -428,7 +428,7 @@ System prompts are assembled from priority-ordered `PromptSection`s that rails c
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Providing a small number of examples in the prompt to guide output format or behavior.
+**TL;DR.** Providing a small number of examples in the prompt to guide output format or behavior.
 
 **Key points.**
 
@@ -436,12 +436,12 @@ System prompts are assembled from priority-ordered `PromptSection`s that rails c
 - Guides format/behavior.
 - Costs tokens per call.
 
-**General.** providing a small number of examples in the prompt to guide output format/behavior.
+**Concept.** providing a small number of examples in the prompt to guide output format/behavior.
 
-**Jiuwen.** The runtime agent is zero-shot; few-shot example injection exists only in the tuning tooling (converting cases to examples and initializing examples), not in the harness or single-agent core.
+**In Jiuwen.** The runtime agent is zero-shot; few-shot example injection exists only in the tuning tooling (converting cases to examples and initializing examples), not in the harness or single-agent core.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -463,7 +463,7 @@ The runtime agent is zero-shot; few-shot example injection exists only in the tu
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Asking the model to reason step by step before giving a final answer.
+**TL;DR.** Asking the model to reason step by step before giving a final answer.
 
 **Key points.**
 
@@ -471,12 +471,12 @@ The runtime agent is zero-shot; few-shot example injection exists only in the tu
 - Improves multi-step accuracy.
 - Can be implicit in reasoning models.
 
-**General.** asking the model to reason step by step before giving a final answer.
+**Concept.** asking the model to reason step by step before giving a final answer.
 
-**Jiuwen.** There is no global chain-of-thought instruction in the deep-agent prompt; explicit CoT appears in auxiliary prompts (a workflow questioner) and implicitly in compaction. Reasoning-model output is parsed and preserved.
+**In Jiuwen.** There is no global chain-of-thought instruction in the deep-agent prompt; explicit CoT appears in auxiliary prompts (a workflow questioner) and implicitly in compaction. Reasoning-model output is parsed and preserved.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -498,7 +498,7 @@ No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxil
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** A model's ability to emit a structured request to invoke an external tool or API.
+**TL;DR.** A model's ability to emit a structured request to invoke an external tool or API.
 
 **Key points.**
 
@@ -506,14 +506,14 @@ No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxil
 - Tools described as schemas.
 - Runtime executes and returns results.
 
-**General.** a model's ability to emit a structured request to invoke an external tool/API.
+**Concept.** a model's ability to emit a structured request to invoke an external tool/API.
 
 ![diagram](assets/diagrams/75030061365f943111a966c7c96fd872a91ec2ea.png)
 
-**Jiuwen.** Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list, and tool calls are parsed per provider, validated in the local function invoke, and dispatched.
+**In Jiuwen.** Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list, and tool calls are parsed per provider, validated in the local function invoke, and dispatched.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -535,7 +535,7 @@ Cards become JSON Schema via the callable schema extractor, the ability manager 
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** A system where the model plans, calls tools, and decides its own next step in a loop.
+**TL;DR.** A system where the model plans, calls tools, and decides its own next step in a loop.
 
 **Key points.**
 
@@ -543,14 +543,14 @@ Cards become JSON Schema via the callable schema extractor, the ability manager 
 - Uses tools in a loop.
 - Bounded by iterations/stopping.
 
-**General.** a system where the model plans, calls tools, and decides its own next step in a loop.
+**Concept.** a system where the model plans, calls tools, and decides its own next step in a loop.
 
 ![diagram](assets/diagrams/3dbf53c979a9114905552371eaadb1217f7583bb.png)
 
-**Jiuwen.** The ReAct loop calls the model, executes tools on tool calls, and returns when none are present, bounded by max iterations; the deep agent adds an outer task loop with stop evaluators.
+**In Jiuwen.** The ReAct loop calls the model, executes tools on tool calls, and returns when none are present, bounded by max iterations; the deep agent adds an outer task loop with stop evaluators.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -572,7 +572,7 @@ The ReAct loop calls the model, executes tools on `tool_calls`, and returns when
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Context an agent retains across turns (short-term) or sessions (long-term).
+**TL;DR.** Context an agent retains across turns (short-term) or sessions (long-term).
 
 **Key points.**
 
@@ -580,12 +580,12 @@ The ReAct loop calls the model, executes tools on `tool_calls`, and returns when
 - Long-term = persisted across sessions.
 - Retrieval chooses what to bring back.
 
-**General.** context an agent retains across turns (short-term) or sessions (long-term).
+**Concept.** context an agent retains across turns (short-term) or sessions (long-term).
 
-**Jiuwen.** Short-term memory is a session model context with a bounded message buffer; long-term is a typed memory taxonomy. The product adds a SQLite/FTS5 hybrid index over markdown memory files.
+**In Jiuwen.** Short-term memory is a session model context with a bounded message buffer; long-term is a typed memory taxonomy. The product adds a SQLite/FTS5 hybrid index over markdown memory files.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -607,7 +607,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** The time between sending a request and receiving a complete response.
+**TL;DR.** The time between sending a request and receiving a complete response.
 
 **Key points.**
 
@@ -615,12 +615,12 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 - TTFT matters for streaming.
 - Affected by model, context, tools.
 
-**General.** the time between sending a request and receiving a complete response.
+**Concept.** the time between sending a request and receiving a complete response.
 
-**Jiuwen.** Streaming with per-call TTFT, parallel tool execution, KV/prefix cache affinity, and model failover. There is no latency-based routing or result cache.
+**In Jiuwen.** Streaming with per-call TTFT, parallel tool execution, KV/prefix cache affinity, and model failover. There is no latency-based routing or result cache.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -642,7 +642,7 @@ Streaming with per-call `ttft_ms`, parallel tool execution, KV/prefix cache affi
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Reducing a model's numerical precision to shrink size and speed up inference.
+**TL;DR.** Reducing a model's numerical precision to shrink size and speed up inference.
 
 **Key points.**
 
@@ -650,12 +650,12 @@ Streaming with per-call `ttft_ms`, parallel tool execution, KV/prefix cache affi
 - Smaller/faster, some accuracy loss.
 - Applies to weights and indexes.
 
-**General.** reducing a model's numerical precision to shrink size and speed up inference.
+**Concept.** reducing a model's numerical precision to shrink size and speed up inference.
 
-**Jiuwen.** Model-weight quantization is not implemented here — it is a passthrough engine param for local vLLM. Vector-index quantization is first-class for Milvus: SQ8 (about 75% memory cut), PQ, PRQ, RABITQ, and SCANN (IVF plus product quantization).
+**In Jiuwen.** Model-weight quantization is not implemented here — it is a passthrough engine param for local vLLM. Vector-index quantization is first-class for Milvus: SQ8 (about 75% memory cut), PQ, PRQ, RABITQ, and SCANN (IVF plus product quantization).
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 
@@ -677,7 +677,7 @@ Model-weight quantization is **not implemented** here — it is a passthrough en
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**Summary.** Malicious or unintended instructions embedded in input or retrieved content that hijack the model.
+**TL;DR.** Malicious or unintended instructions embedded in input or retrieved content that hijack the model.
 
 **Key points.**
 
@@ -685,14 +685,14 @@ Model-weight quantization is **not implemented** here — it is a passthrough en
 - Direct or indirect (retrieval/tools).
 - Defend outside the model.
 
-**General.** malicious or unintended instructions embedded in input or retrieved content that hijack the model.
+**Concept.** malicious or unintended instructions embedded in input or retrieved content that hijack the model.
 
 ![diagram](assets/diagrams/d6657036b14d2d4f125ae25352120de759ce6c45.png)
 
-**Jiuwen.** Enforcement lives in the shell and permission layer (substitution blocking, AST ask floor, builtin deny rules); safety text is advisory and injection detectors are largely unregistered. The untrusted-tool-result seam is missing.
+**In Jiuwen.** Enforcement lives in the shell and permission layer (substitution blocking, AST ask floor, builtin deny rules); safety text is advisory and injection detectors are largely unregistered. The untrusted-tool-result seam is missing.
 
 <details markdown="1">
-<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+<summary><b>Under the hood</b></summary>
 
 **Implementation**
 

@@ -83,7 +83,7 @@ def main():
                     tparts.append("<h4>Canonical source</h4><div class='cite'>"
                                   + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
                 tech_html = (
-                    "<details><summary>Jiuwen technical detail (classes &amp; functions)</summary>"
+                    "<details><summary>Under the hood</summary>"
                     + "".join(tparts) + "</details>"
                 )
             title = f'<div style="color:#4c5bd4;font-weight:700;font-size:13px">{html.escape(q["title"])}</div>' if q.get("title") else ""
@@ -93,9 +93,9 @@ def main():
             badges = f'<div class="badges"><span class="badge">{html.escape(diff)}</span></div>' if diff else ""
             back = (
                 badges + title + summary + points(q.get("points", []))
-                + "<h4>Explanation</h4>" + md(q.get("explain", ""))
+                + "<h4>Concept</h4>" + md(q.get("explain", ""))
                 + img
-                + "<h4>Jiuwen</h4>" + (md(q.get("jiuwenPlain", "")) or md(q.get("mechanism", "")))
+                + "<h4>In Jiuwen</h4>" + (md(q.get("jiuwenPlain", "")) or md(q.get("mechanism", "")))
                 + tech_html
             )
             section = t.get("section", "")

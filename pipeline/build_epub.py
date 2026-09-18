@@ -87,7 +87,7 @@ def main():
             sources = q.get("provenance", {}).get("sources") or []
             td = q.get("diagramTechnical", {}) or {}
             if tech_text or q.get("citations") or sources or td.get("image"):
-                tparts = ["<h3>Jiuwen technical detail (classes &amp; functions)</h3>"]
+                tparts = ["<h3>Under the hood</h3>"]
                 if tech_text:
                     tparts.append("<h4>Implementation</h4>" + md(tech_text))
                 if q.get("citations"):
@@ -108,8 +108,8 @@ def main():
                 tech = "".join(tparts)
             parts.append(
                 f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{badges}{title}{summary}{pts}'
-                f'<h3>Explanation</h3>{md(q.get("explain",""))}{concept}'
-                f'<h3>Jiuwen</h3>{md(q.get("jiuwenPlain","")) or md(q.get("mechanism",""))}{tech}'
+                f'<h3>Concept</h3>{md(q.get("explain",""))}{concept}'
+                f'<h3>In Jiuwen</h3>{md(q.get("jiuwenPlain","")) or md(q.get("mechanism",""))}{tech}'
             )
         ch = epub.EpubHtml(title=t["title"], file_name=fname, lang="en")
         ch.content = "".join(parts)

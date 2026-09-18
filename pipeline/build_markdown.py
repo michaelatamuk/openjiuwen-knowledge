@@ -78,7 +78,7 @@ def main():
             if badges:
                 lines += [" ".join(badges), ""]
             if q.get("tldr"):
-                lines += [f"**Summary.** {q['tldr']}", ""]
+                lines += [f"**TL;DR.** {q['tldr']}", ""]
             if q.get("points"):
                 lines.append("**Key points.**")
                 lines.append("")
@@ -86,7 +86,7 @@ def main():
                     lines.append(f"- {p}")
                 lines.append("")
             if q.get("explain"):
-                lines += [f"**General.** {q['explain']}", ""]
+                lines += [f"**Concept.** {q['explain']}", ""]
             for d in (q.get("diagrams") or [q.get("diagram", {})]):
                 im = write_diagram(d.get("image", "") or d.get("svg", ""))
                 if im:
@@ -94,14 +94,14 @@ def main():
             plain = q.get("jiuwenPlain") or ""
             jiu = plain or q.get("mechanism") or ""
             if jiu:
-                lines += [f"**Jiuwen.** {jiu}", ""]
+                lines += [f"**In Jiuwen.** {jiu}", ""]
             tech_img = write_diagram((q.get("diagramTechnical", {}) or {}).get("image", "")
                                      or (q.get("diagramTechnical", {}) or {}).get("svg", ""))
             tech_text = q.get("mechanism", "") if plain else ""
             sources = q.get("provenance", {}).get("sources") or []
             if tech_text or q.get("citations") or tech_img or sources:
                 lines.append('<details markdown="1">')
-                lines.append("<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>")
+                lines.append("<summary><b>Under the hood</b></summary>")
                 lines.append("")
                 if tech_text:
                     lines += ["**Implementation**", "", tech_text, ""]

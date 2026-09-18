@@ -136,16 +136,16 @@ def build():
             tech_block = ""
             if tparts:
                 tech_block = (
-                    "<details><summary>Jiuwen technical detail (classes &amp; functions)</summary>"
+                    "<details><summary>Under the hood</summary>"
                     + "".join(tparts) + "</details>"
                 )
             parts.append(
                 f'<section class="qa"><h2>{html.escape(q["question"])}</h2>{badges}{title}{summary}'
                 f'<button class="btn" onclick="this.parentElement.classList.toggle(\'revealed\')">Show / hide answer</button>'
                 f'<div class="answer">{points_html(q.get("points", []))}'
-                f'<div class="section-t">Explanation</div>{md(q.get("explain",""))}'
+                f'<div class="section-t">Concept</div>{md(q.get("explain",""))}'
                 f'{concept}'
-                f'<div class="section-t">Jiuwen</div>{jiu}'
+                f'<div class="section-t">In Jiuwen</div>{jiu}'
                 f'{tech_block}'
                 f'</div></section>'
             )

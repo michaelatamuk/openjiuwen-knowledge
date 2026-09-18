@@ -338,7 +338,7 @@ fun TechnicalDetail(
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
         TextButton(onClick = { open = !open }) {
-            Text(if (open) "Hide Jiuwen technical detail" else "Jiuwen technical detail (classes & functions)")
+            Text(if (open) "Hide under the hood" else "Under the hood")
         }
         if (open) {
             if (text.isNotBlank()) {
