@@ -35,31 +35,35 @@ The numbered `01`–`10` files were assembled from the archived docs: near-ident
 
 Rebuild instructions are in `pipeline/README.md`.
 
-## Read in this order
+## Topics
 
-The numbered files are in recommended study order: foundations → prompting → RAG → agents → evaluation → production → security → fine-tuning → general, with the glossary first and the architecture patterns last.
+### Foundations
+- [01-llm-foundations.md](01-llm-foundations.md) — 14 questions. Tokens, embeddings, self-attention, encoder/decoder, positional encoding, sampling, context window.
+- [02-prompting-and-output-control.md](02-prompting-and-output-control.md) — 5 questions. Zero/few-shot/CoT, system vs user prompts, JSON output.
+- [90-llm-terms-glossary.md](90-llm-terms-glossary.md) — 20-term glossary with where each term bites.
 
-| File | Questions | Focus |
-|---|---|---|
-| [01-llm-foundations.md](01-llm-foundations.md) | 14 | Tokens, embeddings, self-attention, encoder/decoder, positional encoding, sampling, context window |
-| [02-prompting-and-output-control.md](02-prompting-and-output-control.md) | 5 | Zero/few-shot/CoT, system vs user prompts, JSON output |
-| [03-rag-and-retrieval.md](03-rag-and-retrieval.md) | 41 | Pipeline, chunking, embeddings, dense/sparse, reranking, query understanding, failure modes |
-| [04-rag-system-design.md](04-rag-system-design.md) | 13 | Whiteboard design prompts, scale, freshness, multi-tenancy, access control |
-| [05-agents-tools-and-memory.md](05-agents-tools-and-memory.md) | 45 | Function calling, loops, tools, planning, memory, frameworks, multi-agent |
-| [06-evaluation.md](06-evaluation.md) | 21 | Retrieval metrics, faithfulness, LLM-as-judge, regression suites, production eval |
-| [07-production-cost-and-scale.md](07-production-cost-and-scale.md) | 8 | Cost, latency, caching, concurrency, 10x scaling |
-| [08-security-and-safety.md](08-security-and-safety.md) | 8 | Prompt injection, untrusted content, sensitive data, harmful output, jailbreaks |
-| [09-fine-tuning-and-customization.md](09-fine-tuning-and-customization.md) | 6 | Full FT vs LoRA, instruction tuning, when to fine-tune, small-dataset risk |
-| [10-general-engineering.md](10-general-engineering.md) | 5 | Model selection, framework/team fit, rule-based vs LLM, release safety, stakeholder tradeoffs |
+### Retrieval & RAG
+- [03-rag-and-retrieval.md](03-rag-and-retrieval.md) — 41 questions. Pipeline, chunking, embeddings, dense/sparse, reranking, query understanding, failure modes.
+- [04-rag-system-design.md](04-rag-system-design.md) — 13 questions. Whiteboard design prompts, scale, freshness, multi-tenancy, access control.
 
-## Glossary and patterns
+### Agents
+- [05-agents-tools-and-memory.md](05-agents-tools-and-memory.md) — 45 questions. Function calling, loops, tools, planning, memory, frameworks, multi-agent.
 
-| File | Scope |
-|---|---|
-| [90-llm-terms-glossary.md](90-llm-terms-glossary.md) | 20-term glossary with where each term bites (read first) |
-| [91-ai-engineer-interview-patterns.md](91-ai-engineer-interview-patterns.md) | 7 recurring technical-interview dynamics |
-| [92-llm-interview-patterns.md](92-llm-interview-patterns.md) | 7 recurring LLM interview dynamics |
-| [93-llm-architecture-patterns.md](93-llm-architecture-patterns.md) | 7 recurring LLM architecture patterns (read last) |
+### Evaluation & operations
+- [06-evaluation.md](06-evaluation.md) — 21 questions. Retrieval metrics, faithfulness, LLM-as-judge, regression suites, production eval.
+- [07-production-cost-and-scale.md](07-production-cost-and-scale.md) — 8 questions. Cost, latency, caching, concurrency, 10x scaling.
+
+### Trust & safety
+- [08-security-and-safety.md](08-security-and-safety.md) — 8 questions. Prompt injection, untrusted content, sensitive data, harmful output, jailbreaks.
+
+### Adaptation & engineering
+- [09-fine-tuning-and-customization.md](09-fine-tuning-and-customization.md) — 6 questions. Full FT vs LoRA, instruction tuning, when to fine-tune, small-dataset risk.
+- [10-general-engineering.md](10-general-engineering.md) — 5 questions. Model selection, framework/team fit, rule-based vs LLM, release safety, stakeholder tradeoffs.
+
+### Patterns
+- [91-ai-engineer-interview-patterns.md](91-ai-engineer-interview-patterns.md) — 7 recurring technical-interview dynamics.
+- [92-llm-interview-patterns.md](92-llm-interview-patterns.md) — 7 recurring LLM interview dynamics.
+- [93-llm-architecture-patterns.md](93-llm-architecture-patterns.md) — 7 recurring LLM architecture patterns.
 
 ## How to read an entry
 

@@ -41,17 +41,24 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - LLM foundations: 01-llm-foundations.md
-  - Prompting & output: 02-prompting-and-output-control.md
-  - RAG & retrieval: 03-rag-and-retrieval.md
-  - RAG system design: 04-rag-system-design.md
-  - Agents, tools & memory: 05-agents-tools-and-memory.md
-  - Evaluation: 06-evaluation.md
-  - Production & scale: 07-production-cost-and-scale.md
-  - Security & safety: 08-security-and-safety.md
-  - Fine-tuning: 09-fine-tuning-and-customization.md
-  - General engineering: 10-general-engineering.md
-  - LLM terms glossary: 90-llm-terms-glossary.md
-  - AI engineer patterns: 91-ai-engineer-interview-patterns.md
-  - LLM interview patterns: 92-llm-interview-patterns.md
-  - LLM architecture patterns: 93-llm-architecture-patterns.md
+  - Foundations:
+      - LLM foundations: 01-llm-foundations.md
+      - Prompting & output: 02-prompting-and-output-control.md
+      - LLM terms glossary: 90-llm-terms-glossary.md
+  - Retrieval & RAG:
+      - RAG & retrieval: 03-rag-and-retrieval.md
+      - RAG system design: 04-rag-system-design.md
+  - Agents:
+      - Agents, tools & memory: 05-agents-tools-and-memory.md
+  - Evaluation & operations:
+      - Evaluation: 06-evaluation.md
+      - Production & scale: 07-production-cost-and-scale.md
+  - Trust & safety:
+      - Security & safety: 08-security-and-safety.md
+  - Adaptation & engineering:
+      - Fine-tuning: 09-fine-tuning-and-customization.md
+      - General engineering: 10-general-engineering.md
+  - Patterns:
+      - AI engineer patterns: 91-ai-engineer-interview-patterns.md
+      - LLM interview patterns: 92-llm-interview-patterns.md
+      - LLM architecture patterns: 93-llm-architecture-patterns.md
