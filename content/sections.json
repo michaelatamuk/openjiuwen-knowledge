@@ -1,0 +1,11 @@
+{
+  "sections": [
+    { "title": "Foundations", "topics": ["01", "02", "90"] },
+    { "title": "Retrieval & RAG", "topics": ["03", "04"] },
+    { "title": "Agents", "topics": ["05"] },
+    { "title": "Evaluation & operations", "topics": ["06", "07"] },
+    { "title": "Trust & safety", "topics": ["08"] },
+    { "title": "Adaptation & engineering", "topics": ["09", "10"] },
+    { "title": "Patterns", "topics": ["91", "92", "93"] }
+  ]
+}

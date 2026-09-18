@@ -12,6 +12,7 @@ data class ContentRoot(
 data class TopicDto(
     val id: String,
     val title: String,
+    val section: String = "",
     val questions: List<QuestionDto> = emptyList(),
 )
 

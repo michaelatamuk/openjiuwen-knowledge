@@ -28,6 +28,7 @@ TOPICS = os.path.join(CONTENT_DIR, "topics")
 SUMMARIES = os.path.join(CONTENT_DIR, "summaries")
 JIUWEN = os.path.join(CONTENT_DIR, "jiuwen")
 DIAGRAMS_JSON = os.path.join(CONTENT_DIR, "diagrams.json")
+SECTIONS_JSON = os.path.join(CONTENT_DIR, "sections.json")
 
 MH = re.compile(r"^##\s*(?:(\d+)\.\s*)?(.+)$")
 DIAGRAM = re.compile(r"```mermaid\r?\n(.*?)```", re.S)
@@ -331,6 +332,17 @@ def load_merge(directory):
     return out
 
 
+def load_sections():
+    """Return (topic order map, topic -> section title) from content/sections.json."""
+    data = json.load(open(SECTIONS_JSON, encoding="utf-8"))
+    order, section_of = {}, {}
+    for si, sec in enumerate(data["sections"]):
+        for ti, tid in enumerate(sec["topics"]):
+            order[tid] = (si, ti)
+            section_of[tid] = sec["title"]
+    return order, section_of
+
+
 def main():
     if "--fix-cache" in sys.argv:
         n = 0
@@ -342,6 +354,7 @@ def main():
     authored = load_merge(SUMMARIES)
     authored_j = load_merge(JIUWEN)
     authored_d = json.load(open(DIAGRAMS_JSON, encoding="utf-8"))
+    order, section_of = load_sections()
     files = sorted(f for f in glob.glob(os.path.join(TOPICS, "*.md"))
                    if re.match(r"^(0[1-9]|10|9[0-9])-", os.path.basename(f)))
     os.makedirs(os.path.join(OUT, "diagrams"), exist_ok=True)
@@ -350,7 +363,8 @@ def main():
     for f in files:
         prefix = os.path.basename(f)[:2]
         title, questions = parse_file(f)
-        t = {"id": prefix, "title": title, "questions": []}
+        t = {"id": prefix, "title": title, "section": section_of.get(prefix, ""),
+             "questions": []}
         n = len(questions)
         for qi, q in enumerate(questions, 1):
             total += 1
@@ -422,6 +436,11 @@ def main():
                 "provenance": {"sources": sources, "reviewedAt": today},
             })
         topics.append(t)
+
+    uncovered = [t["id"] for t in topics if t["id"] not in order]
+    if uncovered:
+        print("WARNING: topics missing from content/sections.json:", ", ".join(uncovered))
+    topics.sort(key=lambda t: order.get(t["id"], (10 ** 6, 0)))
 
     data = {"version": 3, "topics": topics}
     os.makedirs(OUT, exist_ok=True)

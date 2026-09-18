@@ -219,16 +219,24 @@ fun StudyScreen(repo: Repo, onOpen: (String) -> Unit) {
 @Composable
 fun ExploreScreen(repo: Repo, onTopic: (String) -> Unit) {
     val topics by repo.topics.collectAsStateWithLifecycle(emptyList())
+    val grouped = topics.groupBy { it.section.ifBlank { "Other" } }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item { Text("Topics", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold) }
-        items(topics, key = { it.id }) { t ->
-            Card(Modifier.fillMaxWidth().clickable { onTopic(t.id) }) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(t.id, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(14.dp))
-                    Text(t.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+        grouped.forEach { (section, items) ->
+            item(key = "section-$section") {
+                Text(section, style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 8.dp))
+            }
+            items(items, key = { it.id }) { t ->
+                Card(Modifier.fillMaxWidth().clickable { onTopic(t.id) }) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(t.id, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(14.dp))
+                        Text(t.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    }
                 }
             }
         }

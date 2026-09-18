@@ -15,7 +15,7 @@ object ContentImporter {
         val text = context.assets.open("content.json").bufferedReader().use { it.readText() }
         val root = json.decodeFromString<ContentRoot>(text)
 
-        val topics = root.topics.mapIndexed { i, t -> TopicEntity(t.id, t.title, i) }
+        val topics = root.topics.mapIndexed { i, t -> TopicEntity(t.id, t.title, i, t.section) }
         val questions = ArrayList<QuestionEntity>()
         val cards = ArrayList<CardEntity>()
         for (t in root.topics) {

@@ -8,6 +8,7 @@ data class TopicEntity(
     @PrimaryKey val id: String,
     val title: String,
     val orderIndex: Int,
+    val section: String = "",
 )
 
 /** A question as a layered/atomic topic page (v2 schema). */
