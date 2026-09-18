@@ -53,6 +53,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -200,29 +202,45 @@ private fun svgLoader(context: android.content.Context): ImageLoader =
 private fun SvgZoomDialog(asset: String, loader: ImageLoader, onClose: () -> Unit) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { z, pan, _ ->
-        val ns = (scale * z).coerceIn(1f, 12f); scale = ns
-        offset = if (ns <= 1f) Offset.Zero else offset + pan
+    var box by remember { mutableStateOf(IntSize.Zero) }
+    val state = rememberTransformableState { zoomChange, panChange, _ ->
+        val ns = (scale * zoomChange).coerceIn(1f, 8f)
+        scale = ns
+        offset = if (ns <= 1f) Offset.Zero else clampOffset(offset + panChange, ns, box)
     }
     Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Box(Modifier.fillMaxSize().background(Color(0xF0000000))) {
+        Box(Modifier.fillMaxSize().background(Color(0xF0000000)).onSizeChanged { box = it }) {
             AsyncImage(
                 model = "file:///android_asset/$asset", imageLoader = loader, contentDescription = "diagram",
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { if (scale > 1f) { scale = 1f; offset = Offset.Zero } else scale = 3f })
-                }.graphicsLayer {
-                    scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y
-                }.transformable(state),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = {
+                            if (scale > 1f) { scale = 1f; offset = Offset.Zero }
+                            else { scale = 2.5f; offset = Offset.Zero }
+                        })
+                    }
+                    .graphicsLayer {
+                        scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y
+                    }
+                    .transformable(state),
             )
             IconButton(onClick = onClose, modifier = Modifier.align(Alignment.TopEnd).padding(12.dp)) {
                 Icon(Icons.Filled.Close, "Close", tint = Color.White)
             }
-            Text("Pinch to zoom · drag to pan · double-tap", color = Color.White,
+            Text("Double-tap or pinch to zoom \u00b7 drag to pan", color = Color.White,
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp))
         }
     }
+}
+
+private fun clampOffset(o: Offset, scale: Float, box: IntSize): Offset {
+    if (box.width == 0 || box.height == 0) return o
+    val maxX = box.width * (scale - 1f) / 2f
+    val maxY = box.height * (scale - 1f) / 2f
+    return Offset(o.x.coerceIn(-maxX, maxX), o.y.coerceIn(-maxY, maxY))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -242,19 +260,7 @@ fun DiagramView(data: DiagramData, citations: List<CitationDto>) {
     val darkSurface = false
 
     var full by remember { mutableStateOf(false) }
-    var step by remember { mutableIntStateOf(-1) }
-    var playing by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<DiagramNodeDto?>(null) }
-
-    val currentLabel = if (step in data.steps.indices) data.steps[step] else null
-    LaunchedEffect(playing) {
-        if (playing) {
-            while (step < data.steps.size - 1) {
-                delay(1300); step++; haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
-            playing = false
-        }
-    }
 
     Column(Modifier.fillMaxWidth()) {
         Box(
@@ -264,7 +270,7 @@ fun DiagramView(data: DiagramData, citations: List<CitationDto>) {
                     RoundedCornerShape(12.dp),
                 )
                 .aspectRatio(if (data.h > 0f && data.w > 0f) data.w / data.h else 1.6f)
-                .pointerInput(data, step) {
+                .pointerInput(data) {
                     detectTapGestures { off ->
                         val sw = if (data.w > 0f) data.w else size.width.toFloat()
                         val sh = if (data.h > 0f) data.h else size.height.toFloat()
@@ -287,38 +293,7 @@ fun DiagramView(data: DiagramData, citations: List<CitationDto>) {
                 contentDescription = data.alt.ifBlank { "diagram" }, contentScale = ContentScale.Fit,
                 onError = { useSvg = false },
                 modifier = Modifier.fillMaxSize())
-            Canvas(Modifier.fillMaxSize()) {
-                currentLabel?.let { lbl ->
-                    val sw = if (data.w > 0f) data.w else size.width
-                    val sh = if (data.h > 0f) data.h else size.height
-                    val sx = size.width / sw; val sy = size.height / sh
-                    data.nodes.filter { it.label == lbl }.forEach { n ->
-                        val c = Offset(n.x * sx, n.y * sy)
-                        drawCircle(Color(0x334C5BD4), radius = size.minDimension * 0.1f, center = c)
-                        drawCircle(Color(0xFF4C5BD4), radius = size.minDimension * 0.1f, center = c,
-                            style = Stroke(width = 5f))
-                    }
-                }
-            }
             TextButton(onClick = { full = true }, modifier = Modifier.align(Alignment.TopEnd)) { Text("Expand") }
-        }
-        if (data.steps.size >= 2) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = { if (step > 0) { step--; haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) } }, enabled = step > 0) {
-                    Icon(Icons.Filled.ChevronLeft, "Previous step")
-                }
-                Column(Modifier.weight(1f)) {
-                    Text(if (step >= 0) "Step ${step + 1} / ${data.steps.size}" else "Step through the flow",
-                        style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(currentLabel ?: "Tap play", style = MaterialTheme.typography.bodyMedium)
-                }
-                IconButton(onClick = { if (step < data.steps.size - 1) { step++; haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) } }, enabled = step < data.steps.size - 1) {
-                    Icon(Icons.Filled.ChevronRight, "Next step")
-                }
-                IconButton(onClick = { if (playing) playing = false else { if (step >= data.steps.size - 1) step = -1; playing = true } }) {
-                    Icon(Icons.Filled.PlayArrow, "Play")
-                }
-            }
         }
     }
 
