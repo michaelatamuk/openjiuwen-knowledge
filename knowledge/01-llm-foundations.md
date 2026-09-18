@@ -25,6 +25,10 @@
 
 The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `TiktokenCounter` maps known model names to tiktoken encodings (falling back to `cl100k_base` for unknown models), and `TiktokenModelCounter` loads a model-native BPE vocabulary. `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/a13d66dd98d5d103d992aca1836a82027392e2d4.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -33,14 +37,6 @@ The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `T
 | `agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86` | model-native tiktoken BPE |
 | `agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34` | TokenizerSpec; :50 fallback policy chain |
 | `agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60` | resolves/downloads tokenizer artifacts |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/a13d66dd98d5d103d992aca1836a82027392e2d4.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -71,6 +67,10 @@ The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `T
 
 Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKENS`, default 200,000), compression/offload thresholds, and cost via provider-reported `usage_metadata` (`input_tokens`/`output_tokens`/cache/reasoning tokens). Retrieval chunking is also token-based.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c288f596c049a51c85685629bbd5938b9a4b67a4.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -79,14 +79,6 @@ Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKEN
 | `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | per-round token budget |
 | `agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:287` | count() drives limits/cost |
 | `agent-core/openjiuwen/core/foundation/llm/schema/message.py:28` | total_tokens usage metadata |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c288f596c049a51c85685629bbd5938b9a4b67a4.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -124,10 +116,6 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 | `agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212` | TiktokenCounter; :287 fallback |
 | `agent-core/openjiuwen/core/foundation/store/base_embedding.py:24` | Embedding ABC; :29 embed_query |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46` | embed_documents |
-
-**Canonical source**
-
-<sub>`source/llm-applied-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -169,10 +157,6 @@ Not implemented — attention is delegated entirely to provider APIs or to Huggi
 | `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175` | AutoModelForCausalLM.from_pretrained(...); attention delegated |
 | `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:527` | torch.softmax(...) is sampling, not attention |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -213,10 +197,6 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 | `agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:584` | rope scaling passed through |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/offline/coordinator/batch_builder.py:175` | position_ids from cumsum(attention_mask) (padding metadata) |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -246,6 +226,10 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 
 There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c1a6f128cf56f9ef3f538870f5715ca0444241d1.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -256,14 +240,6 @@ There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:174` | model_type limited to None \| "bert" \| "qwen" |
 | `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175` | AutoModelForCausalLM (decoder-only) |
 | `agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:35` | vLLM architectures string |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c1a6f128cf56f9ef3f538870f5715ca0444241d1.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -303,10 +279,6 @@ Model metadata here is operational only: model name, provider, context-window to
 | `agent-core/openjiuwen/core/foundation/llm/schema/config.py:209` | model_name; :214 max_tokens (output cap) |
 | `agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:20` | created timestamp (response, not cutoff) |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -337,6 +309,10 @@ Model metadata here is operational only: model name, provider, context-window to
 
 On every `add_messages`/`get_context_window`, the context engine counts tokens with a model-aware tokenizer and runs passive processors: offloaders persist oversized tool results to `{workspace}/context/{session_id}_context/offload/` and replace them with `<persisted-output>` previews, while compressors trigger at ratio/token thresholds (`RoundLevelCompressor` at 0.9×budget, `FullCompactProcessor` at 180k) and rewrite history into summary/memory blocks. If the model still rejects the request, `ContextEngine.recover_from_model_exception` matches overflow phrases, force-runs compaction, and retries only if context actually changed. A hard `max_context_message_num` provides a last-resort FIFO drop. `effective_context_budget` is the strictest positive bound across configured window, per-call budget, and resolved model window.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c89a897c55359900a31ecd9fb62cb5da0ab663bd.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -348,14 +324,6 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | trigger_total_tokens=180000; :194 messages_to_keep=10 |
 | `agent-core/openjiuwen/core/context_engine/context_engine.py:372` | recover_from_model_exception() |
 | `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | per-round tokens_threshold=50000; agent-core/openjiuwen/core/context_engine/processor/offloader/message_offloader.py:45 tokens_threshold=20000 |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c89a897c55359900a31ecd9fb62cb5da0ab663bd.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -387,6 +355,10 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 There is no explicit "lost-in-the-middle" mitigation; the system instead mechanically keeps the window small and biases toward recency. Compressors protect a newest-message tail (`keep_recent_messages`, `messages_to_keep`, `keep_last_round`), offloaders keep only the newest K results, and truncation helpers preserve head + tail (one also keeps a middle slice) rather than only a prefix. When enabled, `CompressionRecallConfig` archives replaced messages in overlapping token chunks and a two-stage BM25 retriever can re-surface relevant archived chunks by query — the closest thing to relevance-based long-context handling.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/f2814a4283a4122d4ca23e3a80e483b215eacfb3.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -397,14 +369,6 @@ There is no explicit "lost-in-the-middle" mitigation; the system instead mechani
 | `agent-core/openjiuwen/core/context_engine/processor/offloader/message_summary_offloader.py:697` | _smart_truncate_content() head/middle/tail |
 | `agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:114` | _build_head_tail() |
 | `agent-core/openjiuwen/core/context_engine/processor/forked/compressor/recall/archive.py:48` | archive in 3000-token chunks / 300 overlap; agent-core/openjiuwen/core/context_engine/processor/forked/compressor/recall/retriever.py:27 BM25 recall_compressed_context() |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/f2814a4283a4122d4ca23e3a80e483b215eacfb3.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -447,10 +411,6 @@ Temperature is a **passthrough request parameter** — hosted APIs apply the mat
 | `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:516` | scores = next_token_logits / max(1e-6, temperature) |
 | `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:60` | GenerationConfig.temperature: float = 0.0 |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -491,10 +451,6 @@ Top-p (nucleus) is implemented locally; top-k sampling is not. `GenerationConfig
 | `agent-core/openjiuwen/core/foundation/llm/schema/config.py:213` | top_p: Optional[float] = None (no top_k) |
 | `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:40` | TrieConstraint.top_k (allowed outputs, not sampling) |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -534,10 +490,6 @@ Greedy is implemented but not argued. The local sampler returns `argmax` when `t
 | `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/verl_executor.py:185` | remax_input.meta_info["do_sample"] = False (REMAX baseline, not an exploit path) |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/extractor/triple_extractor.py:31` | constructor default temperature=0.0 |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -576,10 +528,6 @@ The repo frames arithmetic/counting as a tool-augmentation problem. A canonical 
 | `agent-core/openjiuwen/core/sys_operation/code.py:16-49` | execute_code sys-operation |
 | `agent-core/openjiuwen/extensions/sys_operation/sandbox/providers/jiuwenbox.py:2927` | sandbox execute_code |
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluation_result_analyzer/evidence_investigation.py:200` | "textual arithmetic is never accepted as execution" |
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -622,10 +570,6 @@ The repo does not model or detect low-level hallucination; it implements downstr
 | `agent-core/openjiuwen/harness/tools/web/paid_search.py:221-222` | extracts citation URLs (no claim linkage) |
 | `agent-core/openjiuwen/agent_evolving/tools/skill.py:284` | "then cite only the refs you actually read" |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -665,10 +609,6 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:404-427` | parses per-token logprobs, rejects > 0 |
 | `agent-core/openjiuwen/agent_evolving/trajectory/schema.py:36-47` | RL_LOGPROBS; agent-core/openjiuwen/agent_evolving/trajectory/spans.py:849-873 — read_rl_fields |
 | `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305-315` | is_abstain from output token "0" (retrieval only) |
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 

@@ -35,10 +35,6 @@ Embedding is batched and effectively one-time: `APIEmbedding` chunks texts (`max
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | add_session_usage; jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:17212 — usage events |
 | `agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24` | input 3e-6 / output 15e-6 USD per token; :85 cost computed |
 
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -79,10 +75,6 @@ The product tracks provider-reported session cost and enforces a per-session cap
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | 180k compaction |
 | `agent-core/openjiuwen/agent_teams/models/allocator.py:559` | availability routing (not cost/quality) |
 
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -113,6 +105,10 @@ The product tracks provider-reported session cost and enforces a per-session cap
 
 The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -122,14 +118,6 @@ The product tracks provider-reported session cost and enforces a per-session cap
 | `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | tool-loop threshold + bailout |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png)
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -170,10 +158,6 @@ Model selection is about availability and endpoint distribution, not cost or que
 | `agent-core/openjiuwen/core/retrieval/common/config.py:46` | top_k: int = 5 (only retrieval-size config) |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:773` | exact embedding cache (no semantic cache) |
 
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -204,6 +188,10 @@ Model selection is about availability and endpoint distribution, not cost or que
 
 Caching is exact-match, not semantic. Core has a session KV-cache runtime with affinity/lineage identities (parent/child sessions, team members, compressors) to reuse inference KV state. The product memory index keeps a SQLite `embedding_cache` keyed by text hash, and `agent_evolving` has its own embedding cache. `ToolCallDeduplicationRail` is an exact `(tool_name, args-hash)` per-turn result cache for read-only tools. Local vLLM/transformers use prefix/prompt caches.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/82f41b4e178809cfcfdf4dc9e5bdab722df1857e.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -213,14 +201,6 @@ Caching is exact-match, not semantic. Core has a session KV-cache runtime with a
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47` | exact per-turn tool result cache |
 | `agent-core/openjiuwen/core/retrieval/lazy_load.py:25` | lazy import cache; agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:221 — reusable encodings |
 | `agent-core/openjiuwen/agent_evolving/ttse/stores.py:522` | embedding cache limit; agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:176 — prefix cache |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/82f41b4e178809cfcfdf4dc9e5bdab722df1857e.png)
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -263,10 +243,6 @@ End-to-end streaming is supported (ReAct `stream` → session stream iterator �
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/intelli_router_model_client.py:32` | ReliableRouter |
 | `jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:6353` | model object cache by name |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -305,10 +281,6 @@ The LLM path is single-process asyncio/anyio. `httpx.AsyncClient` instances shar
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:719` | same pooling for AsyncAnthropic |
 | `agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:55` | asyncio.Semaphore(max_concurrent); :120 ThreadPoolExecutor for sync path |
 | `jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:5326` | asyncio.to_thread(...) offload; jiuwenswarm/jiuwenswarm/server/runtime/agent_warm_pool.py:154 — semaphore-bounded warm pool |
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -350,10 +322,6 @@ The system has per-process bounded resources rather than elastic scaling. LLM HT
 | `agent-core/openjiuwen/core/workflow/components/tool/http/http_request_component.py:110` | HttpRateLimitConfig |
 | `agent-core/openjiuwen/core/runner/message_queue_inmemory.py:34` | bounded queue; agent-core/openjiuwen/harness/subagent_runtime/activity_events.py:53 — bounded activity queue |
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:35` | backoff schedule; jiuwenswarm/jiuwenswarm/server/runtime/agent_warm_pool.py:154 — warm-pool semaphore split |
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -434,10 +402,6 @@ Rollback exists for whole RSI **harness packages**: `rollback(installation_id)` 
 | `agent-core/openjiuwen/auto_harness/stages/activate.py:118` | explicit accept/reject |
 | `agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21` | no eval gate |
 
-**Canonical source**
-
-<sub>`source/llm-applied-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -477,10 +441,6 @@ The closest code mechanisms are CI gates and explicit human activation, not an e
 | `agent-core/openjiuwen/auto_harness/stages/merge.py:95` | static-check retry (max 3) then fail-fast |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617` | rollback; :682 _assert_rollback_allowed; :694 validate target hash |
 | `agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448` | enable_* config flags |
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 

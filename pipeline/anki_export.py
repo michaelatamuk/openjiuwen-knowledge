@@ -63,25 +63,21 @@ def main():
             tech_html = ""
             plain = q.get("jiuwenPlain", "")
             tech_text = q.get("mechanism", "") if plain else ""
-            sources = q.get("provenance", {}).get("sources") or []
-            if tech_text or q.get("citations") or tech.get("image") or sources:
+            if tech_text or q.get("citations") or tech.get("image"):
                 tparts = []
                 if tech_text:
                     tparts.append("<h4>Implementation</h4>" + md(tech_text))
+                if tech.get("image"):
+                    tp = os.path.join(ASSETS, tech["image"].replace("/", os.sep))
+                    if os.path.isfile(tp):
+                        media[os.path.basename(tp)] = tp
+                        tparts.append("<h4>Implementation diagram</h4>" + diagram_img(tech["image"]))
                 if q.get("citations"):
                     rows = "".join(
                         f'<tr><td class="a"><code>{html.escape(c.get("ref",""))}</code></td>'
                         f'<td>{html.escape(c.get("desc",""))}</td></tr>'
                         for c in q.get("citations", []))
                     tparts.append("<h4>Code anchors</h4><table class='anchors'>" + rows + "</table>")
-                if tech.get("image"):
-                    tp = os.path.join(ASSETS, tech["image"].replace("/", os.sep))
-                    if os.path.isfile(tp):
-                        media[os.path.basename(tp)] = tp
-                        tparts.append("<h4>Implementation diagram</h4>" + diagram_img(tech["image"]))
-                if sources:
-                    tparts.append("<h4>Canonical source</h4><div class='cite'>"
-                                  + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
                 tech_html = (
                     "<details><summary>Under the hood</summary>"
                     + "".join(tparts) + "</details>"

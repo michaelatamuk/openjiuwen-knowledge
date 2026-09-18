@@ -38,10 +38,6 @@ The codebase deliberately routes many decisions through deterministic code. The 
 | `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/infra/parsers.py:147` | deterministic JSON extraction |
 | `agent-core/openjiuwen/core/memory/process/extract/memory_analyzer.py:26` | LLM classifier (semantic) |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -78,10 +74,6 @@ Model selection here is about availability and endpoint distribution, not task q
 | `agent-core/openjiuwen/agent_teams/models/pool.py:38` | ModelPoolEntry; :133 ModelRouterConfig; :241 IntelliRouterDeployment; :314 IntelliRouterConfig; :278 tpm/rpm rate-aware; :95 "weights/affinity hints" (documented, not implemented) |
 | `agent-core/openjiuwen/agent_teams/models/allocator.py:176` | round-robin; :240 by-model-name; :452 IntelliRouter; :559 build_model_allocator; :28 allocation-vs-reliability docstring |
 | `agent-core/openjiuwen/harness/schema/config.py:242` | / agent-core/openjiuwen/harness/schema/deep_agent_spec.py:441 — per-agent/task model config |
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 

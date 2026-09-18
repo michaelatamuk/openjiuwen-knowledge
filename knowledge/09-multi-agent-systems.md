@@ -37,10 +37,6 @@ Supervisor teams are built on `core/multi_agent`'s `HierarchicalTeam`, in two im
 | `agent-core/openjiuwen/agent_teams/tools/task_manager.py:1581` | one-active-task invariant |
 | `agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:208` | _reconcile_starts() leader mailbox dispatch |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -83,10 +79,6 @@ The `agent_teams` stack uses a persisted mailbox plus an event bus. `TeamMessage
 | `agent-core/openjiuwen/core/multi_agent/teams/handoff/handoff_tool.py:17` | HandoffTool |
 | `agent-core/openjiuwen/harness/tools/subagent/task_tool.py:154` | TaskTool (synchronous child session, not a mailbox peer) |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -126,10 +118,6 @@ Four paths. **Subagent delegation:** `TaskTool` builds isolated child inputs (`_
 | `agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:208` | scheduled handoff as a rendered leader message |
 | `agent-core/openjiuwen/agent_teams/tools/database/task_dao.py:634` | peer task handoff via CAS claim |
 | `agent-core/openjiuwen/agent_teams/workflow/engine/primitives.py:1495` | pipeline() passes prev between stages |
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -172,10 +160,6 @@ One-active-task-per-member invariant, atomic compare-and-swap claim, reassign in
 | `../../../agent-core/openjiuwen/agent_teams/worktree` | per-member worktree isolation |
 | `agent-core/openjiuwen/agent_teams/reliability/` | conflict detectors |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -205,6 +189,10 @@ One-active-task-per-member invariant, atomic compare-and-swap claim, reassign in
 
 The framework emits an OpenTelemetry span tree attributing each LLM/tool/agent action to a member: `AgentObservabilityRail` opens `agent.{member}.task_iteration.N` / `agent.{member}.invoke` spans, and `TeamObservabilityRail` stamps `agentteam.agent_id`, `member_name`, `role`, `team_id`, and `gen_ai.conversation.id` via an `AgentSpanDecoration`. `OtelTeamMonitorHandler` adds `task.{id}` and `member.*`/`msg.*` event spans under the team span, so task-state and message-routing timelines are visible. Dispatched subagents get their own span (`harness/observability/subagent.py`), and each span carries an `ExecutionSubject` for trajectory-lane attribution. On the product side, TraceHound replays session history and groups records per agent with token/cost attribution; the task board and per-member message history remain ground truth when spans are absent.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/23a1fb5df116ced8178b5713981ff89432d88166.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -217,14 +205,6 @@ The framework emits an OpenTelemetry span tree attributing each LLM/tool/agent a
 | `agent-core/openjiuwen/agent_evolving/trajectory/store.py:23` | TrajectoryStore protocol; :135 FileTrajectoryStore |
 | `jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:12840` | _replay_agent_of() |
 | `jiuwenswarm/jiuwenswarm/server/runtime/session/session_history.py:863` | _is_member_relevant() |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/23a1fb5df116ced8178b5713981ff89432d88166.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -263,10 +243,6 @@ Supported but not the default: `agent_teams` provides a leader/teammate model wi
 | `agent-core/openjiuwen/harness/tools/subagent/task_tool.py:154-158` | TaskTool isolated subagent session |
 | `jiuwenswarm/jiuwenswarm/agents/swarm/assembly.py:260` | product swarm assembly |
 | `agent-core/openjiuwen/agent_teams/agent/team_agent.py:76` | one TeamAgent for leader/teammate |
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 

@@ -26,6 +26,10 @@
 
 Dense is `VectorRetriever`; sparse is `SparseRetriever`, which on Milvus is real BM25 (`metric_type="BM25"` against a `SPARSE_FLOAT_VECTOR` field with `SPARSE_INVERTED_INDEX`). Chroma falls back to a TF-IDF text query; PG uses full-text search. `HybridRetriever` takes an `alpha` but every backend actually uses RRF: Milvus `RRFRanker(k=60)`, Chroma/PG `rrf_fusion(..., k=60)` scoring deduped text by `Σ 1/(k+rank)`. The only true weighted fusion is in the graph store (`WeightedRankConfig`).
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/26b96af4829e8b82868c9ec10bfc07803e96e743.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -36,14 +40,6 @@ Dense is `VectorRetriever`; sparse is `SparseRetriever`, which on Milvus is real
 | `agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:26` | alpha (ignored by stores) |
 | `agent-core/openjiuwen/core/retrieval/utils/fusion.py:15/39` | rrf_fusion + 1/(k+rank) |
 | `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:300` | no BM25 (TF-IDF); agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:375 — FTS |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/26b96af4829e8b82868c9ec10bfc07803e96e743.png)
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -74,6 +70,10 @@ Dense is `VectorRetriever`; sparse is `SparseRetriever`, which on Milvus is real
 
 Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeBase.retrieve` picks the retriever and mode from `config.index_type` (`vector` → `VectorRetriever`, `bm25` → `SparseRetriever`, else hybrid). `AgenticRetriever` derives its default mode from the underlying retriever's `index_type`, and `GraphRetriever` validates against `_allowed_modes`. The only dynamic keyword behavior is a degenerate fallback: if dense returns zero results, `VectorRetriever`/`HybridRetriever` re-run `sparse_search`. `QueryRewriter` produces an `intention` field but never uses it to switch modes.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/fe9b21fbb06c467a9e259c3725f165fccd193634.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -84,14 +84,6 @@ Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeB
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:155` | default_mode from index_type |
 | `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:262` | _allowed_modes |
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:277` | rewrite schema includes intention |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/fe9b21fbb06c467a9e259c3725f165fccd193634.png)
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -134,10 +126,6 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 | `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265` | where dict filter |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:346` | INVERTED scalar index on doc id |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -175,10 +163,6 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 | `agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:64` | threshold honored only in mode="vector" |
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182` | KB path calls no reranker |
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241` | context concatenated unbounded |
-
-**Canonical source**
-
-<sub>`source/rag-part1-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -219,10 +203,6 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:131` | spreadsheets flattened to text documents |
 | `agent-core/openjiuwen/core/sys_operation/local/_rw_lock_manager.py:23` | SQLite used only as a lock DB |
 
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -262,10 +242,6 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:125` | no reranker in retrieve; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:251 — passes **kwargs only |
 | `agent-core/openjiuwen/core/retrieval/common/result_ranking.py:11` | fusion rankers, distinct from cross-encoder |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -303,10 +279,6 @@ There is a real reranker stack (`StandardReranker`, `ChatReranker`, DashScope) a
 | `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:58` | rerank() returns relevance_score per doc |
 | `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | _combined_rerank/rerank sorts in place |
 | `agent-core/examples/retrieval/showcase_reranker.py:23` | standalone reranker demo (no baseline) |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -347,10 +319,6 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 | `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23` | StandardReranker (/rerank) |
 | `agent-core/examples/store/showcase_milvus_graph_store.py:51` | before/after rerank demo (no labels) |
 
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -389,10 +357,6 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 | `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:113` | list-size-1 constraint (per-doc LLM call) |
 | `agent-core/openjiuwen/core/retrieval/utils/api_requests.py:55` | retry/backoff loop |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -428,10 +392,6 @@ The reranker is optional (`reranker=None` by default), and the product `jiuwensw
 |---|---|
 | `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160` | `reranker=None` optional |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340` | product pins `rerank_enabled: False` |
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -470,10 +430,6 @@ Retrieval is bi-encoder (query and docs embedded independently, compared by vect
 | `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:28` | /rerank endpoint; :29 instruct+query template; :81 parses relevance_score |
 | `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:83` | logprob yes/no scoring; :125 chat prompt assembly |
 | `agent-core/openjiuwen/core/retrieval/reranker/dashscope_reranker.py:16` | DashScope reranker |
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -514,10 +470,6 @@ The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and t
 | `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | tokens_threshold=50000; agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_window_processor.py:44 — keep_last_k=3 |
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/micro_compact_processor.py:24` | threshold 5; agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184 — 180k |
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:227/349` | compress_range=20 + history compression |
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 

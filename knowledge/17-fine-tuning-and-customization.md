@@ -37,10 +37,6 @@ Two distinct things live here. The default "evolution" path does **not** train w
 | `agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438` | export_lora(...); :489 _convert_fsdp_to_peft(...) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:51` | versioned adapter store |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -76,10 +72,6 @@ Instruction tuning is implemented as **SFT over agent chat trajectories**: messa
 |---|---|
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/sft_data_formatter.py:201-249` | build_sft_tokenized_sample, loss mask on assistant only; :270-345 write_sft_parquet; :101-133 convert_message_openai; :50-60 Qwen <tool_call> XML; :77-84 <think> → reasoning_content |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:136-176` | train_batch; :395-398 QwenMultiTurnSFTDataset; :270-276 parquet write |
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -120,10 +112,6 @@ The repo trains weights, but only via **LoRA/PEFT adapters** — there is no ful
 | `agent-core/openjiuwen/agent_evolving/agent_rl/config/online_config.py:42-45` | PPO overlay lora_rank: 16, lora_alpha: 32, target_modules: all-linear |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:146` | update_actor (PPO) |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -163,10 +151,6 @@ The repo contains conceptual guidance plus two separate mechanisms, not a decisi
 | `agent-core/openjiuwen/agent_teams/models/pool.py:133-235` | ModelRouterConfig; agent-core/openjiuwen/agent_teams/models/allocator.py:176/240/357/452/559 — allocator strategies / build_model_allocator |
 | `agent-core/examples/intelli_router/intelliRouter_demo.py:142-160` | adaptive routing weights (w_health, w_token, w_rpm, w_latency) |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -205,10 +189,6 @@ The repo does not implement a decision rule, but it does encode the rationale. T
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | alternate weight-training (SFT/LoRA) path |
 | `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78` | retrieval path (knowledge at query time) |
 | `agent-core/openjiuwen/dev_tools/tune/optimizer/example_optimizer.py:109` | few-shot/example optimization |
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -250,10 +230,6 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 | `agent-core/openjiuwen/dev_tools/tune/trainer/trainer.py:38` | early_stop_score; :99 val gate |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:377` | val_files: None; :420 test_freq: -1; :359 weight_decay/clip_grad knobs |
 | `agent-core/examples/agent_evolving/react_agent_evolving.py:156` | split(ratio=0.6) train/val; :202 early_stop_score=0.95 |
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 

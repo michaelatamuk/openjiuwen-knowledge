@@ -698,6 +698,10 @@ Model-weight quantization is **not implemented** here — it is a passthrough en
 
 Enforcement lives in the shell/permission layer (substitution blocking, AST ASK floor, builtin deny rules); safety text is advisory and injection detectors are largely unregistered. The untrusted-tool-result seam is missing.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/3f1ccf81c73dbb46fe1a664c9b9f30c38091ff75.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -706,10 +710,6 @@ Enforcement lives in the shell/permission layer (substitution blocking, AST ASK 
 | `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:40` | check_injection blocks |
 | `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor; agent-core/openjiuwen/harness/security/permission_engine/core.py:272 — strictest merge |
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail (unregistered in production) |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/3f1ccf81c73dbb46fe1a664c9b9f30c38091ff75.png)
 
 </details>
 

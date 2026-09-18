@@ -84,27 +84,23 @@ def main():
             tech = ""
             plain = q.get("jiuwenPlain", "")
             tech_text = q.get("mechanism", "") if plain else ""
-            sources = q.get("provenance", {}).get("sources") or []
             td = q.get("diagramTechnical", {}) or {}
-            if tech_text or q.get("citations") or sources or td.get("image"):
+            if tech_text or q.get("citations") or td.get("image"):
                 tparts = ["<h3>Under the hood</h3>"]
                 if tech_text:
                     tparts.append("<h4>Implementation</h4>" + md(tech_text))
-                if q.get("citations"):
-                    rows = "".join(
-                        f'<tr><td class="a"><code>{html.escape(x.get("ref",""))}</code></td>'
-                        f'<td>{html.escape(x.get("desc",""))}</td></tr>'
-                        for x in q.get("citations", []))
-                    tparts.append("<h4>Code anchors</h4><table class='anchors'>" + rows + "</table>")
                 if td.get("image"):
                     tp = os.path.join(ASSETS, td["image"].replace("/", os.sep))
                     if os.path.isfile(tp):
                         images[os.path.basename(tp)] = tp
                         tparts.append("<h4>Implementation diagram</h4>"
                                       f'<div class="diagram"><img src="images/{os.path.basename(tp)}"/></div>')
-                if sources:
-                    tparts.append("<h4>Canonical source</h4><div class='cite'>"
-                                  + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
+                if q.get("citations"):
+                    rows = "".join(
+                        f'<tr><td class="a"><code>{html.escape(x.get("ref",""))}</code></td>'
+                        f'<td>{html.escape(x.get("desc",""))}</td></tr>'
+                        for x in q.get("citations", []))
+                    tparts.append("<h4>Code anchors</h4><table class='anchors'>" + rows + "</table>")
                 tech = "".join(tparts)
             parts.append(
                 f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{badges}{title}{summary}{pts}'

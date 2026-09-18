@@ -38,10 +38,6 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 | `agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119` | tests/lint/diff scoring |
 | `agent-core/openjiuwen/symphony/evaluation/evaluators.py:1-16` | static/trace evaluators incl. LLMJudgeEvaluator |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -80,10 +76,6 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47` | judge gets question/expected/answer, not retrieved context |
 | `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:311` | end-to-end pass_rate |
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | end-to-end weighted score |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -124,10 +116,6 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 | `agent-core/openjiuwen/symphony/evaluation/evaluators.py:520` | exact-match shortcut then LLM fallback |
 | `agent-core/examples/PerStream/src/eval/score_passive_judge.py:57` | "Consider synonyms or paraphrases as valid matches" |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -165,10 +153,6 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 | `agent-core/examples/PerStream/src/eval/test_remember_gate.py:180` | sklearn recall_score (gate classifier) |
 | `agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:92` | LLM-judged memory metrics |
 | `agent-core/openjiuwen/core/context_engine/processor/forked/compressor/recall/retriever.py:27` | recall_compressed_context (name only) |
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -208,10 +192,6 @@ Precision@k is **absent**. The only precision present is classification/answer p
 | `agent-core/examples/PerStream/src/eval/test_remember_gate.py:22` | sklearn `precision_score` |
 | `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | `rerank(...)` re-sorts, no precision measurement |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -247,10 +227,6 @@ The retrieval stack produces an ordered candidate list — and a cross-encoder c
 |---|---|
 | `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | `rerank(...)` re-sorts, no precision measurement |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60` | `compute_batch` zips predictions/labels, no relevance-per-rank |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -290,10 +266,6 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/internal.py:165` | bm25_rank_to_score (rank→score) |
 | `agent-core/openjiuwen/core/foundation/store/index/simple_memory_index.py:348` | sorts by score only |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -332,10 +304,6 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 | `agent-core/openjiuwen/core/retrieval/utils/fusion.py:20` | RRF only |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/__init__.py:11` | only three metrics exported |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -373,10 +341,6 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:58` | parses only result: true/false, no context/attribution input |
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:68` | generic rubric contract (no built-in faithfulness dimension) |
 | `agent-core/openjiuwen/harness/tools/web/free_search.py:299` | "simple relevance checks" (lexical, not RAG relevance) |
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -417,10 +381,6 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 | `agent-core/openjiuwen/symphony/evaluation/base.py:336` | redacted fingerprint+case (incidental context) |
 | `agent-core/openjiuwen/symphony/evaluation/evaluators.py:546` | payload filters trace |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -458,10 +418,6 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/judge_evidence.py:90` | prepare_judge_workspace (evidence snapshot, no claim checker) |
 | `agent-core/openjiuwen/symphony/evaluation/evaluators.py:438` | AccuracyEvaluator; :447 factual-error rubric |
 | `agent-core/openjiuwen/agent_evolving/evaluator/templates.py:7` | judge compares response vs expected answer (no context) |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -501,10 +457,6 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 | `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:94-107` | exp(logprob) yes/no |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:408-418` | stores token logprobs for RL |
 | `agent-core/openjiuwen/harness/tools/web/paid_search.py:44` | "Perplexity" is the search vendor, not the metric |
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -546,10 +498,6 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38` | num_votes |
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:127` | strict single-verdict parsing |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -587,10 +535,6 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 | `agent-core/examples/PerStream/scripts/generate_dataset.sh:31` | LLM-driven QA/memory generation (example only) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47` | LLM judge usable on unlabeled answers but no context |
 | `agent-core/openjiuwen/rsi/dataset_generator/__pycache__/case_generator.cpython-311.pyc` | NotImplementedError stubs (no .py source) |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -630,10 +574,6 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 | `agent-core/openjiuwen/rsi/dataset_generator/__pycache__/case_generator.cpython-311.pyc` | NotImplementedError stubs (no source) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:42` | metric interface lacks ranked-list eval |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -671,10 +611,6 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/metrics_collector.py:34` | total_cases/passed_cases/average_score (no variance/CI) |
 | `agent-core/openjiuwen/symphony/orchestration/config.py:50` | min_successes_verified (threshold, not statistics) |
 | `agent-core/openjiuwen/symphony/retrieval/build/tree/schema.py:232` | structure_sample_size (sampling config) |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -716,10 +652,6 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 | `agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119` | rank by tests/lint/diff |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38/58` | num_votes judge voting |
 
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -759,10 +691,6 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 | `agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217` | improved = val_score > progress.best_score |
 | `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:664` | _compute_evolution_metrics |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -792,6 +720,10 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 There is a live capture-and-score path, but it serves **online RL training, not quality monitoring**: `CapturePipeline` stages each production completion and a judge later attaches an LLM score or user reward, persisting to a trajectory sample store. The product writes all spans into a per-session SQLite trajectory store (diagnostic, 7-day retention) for replay. There is no drift detection, no eval traffic-sampling policy, no dashboard, and no quality alert.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/961b27df3d1ec939c1b0f7e8804acd6eac50c743.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -802,14 +734,6 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 | `jiuwenswarm/jiuwenswarm/observability/store.py:304` | TrajectoryStore; :307 7-day retention (diagnostic) |
 | `jiuwenswarm/jiuwenswarm/observability/sink.py:578` | TrajectorySessionSinkRouter; jiuwenswarm/jiuwenswarm/observability/runtime.py:69 — runtime |
 | `agent-core/openjiuwen/harness/observability/rail.py:355` | span emission |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/961b27df3d1ec939c1b0f7e8804acd6eac50c743.png)
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -848,10 +772,6 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 | `jiuwenswarm/jiuwenswarm/observability/store.py:102` | has_error; :137 trajectory_current_records |
 | `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167` | offline bench.evaluate; :668 _compute_evolution_metrics |
 | `agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217` | validation-score gate (offline) |
-
-**Canonical source**
-
-<sub>`source/rag-part1-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -892,10 +812,6 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 | `jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:544` | _TurnOutcomeTracker (runtime outcome) |
 | `agent-core/openjiuwen/agent_evolving/signal/review_feedback.py:117` | ReviewFeedbackAttributor |
 
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -934,10 +850,6 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 | `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/base.py:232` | aggregate() |
 | `agent-core/openjiuwen/agent_teams/verification/memory.py:160` | aggregates pass_rate/avg_score |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:32` | cost settings; :65 CostLimitExceededError |
-
-**Canonical source**
-
-<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
 
 </details>
 

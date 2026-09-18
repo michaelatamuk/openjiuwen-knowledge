@@ -25,6 +25,10 @@
 
 The system prompt is a single assembled string from priority-ordered, host-injectable sections; rails mutate the `SystemPromptBuilder` (add/remove sections) before the model call, and `ReActAgent` renders it once as a `SystemMessage` passed as `system_messages`. User turns are admitted separately as `UserMessage` history; the context engine windows `system_messages` and `context_messages` independently. Provider mapping differs: OpenAI chat keeps `role:"system"` in the list, Anthropic lifts system content to the top-level `system` parameter (with an opt-in mid-conversation system path), and the Responses API folds system/developer into `instructions`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/69d2dcb4f4fc5314eeedb02c0743d63433007226.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -36,14 +40,6 @@ The system prompt is a single assembled string from priority-ordered, host-injec
 | `agent-core/openjiuwen/harness/prompts/prompt_attachment_manager.py:591` | user→system re-role per provider |
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:379` | lifts system into top-level blocks; :858 params["system"] |
 | `agent-core/openjiuwen/core/foundation/llm/utils/responses_utils.py:142` | system/developer → instructions |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/69d2dcb4f4fc5314eeedb02c0743d63433007226.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -74,6 +70,10 @@ The system prompt is a single assembled string from priority-ordered, host-injec
 
 The runtime agent is fundamentally zero-shot: the system prompt is assembled from instruction-only `PromptSection`s (identity, safety, skills, tools, task guidance) and the model is steered through the ReAct tool-calling loop, not worked examples. Few-shot machinery exists only in the evolution/tuning tooling (`agent_evolving`, `dev_tools/tune`), which formats cases into example blocks and injects them as prompt gradients. Chain-of-thought appears in auxiliary prompts (workflow `questioner_comp` has an explicit "Let's think step by step") and implicitly in the compaction prompt's `<analysis>`-then-`<summary>` structure. Reasoning-model output is preserved: clients parse `reasoning_content`, and DeepSeek profiles inject an empty `reasoning_content` into assistant history.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/373c42a4809dccd4f18dc3d12ea2a6b8634bad52.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -85,14 +85,6 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 | `agent-core/openjiuwen/dev_tools/tune/optimizer/example_optimizer.py:109` | init_examples() few-shot injection |
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:347` | parses reasoning_content; agent-core/openjiuwen/core/foundation/llm/utils/endpoint_profiles.py:33 — DeepSeek empty reasoning_content |
 | `agent-core/openjiuwen/core/workflow/components/llm/questioner_comp.py:68` | explicit CoT instruction |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/373c42a4809dccd4f18dc3d12ea2a6b8634bad52.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -124,6 +116,10 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 
 The core harness has **no native `response_format`/JSON mode**; structured output is enforced by giving the model a single-use `structured_output` tool whose `ToolCard.input_params` is the caller's JSON Schema, so the provider's tool-use layer constrains arguments. On success the arguments are captured on the tool instance and a finish rail ends the round; on failure the error tool-result is returned for self-correction, and the workflow engine retries then validates the captured object with pydantic `model_validate` or `jsonschema.validate`. For text-based JSON (compression summaries), `JsonOutputParser` strips a ```` ```json ```` fence when present and `json.loads` the payload, returning `None` on decode failure rather than raising.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/9e0c742c339b0d2117ec2d070d21466a87e6ce4f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -134,14 +130,6 @@ The core harness has **no native `response_format`/JSON mode**; structured outpu
 | `agent-core/openjiuwen/agent_teams/workflow/engine/primitives.py:693` | retries; :763 coerce(res.structured, ...); agent-core/openjiuwen/agent_teams/workflow/engine/runtime.py:62 retries: int = 2 |
 | `agent-core/openjiuwen/core/foundation/llm/output_parsers/json_output_parser.py:15` | fence/bare extraction + json.loads; :92 stream_parse() |
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:713` | JsonOutputParser(); :1266 validates {"blocks":[...]} |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/9e0c742c339b0d2117ec2d070d21466a87e6ce4f.png)
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -172,6 +160,10 @@ The core harness has **no native `response_format`/JSON mode**; structured outpu
 
 Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -182,14 +174,6 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 | `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208` | MCPTool.invoke validates MCP args via the same path |
 | `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82` | input_params = schema_json; :86 invoke |
 | `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard.input_params is the schema source |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -221,6 +205,10 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 
 Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPromptBuilder.add_section`/`build`), extended by `harness.prompts.builder` with a `PromptMode` filter, and JiuwenSwarm supplies a static priority registry. Sections carry only name/priority/category — no version, hash, or ID. Diagnostics exist (`PromptReport`) but are not versioning. Prompt optimization overwrites the operator's `system_prompt`/`user_prompt` in place; the only persistence is `EvolveCheckpoint.version` storing `operators_state` for resume. Real versioning/rollback exists only at the RSI harness-package level (content-addressed `installation_id`, `list_versions`, `rollback` with hash re-validation) and config migration.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6c8287bc575edbdb8b65bb192f6e4eff83083589.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -234,14 +222,6 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 | `agent-core/openjiuwen/agent_evolving/checkpointing/state.py:15` | EvolveCheckpoint.version for resume |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617` | rollback; :587 list_versions; jiuwenswarm/jiuwenswarm/server/rsi/rsi_handlers.py:218 — RPC list/rollback |
 | `jiuwenswarm/jiuwenswarm/common/utils.py:882` | config_version migration |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6c8287bc575edbdb8b65bb192f6e4eff83083589.png)
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 

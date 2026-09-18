@@ -39,10 +39,6 @@ Cards become JSON Schema through the callable schema extractor, the ability mana
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:1078` | dispatch |
 | `agent-core/openjiuwen/core/foundation/tool/function/function.py:82` | argument schema validation |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -72,6 +68,10 @@ Cards become JSON Schema through the callable schema extractor, the ability mana
 
 Abilities are stored as metadata cards (`ToolCard`/`WorkflowCard`/`AgentCard`/`McpServerConfig`) in `AbilityManager`'s per-type dicts via `add()`; executable instances live separately in `Runner.resource_mgr`, bound by `add_ability()`. On each ReAct iteration, `list_tool_info()` flattens cards into `ToolInfo(name, description, parameters)`, and MCP servers are resolved lazily with an `mcp_<server>_` prefix. The list is placed on `ctx.inputs.tools` (after rails may filter it) and converted by the model client — OpenAI-style `_convert_tools_to_dict` emits `{"type":"function","function":{...}}`, Anthropic `_convert_tool_schemas` renames `parameters` → `input_schema`. Function/`@tool` backends auto-derive the schema via `CallableSchemaExtractor`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/34c616223b9111063e002a7c166ec340de492872.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -86,14 +86,6 @@ Abilities are stored as metadata cards (`ToolCard`/`WorkflowCard`/`AgentCard`/`M
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:494` | _convert_tool_schemas() → input_schema |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2683` | per-invoke list_tool_info(); set at :1538 |
 | `agent-core/openjiuwen/harness/factory.py:443` | registers tool instances (add_ability); :453 pure cards (add) |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/34c616223b9111063e002a7c166ec340de492872.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -124,6 +116,10 @@ Abilities are stored as metadata cards (`ToolCard`/`WorkflowCard`/`AgentCard`/`M
 
 The primary path is the `@tool` decorator, which wraps any plain function into a `LocalFunction` (a `Tool` subclass) with an auto-extracted or explicit `input_params`, then registers it via `ability_manager.add_ability(card, resource)`. The decorator builds a fresh `ToolCard` (`_create_new_tool_card`) or derives one from a prebuilt card (`_handle_prebuilt_card`), so callers can override `name`/`description`/`input_params`/`stateless`. Unsupported tools can also be declared as a `ToolCard` plus a concrete `Tool` subclass, or exposed through MCP: a `McpServerConfig` is added to the ability manager, and the runner materializes each discovered `McpToolCard` into an `MCPTool`. `build_tool_card` is the harness-standard card factory.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/eef9c6d5dbc4de81dc160a39fddbb89fafa8a79f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -136,14 +132,6 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 | `agent-core/openjiuwen/core/runner/resources_manager/tool_manager.py:281` | discovered MCP cards materialized into MCPTool |
 | `agent-core/openjiuwen/extensions/context_evolver/tool/wikipedia_tool.py:86` | minimal ToolCard + LocalFunction example |
 | `agent-core/openjiuwen/harness/prompts/tools/__init__.py:250` | build_tool_card() |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/eef9c6d5dbc4de81dc160a39fddbb89fafa8a79f.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -187,10 +175,6 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:1424` | surface raw JSON to the model |
 | `agent-core/openjiuwen/core/foundation/llm/output_parsers/json_output_parser.py:56` | no repair (returns None) |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -220,6 +204,10 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 
 `ToolCard.idempotent` defaults to `False` (secure-by-default), and non-idempotent tools are never retried. `ToolCallResilienceRail` decides in layers: reject retry for any card with `idempotent is False`; allow retry only for retryable exception types/markers (timeouts, connection resets, MCP transport); enforce a per-invoke budget (default 3). On a retry it calls `ctx.request_retry()` and the `@rail` decorator re-runs the call. Separately, `ToolCallDeduplicationRail` short-circuits repeated *read-only* calls via an exact `(tool_name, args-hash)` cache, setting `_skip_tool` so the real tool never runs.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c23f89481ba57d80fe58576f5c9e8c45b4131a6e.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -230,14 +218,6 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:24/109` | read-only whitelist + exact cache interception |
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:1324` | _skip_tool_calls honored |
 | `agent-core/openjiuwen/harness_providers/native/harness.py:226` | native harness rejects protocol checkpoints (no replay) |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c23f89481ba57d80fe58576f5c9e8c45b4131a6e.png)
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -281,10 +261,6 @@ Retry decisions are centralized in `ToolCallResilienceRail` (priority 70, auto-m
 | `agent-core/openjiuwen/harness/tools/subagent/subagent_tools.py:45` | _attach_call_timeout() sets properties["resilience"]["timeout_s"] |
 | `agent-core/openjiuwen/core/single_agent/rail/base.py:612` | ctx.request_retry(); agent-core/openjiuwen/harness/prompts/tools/__init__.py:284 — build_tool_card honors ToolCardBuildOptions(idempotent=…) |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -323,10 +299,6 @@ The ReAct loop can emit a `List[ToolCall]` in one turn. `AbilityManager.execute`
 | `agent-core/openjiuwen/core/graph/pregel/task.py:27` | submit creates a Task; :47 asyncio.wait(..., FIRST_EXCEPTION) cancels siblings |
 | `agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:45` | lazy semaphore for sub-agent fan-out |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -356,6 +328,10 @@ The ReAct loop can emit a `List[ToolCall]` in one turn. `AbilityManager.execute`
 
 Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout resolves from `ToolCard.properties["resilience"]["timeout_s"]` (or a default), and an exempt tool is still bounded by a hard limit. A `TimeoutError` becomes an `AbilityExecutionError` carrying a pre-built `ToolMessage`; `asyncio.CancelledError` and `ToolInterruptException` are re-raised as control flow. `ToolCallResilienceRail.on_tool_exception` decides retryability in layers and calls `ctx.request_retry()`, which the `@rail` decorator consumes to re-run the tool; on budget exhaustion it fabricates a `[Retry Summary]` `ToolMessage` so the model sees the failure as a result. Model-call failures route to `ON_MODEL_EXCEPTION` rails (`ModelAnomalyDetectionRail` retries repeated/stream-timeout errors with backoff; `_call_model` has a one-shot recovery hook). Workflow failures wrap timeout as `WORKFLOW_EXECUTION_TIMEOUT`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/85e5a2c1392557c926adcfc6379b13ae6f1c0c5a.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -367,14 +343,6 @@ Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout re
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1016` | model exception + one recovery attempt; :2857/2868 persist safe prefix then re-raise |
 | `agent-core/openjiuwen/harness/schema/stop_condition.py:162` | TimeoutEvaluator; agent-core/openjiuwen/harness/deep_agent.py:2712 — completion_timeout (600s) |
 | `agent-core/openjiuwen/core/workflow/workflow.py:671` | WORKFLOW_EXECUTION_TIMEOUT; agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:243 — interrupt as AbortError |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/85e5a2c1392557c926adcfc6379b13ae6f1c0c5a.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -405,6 +373,10 @@ Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout re
 
 The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -414,14 +386,6 @@ The product tracks provider-reported session cost and enforces a per-session cap
 | `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | tool-loop threshold + bailout |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png)
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 

@@ -35,10 +35,6 @@ Model-driven todo tools, not an algorithmic planner. The model's answer *request
 | `agent-core/openjiuwen/harness/rails/task_planning_rail.py:31/108/152` | rail, tool registration, guidance |
 | `agent-core/openjiuwen/harness/rails/agent_mode_rail.py:645` | plan-mode task_tool |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -79,10 +75,6 @@ Several mechanisms. `TodoModifyTool` supports update/delete/cancel/append/insert
 | `agent-core/openjiuwen/core/single_agent/rail/base.py:687` | ctx.push_steering |
 | `agent-core/openjiuwen/harness/rails/agent_mode_rail.py:460` | enter/exit plan gate |
 | `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_rail.py:74` | product plan-approval rail |
-
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -131,10 +123,6 @@ Jiuwen keeps the two axes as separate layers. `ReActAgent` is multi-step **react
 | `agent-core/openjiuwen/harness/task_loop/task_loop_event_executor.py:222` | one outer round = one inner invoke |
 | `agent-core/openjiuwen/harness/rails/task_completion_rail.py:74` | completion rail bounds the loop |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -172,10 +160,6 @@ Three patterns exist. (a) Scheduled-dispatch leader: `TeamScheduler` scans the t
 | `../../../agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus` | supervisor routing |
 | `agent-core/openjiuwen/harness/subagents/plan_agent.py:88` | dedicated plan subagent |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -205,6 +189,10 @@ Three patterns exist. (a) Scheduled-dispatch leader: `TeamScheduler` scans the t
 
 State lives in three layers that are checkpointed independently. The agent layer uses `StateCollection` (a `global_state` + `agent_state`) inside `AgentSession`. The workflow layer uses a different `StateCollection` split into `io_state`, `global_state`, `comp_state`, and `workflow_state`. Conversation history is a separate `ContextMessageBuffer` inside `SessionModelContext`, flushed to session global state by `ContextEngine.save_contexts`. Graph execution adds a third layer — `GraphState` (step, channel snapshot, pending buffer/nodes, node versions) persisted through a `Store`/checkpointer keyed by `(session_id, ns)` and restored in `PregelLoop.init`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/5d5fb55024351b593e3784f22cd1f0109ed89f43.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -217,14 +205,6 @@ State lives in three layers that are checkpointed independently. The agent layer
 | `agent-core/openjiuwen/core/graph/pregel/engine.py:39` | PregelLoop.init reads saved state; :44 restore path |
 | `agent-core/openjiuwen/core/session/checkpointer/persistence.py:299` | _get_state_to_save; :352 WorkflowStorage.save |
 | `agent-core/openjiuwen/core/context_engine/context_engine.py:589` | save_contexts |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/5d5fb55024351b593e3784f22cd1f0109ed89f43.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -268,10 +248,6 @@ Two mechanisms. *Interrupt rails* abort the current tool call by raising `AbortE
 | `agent-core/openjiuwen/core/context_engine/context/context.py:1519/1526` | save_state/load_state |
 | `agent-core/openjiuwen/harness/deep_agent.py:2491/2516` | load_state/save_state; agent-core/openjiuwen/harness_providers/io_adapter.py:299/308 — pause()/resume() |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -314,10 +290,6 @@ Tool execution passes through `PermissionInterruptRail` (subclass of `ConfirmInt
 | `agent-core/openjiuwen/core/single_agent/interrupt/handler.py:310` | handle_resume; :358 re-commit; :384 restore auto-confirm |
 | `agent-core/openjiuwen/harness/deep_agent.py:767-782` | auto-mount when permissions["enabled"]; jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_rail.py:74 — PlanApprovalRail; agent-core/openjiuwen/harness/rails/interrupt/ask_user_rail.py:29 — AskUserRail |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -357,10 +329,6 @@ Short-term is `SessionModelContext` with a bounded message buffer. Long-term is 
 | `../../../agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py` | memory type taxonomy |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:56` | product hybrid memory index |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -399,10 +367,6 @@ An LLM classifier decides whether a turn has key information, and extraction run
 | `agent-core/openjiuwen/core/memory/manage/index/fragment_memory_manager.py:125` | dedupe + conflict resolution |
 | `agent-core/openjiuwen/core/memory/manage/update/mem_update_checker.py:22` | CheckResult |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/dreaming/sweeper.py:617` | discard rules |
-
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -446,10 +410,6 @@ A bounded FIFO buffer drops the oldest messages beyond twice the limit. Budget g
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:96` | round compaction |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/dreaming/sweeper.py:36` | per-session promotion caps |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -487,10 +447,6 @@ Compaction replaces the active segment with a structured summary plus a boundary
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/util.py:242` | build_skill_reinjected_content(); :294 build_task_status_reinjected_content(); :105 build_team_policy_reinjected_messages() |
 | `agent-core/openjiuwen/core/context_engine/context/session_memory_manager.py:37` | 15-section template; :738 should_update(); :824 _update_background(); :529 invalidate_session_memory_anchor() |
 | `agent-core/openjiuwen/core/context_engine/processor/forked/compressor/reinjection/builders.py:29` | forked reinjection builders |
-
-**Canonical source**
-
-<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
 
 </details>
 

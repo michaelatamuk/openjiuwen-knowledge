@@ -125,14 +125,10 @@ def build():
             tparts = []
             if tech_text:
                 tparts.append('<div class="tech-t">Implementation</div>' + md(tech_text))
-            if q.get("citations"):
-                tparts.append('<div class="tech-t">Code anchors</div>' + anchors_table(q["citations"]))
             if tech:
                 tparts.append('<div class="tech-t">Implementation diagram</div>' + tech)
-            srcs = q.get("provenance", {}).get("sources") or []
-            if srcs:
-                tparts.append('<div class="tech-t">Canonical source</div><div class="src">'
-                              + "".join(f'<code>{html.escape(s)}</code> ' for s in srcs) + "</div>")
+            if q.get("citations"):
+                tparts.append('<div class="tech-t">Code anchors</div>' + anchors_table(q["citations"]))
             tech_block = ""
             if tparts:
                 tech_block = (

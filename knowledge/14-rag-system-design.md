@@ -36,10 +36,6 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | session cost cap |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47` | exact tool result cache |
 
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -78,10 +74,6 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/chroma_indexer.py:198` | update_index = delete + build; :217 delete by doc_id |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:209` | delete + flush + rebuild; :346 INVERTED scalar index |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19` | structural no-split guard |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -122,10 +114,6 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks |
 | `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` | check_permission (tool/file/net, not retrieval) |
 | `agent-core/openjiuwen/core/common/security/user_config.py:69` | sensitive-path config (filesystem, not doc ACL) |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -168,10 +156,6 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 | `agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47` | Chroma HNSW defaults |
 | `agent-core/openjiuwen/core/retrieval/vector_store/base.py:57` | add(..., batch_size=128) |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -208,10 +192,6 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:79` | database_name |
 | `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:512` | delete_table/drop granularity only |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -252,10 +232,6 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 | `agent-core/openjiuwen/core/retrieval/lazy_load.py:143` | lazy_load (module imports) |
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74` | add_documents appends via build_index |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -286,6 +262,10 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 
 Three backends behind one factory: Chroma (local persisted, **vector-only** — sparse/hybrid rejected), Milvus (server, native BM25 + hybrid with RRF), PostgreSQL+pgvector (server, `tsvector` sparse + vector). The KB selects the index type (`hybrid` default). So hybrid/RRF requires Milvus or PG; Chroma is the small/local choice.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6abca665976ef1d20b7cbc7aef0a5ca57f968b55.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -294,14 +274,6 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 | `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` | PersistentClient (local); agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — MilvusClient(uri=...) (server); agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — create_async_engine(...) |
 | `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` | Chroma rejects sparse/hybrid in local mode |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:32/60` | index types hybrid/bm25/vector |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6abca665976ef1d20b7cbc7aef0a5ca57f968b55.png)
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -341,10 +313,6 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 | `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` | Chroma rejects hybrid |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:67` | StoreType |
 
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -383,10 +351,6 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 | `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:326` | sparse/text returns [] on error |
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:300` | retrieve_multi_kb swallows per-KB errors |
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:123` | re-raises build_error |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -429,10 +393,6 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 | `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:300` | INSERT ... ON CONFLICT DO UPDATE |
 | `agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:253` | delete chunk + triple index; :294 update = delete + re-add |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -472,10 +432,6 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 | `agent-core/openjiuwen/core/memory/manage/update/mem_update_checker.py:22/252` | memory-only conflict (newest wins) |
 | `agent-core/openjiuwen/agent_evolving/experience/scorer.py:219` | calc_freshness (experiences only) |
 
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -513,10 +469,6 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241` | empty results → empty context |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:47` | score_threshold defaults None |
 | `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305` | is_abstain; agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94; agent-core/openjiuwen/symphony/retrieval/search/runtime/progressive.py:1060 — abstain_no_backfill |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -557,10 +509,6 @@ Provides streaming (ReAct → session → WebSocket frames) with per-call `ttft_
 | `agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9` | ModelBackupRail.on_model_exception failover |
 | `jiuwenswarm/jiuwenswarm/server/runtime/session/kv_cache/kv_cache_model_provider.py:80` | KV/prefix affinity |
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182` | KB path calls no reranker |
-
-**Canonical source**
-
-<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 

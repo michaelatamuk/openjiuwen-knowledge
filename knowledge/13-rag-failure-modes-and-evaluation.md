@@ -35,10 +35,6 @@ None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG
 | `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:355/362` | classification recall/precision |
 | `agent-core/examples/store/showcase_milvus_graph_store.py:51` | reranker score-delta (no labels) |
 
-**Canonical source**
-
-<sub>`source/rag-part1-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -78,10 +74,6 @@ There is no tooling for "does the retrieved chunk contain the answer". The close
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:58` | parses result: true/false, no context/attribution |
 | `agent-core/openjiuwen/agent_teams/verification/reviewer.py:43` | Correctness dimension on the output |
 
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -111,6 +103,10 @@ There is no tooling for "does the retrieved chunk contain the answer". The close
 
 There is a retrieval score filter (`score_threshold`) but its default is `None`, so out-of-scope chunks are normally returned. The closest "answerable?" logic is in `AgenticRetriever`, which asks an LLM whether current facts are `sufficient` — but `sufficient=False` only generates a follow-up query, never a user-facing abstention. A true abstention path exists only inside `symphony/retrieval` internal selection (`is_abstain` → empty candidates). Grounding is provided by separate higher layers: the `VerificationReviewer` scores a `Correctness` dimension and downgrades status, the RSI judge forbids treating claims as proof, and the harness verification agent requires command evidence with a PASS/FAIL/PARTIAL verdict — none of which is a RAG answerability gate.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/38735405c0b98cd9ba5b35c4cfb345464f375f86.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -120,14 +116,6 @@ There is a retrieval score filter (`score_threshold`) but its default is `None`,
 | `agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94` | is_abstain → empty candidates; agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305 — is_abstain |
 | `agent-core/openjiuwen/agent_teams/verification/reviewer.py:43` | Correctness dimension; :279 threshold re-normalization |
 | `agent-core/openjiuwen/harness/subagents/verification_agent.py:51` | PASS/FAIL/PARTIAL verdict |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/38735405c0b98cd9ba5b35c4cfb345464f375f86.png)
-
-**Canonical source**
-
-<sub>`source/genai-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -169,10 +157,6 @@ The retrieval layer has no notion of document time at all: `RetrievalResult`/`Te
 | `agent-core/openjiuwen/agent_evolving/experience/scorer.py:219` | calc_freshness (experiences only) |
 | `agent-core/openjiuwen/core/memory/long_term_memory.py:1004` | search sorts by score, ignores timestamp |
 
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -211,10 +195,6 @@ There is a retrieval score filter but its default is `None`, so out-of-scope chu
 | `agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94` | is_abstain → empty candidates; agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305 — is_abstain |
 | `agent-core/openjiuwen/harness/subagents/verification_agent.py:51` | PASS/FAIL/PARTIAL verdict |
 
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -244,6 +224,10 @@ There is a retrieval score filter but its default is `None`, so out-of-scope chu
 
 Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRetriever` calls its rewrite LLM at `temperature=0.0`, but `StandardReranker`/`DashscopeReranker` send no temperature or seed (the remote `/rerank` model decides), and `QueryRewriter` uses the configured temperature, which defaults to `None` (provider default). There is no seed plumbing and no embedding fingerprint in core retrieval — `OpenAIEmbedding`/`DashscopeEmbedding` store only a cached dimension. The memory/lite subsystem does store an `EmbeddingProvider.config_fingerprint` and re-indexes when it changes.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/50dc2ff5ae170eae47d9cc477e8a608c05dcef2e.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -254,14 +238,6 @@ Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRe
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:265` | temperature from config; agent-core/openjiuwen/core/foundation/llm/schema/config.py:210 — default None |
 | `agent-core/openjiuwen/core/memory/lite/embeddings.py:78` | config_fingerprint; agent-core/openjiuwen/core/memory/lite/manager.py:873 — _should_full_reindex |
 | `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:58` | seed=1223 (skill-retrieval subsystem only) |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/50dc2ff5ae170eae47d9cc477e8a608c05dcef2e.png)
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -302,10 +278,6 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 | `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:349` | vector retriever (dense semantic match) |
 | `agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:735` | _fetch_relevant_entities semantic entity match |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -335,6 +307,10 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 
 Failures are mostly contained per stage. Retrievers implement stage-local fallbacks: `VectorRetriever` falls back to BM25 when vector search is empty, `HybridRetriever` falls back to sparse when dense search is empty (in `mode="vector"` only), and `GraphRetriever` falls back to sparse only in its `mode="sparse"` branch. Model-call failures are handled by rails: `ModelAnomalyDetectionRail.on_model_exception` retries stream-timeout/repetition with backoff, and `ToolCallResilienceRail` retries transport/timeout tool errors. In `AbilityManager`, any tool/workflow/sub-agent exception is caught and converted to an error `ToolMessage` so the round continues. Workflow HTTP components have per-component retry (`HttpRetryConfig`, 429/5xx) and rate-limit config. Pregel node failure cancels siblings via `FIRST_EXCEPTION`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/eb1a6226460f9424d48d7261ecc3c990770383f4.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -344,14 +320,6 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:1186` | exception rendered into a ToolMessage |
 | `agent-core/openjiuwen/core/workflow/components/tool/http/http_request_component.py:102` | HttpRetryConfig; :110 HttpRateLimitConfig |
 | `agent-core/openjiuwen/core/graph/pregel/task.py:47` | FIRST_EXCEPTION cancels siblings |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/eb1a6226460f9424d48d7261ecc3c990770383f4.png)
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -391,10 +359,6 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 | `agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py` | mock-based unit fixtures |
 | `agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py` | mock-based agentic test |
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | rewrite (query generation from user input, not eval-set synthesis) |
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 

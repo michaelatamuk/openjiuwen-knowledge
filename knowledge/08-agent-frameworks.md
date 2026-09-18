@@ -26,6 +26,10 @@
 
 The reusable pieces are concrete classes, not a monolith. `Session` owns state, streaming, tracer, and interaction lifecycle; `Model` + `BaseModelClient` wrap providers behind one `invoke`/`stream` surface; `ContextEngine` owns windowing and compression; `AbilityManager` owns tool registration and execution; `AgentRail` is the class-based lifecycle hook bus; `Tracer` plus `extensions/observability` own telemetry; `Workflow`/`Pregel` own deterministic graph execution; and `Runner` is the process-global facade binding sessions, resource registry, checkpointer, and callbacks.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/72bfdfa2e9eb30e5fca4d9dc8668288ebe593cc8.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -38,14 +42,6 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:142` | AbilityManager (tool registry + execution) |
 | `agent-core/openjiuwen/core/single_agent/rail/base.py:824` | AgentRail base (lifecycle hooks) |
 | `agent-core/openjiuwen/core/session/tracer/tracer.py:98` | Tracer; agent-core/openjiuwen/extensions/observability/runtime.py:103 — ObservabilityRuntime |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/72bfdfa2e9eb30e5fca4d9dc8668288ebe593cc8.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -89,10 +85,6 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 | `agent-core/openjiuwen/agent_teams/schema/team.py:81` | TeamRole; agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92 — TeamScheduler; agent-core/openjiuwen/agent_teams/agent/coordination/kernel.py:33 — CoordinationKernel |
 | `agent-core/openjiuwen/agent_teams/runtime/manager.py:104` | TeamRuntimeManager pool/dispatch; agent-core/openjiuwen/agent_teams/tools/tool_factory.py:97 — create_team_tools |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -123,6 +115,10 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 
 There is no in-repo LangGraph or CrewAI code, so this is architectural reading. Jiuwen's design center is *deterministic graph when the flow is known* (`Workflow`/`Pregel`, with persistence via `GraphStore`/checkpointer) and *role-based teams when work assignment is emergent* (`TeamAgent` + `TeamScheduler` + task board). Over both sits a provider-agnostic model client: `ProviderType` enumerates OpenAI/Anthropic/DashScope/DeepSeek/… and `create_model_client` resolves the implementation, with `IntelliRouterModelClient` for routing. For the third archetype ("bring your own agent SDK"), it ships a `harness_protocol` SPI plus `harness_providers` (`native`, `claudecode`, `codex`, `dsh`) and `create_harness(manifest, provider=...)`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/471e610201432eec01ca6c8e0ff05fd7862ca214.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -134,14 +130,6 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 | `agent-core/openjiuwen/harness_providers/factory.py:160` | create_harness(manifest, provider=...) |
 | `agent-core/openjiuwen/core/workflow/workflow.py:98` | graph and teams coexist in one SDK |
 | `agent-core/openjiuwen/harness/manifest/catalog.py:67` | declarative element catalog |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/471e610201432eec01ca6c8e0ff05fd7862ca214.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -172,6 +160,10 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 
 The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, optional rails, and `Workflow` graphs — no workspace, no permission engine, no task loop, no teams. The heavy path is `harness`: `factory.create_deep_agent` assembles `DeepAgent` with default rails (security, tool resilience, task planning, skills, subagents), a task loop, a workspace, and a tiered permission engine; `agent_teams` adds multi-process teams, DB/messager transport, worktrees, and reliability monitoring. Heaviness is partly config-gated (`enable_task_loop`, `enable_subagent_runtime`, `enable_security_rail`), but the default DeepAgent assembly is substantial.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c9c4fe969c6752cfb0b56c4e94267eb61cbbd3da.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -182,14 +174,6 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 | `agent-core/openjiuwen/harness/schema/config.py:248-260` | enable_task_loop/enable_subagent_runtime/enable_skill_discovery defaults False |
 | `agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448/452` | spec defaults enable_task_loop=True, enable_security_rail=True |
 | `agent-core/openjiuwen/agent_teams/agent/team_agent.py:76` | team heaviness; agent-core/openjiuwen/extensions/context_evolver/ + agent-core/openjiuwen/rsi/ + agent-core/openjiuwen/auto_harness/ — optional layers |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c9c4fe969c6752cfb0b56c4e94267eb61cbbd3da.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -220,6 +204,10 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 
 The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creates a session when none is passed, so a minimal loop runs without `Runner`; the legacy `BaseAgent` still offers `add_tools` + `invoke`; `Workflow` is just a graph of `Executable`s with optional schema validation. Heavier behavior lives in `harness/` and is opt-in: `factory.create_deep_agent` adds default rails only when their config flag is on, and `DeepAgentConfig` defaults `enable_task_loop`, `enable_skill_discovery`, and `enable_subagent_runtime` to `False`.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/d8d42dbe6ef944a51d7929e155664feb4f6088b5.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -231,14 +219,6 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 | `agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448/452/469` | enable_task_loop/enable_security_rail/enable_skill_discovery defaults |
 | `agent-core/openjiuwen/harness/deep_agent.py:1873` | add_rail optional, queue-based |
 | `agent-core/openjiuwen/core/workflow/workflow.py:328` | Workflow.invoke requires an explicit session |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/d8d42dbe6ef944a51d7929e155664feb4f6088b5.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -269,6 +249,10 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 
 The framework exposes multiple escape hatches. At graph level, implement `Executable`/`ComponentExecutable` with full control over I/O and bypass schemas. At LLM level, call `Model.invoke` directly (no agent/runner required). At tool level, wrap any function with `LocalFunction`/`@tool`, including a custom `render`. At behavior level, intercept with `AgentRail` hooks or replace a rail via `strip_rails_by_type`; at assembly level, override config fields or subclass (`ReActAgentEvolve` is a shipped example). `_apply_extension_parts` hot-swaps rails/tools/prompts, and custom clients plug into the registry.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/00e51ed5eef64c00e2feb193d0bbda70f8a99561.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -281,14 +265,6 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent_evolve.py:16` | subclassing ReActAgent |
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:53` | + agent-core/openjiuwen/core/common/clients/client_registry.py:50 — custom model backend |
 | `agent-core/openjiuwen/harness/deep_agent.py:2015` | _apply_extension_parts hot-swap |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/00e51ed5eef64c00e2feb193d0bbda70f8a99561.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -319,6 +295,10 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 
 Workflow next-node selection is Pregel super-step scheduling: each step `ChannelManager.get_ready_nodes()` yields nodes whose trigger/barrier channels are satisfied, they are submitted to a `TaskExecutorPool`, their routers emit messages, messages are flushed into channels, and the loop repeats until the active set and buffer are empty. Agent-level dispatch is separate and LLM-driven: the ReAct loop calls the model, and if the assistant message carries `tool_calls` it hands them to `AbilityManager.execute`; if there are none it terminates with an answer. Team-level, `TeamScheduler` scans the task board and starts each idle member's earliest assigned pending task.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6660ca48b7b15610f973cc34946fc3b347e18ff7.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -329,14 +309,6 @@ Workflow next-node selection is Pregel super-step scheduling: each step `Channel
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | iteration loop; :2793 no tool_calls → answer; :2813 _execute_tool_call |
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:1078` | execute (invoked from agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813) |
 | `agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:197` | _scan; :208 _reconcile_starts |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6660ca48b7b15610f973cc34946fc3b347e18ff7.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -380,10 +352,6 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 | `agent-core/openjiuwen/auto_harness/infra/runtime_manifest.py:121` | schema_version; agent-core/openjiuwen/harness/schema/expert_harness_spec.py:122 — schema_version |
 | `agent-core/openjiuwen/agent_evolving/checkpointing/manager.py:121` | restores operator state/best score (training only) |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -414,6 +382,10 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 
 Extension is registry/manifest based rather than patch based. Provider modules declare `@harness_element(kind, name, ...)` descriptors; `register_from_catalog()` converts the catalog into class registrations, and `DeepAgent.load_plugin` / `load_agent_template` / `load_harness_config` hot-load packages through one `BuildContext` apply path. Model providers auto-register via `BaseModelClient.__init_subclass__` into `ClientRegistry`, and team infrastructure uses `register_transport`/`register_storage` name→config registries. `Runner.resource_mgr` centralizes tool/workflow/agent/team/model/prompt managers, and the product demonstrates the pattern: `jiuwenswarm/agents/swarm/registry.py` imports provider modules and drives registration from the manifest catalog.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/c9abcea8619a4d4e41741e42e999f2b006a467b8.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -425,14 +397,6 @@ Extension is registry/manifest based rather than patch based. Provider modules d
 | `agent-core/openjiuwen/harness/schema/config.py:248` | ; agent-core/openjiuwen/harness/schema/deep_agent_spec.py:354 — config schema (Pydantic) |
 | `agent-core/openjiuwen/agent_teams/schema/blueprint.py:99` | TransportSpec/StorageSpec registry pattern |
 | `jiuwenswarm/jiuwenswarm/agents/swarm/registry.py:8-12` | product-side provider registration via the catalog |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c9abcea8619a4d4e41741e42e999f2b006a467b8.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 

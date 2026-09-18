@@ -37,10 +37,6 @@ There is no separate `Chatbot` class; the distinction is structural. A single mo
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813` | execute tools and iterate |
 | `agent-core/openjiuwen/harness/deep_agent.py:2694` | outer task loop |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -82,10 +78,6 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 | `agent-core/openjiuwen/core/workflow/workflow.py:551` | terminates when the end component produces output |
 | `agent-core/openjiuwen/core/workflow/components/llm/react/react_executable.py:41` | workflow node embedding an agent |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -115,6 +107,10 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 
 Both are built on the same `PregelGraph`. `add_connection` registers a static edge; at compile time `PregelGraph._compile` turns static edges into `StaticRouter` (1→N) or `BarrierChannel` (N→1, with CNF OR-groups for mutually exclusive predecessors). `add_conditional_connection` registers a branch router compiled to `ConditionalRouter`, whose `dispatch` calls the user selector and emits `TriggerMessage`s only for the chosen targets. A linear chain always activates its single successor; a conditional graph activates only the selector's targets, and `BranchRouter` raises `COMPONENT_BRANCH_EXECUTION_ERROR` if none match.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/f8187e4326273ad5b0aef299c2f2d3537c7bb91f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -126,14 +122,6 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 | `agent-core/openjiuwen/core/graph/pregel/router.py:11` | StaticRouter.dispatch; :26 ConditionalRouter.dispatch |
 | `agent-core/openjiuwen/core/graph/pregel/channels.py:104` | TriggerChannel; :129 BarrierChannel; :166 is_ready (CNF OR-groups) |
 | `agent-core/openjiuwen/core/workflow/components/flow/branch_router.py:92` | BranchRouter.__call__ |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/f8187e4326273ad5b0aef299c2f2d3537c7bb91f.png)
-
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -174,10 +162,6 @@ The loop is exactly reason/act/observe: model call, branch on `tool_calls`, exec
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2787` | retain reasoning_content |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2742` | iteration exposed to rails |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:568` | ReActAgent documents the pattern |
-
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -220,10 +204,6 @@ The inner ReAct loop is bounded by `ReActAgentConfig.max_iterations` (default 5)
 | `agent-core/openjiuwen/agent_teams/agent/agent_configurator.py:436` | member TaskCompletionRail(max_rounds=agent_spec.max_iterations) |
 | `agent-core/openjiuwen/agent_teams/workflow/backends/budget_rail.py:88` | token-ceiling ctx.request_force_finish; agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:300 — review-round cap |
 
-**Canonical source**
-
-<sub>`source/ai-agent-framework-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -265,10 +245,6 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 | `agent-core/openjiuwen/harness/rails/task_completion_rail.py:403` | completion-promise extraction |
 | `agent-core/openjiuwen/harness/deep_agent.py:2723` | hard 50-round ceiling |
 
-**Canonical source**
-
-<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -298,20 +274,16 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 `AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6a5d37740697623b79f14b94573e6f9f238d5666.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question` |
 | `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37` | `max_length < 1` raises; `:402` `graph_hops` default 2 |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6a5d37740697623b79f14b94573e6f9f238d5666.png)
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -350,10 +322,6 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:128` | `_skip_tool` duplicate suppression |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | `for iteration in range(..., max_iterations)` |
 
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -383,6 +351,10 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition detection: `ModelAnomalyDetectionRail` finds consecutive identical `(tool_name, canonical_args)` rounds and either folds them into a warning or aborts; `ToolCallDeduplicationRail` counts repeated read-only calls and warns. Outer guards: `NoProgressAnswerEvaluator`, `MaxRoundsEvaluator`, and the hard 50-round ceiling. Agent teams add repeat-tool and ping-pong detectors.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6e2901e774084aaa9c66588fb0bb93cb4037fccb.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -393,14 +365,6 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 | `agent-core/openjiuwen/harness/schema/stop_condition.py:181` | NoProgressAnswerEvaluator |
 | `agent-core/openjiuwen/harness/deep_agent.py:2723` | hard 50-round ceiling |
 | `agent-core/openjiuwen/agent_teams/reliability/detectors/repeat_tool.py:15` | repeat-tool; agent-core/openjiuwen/agent_teams/reliability/detectors/pingpong.py:12 — ping-pong |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6e2901e774084aaa9c66588fb0bb93cb4037fccb.png)
-
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -438,10 +402,6 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51` | _REWRITE_PROMPT JSON contract; :326 _rewrite; :341 history formatting; :364 sufficient/next_question; :244/290 append-and-continue |
 | `agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16` | triples_str fed to the prompt |
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67` | prompt to differentiate/simplify later questions |
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 

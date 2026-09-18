@@ -335,9 +335,8 @@ fun TechnicalDetail(
     text: String,
     citations: List<CitationDto>,
     diagram: DiagramData? = null,
-    sources: List<String> = emptyList(),
 ) {
-    if (text.isBlank() && citations.isEmpty() && diagram == null && sources.isEmpty()) return
+    if (text.isBlank() && citations.isEmpty() && diagram == null) return
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
         Row(
@@ -355,18 +354,13 @@ fun TechnicalDetail(
                 TechTitle("Implementation")
                 MarkdownText(text)
             }
-            if (citations.isNotEmpty()) {
-                TechTitle("Code anchors")
-                CitationChips(citations)
-            }
             if (diagram != null) {
                 TechTitle("Implementation diagram")
                 DiagramView(diagram, citations)
             }
-            if (sources.isNotEmpty()) {
-                TechTitle("Canonical source")
-                Text(sources.joinToString(", "), style = MaterialTheme.typography.labelSmall,
-                    fontFamily = FontFamily.Monospace)
+            if (citations.isNotEmpty()) {
+                TechTitle("Code anchors")
+                CitationChips(citations)
             }
         }
     }

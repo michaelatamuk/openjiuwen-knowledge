@@ -36,10 +36,6 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109` | retrieve_multi_kb_with_source(...); :243 joins texts into context |
 | `agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654` | template format feeding {{context}}/{{query}} |
 
-**Canonical source**
-
-<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -79,10 +75,6 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 | `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78` | embed_query → vector_store.search |
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109` | retrieve_multi_kb_with_source(...); :243 joins texts into context |
 | `agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654` | template format feeding {{context}}/{{query}} |
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -125,10 +117,6 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | query rewriter module |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:51` | agentic toggle |
 
-**Canonical source**
-
-<sub>`source/rag-part1-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -169,10 +157,6 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:375` | text field max_length=65535 |
 | `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:176` | pgvector rejects dim > 2000 |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -210,10 +194,6 @@ The code guards the mechanics but not the quality: construction rejects `chunk_s
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:198` | _resolve_chunk_size clamps to model_max_length |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/chunking.py:82` | tokenizer-limit auto-adjust |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:378` | text max_length=65535 |
-
-**Canonical source**
-
-<sub>`source/rag-part1-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -256,10 +236,6 @@ True fixed-size is `CharChunker` (raw character windows via `CharSplitter`). Tok
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/__init__.py:117` | only "char"/"hybrid" registered |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:98` | splitter_config normalized but not forwarded |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -296,10 +272,6 @@ Overlap is a first-class `chunk_overlap` integer (default 50) enforced on both p
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:39` | chunk_overlap: int = 50; :69 overlap >= chunk_size raises; :106 overlap not carried into metadata |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:41` | overlap clamped to [0, size-1]; :54 step = chunk_size - chunk_overlap; :56 slicing loop; :110 token path default chunk_size // 5 |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:215` | _flush re-injects trailing sentences ≤ overlap; :186 long-segment window step |
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -342,10 +314,6 @@ Structure is preserved at parse time, not chunk time. Excel emits one `Document`
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/txt_md_parser.py:40` | Markdown read verbatim |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:106` | metadata copied onto every TextChunk |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -385,10 +353,6 @@ Protection is inconsistent by chunker. `SentenceSplitter` builds chunks from who
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_preprocessor.py:53` | WhitespaceNormalizer |
 | `agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:118` | head/tail truncation; agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:1088 — _build_head_tail_truncated_text |
 
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -419,6 +383,10 @@ Protection is inconsistent by chunker. `SentenceSplitter` builds chunks from who
 
 An `Embedding` ABC defines `embed_query`, `embed_documents`, and a `dimension` property; `EmbeddingConfig` carries only `model_name`/`base_url`/`api_key`. Providers are `APIEmbedding` (generic HTTP), `OpenAIEmbedding` (OpenAI-compatible), `VLLMEmbedding` (extends OpenAI, adds multimodal `instruction`), and `DashscopeEmbedding`. Dimension is discovered lazily from the first response or set explicitly for Matryoshka models. Batching is provider-level (`max_batch_size=8`, `max_concurrent=50`). Model choice is entirely caller-driven — there is no model registry, benchmark, or size heuristic.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/e0a04fa543a3ba136134fb68f18fba294d11bb61.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -428,14 +396,6 @@ An `Embedding` ABC defines `embed_query`, `embed_documents`, and a `dimension` p
 | `agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:105` | Dashscope dimension |
 | `agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:45` | max_batch_size=8; :46 max_concurrent=50; :175 batch splitting/concurrency |
 | `agent-core/openjiuwen/core/retrieval/embedding/vllm_embedding.py:17` | VLLMEmbedding |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/e0a04fa543a3ba136134fb68f18fba294d11bb61.png)
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -466,6 +426,10 @@ An `Embedding` ABC defines `embed_query`, `embed_documents`, and a `dimension` p
 
 In the KB pipeline they do: one `embed_model` instance is held on the KB, passed to `build_index` for documents and to the constructed `VectorRetriever`/`HybridRetriever` for queries. Query embedding uses `embed_query`; document embedding uses `embed_documents`. For Dashscope, `embed_query` literally calls `embed_documents([text])` (the OpenAI-compatible client calls the same shared embedding method directly), so there is no query-vs-passage prefix distinction. Only `VLLMEmbedding.embed_multimodal` supports an `instruction`. Nothing validates that the retriever's model matches the indexer's (only dimension is indirectly constrained by the collection schema).
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/ec4c03e4e18edc3ad3edf347b579e43e77d985af.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -476,14 +440,6 @@ In the KB pipeline they do: one `embed_model` instance is held on the KB, passed
 | `agent-core/openjiuwen/core/retrieval/knowledge_base.py:34` | single embed_model field |
 | `agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:124` | embed_query delegates to embed_documents |
 | `agent-core/openjiuwen/core/retrieval/embedding/vllm_embedding.py:25` | instruction only for multimodal |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/ec4c03e4e18edc3ad3edf347b579e43e77d985af.png)
-
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -524,10 +480,6 @@ At index time `compute_chunk_embeddings` calls `embed_model.embed_documents` and
 | `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:129` | fixed pgvector table definition |
 | `agent-core/openjiuwen/core/foundation/store/vector/utils.py:264` | UpdateEmbeddingDimensionOperation |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -566,10 +518,6 @@ Effectively bilingual zh/en at the processing layer, with no translation. `Sente
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/tokenizer_chunker.py:25` | language="auto" |
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:228` | prompt_lang: str = "zh"; :309 template selection |
 | `agent-core/openjiuwen/core/retrieval/embedding/openai_embedding.py:140` | no language field; agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:37 — multimodal, not multilingual |
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -610,10 +558,6 @@ Format dispatch is an extension-keyed plugin registry loaded lazily by `AutoFile
 | `agent-core/openjiuwen/core/foundation/store/base_reranker.py:29` | uniform Document{id_, text, metadata} |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:91` | chunk_documents uniform conversion |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -652,10 +596,6 @@ The KB is not budgeted against the model window. `KnowledgeRetrievalExecutable._
 | `agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:37` | effective_context_budget (strictest positive) |
 | `agent-core/openjiuwen/core/context_engine/usage/models.py:45` | ContextWindowUsage.limit_tokens / occupancy_rate |
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | 180k compaction threshold |
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -763,6 +703,10 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 `RetrievalConfig.agentic` (default `False`) is the switch. When true, `SimpleKnowledgeBase.retrieve` wraps its base retriever in `AgenticRetriever(retriever=..., llm_client=...)`; otherwise the base `VectorRetriever`/`SparseRetriever`/`HybridRetriever` is called directly. `GraphKnowledgeBase` does the same wrapping a `GraphRetriever`. Agentic = base retrieval + LLM triple extraction + sufficiency/rewrite + multi-round RRF + optional graph expansion; it requires an `llm_client`. In the product harness the model also chooses retrieval via the `memory_search` tool.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/3fe376e8a2ef7a04b341a4be14ebe6f80d9e067f.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -774,14 +718,6 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 | `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:156` | LLM only when agentic |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167` | memory_search tool |
 | `agent-core/openjiuwen/harness/deep_agent.py:225` | memory_search in builtin tools |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/3fe376e8a2ef7a04b341a4be14ebe6f80d9e067f.png)
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -812,6 +748,10 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 Caps exist (`AgenticRetriever.max_iter` default 2 clamped, `graph_hops`/`max_length` default 2), and the sufficiency break avoids a needless round. Harness rails catch loops at the tool layer: `ModelAnomalyDetectionRail` compacts consecutive identical tool rounds and aborts after a threshold, and `ToolCallDeduplicationRail` caches/exact-suppresses repeated read calls. The ReAct loop is capped at `max_iterations`. But there is no retrieval-specific token/cost budget, and the harness rails are not applied to the retrieval agent's own LLM calls.
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/26ca31d8ac339af71467579c4118dfb47e0520bb.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -821,14 +761,6 @@ Caps exist (`AgenticRetriever.max_iter` default 2 clamped, `graph_hops`/`max_len
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:25/109/157` | cacheable whitelist + per-turn cache + repeat warning |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations=5 |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/context_headroom_rail.py:97` | 60%/80% token-window directives |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/26ca31d8ac339af71467579c4118dfb47e0520bb.png)
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 

@@ -98,20 +98,16 @@ def main():
             tech_img = write_diagram((q.get("diagramTechnical", {}) or {}).get("image", "")
                                      or (q.get("diagramTechnical", {}) or {}).get("svg", ""))
             tech_text = q.get("mechanism", "") if plain else ""
-            sources = q.get("provenance", {}).get("sources") or []
-            if tech_text or q.get("citations") or tech_img or sources:
+            if tech_text or q.get("citations") or tech_img:
                 lines.append('<details markdown="1">')
                 lines.append("<summary><b>Under the hood</b></summary>")
                 lines.append("")
                 if tech_text:
                     lines += ["**Implementation**", "", tech_text, ""]
-                if q.get("citations"):
-                    lines += ["**Code anchors**", "", anchors_md(q["citations"]), ""]
                 if tech_img:
                     lines += ["**Implementation diagram**", "", tech_img, ""]
-                if sources:
-                    srcs = ", ".join(f"`{s}`" for s in sources)
-                    lines += ["**Canonical source**", "", f"<sub>{srcs}</sub>", ""]
+                if q.get("citations"):
+                    lines += ["**Code anchors**", "", anchors_md(q["citations"]), ""]
                 lines.append("</details>")
                 lines.append("")
             lines += ["---", ""]

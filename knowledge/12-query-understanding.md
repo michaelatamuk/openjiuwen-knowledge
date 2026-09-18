@@ -33,10 +33,6 @@
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/prompts/intention_completion_en.md:32` | coreference resolution; :47 typo correction |
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326` | follow-up question generation |
 
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -75,10 +71,6 @@ Ambiguity is not resolved by asking the user pre-retrieval. `QueryRewriter.rewri
 | `agent-core/openjiuwen/harness/tools/ask_user.py:11` | AskUserTool; agent-core/openjiuwen/harness/rails/interrupt/ask_user_rail.py:63 — resolve_interrupt |
 | `agent-core/openjiuwen/core/controller/schema/intent.py:59` | UNKNOWN_TASK clarification prompt; agent-core/openjiuwen/core/controller/modules/intent_recognizer.py:436 |
 
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -114,10 +106,6 @@ Decomposition is prompt-level and **sequential** inside `AgenticRetriever`. `_RE
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:70` | "Break it down into smaller questions if needed."; :326 _rewrite one next question; :213/272 loops; :290 append; :295 rrf_fusion(history_results); :133 max_iter=2; :530 batch_retrieve |
 | `agent-core/openjiuwen/core/controller/legacy/reasoner/planner.py:12` | general task Planner (not retrieval) |
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -157,10 +145,6 @@ Two mechanisms. `AgenticRetriever` keeps a `queries` list and loops up to `max_i
 | `agent-core/openjiuwen/core/retrieval/common/triple_beam.py:12` | TripleBeam; agent-core/openjiuwen/core/retrieval/common/triple_memory.py:31 — extend_memory dedup |
 | `agent-core/openjiuwen/core/memory/config/graph.py:86` | bfs_k/bfs_depth |
 | `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:38` | fixed single-pass retrieve |
-
-**Canonical source**
-
-<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
 
 </details>
 
@@ -202,10 +186,6 @@ This is the strongest area. `AgenticRetriever` runs up to `max_iter` rounds agai
 | `agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:422` | concurrent entity/relation/episode search |
 | `agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:353` | retrieve_multi_graph_kb |
 
-**Canonical source**
-
-<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
-
 </details>
 
 ---
@@ -235,6 +215,10 @@ This is the strongest area. `AgenticRetriever` runs up to `max_iter` rounds agai
 
 There is no skip-retrieval classifier. `RetrievalConfig.agentic` is opt-in (default `False`); when enabled, `AgenticRetriever` still executes at least one retrieval unconditionally and uses an LLM "sufficiency" judgment only to decide whether to issue *another* rewritten query — it stops extra rounds, never the first. Otherwise the retrieval-vs-parametric decision is delegated to the model's tool choice: `memory_search` is a normal tool card the agent may elect to call, and skill retrieval is invoked through tool calls. Nothing inspects the query to decide "the model already knows this".
 
+**Implementation diagram**
+
+![diagram](assets/diagrams/6152ee99423ca07785db0ae2b939c5d5bb777424.png)
+
 **Code anchors**
 
 | Code anchor | What it points to |
@@ -242,14 +226,6 @@ There is no skip-retrieval classifier. `RetrievalConfig.agentic` is opt-in (defa
 | `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:173` | retrieve always performs one round; :326 _rewrite returns None when sufficient; :241 loop breaks after max_iter |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:51` | RetrievalConfig.agentic: bool = False (opt-in, not a router) |
 | `agent-core/openjiuwen/harness/tools/memory.py:25` | memory_search tool (model decides whether to call) |
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6152ee99423ca07785db0ae2b939c5d5bb777424.png)
-
-**Canonical source**
-
-<sub>`source/rag-practical-interview-questions_for_engineers.md`</sub>
 
 </details>
 
