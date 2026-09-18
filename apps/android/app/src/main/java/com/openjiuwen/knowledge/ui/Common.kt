@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.ui
+package com.openjiuwen.knowledge.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -75,9 +75,9 @@ import androidx.compose.ui.window.DialogProperties
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
-import com.jiuwenswarm.study.data.CitationDto
-import com.jiuwenswarm.study.data.DiagramData
-import com.jiuwenswarm.study.data.DiagramNodeDto
+import com.openjiuwen.knowledge.data.CitationDto
+import com.openjiuwen.knowledge.data.DiagramData
+import com.openjiuwen.knowledge.data.DiagramNodeDto
 import kotlinx.coroutines.delay
 
 /** Minimal, dependency-free markdown renderer: **bold** and `code` spans. */

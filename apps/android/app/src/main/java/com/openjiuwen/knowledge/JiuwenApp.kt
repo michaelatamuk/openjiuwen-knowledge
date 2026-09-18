@@ -1,8 +1,8 @@
-package com.jiuwenswarm.study
+package com.openjiuwen.knowledge
 
 import android.app.Application
-import com.jiuwenswarm.study.data.AppContainer
-import com.jiuwenswarm.study.data.ContentImporter
+import com.openjiuwen.knowledge.data.AppContainer
+import com.openjiuwen.knowledge.data.ContentImporter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.data
+package com.openjiuwen.knowledge.data
 
 import android.content.Context
 import androidx.room.Database
@@ -27,7 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         fun build(context: Context): AppDatabase =
-            Room.databaseBuilder(context, AppDatabase::class.java, "jiuwen-study.db")
+            Room.databaseBuilder(context, AppDatabase::class.java, "jiuwen-knowledge.db")
                 .fallbackToDestructiveMigration()
                 .build()
     }

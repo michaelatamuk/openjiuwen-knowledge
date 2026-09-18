@@ -78,7 +78,7 @@ def build():
 
 def zip_site():
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, "jiuwenswarm-site.zip")
+    out = os.path.join(DIST, "jiuwen-knowledge-site.zip")
     if os.path.isfile(out):
         os.remove(out)
     n = 0

@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.data
+package com.openjiuwen.knowledge.data
 
 import kotlin.math.exp
 import kotlin.math.max

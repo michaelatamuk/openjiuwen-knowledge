@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.ui
+package com.openjiuwen.knowledge.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,9 +47,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jiuwenswarm.study.data.QuestionEntity
-import com.jiuwenswarm.study.data.Repo
-import com.jiuwenswarm.study.data.StudyItem
+import com.openjiuwen.knowledge.data.QuestionEntity
+import com.openjiuwen.knowledge.data.Repo
+import com.openjiuwen.knowledge.data.StudyItem
 import kotlinx.coroutines.launch
 
 @Composable

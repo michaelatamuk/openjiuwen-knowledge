@@ -107,7 +107,7 @@ def main():
     mid = int(hashlib.sha1(b"jiuwen-qa-v2").hexdigest()[:8], 16)
     did = int(hashlib.sha1(b"jiuwen-knowledge-base").hexdigest()[:8], 16)
     model = genanki.Model(
-        mid, "Jiuwen Q&A v2",
+        mid, "Jiuwen Knowledge Q&A",
         fields=[{"name": "Question"}, {"name": "Topic"}, {"name": "Answer"}],
         templates=[{
             "name": "Recall",

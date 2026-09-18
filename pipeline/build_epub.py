@@ -5,7 +5,7 @@ Title -> Summary -> Key points -> Explanation -> concept diagram -> Jiuwen
 (plain) -> Technical detail (as a labeled section; EPUB readers don't reliably
 support <details>). Diagrams are embedded PNGs.
 
-Output: build/dist/jiuwenswarm-knowledge.epub
+Output: build/dist/jiuwen-knowledge.epub
 """
 import os
 import re
@@ -45,7 +45,7 @@ def md(t):
 def main():
     data = json.load(open(CONTENT, encoding="utf-8"))
     book = epub.EpubBook()
-    book.set_identifier("jiuwenswarm-knowledge-base")
+    book.set_identifier("jiuwen-knowledge-base")
     book.set_title("Jiuwen Knowledge Base")
     book.set_language("en")
     book.add_author("Jiuwenswarm")
@@ -106,7 +106,7 @@ def main():
     book.add_item(epub.EpubNav())
     book.spine = ["nav"] + chapters
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, "jiuwenswarm-knowledge.epub")
+    out = os.path.join(DIST, "jiuwen-knowledge.epub")
     epub.write_epub(out, book)
     print(f"wrote {out} ({os.path.getsize(out)//1024} KB, {len(chapters)} chapters, {len(images)} images)")
 

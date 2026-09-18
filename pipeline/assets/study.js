@@ -1,6 +1,6 @@
 /* Study mode: hide answers, reveal with one tap. Persists across pages. */
 (function () {
-  var KEY = "jiuwen-study-mode";
+  var KEY = "jiuwen-knowledge-study-mode";
 
   function getMode() {
     try { return localStorage.getItem(KEY) === "1"; } catch (e) { return false; }

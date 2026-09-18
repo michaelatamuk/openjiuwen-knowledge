@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.JiuwenStudy">
+        android:theme="@style/Theme.JiuwenKnowledge">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -5,7 +5,7 @@ concept diagram -> Jiuwen (plain) -> Technical detail (expanded).
 
 Browsers render Mermaid SVG correctly, so the HTML inlines SVG (crisp at any zoom).
 
-Output: build/dist/jiuwenswarm-knowledge-offline.html
+Output: build/dist/jiuwen-knowledge-offline.html
 Run with an interpreter that has `markdown` (the mkdocs venv does).
 """
 import os
@@ -153,7 +153,7 @@ mode.addEventListener('click',function(){{setMode(!document.body.classList.conta
 document.querySelectorAll('.qa>h2').forEach(function(h){{h.addEventListener('click',function(){{h.parentElement.classList.toggle('revealed');}});}});
 </script></body></html>"""
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, "jiuwenswarm-knowledge-offline.html")
+    out = os.path.join(DIST, "jiuwen-knowledge-offline.html")
     open(out, "w", encoding="utf-8").write(doc)
     print(f"wrote {out} ({len(doc)//1024} KB, {sum(len(t['questions']) for t in data['topics'])} questions)")
 

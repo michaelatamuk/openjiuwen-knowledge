@@ -4,7 +4,7 @@
 The zip wraps the markdown output in a top-level `openjiuwen-knowledge/` folder
 so the whole thing opens directly as an Obsidian vault.
 
-Output: build/knowledge-vault.zip
+Output: build/dist/jiuwen-knowledge-vault.zip
 """
 import os
 import zipfile
@@ -12,7 +12,8 @@ import zipfile
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
 ROOT = os.path.dirname(HERE)                         # repo root
 SRC = os.path.join(ROOT, "knowledge")
-OUT = os.path.join(ROOT, "build", "knowledge-vault.zip")
+DIST = os.path.join(ROOT, "build", "dist")
+OUT = os.path.join(DIST, "jiuwen-knowledge-vault.zip")
 VAULT = "openjiuwen-knowledge"
 
 

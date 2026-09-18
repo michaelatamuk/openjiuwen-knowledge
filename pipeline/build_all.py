@@ -4,10 +4,10 @@
 Runs, in order:
     build_content_json.py   content.json + diagram assets for the app
     build_study.py          build/markdown -> build/docs -> build/site (+ site zip)
-    build_singlefile.py     build/dist/jiuwenswarm-knowledge-offline.html
+    build_singlefile.py     build/dist/jiuwen-knowledge-offline.html
     anki_export.py          build/dist/*.apkg + *.csv
     build_epub.py           build/dist/*.epub
-    build_vault.py          build/knowledge-vault.zip
+    build_vault.py          build/dist/jiuwen-knowledge-vault.zip
 
 Options:
     --android       also run `gradlew assembleDebug` for the Android app

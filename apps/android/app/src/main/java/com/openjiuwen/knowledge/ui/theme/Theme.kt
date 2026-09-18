@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.ui.theme
+package com.openjiuwen.knowledge.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

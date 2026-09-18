@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.data
+package com.openjiuwen.knowledge.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.decodeFromString

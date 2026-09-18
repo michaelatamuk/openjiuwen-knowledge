@@ -1,4 +1,4 @@
-package com.jiuwenswarm.study.ui
+package com.openjiuwen.knowledge.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,7 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.jiuwenswarm.study.data.Repo
+import com.openjiuwen.knowledge.data.Repo
 
 private data class Tab(val route: String, val label: String, val icon: ImageVector)
 

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.jiuwenswarm.study"
+    namespace = "com.openjiuwen.knowledge"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.jiuwenswarm.study"
+        applicationId = "com.openjiuwen.knowledge"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
