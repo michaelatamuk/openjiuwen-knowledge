@@ -1,0 +1,21 @@
+# Generated build outputs
+build/
+dist/
+
+# Bundled runtime assets (downloaded; not needed after build-time rendering)
+pipeline/assets/mermaid.min.js
+pipeline/assets/mermaid-init.js
+pipeline/assets/iframe-worker-shim.js
+
+# Android app build outputs / generated assets
+apps/android/.gradle/
+apps/android/.kotlin/
+apps/android/local.properties
+apps/android/app/src/main/assets/content.json
+apps/android/app/src/main/assets/diagrams/
+
+# Python / Node
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/

@@ -1,0 +1,49 @@
+{
+ "02-1": {
+  "title": "System vs user prompt",
+  "tldr": "The system prompt sets persistent role and rules; the user prompt is the per-turn request. Providers give system content higher priority and may pass it as a separate field.",
+  "points": [
+   "System: identity, rules, constraints — consistent across turns.",
+   "User: the changing per-turn input.",
+   "Anthropic lifts system to a top-level field; the Responses API folds it into instructions."
+  ]
+ },
+ "02-2": {
+  "title": "Zero-shot, few-shot, CoT",
+  "tldr": "Zero-shot for tasks the model knows; few-shot pins down format or edge cases; chain-of-thought helps multi-step reasoning (more as scale grows) and is largely subsumed by reasoning models.",
+  "points": [
+   "Few-shot: worked examples fix format, labels, and conventions.",
+   "CoT: intermediate reasoning; benefit grows with model scale.",
+   "All add tokens; not free wins on simple tasks."
+  ]
+ },
+ "02-3": {
+  "title": "Reliable JSON output",
+  "tldr": "Constrain generation (schema/tool mode), validate, and retry on failure; treat free-text JSON as a last resort.",
+  "points": [
+   "Prefer provider JSON/schema mode or tool calling with a JSON Schema.",
+   "Validate against the schema and feed errors back for a retry.",
+   "Free-text/fenced JSON needs tolerant extraction and repair.",
+   "Never act on unvalidated structured output."
+  ]
+ },
+ "02-4": {
+  "title": "Validating tool-call output",
+  "tldr": "Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.",
+  "points": [
+   "json.loads → bracket/quote repair → otherwise a readable error.",
+   "Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.",
+   "Return the error to the model so it can self-correct."
+  ]
+ },
+ "02-5": {
+  "title": "Versioning prompts",
+  "tldr": "Treat prompts like code: immutable IDs/hashes, diffs, activate/rollback without redeploying, and tie each version to the model and parameters it was tested with.",
+  "points": [
+   "Store in source control or a prompt store with content hashes.",
+   "Build prompts from composable, individually versioned sections.",
+   "Support activate/rollback and A/B without redeploying.",
+   "Log the prompt version alongside outputs."
+  ]
+ }
+}

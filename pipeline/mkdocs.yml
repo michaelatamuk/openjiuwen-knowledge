@@ -1,0 +1,58 @@
+site_name: Jiuwen Interview Prep
+site_description: Offline study build of the Jiuwen interview question bank
+docs_dir: ../build/docs
+site_dir: ../build/site
+use_directory_urls: false
+
+theme:
+  name: material
+  font: false
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-6
+        name: Switch light/dark
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+  features:
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+  - offline
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.superfences
+
+extra_css:
+  - assets/study.css
+extra_javascript:
+  - assets/study.js
+
+nav:
+  - Home: index.md
+  - LLM foundations: 01-llm-foundations.md
+  - Prompting & output: 02-prompting-and-output-control.md
+  - RAG & retrieval: 03-rag-and-retrieval.md
+  - RAG system design: 04-rag-system-design.md
+  - Agents, tools & memory: 05-agents-tools-and-memory.md
+  - Evaluation: 06-evaluation.md
+  - Production & scale: 07-production-cost-and-scale.md
+  - Security & safety: 08-security-and-safety.md
+  - Fine-tuning: 09-fine-tuning-and-customization.md
+  - General engineering: 10-general-engineering.md
+  - Reference:
+      - Terms glossary: 90-llm-terms-glossary.md
+      - AI engineer patterns: 91-ai-engineer-interview-patterns.md
+      - LLM interview patterns: 92-llm-interview-patterns.md
+      - LLM architecture patterns: 93-llm-architecture-patterns.md

@@ -1,0 +1,32 @@
+/* Study mode for the offline Jiuwen interview build. */
+.study-toggle {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--md-default-fg-color--lighter, #999);
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color, #111);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.study-toggle:hover { border-color: var(--md-primary-fg-color, #3f51b5); }
+
+.qa-reveal { display: none; }
+body.study-on .qa-reveal {
+  display: inline-block;
+  margin: 6px 0 16px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px dashed var(--md-primary-fg-color, #3f51b5);
+  background: transparent;
+  color: var(--md-primary-fg-color, #3f51b5);
+  font-size: 13px;
+  cursor: pointer;
+}
+body.study-on .qa-answer { display: none; }
+body.study-on .qa-answer.revealed { display: block; }
