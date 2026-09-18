@@ -1,4 +1,4 @@
-# 20 LLM terms — definitions, where each one bites, and how Jiuwen handles it
+# LLM terms glossary
 
 ## 1. Token
 

@@ -46,7 +46,7 @@ fun AppNav(repo: Repo) {
         topBar = {
             if (chrome) {
                 TopAppBar(
-                    title = { Text("Jiuwen Study") },
+                    title = { Text("Jiuwen Knowledge Base") },
                     actions = {
                         IconButton(onClick = { nav.navigate("search") }) {
                             Icon(Icons.Filled.Search, contentDescription = "Search")

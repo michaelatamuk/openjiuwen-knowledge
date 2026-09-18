@@ -1,0 +1,72 @@
+{
+ "13-1": {
+  "title": "'How does the model know X': context window understanding",
+  "tldr": "'How does the model know X' is really testing context-window understanding.",
+  "points": [
+   "Strictest-bound budget.",
+   "Offload large tool results.",
+   "Multi-stage compaction.",
+   "FIFO drop beyond message cap."
+  ]
+ },
+ "13-2": {
+  "title": "'The model made something up': hallucination handling",
+  "tldr": "'The model made something up' is testing hallucination handling, not model quality.",
+  "points": [
+   "Verification agent (read-only, PASS/FAIL/PARTIAL).",
+   "Reviewer correctness dimension.",
+   "No answerability gate/abstention.",
+   "No faithfulness judge with context."
+  ]
+ },
+ "13-3": {
+  "title": "A-vs-B comparisons: tradeoff reasoning",
+  "tldr": "Any A-vs-B comparison is testing tradeoff reasoning, not the 'right' answer.",
+  "points": [
+   "top_k defaults 5.",
+   "No reranking in the KB path.",
+   "Allocation is availability-based.",
+   "Session cost tracked and capped."
+  ]
+ },
+ "13-4": {
+  "title": "'Stuck in a loop': production experience",
+  "tldr": "'The agent is stuck in a loop' is testing production experience.",
+  "points": [
+   "ReAct max_iterations (5; harness 15).",
+   "Agentic retriever max_iter (2, clamped).",
+   "Anomaly rail compact/abort.",
+   "Dedup rail; idempotent=False default."
+  ]
+ },
+ "13-5": {
+  "title": "Prompt behavior: versioning and testing",
+  "tldr": "Any prompt behavior question is secretly a versioning and testing question.",
+  "points": [
+   "Sections carry name/priority/category, no version.",
+   "Optimization overwrites in place.",
+   "Diagnostics ≠ versioning.",
+   "Rollback only at harness-package level."
+  ]
+ },
+ "13-6": {
+  "title": "'How do you know it's working': eval depth",
+  "tldr": "'How do you know it's working' is testing evaluation depth.",
+  "points": [
+   "Offline answer-level eval exists.",
+   "No faithfulness/relevance metric.",
+   "No retrieval metric layer.",
+   "No CI quality gate."
+  ]
+ },
+ "13-7": {
+  "title": "Untrusted input: injection awareness",
+  "tldr": "Any question about untrusted input is testing prompt-injection awareness.",
+  "points": [
+   "Tool results are plain messages.",
+   "Sanitizers unused; detector unregistered.",
+   "Safety rail is advisory.",
+   "Real control: shell/permission layer."
+  ]
+ }
+}

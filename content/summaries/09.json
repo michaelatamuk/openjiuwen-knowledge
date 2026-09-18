@@ -1,8 +1,81 @@
 {
-  "09-1": {"title":"Pretraining vs fine-tuning","tldr":"Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.","points":["Pretraining: self-supervised, general, expensive.","Fine-tuning: task adaptation with labels.","Jiuwen's default evolution tunes prompts, not weights."]},
-  "09-2": {"title":"Instruction tuning","tldr":"Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.","points":["Pretraining: next/masked token, not instruction-following.","Instruction tuning: supervised on instruction/response pairs.","Produces an assistant that follows instructions."]},
-  "09-3": {"title":"Full fine-tuning vs LoRA","tldr":"Full fine-tuning updates every weight (most capacity, but the full model in memory and easy to overfit/drift). LoRA freezes the base and trains small low-rank adapters (cheap, portable).","points":["Full: updates all weights, high cost/capacity.","LoRA: freezes base, trains low-rank adapters.","LoRA is cheaper and portable."]},
-  "09-4": {"title":"Fine-tune vs a longer prompt","tldr":"Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.","points":["Hard-to-specify behavior (style/schema).","Compress a long few-shot prompt into weights.","Many labeled examples exist."]},
-  "09-5": {"title":"RAG vs fine-tuning","tldr":"RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).","points":["RAG: knowledge at query time, fresh/auditable.","Fine-tuning: behavior/style baked into weights.","Often combine them."]},
-  "09-6": {"title":"Risk of fine-tuning on a narrow dataset","tldr":"Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.","points":["Overfitting to the sample.","Catastrophic forgetting.","Brittleness to new inputs.","Amplified bias / format lock-in."]}
+ "09-1": {
+  "title": "Prompt injection defenses",
+  "tldr": "Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.",
+  "points": [
+   "Direct and indirect injection.",
+   "Treat content as data, not instructions.",
+   "Delimit/label untrusted content.",
+   "Enforce privilege outside the model."
+  ]
+ },
+ "09-2": {
+  "title": "Untrusted tool output and documents",
+  "tldr": "Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.",
+  "points": [
+   "Treat as data, not instructions.",
+   "Delimit and label as data.",
+   "Strip control/escape sequences.",
+   "Re-check permissions before privileged actions."
+  ]
+ },
+ "09-3": {
+  "title": "Handling jailbreak attempts",
+  "tldr": "Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.",
+  "points": [
+   "Assume the model can be manipulated.",
+   "Detect/block known patterns.",
+   "Permission-check privileged actions.",
+   "Sandbox and log."
+  ]
+ },
+ "09-4": {
+  "title": "Per-user document authorization",
+  "tldr": "Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.",
+  "points": [
+   "ACL metadata on every chunk.",
+   "Mandatory identity-derived filter.",
+   "Pre-filter in the store, not post-hoc."
+  ]
+ },
+ "09-5": {
+  "title": "Preventing destructive actions",
+  "tldr": "Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.",
+  "points": [
+   "Classify by risk.",
+   "Deny known-dangerous patterns.",
+   "Approve the ambiguous middle.",
+   "Prefer reversible ops; fail closed."
+  ]
+ },
+ "09-6": {
+  "title": "Preventing harmful or biased output",
+  "tldr": "Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.",
+  "points": [
+   "Safety instruction in the system prompt.",
+   "Input/output moderation.",
+   "Policy filters on output.",
+   "Red-team refusal behavior."
+  ]
+ },
+ "09-7": {
+  "title": "Preventing sensitive data leakage",
+  "tldr": "Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.",
+  "points": [
+   "Scrub secrets before model/logs.",
+   "Redact log fields (not drop whole events).",
+   "Gate secret-like egress.",
+   "Provider zero-retention."
+  ]
+ },
+ "09-8": {
+  "title": "Multi-tenant RAG isolation",
+  "tldr": "Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.",
+  "points": [
+   "Separate index per tenant (strongest).",
+   "Tenant key + mandatory pre-filter.",
+   "Row-level security.",
+   "Filter inside the store."
+  ]
+ }
 }

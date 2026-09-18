@@ -38,30 +38,30 @@ A real entry looks like this:
 ### Foundations (39)
 - [LLM foundations](knowledge/01-llm-foundations.md) — 14
 - [Prompting and output control](knowledge/02-prompting-and-output-control.md) — 5
-- [LLM terms glossary](knowledge/90-llm-terms-glossary.md) — 20
-
-### Retrieval and RAG (54)
-- [RAG and retrieval](knowledge/03-rag-and-retrieval.md) — 41
-- [RAG system design](knowledge/04-rag-system-design.md) — 13
+- [LLM terms glossary](knowledge/03-llm-terms-glossary.md) — 20
 
 ### Agents (45)
-- [Agents, tools and memory](knowledge/05-agents-tools-and-memory.md) — 45
+- [Agents, tools and memory](knowledge/04-agents-tools-and-memory.md) — 45
 
-### Evaluation and operations (29)
-- [Evaluation](knowledge/06-evaluation.md) — 21
-- [Production, cost and scale](knowledge/07-production-cost-and-scale.md) — 8
+### Retrieval and RAG (54)
+- [RAG and retrieval](knowledge/05-rag-and-retrieval.md) — 41
+- [RAG system design](knowledge/06-rag-system-design.md) — 13
+
+### Quality and operations (29)
+- [Evaluation](knowledge/07-evaluation.md) — 21
+- [Production, cost and scale](knowledge/08-production-cost-and-scale.md) — 8
 
 ### Trust and safety (8)
-- [Security and safety](knowledge/08-security-and-safety.md) — 8
+- [Security and safety](knowledge/09-security-and-safety.md) — 8
 
-### Adaptation and engineering (11)
-- [Fine-tuning and customization](knowledge/09-fine-tuning-and-customization.md) — 6
-- [General engineering](knowledge/10-general-engineering.md) — 5
+### Customization and engineering (11)
+- [Fine-tuning and customization](knowledge/10-fine-tuning-and-customization.md) — 6
+- [General engineering](knowledge/11-general-engineering.md) — 5
 
 ### Patterns (21)
-- [AI engineer patterns](knowledge/91-ai-engineer-interview-patterns.md) — 7
-- [LLM patterns](knowledge/92-llm-interview-patterns.md) — 7
-- [LLM architecture patterns](knowledge/93-llm-architecture-patterns.md) — 7
+- [AI engineer interview patterns](knowledge/12-ai-engineer-interview-patterns.md) — 7
+- [LLM interview patterns](knowledge/13-llm-interview-patterns.md) — 7
+- [LLM architecture patterns](knowledge/14-llm-architecture-patterns.md) — 7
 
 ## Formats
 

@@ -1,23 +1,128 @@
 {
-  "06-1": {"title":"Evaluating beyond 'looks correct'","tldr":"Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.","points":["Automatic metrics where deterministic (EM, F1, tests).","LLM-as-judge with a rubric for open-ended quality.","Human review on a sample.","Held-out set + regression tracking."]},
-  "06-2": {"title":"Retrieval vs generation, separately","tldr":"An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.","points":["Separate stages → attribution.","A retrieval miss can't be fixed by the generator.","Retrieved-but-wrong = generation/grounding."]},
-  "06-3": {"title":"Why exact match fails","tldr":"Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.","points":["Requires full-string equality.","Brittle to wording, articles, ordering.","Use only on constrained answers; judge for paraphrase."]},
-  "06-4": {"title":"Recall@k","tldr":"Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.","points":["Recall@k = relevant-in-top-k / total relevant.","Low → retrieval (embedding/chunking/query) is failing.","Distinguishes missing content from ranking issues."]},
-  "06-5": {"title":"Precision@k","tldr":"Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.","points":["Precision@k = relevant-in-top-k / k.","Higher k → recall up, precision usually down.","Both can look fine while real quality is poor."]},
-  "06-6": {"title":"MRR","tldr":"Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.","points":["MRR = mean of 1/rank of first relevant hit.","Best when one strong hit is needed (lookup/FAQ).","Complements recall/NDCG."]},
-  "06-7": {"title":"NDCG","tldr":"Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.","points":["Discount by position (log2 rank+1).","Normalize by the ideal ranking.","Supports graded relevance."]},
-  "06-8": {"title":"Faithfulness vs relevance","tldr":"Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.","points":["Relevance: context vs query.","Faithfulness: answer vs context.","Both are needed; they fail differently."]},
-  "06-9": {"title":"Computing faithfulness","tldr":"Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.","points":["Decompose the answer into atomic claims.","Verify each against the retrieved source.","Average → faithfulness score."]},
-  "06-10": {"title":"Measuring hallucination rate","tldr":"Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).","points":["Extract claims from the answer.","Verify each against retrieved context.","Rate = unsupported / total claims."]},
-  "06-11": {"title":"Perplexity","tldr":"Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.","points":["Exponential of average negative log-likelihood.","Lower = more predictable; compare on the same text.","Not a task/quality metric."]},
-  "06-12": {"title":"LLM-as-judge limitations","tldr":"Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.","points":["Biases: position, verbosity, self-preference.","Noisy, non-deterministic, gameable.","Mitigate: swap positions, vote, calibrate with humans."]},
-  "06-13": {"title":"Evaluating with no ground truth","tldr":"Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.","points":["Synthetic queries from known docs (doc = gold).","LLM judge with a rubric.","Pairwise / few-shot judging."]},
-  "06-14": {"title":"Building an eval dataset","tldr":"Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.","points":["Mine real queries from logs.","Synthetic queries (doc = gold).","Or LLM answers with citations as gold."]},
-  "06-15": {"title":"How many eval examples","tldr":"Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.","points":["~100–200 for a usable single-metric signal.","Comparing systems needs power for the effect size.","Report confidence/variance, not a bare mean."]},
-  "06-16": {"title":"Comparing two models","tldr":"Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.","points":["Same held-out set, same prompts/decoding.","Task-appropriate metrics.","Compare accuracy + latency + cost."]},
-  "06-17": {"title":"Regression test suite","tldr":"Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.","points":["Fast unit tests for components.","Quality eval on a fixed dataset.","Baseline + fail on regression."]},
-  "06-18": {"title":"Continuous production eval","tldr":"Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.","points":["Sample live traffic; score on a schedule.","Alert on quality drops, not just errors.","Watch drift in queries and hit rates."]},
-  "06-19": {"title":"Detecting retrieval degradation","tldr":"Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.","points":["Zero-result rate + score distributions.","Periodic re-run of a frozen set.","Slice per query type/language."]},
-  "06-20": {"title":"High eval, users still unhappy","tldr":"The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.","points":["Eval set not representative of real usage.","Missing adversarial/long-tail/slices.","Metric rewards the wrong thing."]},
-  "06-21": {"title":"Tying eval to business outcome","tldr":"Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.","points":["Pick the business proxy (success, deflection, cost).","Correlate the offline metric to the proxy.","Use the offline metric as the fast proxy."]}
+ "06-1": {
+  "title": "RAG for customer support (100k/day)",
+  "tldr": "Start from rate/SLA, then pick components: ingestion, hybrid retrieval, reranking, generation, caching, observability. 100k/day is ~1.2 QPS average with bursts.",
+  "points": [
+   "Budget from QPS + latency SLA.",
+   "Ingestion: parse → chunk → embed → index.",
+   "Hybrid retrieval + reranker + generation + cache.",
+   "Observability and per-session cost caps."
+  ]
+ },
+ "06-2": {
+  "title": "Codebase assistant (daily changes)",
+  "tldr": "Make re-indexing incremental and event-driven: stable IDs per file/chunk, delete-by-ID on change, append new chunks, and trigger on commit/CI — avoid full re-embeds except on model/index changes.",
+  "points": [
+   "Stable doc/chunk IDs; delete-by-ID on change.",
+   "Append new chunks (no full re-index).",
+   "Trigger into indexing from commit/CI.",
+   "Structure-aware chunks (function boundaries)."
+  ]
+ },
+ "06-3": {
+  "title": "Legal document search (confidential)",
+  "tldr": "Access control dominates, then scale: every chunk carries an ACL and every query is filtered by the caller's permissions inside the vector search (pre-filter), not after.",
+  "points": [
+   "ACL on every chunk (owner/matter/tenant).",
+   "Pre-filter queries by caller permissions.",
+   "Per-tenant/matter isolation + audit logging.",
+   "Then scale: ANN, quantization, sharding."
+  ]
+ },
+ "06-4": {
+  "title": "Scaling 10K → 10M documents",
+  "tldr": "Small scale: a local index (Chroma/FAISS). Large scale: a dedicated vector DB with tuned ANN (HNSW/IVF/quantization), sharding/replication, and batch ingestion — and you tune recall vs latency.",
+  "points": [
+   "Small: local in-process index.",
+   "Large: server vector DB, tuned ANN + quantization.",
+   "Sharding/partitioning, replication, batch ingest.",
+   "Tune recall vs latency per query."
+  ]
+ },
+ "06-5": {
+  "title": "Sharding a vector DB",
+  "tldr": "Options: partition by key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate and route by collection. Plan for metadata routing and rebalancing.",
+  "points": [
+   "Partition by tenant/category.",
+   "Hash/range shard across nodes.",
+   "Route queries; plan rebalancing."
+  ]
+ },
+ "06-6": {
+  "title": "Fast retrieval as the DB grows",
+  "tldr": "Append-only incremental indexing into a pre-built ANN index avoids rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters tune recall vs latency without reindexing.",
+  "points": [
+   "Append-only writes; no full rebuild.",
+   "Scalar/inverted indexes for fast deletes/filters.",
+   "Search-time params (ef/nprobe) tune the dial."
+  ]
+ },
+ "06-7": {
+  "title": "Choosing a vector store",
+  "tldr": "Choose by scale and features: local/embedded for prototypes; a managed vector DB for scale and hybrid; pgvector when you already run Postgres and want one datastore.",
+  "points": [
+   "Local/embedded for prototypes.",
+   "Managed vector DB for scale + hybrid.",
+   "pgvector for one relational datastore + joins.",
+   "Evaluate hybrid, filtering, ops cost, lock-in."
+  ]
+ },
+ "06-8": {
+  "title": "Hosted vs self-managed vector DB",
+  "tldr": "Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.",
+  "points": [
+   "Hosted: less ops, elastic, lock-in, cost scales.",
+   "Self-managed: control, cost, residency, you run it.",
+   "Decide by ops capacity, sensitivity, volume."
+  ]
+ },
+ "06-9": {
+  "title": "Vector DB down: fallback",
+  "tldr": "Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.",
+  "points": [
+   "Fail fast with a clear error, or",
+   "Fall back to sparse/cached/replica, or",
+   "Disable retrieval and answer with a caveat.",
+   "Add circuit breaker + health checks."
+  ]
+ },
+ "06-10": {
+  "title": "Updating/deleting an indexed doc",
+  "tldr": "Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.",
+  "points": [
+   "Stable doc id + delete-by-id.",
+   "Update = delete + re-insert (or upsert).",
+   "Chunk ids tied to the doc id.",
+   "Atomicity and consistency are the hard parts."
+  ]
+ },
+ "06-11": {
+  "title": "Never serving stale information",
+  "tldr": "Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.",
+  "points": [
+   "Timestamps/versions on documents.",
+   "Recency preference or a freshness filter.",
+   "Tombstone superseded versions; propagate deletes.",
+   "Surface recency to the generator."
+  ]
+ },
+ "06-12": {
+  "title": "Zero relevant documents",
+  "tldr": "Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.",
+  "points": [
+   "Detect: score threshold / answerability.",
+   "Abstain or ask a clarifying question.",
+   "Optional fallbacks: sparse, graph hop."
+  ]
+ },
+ "06-13": {
+  "title": "Sub-500ms budget",
+  "tldr": "Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.",
+  "points": [
+   "Retrieval tens of ms; rerank tens–low-hundreds.",
+   "Generation dominates — stream for TTFT.",
+   "Cache embeddings/results; parallelize tools.",
+   "Skip rerank when latency-bound."
+  ]
+ }
 }

@@ -1,4 +1,4 @@
-# LLM interview patterns — what's really being tested + how Jiuwen maps
+# LLM interview patterns
 
 Based on the recurring observations *Patterns I've Noticed in LLM Interview Questions*. Like the AI-engineer patterns doc, this is not a question list; each entry is an interview dynamic — the real concern behind the wording, what a strong answer includes, and the concrete mechanism in this codebase (or the gap).
 

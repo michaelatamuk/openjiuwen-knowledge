@@ -1,4 +1,4 @@
-# LLM architecture patterns — how each is built + how Jiuwen maps
+# LLM architecture patterns
 
 ## 1. Simple RAG pipeline
 

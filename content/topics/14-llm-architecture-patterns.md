@@ -1,4 +1,4 @@
-# LLM architecture patterns — how each is built + how Jiuwen maps
+# LLM architecture patterns
 
 Based on the recurring list *Architecture Patterns I've Seen Repeatedly in LLM Projects*. Each of the seven patterns is described, then mapped to what this codebase actually provides (mechanism + anchors), including the gaps a real implementation would have to fill.
 

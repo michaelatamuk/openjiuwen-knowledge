@@ -1,10 +1,80 @@
 {
-  "08-1": {"title":"Prompt injection defenses","tldr":"Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.","points":["Direct and indirect injection.","Treat content as data, not instructions.","Delimit/label untrusted content.","Enforce privilege outside the model."]},
-  "08-2": {"title":"Untrusted tool output and documents","tldr":"Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.","points":["Treat as data, not instructions.","Delimit and label as data.","Strip control/escape sequences.","Re-check permissions before privileged actions."]},
-  "08-3": {"title":"Handling jailbreak attempts","tldr":"Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.","points":["Assume the model can be manipulated.","Detect/block known patterns.","Permission-check privileged actions.","Sandbox and log."]},
-  "08-4": {"title":"Per-user document authorization","tldr":"Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.","points":["ACL metadata on every chunk.","Mandatory identity-derived filter.","Pre-filter in the store, not post-hoc."]},
-  "08-5": {"title":"Preventing destructive actions","tldr":"Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.","points":["Classify by risk.","Deny known-dangerous patterns.","Approve the ambiguous middle.","Prefer reversible ops; fail closed."]},
-  "08-6": {"title":"Preventing harmful or biased output","tldr":"Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.","points":["Safety instruction in the system prompt.","Input/output moderation.","Policy filters on output.","Red-team refusal behavior."]},
-  "08-7": {"title":"Preventing sensitive data leakage","tldr":"Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.","points":["Scrub secrets before model/logs.","Redact log fields (not drop whole events).","Gate secret-like egress.","Provider zero-retention."]},
-  "08-8": {"title":"Multi-tenant RAG isolation","tldr":"Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.","points":["Separate index per tenant (strongest).","Tenant key + mandatory pre-filter.","Row-level security.","Filter inside the store."]}
+ "08-1": {
+  "title": "Where cost concentrates",
+  "tldr": "Embedding is a one-time, change-only indexing cost; the recurring traffic-scaling cost is generation, especially input tokens from long context. Optimize generation.",
+  "points": [
+   "Embedding = one-time indexing cost.",
+   "Generation scales with traffic.",
+   "Input tokens dominate with long context."
+  ]
+ },
+ "08-2": {
+  "title": "Reducing cost in high-volume RAG",
+  "tldr": "Cut the dominant input-token/generation cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts/context, and summarize history.",
+  "points": [
+   "Rerank down to a smaller k.",
+   "Cache exact and semantic.",
+   "Route easy queries to smaller models.",
+   "Shorten prompts/context; summarize history."
+  ]
+ },
+ "08-3": {
+  "title": "Controlling unpredictable cost",
+  "tldr": "Bound the loop (iterations/rounds/time), cap tokens per request and session, let cheap models do cheap work, cache, offload/summarize context, and surface per-run cost to budget and alert.",
+  "points": [
+   "Bound iterations/time.",
+   "Cap tokens per request/session.",
+   "Cheap models for cheap work.",
+   "Surface per-run cost."
+  ]
+ },
+ "08-4": {
+  "title": "First cut: 50% cost reduction",
+  "tldr": "Cheapest high-impact cuts: route easy queries to a smaller model, lower top-k, cache, shorten the prompt, and reduce the agent's iteration cap.",
+  "points": [
+   "Route easy queries to a smaller model.",
+   "Lower top-k.",
+   "Cache.",
+   "Shorten prompt; lower iteration cap."
+  ]
+ },
+ "08-5": {
+  "title": "Designing caching",
+  "tldr": "Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.",
+  "points": [
+   "Exact-match response cache.",
+   "Provider prefix/prompt cache.",
+   "Embedding cache.",
+   "Semantic cache with a similarity threshold."
+  ]
+ },
+ "08-6": {
+  "title": "Reducing latency",
+  "tldr": "Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.",
+  "points": [
+   "Stream (optimize TTFT).",
+   "Parallelize independent steps.",
+   "Cache prompts/embeddings.",
+   "Route easy steps to faster models."
+  ]
+ },
+ "08-7": {
+  "title": "Threads vs processes for I/O-bound LLM calls",
+  "tldr": "For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.",
+  "points": [
+   "I/O-bound → concurrency, not processes.",
+   "Async is most efficient.",
+   "Multiprocessing only for CPU-bound work."
+  ]
+ },
+ "08-8": {
+  "title": "Architecture at 10x traffic",
+  "tldr": "You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.",
+  "points": [
+   "Provider rate limits/429s first.",
+   "Serialized tool/DB access.",
+   "Memory pressure from context.",
+   "Connection pools."
+  ]
+ }
 }

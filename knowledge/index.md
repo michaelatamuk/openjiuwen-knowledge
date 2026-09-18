@@ -38,30 +38,30 @@ A real entry looks like this:
 ### Foundations (39)
 - [LLM foundations](01-llm-foundations.md) — 14
 - [Prompting and output control](02-prompting-and-output-control.md) — 5
-- [LLM terms glossary](90-llm-terms-glossary.md) — 20
-
-### Retrieval and RAG (54)
-- [RAG and retrieval](03-rag-and-retrieval.md) — 41
-- [RAG system design](04-rag-system-design.md) — 13
+- [LLM terms glossary](03-llm-terms-glossary.md) — 20
 
 ### Agents (45)
-- [Agents, tools and memory](05-agents-tools-and-memory.md) — 45
+- [Agents, tools and memory](04-agents-tools-and-memory.md) — 45
 
-### Evaluation and operations (29)
-- [Evaluation](06-evaluation.md) — 21
-- [Production, cost and scale](07-production-cost-and-scale.md) — 8
+### Retrieval and RAG (54)
+- [RAG and retrieval](05-rag-and-retrieval.md) — 41
+- [RAG system design](06-rag-system-design.md) — 13
+
+### Quality and operations (29)
+- [Evaluation](07-evaluation.md) — 21
+- [Production, cost and scale](08-production-cost-and-scale.md) — 8
 
 ### Trust and safety (8)
-- [Security and safety](08-security-and-safety.md) — 8
+- [Security and safety](09-security-and-safety.md) — 8
 
-### Adaptation and engineering (11)
-- [Fine-tuning and customization](09-fine-tuning-and-customization.md) — 6
-- [General engineering](10-general-engineering.md) — 5
+### Customization and engineering (11)
+- [Fine-tuning and customization](10-fine-tuning-and-customization.md) — 6
+- [General engineering](11-general-engineering.md) — 5
 
 ### Patterns (21)
-- [AI engineer patterns](91-ai-engineer-interview-patterns.md) — 7
-- [LLM patterns](92-llm-interview-patterns.md) — 7
-- [LLM architecture patterns](93-llm-architecture-patterns.md) — 7
+- [AI engineer interview patterns](12-ai-engineer-interview-patterns.md) — 7
+- [LLM interview patterns](13-llm-interview-patterns.md) — 7
+- [LLM architecture patterns](14-llm-architecture-patterns.md) — 7
 
 ## Formats
 

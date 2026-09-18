@@ -1,7 +1,57 @@
 {
-  "10-1": {"title":"When to use an LLM vs rules","tldr":"Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.","points":["Rules: enumerable, auditable, reproducible.","LLM: semantic, ambiguous, open-ended.","Prefer rules; add the LLM where needed."]},
-  "10-2": {"title":"Larger vs smaller model","tldr":"Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.","points":["Large for reasoning/ambiguity.","Small/fast for classification/extraction/routing.","Measure quality per task; weigh latency/cost."]},
-  "10-3": {"title":"Will a framework scale with your team","tldr":"Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.","points":["Declarative registration and plugins.","Stable extension contracts.","Provider/config abstraction.","Schema'd config + docs."]},
-  "10-4": {"title":"Rollback plan for a bad update","tldr":"Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).","points":["Version prompts/models.","Ship behind flag/canary.","One-command rollback.","Gate on eval; monitor quality."]},
-  "10-5": {"title":"Shipping before eval is ready","tldr":"Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.","points":["Ship behind flag/canary.","Define rollback and cap blast radius.","Minimal offline eval gate.","Monitoring to detect drops."]}
+ "10-1": {
+  "title": "Pretraining vs fine-tuning",
+  "tldr": "Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.",
+  "points": [
+   "Pretraining: self-supervised, general, expensive.",
+   "Fine-tuning: task adaptation with labels.",
+   "Jiuwen's default evolution tunes prompts, not weights."
+  ]
+ },
+ "10-2": {
+  "title": "Instruction tuning",
+  "tldr": "Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.",
+  "points": [
+   "Pretraining: next/masked token, not instruction-following.",
+   "Instruction tuning: supervised on instruction/response pairs.",
+   "Produces an assistant that follows instructions."
+  ]
+ },
+ "10-3": {
+  "title": "Full fine-tuning vs LoRA",
+  "tldr": "Full fine-tuning updates every weight (most capacity, but the full model in memory and easy to overfit/drift). LoRA freezes the base and trains small low-rank adapters (cheap, portable).",
+  "points": [
+   "Full: updates all weights, high cost/capacity.",
+   "LoRA: freezes base, trains low-rank adapters.",
+   "LoRA is cheaper and portable."
+  ]
+ },
+ "10-4": {
+  "title": "Fine-tune vs a longer prompt",
+  "tldr": "Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.",
+  "points": [
+   "Hard-to-specify behavior (style/schema).",
+   "Compress a long few-shot prompt into weights.",
+   "Many labeled examples exist."
+  ]
+ },
+ "10-5": {
+  "title": "RAG vs fine-tuning",
+  "tldr": "RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).",
+  "points": [
+   "RAG: knowledge at query time, fresh/auditable.",
+   "Fine-tuning: behavior/style baked into weights.",
+   "Often combine them."
+  ]
+ },
+ "10-6": {
+  "title": "Risk of fine-tuning on a narrow dataset",
+  "tldr": "Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.",
+  "points": [
+   "Overfitting to the sample.",
+   "Catastrophic forgetting.",
+   "Brittleness to new inputs.",
+   "Amplified bias / format lock-in."
+  ]
+ }
 }

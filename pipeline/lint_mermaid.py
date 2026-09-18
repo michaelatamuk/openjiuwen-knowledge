@@ -55,8 +55,7 @@ def lint_file(path):
 
 
 def main():
-    files = sorted(glob.glob(os.path.join(BASE, "[01][0-9]-*.md"))) + \
-            sorted(glob.glob(os.path.join(BASE, "[9][0-9]-*.md")))
+    files = sorted(glob.glob(os.path.join(BASE, "[0-9][0-9]-*.md")))
     bad = 0
     for f in files:
         for p in lint_file(f):

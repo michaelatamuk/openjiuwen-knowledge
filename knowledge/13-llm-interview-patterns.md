@@ -1,4 +1,4 @@
-# LLM interview patterns — what's really being tested + how Jiuwen maps
+# LLM interview patterns
 
 ## 1. "How does the model know X" is really testing context window understanding
 

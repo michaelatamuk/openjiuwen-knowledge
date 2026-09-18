@@ -19,12 +19,12 @@ CONTENT = os.path.join(ASSETS, "content.json")
 
 FNAME = {
     "01": "01-llm-foundations", "02": "02-prompting-and-output-control",
-    "03": "03-rag-and-retrieval", "04": "04-rag-system-design",
-    "05": "05-agents-tools-and-memory", "06": "06-evaluation",
-    "07": "07-production-cost-and-scale", "08": "08-security-and-safety",
-    "09": "09-fine-tuning-and-customization", "10": "10-general-engineering",
-    "90": "90-llm-terms-glossary", "91": "91-ai-engineer-interview-patterns",
-    "92": "92-llm-interview-patterns", "93": "93-llm-architecture-patterns",
+    "03": "03-llm-terms-glossary", "04": "04-agents-tools-and-memory",
+    "05": "05-rag-and-retrieval", "06": "06-rag-system-design",
+    "07": "07-evaluation", "08": "08-production-cost-and-scale",
+    "09": "09-security-and-safety", "10": "10-fine-tuning-and-customization",
+    "11": "11-general-engineering", "12": "12-ai-engineer-interview-patterns",
+    "13": "13-llm-interview-patterns", "14": "14-llm-architecture-patterns",
 }
 
 

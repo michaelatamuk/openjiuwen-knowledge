@@ -1,4 +1,4 @@
-# AI engineer interview patterns — what's really being tested + how Jiuwen maps
+# AI engineer interview patterns
 
 Based on the recurring observations *Patterns I Keep Seeing in AI Engineer Technical Interviews*. This is not a question list; each entry is an interview dynamic — what the interviewer is actually probing, what a strong answer includes (with a concrete number), and the concrete mechanism in this codebase that backs it up (or shows the gap).
 

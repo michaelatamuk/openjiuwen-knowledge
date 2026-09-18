@@ -1,0 +1,65 @@
+{
+ "14-1": {
+  "title": "Simple RAG pipeline",
+  "tldr": "The most common starting point: embed the query, get top-k similar docs, stuff them into the prompt, and generate.",
+  "points": [
+   "Embed query → vector search top-k.",
+   "Stuff docs into the prompt.",
+   "LLM generates the answer."
+  ]
+ },
+ "14-2": {
+  "title": "Modular RAG with reranking",
+  "tldr": "The upgrade once simple RAG returns irrelevant context: retrieve a larger candidate set, rerank by relevance, and keep only the top results.",
+  "points": [
+   "Retrieve a larger candidate set.",
+   "Rerank by query relevance.",
+   "Keep only the top results."
+  ]
+ },
+ "14-3": {
+  "title": "Agentic tool-calling pattern",
+  "tldr": "The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.",
+  "points": [
+   "Model emits structured tool calls.",
+   "Runtime executes and feeds back results.",
+   "Loops until the model answers."
+  ]
+ },
+ "14-4": {
+  "title": "Planner–executor pattern",
+  "tldr": "A planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response.",
+  "points": [
+   "Planner decomposes the task.",
+   "Executors carry out subtasks.",
+   "Results are combined."
+  ]
+ },
+ "14-5": {
+  "title": "Critic or reflection loop",
+  "tldr": "A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.",
+  "points": [
+   "Draft, then critique.",
+   "Revise on failure.",
+   "Adds a verification step."
+  ]
+ },
+ "14-6": {
+  "title": "Memory-augmented agent",
+  "tldr": "Context across sessions: short-term is the active window; long-term is a store of past interactions; retrieval decides what long-term memory returns.",
+  "points": [
+   "Short-term = active context window.",
+   "Long-term = persisted store.",
+   "Retrieval brings memory back."
+  ]
+ },
+ "14-7": {
+  "title": "Router pattern",
+  "tldr": "One entry point decides which subsystem handles the request: the query is classified and routed to a specialized agent or tool.",
+  "points": [
+   "Classify the query.",
+   "Route to a specialized handler.",
+   "Avoid one generic prompt."
+  ]
+ }
+}

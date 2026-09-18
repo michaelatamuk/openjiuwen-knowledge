@@ -1,47 +1,378 @@
 {
-  "05-1": {"title":"Chatbot vs agent","tldr":"A chatbot maps one input to one model reply; an agent runs a loop (model → tools → results → repeat) until a stopping condition.","points":["Chatbot: one model turn, no tools.","Agent: tool/reason loop with a stopping rule.","The loop and tools, not the model, define an agent."]},
-  "05-2": {"title":"Workflow vs agent","tldr":"A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.","points":["Workflow: fixed topology, predictable, cheap.","Agent: runtime branching on model output.","A workflow can embed an agent as a node."]},
-  "05-3": {"title":"Linear chain vs conditional graph","tldr":"A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).","points":["Linear: static edges, fixed order.","Graph: conditional edges route by state.","Join/barrier gates merge nodes."]},
-  "05-4": {"title":"ReAct pattern","tldr":"ReAct alternates thought → action → observation; interleaving lets each real tool result inform the next thought, correcting drift and grounding reasoning.","points":["Loop: reason → act → observe.","Tool results become the next observation.","Interleaving corrects drift vs a big upfront plan."]},
-  "05-5": {"title":"Function calling under the hood","tldr":"Tool schemas (name, description, JSON-Schema params) go in the request; the model returns a structured tool_calls list; the host validates args, executes, and feeds results back.","points":["Send tool schemas with the request.","Model returns structured tool_calls (not prose).","Host validates args, runs the tool, feeds the result back."]},
-  "05-6": {"title":"Hard iteration limit","tldr":"Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.","points":["Max iterations/rounds, enforced.","Add token and wall-clock budgets.","Cap each nested loop; make caps configurable."]},
-  "05-7": {"title":"What stops an agent","tldr":"Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.","points":["No tool calls → final answer.","Hard limits: iterations, tokens, time.","Outer loop: stop evaluators + completion promise."]},
-  "05-8": {"title":"How many retrieval hops","tldr":"Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.","points":["Stop when evidence is sufficient.","Hard hop cap as a backstop.","Repetition detection + cost ceiling."]},
-  "05-9": {"title":"Infinite tool-calling loop","tldr":"Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.","points":["Iteration cap.","Repetition detection on canonicalized args.","No-progress nudge/abort + token/time caps."]},
-  "05-10": {"title":"Retrieve again or answer","tldr":"Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.","points":["Sufficiency judgment on accumulated evidence.","If not sufficient, produce the next query.","Stop on sufficient/no-next-question or the cap."]},
-  "05-11": {"title":"Registering tools","tldr":"Register a tool with name, description, and parameter schema; the framework collects them into the model request in the provider's tool format; returned tool calls are dispatched.","points":["Register name + description + schema.","Framework builds the provider tool list.","Model tool calls are parsed and dispatched."]},
-  "05-12": {"title":"Unsupported tool","tldr":"Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.","points":["Wrap any function as a tool.","Custom tool class for transport/auth.","MCP for external tool servers."]},
-  "05-13": {"title":"Failed or malformed tool call","tldr":"Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).","points":["Catch and classify retryable vs not.","Return a structured, model-readable error.","Repair broken payloads when possible."]},
-  "05-14": {"title":"Retry without duplicate effects","tldr":"Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.","points":["Mark non-idempotent tools; never blind-retry.","Idempotency keys make repeats detectable.","Retry reads/idempotent ops only."]},
-  "05-15": {"title":"Custom per-tool retry policy","tldr":"Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.","points":["Per-tool override: attempts, backoff, timeout.","Keep the idempotency safety default.","Central policy with per-tool hooks."]},
-  "05-16": {"title":"Concurrent tool calls","tldr":"Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.","points":["Group the turn's tool calls; run them concurrently.","Bound concurrency (semaphore/pool).","Respect ordering for conflicting writes."]},
-  "05-17": {"title":"Step timeout or error","tldr":"Bound each step with a timeout, classify errors, convert failures into data (an observation) so the loop can adapt, and propagate fatal errors with cleanup.","points":["Timeout each step.","Classify retryable vs fatal.","Convert failure into a model-readable result."]},
-  "05-18": {"title":"Task decomposition","tldr":"Either ask the model to emit a plan/todo list up front, or decompose lazily and revise; store it as structured tasks that can be marked in-progress/done.","points":["Model emits a plan/todo list.","Or decompose lazily and revise.","Store as structured tasks with status."]},
-  "05-19": {"title":"Changing the plan mid-run","tldr":"Allow plan mutation during the run — add, reorder, cancel, replace tasks — and support steering with new instructions; keep the authoritative plan separate from live state.","points":["Mutate: add/reorder/cancel/replace tasks.","Steer with new instructions.","Reconcile plan vs live state."]},
-  "05-20": {"title":"Single-step vs planning agent","tldr":"Two axes: single-step vs multi-step (how many model↔tool cycles) and reactive vs planning (whether an explicit plan is kept and updated).","points":["Axis 1: number of model/tool cycles.","Axis 2: explicit plan vs none.","The two are independent."]},
-  "05-21": {"title":"Planner-executor pattern","tldr":"A planner produces the steps; one or more executors carry them out, often with a supervisor re-planning — useful when planning needs a global view and execution is parallel/specialized.","points":["Planner produces steps.","Executors carry them out.","Supervisor re-plans; parallel/specialized execution."]},
-  "05-22": {"title":"State across steps","tldr":"A state object threaded through (or held per session) that each step reads/writes; conversation history is usually separate from working state; persist via checkpoints.","points":["Working state object per session.","Separate conversation history from task state.","Checkpoint for persistence."]},
-  "05-23": {"title":"Pause and resume an agent","tldr":"Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.","points":["Durable checkpoint or interrupt signal.","Preserve state while unwinding.","Resume by reload or replay."]},
-  "05-24": {"title":"Human-in-the-loop approval","tldr":"Route sensitive steps through a permission check returning allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and remember/persist rules; fail closed on unknown.","points":["Permission check: allow/ask/deny.","Pause on ask; resume with the decision.","Persist allow rules; fail closed."]},
-  "05-25": {"title":"Short vs long-term memory","tldr":"Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.","points":["Short-term: live context window.","Long-term: durable, cross-session.","Long-term is retrieved into the turn."]},
-  "05-26": {"title":"What to store vs discard","tldr":"Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.","points":["Keep durable/reused/preference facts.","Discard transient and contradicted.","LLM extract then dedupe/resolve."]},
-  "05-27": {"title":"Bounding memory growth","tldr":"Bound on multiple axes: hard-drop/truncate oldest context, offload large blobs, compact old tool results, summarize/archive, and cap stored long-term entries.","points":["FIFO/truncate oldest context.","Offload large blobs; compact tool results.","Summarize/archive; cap long-term entries."]},
-  "05-28": {"title":"Summarizing history safely","tldr":"Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.","points":["Recent turns verbatim.","Structured summary, not free prose.","Re-inject durable state (plan, status, files)."]},
-  "05-29": {"title":"What a framework gives you","tldr":"Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.","points":["Session/state across turns.","Context trimming/compression.","Tool registry + control loop.","Streaming, tracing, guardrails."]},
-  "05-30": {"title":"Graph vs role frameworks","tldr":"Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).","points":["Graph: explicit nodes/edges, deterministic routing.","Role: agents with roles that collaborate.","Trade control for flexibility."]},
-  "05-31": {"title":"Choosing a framework","tldr":"Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.","points":["Explicit graph + durable state → LangGraph.","Role/team collaboration → CrewAI.","Managed agent SDK for hosted agents.","Match the framework to the control shape."]},
-  "05-32": {"title":"Heavier framework vs custom","tldr":"Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.","points":["Heavy: batteries included, more config/learning.","Light: transparent, you build plumbing.","Choose by team size, rate of change, control needs."]},
-  "05-33": {"title":"Unnecessary abstraction","tldr":"The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.","points":["Single model call doesn't need a framework.","Forcing business logic into nodes/agents is a smell.","A straight line disguised as a graph."]},
-  "05-34": {"title":"When abstractions don't fit","tldr":"Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.","points":["Implement the base interface directly.","Call the primitive (model/tool) without the wrapper.","Override hooks or replace a component."]},
-  "05-35": {"title":"Which node runs next","tldr":"A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.","points":["Ready = input channels satisfied.","Run ready nodes concurrently.","Route outputs; repeat until quiescent."]},
-  "05-36": {"title":"Versioning & rolling back workflows","tldr":"Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.","points":["Version the whole definition, not just prompts.","Immutable versions + content hash.","Activate/list/rollback atomically."]},
-  "05-37": {"title":"Supervisor vs peer-to-peer","tldr":"A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.","points":["Supervisor: top-down, workers-as-tools.","Peer-to-peer: shared board/bus, equals.","Different control and failure modes."]},
-  "05-38": {"title":"Multi-agent communication","tldr":"Either a shared blackboard (task board/state) plus a message bus, or direct messaging; messages should be persisted and ordered for auditability, with routing (direct/broadcast/mentions).","points":["Shared board + message bus.","Or direct message passing.","Persist and order; support routing."]},
-  "05-39": {"title":"Agent output as another's input","tldr":"Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.","points":["Subagent/tool call returns the value.","Handoff transfers control + context.","Shared board/bus carries the artifact."]},
-  "05-40": {"title":"Conflicting/redundant results","tldr":"Give each unit of work one owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign instead of release, dedupe dispatch, and isolate workspaces.","points":["Single owner per task.","Atomic claim; reassign not release.","Dedupe dispatch; isolate workspaces."]},
-  "05-41": {"title":"Debugging a multi-agent failure","tldr":"You need per-agent attribution: a trace/span tree where every agent, model, and tool call is a span with agent identity, plus durable conversation/task history to reconstruct order.","points":["Per-agent span attribution.","Trace model/tool calls per member.","Durable history to reconstruct order."]},
-  "05-42": {"title":"When multi-agent is overkill","tldr":"Multi-agent is justified when workstreams are genuinely independent, scopes differ (tools/permissions), or specialization would otherwise fight for one context; otherwise a single well-designed agent is simpler.","points":["Justified: independent parallel workstreams.","Justified: distinct tool/permission scopes.","Otherwise: a single agent is simpler."]},
-  "05-43": {"title":"Agentic RAG","tldr":"A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.","points":["Fixed: retrieve once, then generate.","Agentic: decide whether/when to retrieve again.","Loop until sufficient or capped."]},
-  "05-44": {"title":"Preventing agentic RAG loops","tldr":"Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.","points":["Round cap + sufficiency gate.","Detect repeated queries/results.","Token/cost budget; cache/dedupe."]},
-  "05-45": {"title":"Cost with repeated tool calls","tldr":"Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.","points":["Bound loop: iterations/rounds/time.","Cap tokens; route cheap work to small models.","Cache; watch retries and large tool outputs."]}
+ "05-1": {
+  "title": "RAG pipeline end to end",
+  "tldr": "Two halves — ingestion (parse → chunk → embed → index) and query (embed → retrieve → rerank → assemble → generate); every stage is separable and can fail.",
+  "points": [
+   "Ingestion: parse files, chunk, embed, and write vectors to the store.",
+   "Query: embed the query, retrieve top-k (dense and/or sparse), rerank, assemble context.",
+   "Generation sees only the assembled context; cite from it.",
+   "Quality drops can come from any stage — isolate them."
+  ]
+ },
+ "05-2": {
+  "title": "Pipeline stages",
+  "tldr": "The same pipeline stage by stage: query embedding → vector search → context assembly → prompt construction → generation.",
+  "points": [
+   "Embed the query with the same model used for the index.",
+   "Vector search returns top-k candidate chunks.",
+   "Assemble the hits into a context string and build the prompt.",
+   "Generate the answer from that context."
+  ]
+ },
+ "05-3": {
+  "title": "Measuring retrieval",
+  "tldr": "Use a labeled (query, relevant docs) set and ranked metrics — Recall@k, Precision@k, MRR, NDCG — and track zero-result rate.",
+  "points": [
+   "Recall@k: did the relevant docs make the top-k?",
+   "Precision@k / MRR / NDCG: how high and how well-ordered the hits are.",
+   "Track zero-result rate and score distributions in production.",
+   "Judge retrieval separately from generation."
+  ]
+ },
+ "05-4": {
+  "title": "Modular RAG",
+  "tldr": "Simple RAG is a fixed chain; Modular RAG decomposes it into swappable modules (indexing, retrieval, fusion, reranking, query rewriting, generation) that can be routed and scheduled.",
+  "points": [
+   "Simple RAG: retrieve → stuff → generate, fixed order.",
+   "Modular RAG: interchangeable modules with routing/orchestration.",
+   "Lets you add rewriting, reranking, or iteration per query."
+  ]
+ },
+ "05-5": {
+  "title": "Choosing chunk size",
+  "tldr": "Too small loses context and splits answers; too large dilutes the embedding. Start at a few hundred tokens with modest overlap.",
+  "points": [
+   "Small chunks: precise but may lack context or split the answer.",
+   "Large chunks: richer context but a diluted, multi-topic embedding.",
+   "Start ~a few hundred tokens with small overlap; tune by measuring."
+  ]
+ },
+ "05-6": {
+  "title": "Chunks too small or too large",
+  "tldr": "Too small: the answer splits and the answer-bearing chunk can be missed. Too large: the embedding blends topics, precision drops, and prompt cost rises.",
+  "points": [
+   "Small: context lost, answer split, more index overhead.",
+   "Large: embedding averages topics, precision down, prompt budget wasted.",
+   "The code guards mechanics (invalid values, limits), not retrieval quality."
+  ]
+ },
+ "05-7": {
+  "title": "Fixed-size vs semantic chunking",
+  "tldr": "Fixed-size is cheap and deterministic but cuts mid-sentence; structure/sentence-aware chunking keeps chunks coherent at the cost of variable size and extra processing.",
+  "points": [
+   "Fixed-size: deterministic and cheap, but fragments mid-sentence/mid-table.",
+   "Semantic/structure-aware: split on real boundaries; coherent, variable size.",
+   "Best: sentence/structure-aware with a cap, not raw character windows."
+  ]
+ },
+ "05-8": {
+  "title": "Chunk overlap",
+  "tldr": "A small overlap preserves meaning across a boundary; too much duplicates content, inflates the index, and returns near-identical hits.",
+  "points": [
+   "Overlap keeps boundary-spanning answers retrievable.",
+   "Too much overlap duplicates text and crowds out diverse hits.",
+   "Non-overlapping is cheaper but risks losing the boundary fact."
+  ]
+ },
+ "05-9": {
+  "title": "Chunking tables, code, headings",
+  "tldr": "Capture structure at parse time and carry it as metadata — keep tables intact (row/column), preserve code boundaries, and split on headings.",
+  "points": [
+   "Preserve structure at parse time, not chunk time.",
+   "Tables: keep rows/columns whole or serialize per record.",
+   "Code: split on function/class boundaries and keep fences.",
+   "Headings: use them as split boundaries."
+  ]
+ },
+ "05-10": {
+  "title": "Answer cut across chunks",
+  "tldr": "If the answer spans a boundary, the retrieved chunk holds only half of it. Fix with overlap, sentence/structure-aware splitting, and neighbor expansion at serve time.",
+  "points": [
+   "Boundary cuts produce half-answers that still rank.",
+   "Overlap + sentence/structure-aware chunking reduce it.",
+   "At serve time, expand a hit with its neighbors."
+  ]
+ },
+ "05-11": {
+  "title": "Choosing an embedding model",
+  "tldr": "Bigger isn't automatically better: fit to domain and language, use the right query/passage prefixes, pick an affordable dimension, and weigh latency/cost.",
+  "points": [
+   "Domain + language fit beats raw size.",
+   "Asymmetric models need correct query/passage prefixes.",
+   "Dimension drives storage/latency; a smaller in-domain model can win.",
+   "Evaluate recall on your data, not a leaderboard."
+  ]
+ },
+ "05-12": {
+  "title": "Same embedding model for query & docs",
+  "tldr": "Yes — both sides must use the same model, and asymmetric models need the correct role prefix on each side, or the vectors aren't comparable.",
+  "points": [
+   "One model embeds both queries and documents.",
+   "Asymmetric models: apply query vs passage prefixes.",
+   "Mixing models or dropping prefixes degrades retrieval."
+  ]
+ },
+ "05-13": {
+  "title": "Re-embedding after model swap",
+  "tldr": "Stored vectors belong to one model; a new model — even at the same dimension — is a different space, so every chunk must be re-embedded and the index rebuilt.",
+  "points": [
+   "Vectors from different models aren't comparable.",
+   "Same dimension does not mean same space.",
+   "Re-embed the whole corpus and rebuild the index."
+  ]
+ },
+ "05-14": {
+  "title": "Multilingual retrieval",
+  "tldr": "Use a multilingual/alignment embedding so queries and docs share one space; otherwise translate at index or query time and store language metadata.",
+  "points": [
+   "Prefer a multilingual/alignment embedding model.",
+   "Otherwise translate at index or query time.",
+   "Store language metadata to route and evaluate per language."
+  ]
+ },
+ "05-15": {
+  "title": "Dense vs sparse + rank fusion",
+  "tldr": "Dense matches meaning but can miss rare exact terms; sparse (BM25) matches literal terms but fails on paraphrase; fuse both with reciprocal rank fusion.",
+  "points": [
+   "Dense: embeddings, semantic match; weak on exact tokens.",
+   "Sparse/BM25: literal term match; weak on paraphrase.",
+   "Fuse with RRF: combine ranks, not raw scores.",
+   "Weighting is often ignored in favor of RRF."
+  ]
+ },
+ "05-16": {
+  "title": "When keyword search wins",
+  "tldr": "Keyword wins on exact identifiers, codes, rare names, jargon, and small/distinctive corpora; dense wins on paraphrase and intent. Best is hybrid.",
+  "points": [
+   "Exact codes/IDs/names favor keyword.",
+   "Paraphrase/intent favor dense.",
+   "Combine both to cover each other's blind spots."
+  ]
+ },
+ "05-17": {
+  "title": "Semantic misses exact codes",
+  "tldr": "Opaque tokens (codes, SKUs, UUIDs, rare names) carry little semantic signal, so a semantically close but wrong chunk can outrank the exact hit — and dense results are rarely empty, so no fallback fires.",
+  "points": [
+   "Short opaque tokens embed to near-random neighbors.",
+   "A wrong-but-close chunk can rank above the exact hit.",
+   "Fix: metadata/exact filtering, a sparse leg, or an exact-match boost."
+  ]
+ },
+ "05-18": {
+  "title": "Retrieve 5 vs 20",
+  "tldr": "Higher k raises recall but costs tokens/latency and can dilute; lower k is precise and cheap. Retrieve more then rerank down when you have a reranker.",
+  "points": [
+   "More docs → recall up, tokens/latency up.",
+   "Fewer docs → precision, lower cost.",
+   "Ideal: retrieve many, rerank to few (needs a wired reranker)."
+  ]
+ },
+ "05-19": {
+  "title": "SQL + documents retrieval",
+  "tldr": "Keep paths explicit: route structured questions to a schema-aware text-to-SQL/table tool and unstructured to document retrieval, then merge and ground results.",
+  "points": [
+   "Structured → text-to-SQL/table query (validatable).",
+   "Unstructured → document retrieval.",
+   "Merge and ground; don't flatten tables into text."
+  ]
+ },
+ "05-20": {
+  "title": "What reranking adds",
+  "tldr": "First-stage retrieval optimizes recall with cheap approximate similarity; a cross-encoder reranker scores candidates jointly with the query to reorder the top-k for precision — but only over candidates retrieval already returned.",
+  "points": [
+   "Retrieval: recall, cheap, approximate.",
+   "Rerank: precision, joint query+doc scoring, expensive.",
+   "Cannot recover what retrieval never returned."
+  ]
+ },
+ "05-21": {
+  "title": "Is the reranker helping?",
+  "tldr": "You can't tell from order alone; on a labeled set, compare ranking metrics (NDCG/MRR/precision) with and without the reranker on the same candidates.",
+  "points": [
+   "Order alone isn't evidence.",
+   "Compare ranked metrics on the same candidate set.",
+   "If NDCG doesn't improve, it's just reordering."
+  ]
+ },
+ "05-22": {
+  "title": "Rerank every query?",
+  "tldr": "Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.",
+  "points": [
+   "Rerank when precision matters and candidates are bounded.",
+   "Skip exact-match, high-volume, latency-critical queries.",
+   "Decide per query, not globally."
+  ]
+ },
+ "05-23": {
+  "title": "Reranking latency",
+  "tldr": "Latency scales with candidate count and batching: a cross-encoder over ~50–100 candidates adds tens to low-hundreds of ms; an LLM-judge reranker is one call per document (O(N)).",
+  "points": [
+   "Cross-encoder: one batched call over N candidates.",
+   "LLM-judge: one call per doc — much slower.",
+   "Weigh added latency against precision gain."
+  ]
+ },
+ "05-24": {
+  "title": "Bi-encoder vs cross-encoder",
+  "tldr": "Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).",
+  "points": [
+   "Bi-encoder: independent embeddings, scalable retrieval.",
+   "Cross-encoder: joint scoring, higher precision, per-pair cost.",
+   "Use bi-encoder to retrieve, cross-encoder to rerank."
+  ]
+ },
+ "05-25": {
+  "title": "Query rewriting vs expansion",
+  "tldr": "Rewriting makes a query self-contained (coreference, typos, prior-turn reliance); expansion adds terms/synonyms or a hypothetical answer (HyDE) to bridge vocabulary gaps.",
+  "points": [
+   "Rewriting: coreference/ellipsis, typos, drop turn dependence.",
+   "Expansion: synonyms or a hypothetical answer (HyDE).",
+   "Rewriting for multi-turn/malformed; expansion for vocabulary mismatch."
+  ]
+ },
+ "05-26": {
+  "title": "Handling vague queries",
+  "tldr": "Detect ambiguity and either ask a clarifying question or rewrite to the most likely intent; cheap path is a rewrite, interactive path is a clarification turn.",
+  "points": [
+   "Rewrite resolves coreference/ellipsis for free.",
+   "Ask a clarification only when it changes the retrieval target.",
+   "Don't blindly retrieve on an ambiguous query."
+  ]
+ },
+ "05-27": {
+  "title": "Decomposing multi-part questions",
+  "tldr": "Split a compound question into independently answerable sub-questions, retrieve for each (often in parallel), then synthesize.",
+  "points": [
+   "Break 'compare A and B on X and Y' into sub-questions.",
+   "Retrieve per sub-question; merge and dedupe.",
+   "Synthesize across the sub-answers."
+  ]
+ },
+ "05-28": {
+  "title": "Multi-hop retrieval",
+  "tldr": "Multi-hop runs more than one retrieval step, using the first hop's result to form the next query, because the answer needs a bridging entity not present in the original question.",
+  "points": [
+   "The answer needs a bridging entity/fact.",
+   "Each hop feeds the next query.",
+   "Single-pass fails when the link isn't in the query."
+  ]
+ },
+ "05-29": {
+  "title": "Multi-document questions",
+  "tldr": "Retrieve a candidate set per sub-query or entity, merge and deduplicate, and let the generator synthesize across them (or add an aggregation step).",
+  "points": [
+   "Per-sub-query retrieval, then merge/dedupe.",
+   "Ranked-list fusion across queries.",
+   "Generator synthesizes across documents."
+  ]
+ },
+ "05-30": {
+  "title": "When to skip RAG",
+  "tldr": "Skip retrieval for general knowledge the model already holds, when latency/cost matter and the corpus won't add signal, or for conversational turns — but you need a way to decide.",
+  "points": [
+   "Skip for general knowledge, reasoning, or code the model knows.",
+   "Skip when the corpus adds no signal and cost/latency matter.",
+   "Decide with a classifier or a sufficiency check."
+  ]
+ },
+ "05-31": {
+  "title": "Chunk doesn't contain the answer",
+  "tldr": "'Looked relevant' isn't 'contains the answer': read the chunk and confirm the answer span is present; if not, retrieval failed; if yes, generation failed.",
+  "points": [
+   "First check: is the answer actually in the retrieved chunk?",
+   "No → retrieval failure (chunking, index, query mismatch).",
+   "Yes → generation/grounding failure."
+  ]
+ },
+ "05-32": {
+  "title": "Context doesn't answer the question",
+  "tldr": "Detect that the context is insufficient, then answer only from what's supported: gate on retrieval score/answerability, allow explicit 'I don't know', and verify claims against the context.",
+  "points": [
+   "Detect insufficient context (score/answerability gate).",
+   "Allow explicit abstention ('I don't know').",
+   "Ground/verify claims against the context."
+  ]
+ },
+ "05-33": {
+  "title": "Conflicting / outdated documents",
+  "tldr": "Apply precedence before generation — recency, source authority, or an explicit priority field; dedupe/reconcile; and surface the conflict (or abstain).",
+  "points": [
+   "Precedence: newest / most authoritative / priority field.",
+   "Dedupe and reconcile conflicting facts.",
+   "Surface the conflict or abstain rather than guess."
+  ]
+ },
+ "05-34": {
+  "title": "No relevant documents",
+  "tldr": "When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.",
+  "points": [
+   "Gate on retrieval score or answerability.",
+   "Abstain or ask a clarifying question.",
+   "Don't generate from out-of-scope chunks."
+  ]
+ },
+ "05-35": {
+  "title": "Different answers on different days",
+  "tldr": "Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).",
+  "points": [
+   "Sampling: pin temperature 0 and use a seed.",
+   "Remote rerankers may be non-deterministic.",
+   "Embedding drift: fingerprint the model and re-index on change."
+  ]
+ },
+ "05-36": {
+  "title": "Vocabulary mismatch",
+  "tldr": "The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.",
+  "points": [
+   "Semantic embeddings match paraphrases.",
+   "Query expansion / synonyms.",
+   "HyDE: retrieve with a generated hypothetical answer.",
+   "Hybrid search catches exact terms."
+  ]
+ },
+ "05-37": {
+  "title": "Per-stage error handling",
+  "tldr": "Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.",
+  "points": [
+   "Typed errors per stage.",
+   "Explicit fallbacks (empty result, pre-rerank order).",
+   "Degrade, don't abort the whole pipeline."
+  ]
+ },
+ "05-38": {
+  "title": "Cutting tokens without losing quality",
+  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
+  "points": [
+   "Retrieve many, rerank to few (needs a reranker).",
+   "Summarize long chunks before insertion.",
+   "Trim conversation history."
+  ]
+ },
+ "05-39": {
+  "title": "Building a retrieval eval set",
+  "tldr": "Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.",
+  "points": [
+   "Mine real queries from logs.",
+   "Label via LLM judge or a strong model's citations.",
+   "Or synthesize queries from known documents (doc = gold)."
+  ]
+ },
+ "05-40": {
+  "title": "Multiple document formats",
+  "tldr": "Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by type, preserving format-specific structure as metadata.",
+  "points": [
+   "One record shape: text + metadata + id.",
+   "Parser per format behind a registry.",
+   "Keep format-specific structure as metadata."
+  ]
+ },
+ "05-41": {
+  "title": "RAG vs pasting a long context",
+  "tldr": "Pasting whole documents is simpler and avoids chunking errors but is expensive, slow, and noisy; retrieval pays a one-time chunking/index cost and sends only relevant, citable chunks.",
+  "points": [
+   "Paste: simple, no chunking bugs, but costly/slow/noisy.",
+   "RAG: cheaper per call, citable, scales past the window.",
+   "Choose by cost, latency, and need to cite."
+  ]
+ }
 }

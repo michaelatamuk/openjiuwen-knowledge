@@ -1,4 +1,4 @@
-# 20 LLM terms — definitions, where each one bites, and how Jiuwen handles it
+# LLM terms glossary
 
 Based on the reference list *20 LLM Terms That Show Up in Every AI Engineering Interview*. This is a glossary, not a question list: interviewers assume you know these terms and expect you to *apply* them. So each entry has the definition, **where it bites** (the failure or decision it explains), and the concrete mechanism in this codebase.
 

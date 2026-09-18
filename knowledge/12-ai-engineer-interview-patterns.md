@@ -1,4 +1,4 @@
-# AI engineer interview patterns — what's really being tested + how Jiuwen maps
+# AI engineer interview patterns
 
 ## 1. "Design a RAG system" tests failure mode awareness, not architecture recall
 
