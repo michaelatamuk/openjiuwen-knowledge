@@ -2,6 +2,8 @@
 
 Concepts and how the Jiuwen codebase implements them — organized by topic, with offline study formats. Every entry pairs a short framework-agnostic **General** answer with a **Jiuwen** answer describing how this codebase implements it (or explicitly does not), plus a diagram and `file:line` **Anchors**.
 
+**Browse online:** https://michaelatamuk.github.io/openjiuwen-knowledge/
+
 ## Structure
 
 ```

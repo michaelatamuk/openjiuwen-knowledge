@@ -70,6 +70,16 @@ Helpers: `lint_mermaid.py` (Mermaid syntax check), `diagram_audit.py`
 (concept-vs-Jiuwen report → `build/diagram_audit.csv`), `serve.py` (serve
 `build/site`), `reorder.py` (historical; already applied).
 
+## Publish (GitHub Pages)
+
+The built site is published to the `gh-pages` branch and served at
+https://michaelatamuk.github.io/openjiuwen-knowledge/.
+
+```bash
+python build_study.py     # build/site must exist
+python publish_site.py    # force-pushes build/site to origin gh-pages
+```
+
 ## Read it
 
 **Windows**
