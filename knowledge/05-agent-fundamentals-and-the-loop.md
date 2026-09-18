@@ -2,9 +2,7 @@
 
 ## 1. What's the difference between a chatbot and an agent
 
-<span class="badge">basic</span>
-
-**Title.** Chatbot vs agent
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A chatbot maps one input to one model reply; an agent runs a loop (model → tools → results → repeat) until a stopping condition.
 
@@ -49,9 +47,7 @@ There is no separate `Chatbot` class; the distinction is structural. A single mo
 
 ## 2. What's the difference between a workflow and an agent
 
-<span class="badge">basic</span>
-
-**Title.** Workflow vs agent
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.
 
@@ -96,9 +92,7 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 
 ## 3. What's the difference between a linear chain and a graph with conditional branches
 
-<span class="badge">basic</span>
-
-**Title.** Linear chain vs conditional graph
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).
 
@@ -147,9 +141,7 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 
 ## 4. What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront
 
-<span class="badge">basic</span>
-
-**Title.** ReAct pattern
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** ReAct alternates thought → action → observation; interleaving lets each real tool result inform the next thought, correcting drift and grounding reasoning.
 
@@ -193,9 +185,7 @@ The loop is exactly reason/act/observe: model call, branch on `tool_calls`, exec
 
 ## 5. How do you set a hard limit on iterations or steps within a framework
 
-<span class="badge">intermediate</span>
-
-**Title.** Hard iteration limit
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.
 
@@ -240,9 +230,7 @@ The inner ReAct loop is bounded by `ReActAgentConfig.max_iterations` (default 5)
 
 ## 6. What decides when an agent stops and returns a final answer instead of calling another tool
 
-<span class="badge">intermediate</span>
-
-**Title.** What stops an agent
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.
 
@@ -287,9 +275,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ## 7. How do you decide how many retrieval hops are enough?
 
-<span class="badge">intermediate</span>
-
-**Title.** How many retrieval hops
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.
 
@@ -333,9 +319,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ## 8. How do you prevent a retrieval loop from running indefinitely and burning cost?
 
-<span class="badge">intermediate</span>
-
-**Title.** Preventing an infinite retrieval/tool loop
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Add repetition detection, tool-call dedup, a max-iteration cap, and a cost ceiling so a confused agent cannot loop forever.
 
@@ -376,9 +360,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
 
-<span class="badge">intermediate</span>
-
-**Title.** Infinite tool-calling loop
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.
 
@@ -426,9 +408,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ## 10. How does an agent decide when to retrieve again versus when it has enough context to answer
 
-<span class="badge">intermediate</span>
-
-**Title.** Retrieve again or answer
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.
 
@@ -469,9 +449,7 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 
 ## 11. "The agent is stuck" tests whether you've shipped one, not studied one
 
-<span class="badge">intermediate</span>
-
-**Title.** 'The agent is stuck': tests shipped experience
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'The agent is stuck' tests whether you've shipped one, not studied one.
 
@@ -511,9 +489,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ## 12. "The agent is stuck in a loop" is testing production experience
 
-<span class="badge">intermediate</span>
-
-**Title.** 'Stuck in a loop': production experience
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'The agent is stuck in a loop' is testing production experience.
 

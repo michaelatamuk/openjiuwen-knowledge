@@ -70,11 +70,13 @@ def main():
             lines.append(f"## {i}. {q['question']}")
             lines.append("")
             meta = q.get("meta", {}) or {}
-            diff = meta.get("difficulty", "")
-            if diff:
-                lines += [f'<span class="badge">{diff}</span>', ""]
-            if q.get("title"):
-                lines += [f"**Title.** {q['title']}", ""]
+            badges = []
+            if q.get("type"):
+                badges.append(f'<span class="badge badge-type">{html.escape(q["type"].capitalize())}</span>')
+            if meta.get("difficulty"):
+                badges.append(f'<span class="badge badge-{html.escape(meta["difficulty"].lower())}">{html.escape(meta["difficulty"])}</span>')
+            if badges:
+                lines += [" ".join(badges), ""]
             if q.get("tldr"):
                 lines += [f"**Summary.** {q['tldr']}", ""]
             if q.get("points"):

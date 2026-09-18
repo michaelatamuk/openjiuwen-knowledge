@@ -2,9 +2,7 @@
 
 ## 1. Design a RAG system for a customer support chatbot handling 100,000 queries a day
 
-<span class="badge">advanced</span>
-
-**Title.** RAG for customer support (100k/day)
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Start from rate/SLA, then pick components: ingestion, hybrid retrieval, reranking, generation, caching, observability. 100k/day is ~1.2 QPS average with bursts.
 
@@ -48,9 +46,7 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 ## 2. Design a RAG pipeline for a codebase assistant that needs to stay current as code changes daily
 
-<span class="badge">advanced</span>
-
-**Title.** Codebase assistant (daily changes)
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Make re-indexing incremental and event-driven: stable IDs per file/chunk, delete-by-ID on change, append new chunks, and trigger on commit/CI — avoid full re-embeds except on model/index changes.
 
@@ -93,9 +89,7 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 
 ## 3. Design a document search system for a legal firm with millions of confidential documents
 
-<span class="badge">advanced</span>
-
-**Title.** Legal document search (confidential)
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Access control dominates, then scale: every chunk carries an ACL and every query is filtered by the caller's permissions inside the vector search (pre-filter), not after.
 
@@ -139,9 +133,7 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 
 ## 4. How retrieval architecture changes from 10,000 to 10 million documents
 
-<span class="badge">intermediate</span>
-
-**Title.** Scaling 10K → 10M documents
+<span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Small scale: a local index (Chroma/FAISS). Large scale: a dedicated vector DB with tuned ANN (HNSW/IVF/quantization), sharding/replication, and batch ingestion — and you tune recall vs latency.
 
@@ -186,9 +178,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 ## 5. How do you shard or partition a vector database as it grows
 
-<span class="badge">advanced</span>
-
-**Title.** Sharding a vector DB
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Options: partition by key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate and route by collection. Plan for metadata routing and rebalancing.
 
@@ -229,9 +219,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 ## 6. Keeping retrieval fast as the vector database grows, without a full re-index
 
-<span class="badge">intermediate</span>
-
-**Title.** Fast retrieval as the DB grows
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Append-only incremental indexing into a pre-built ANN index avoids rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters tune recall vs latency without reindexing.
 
@@ -274,9 +262,7 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 
 ## 7. What database would you choose for the vector store, and why that one over the alternatives
 
-<span class="badge">intermediate</span>
-
-**Title.** Choosing a vector store
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Choose by scale and features: local/embedded for prototypes; a managed vector DB for scale and hybrid; pgvector when you already run Postgres and want one datastore.
 
@@ -323,9 +309,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 ## 8. How do you decide between a hosted vector database and a self-managed one at scale
 
-<span class="badge">advanced</span>
-
-**Title.** Hosted vs self-managed vector DB
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.
 
@@ -367,9 +351,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 ## 9. What happens to the user experience if the vector database is down, what's your fallback
 
-<span class="badge">intermediate</span>
-
-**Title.** Vector DB down: fallback
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.
 
@@ -412,9 +394,7 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 ## 10. Handling a document updated or deleted after it's already indexed
 
-<span class="badge">intermediate</span>
-
-**Title.** Updating/deleting an indexed doc
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.
 
@@ -459,9 +439,7 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 ## 11. How would you design the system so users never get an answer based on stale, outdated information
 
-<span class="badge">advanced</span>
-
-**Title.** Never serving stale information
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.
 
@@ -504,9 +482,7 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 
 ## 12. How do you design for the case where retrieval returns zero relevant documents
 
-<span class="badge">advanced</span>
-
-**Title.** Zero relevant documents
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.
 
@@ -548,9 +524,7 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 
 ## 13. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
 
-<span class="badge">advanced</span>
-
-**Title.** Sub-500ms budget
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.
 

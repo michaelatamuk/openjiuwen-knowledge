@@ -2,9 +2,7 @@
 
 ## 1. What does an agent framework actually give you that raw API calls don't
 
-<span class="badge">basic</span>
-
-**Title.** What a framework gives you
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.
 
@@ -55,9 +53,7 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 
 ## 2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI
 
-<span class="badge">basic</span>
-
-**Title.** Graph vs role frameworks
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).
 
@@ -103,9 +99,7 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 
 ## 3. How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project
 
-<span class="badge">intermediate</span>
-
-**Title.** Choosing a framework
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.
 
@@ -155,9 +149,7 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 
 ## 4. What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer
 
-<span class="badge">advanced</span>
-
-**Title.** Heavier framework vs custom
+<span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.
 
@@ -205,9 +197,7 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 
 ## 5. When does a framework add unnecessary abstraction instead of solving a real problem
 
-<span class="badge">intermediate</span>
-
-**Title.** Unnecessary abstraction
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.
 
@@ -256,9 +246,7 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 
 ## 6. What happens when the framework's abstractions don't match how your actual business logic needs to work
 
-<span class="badge">intermediate</span>
-
-**Title.** When abstractions don't fit
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.
 
@@ -308,9 +296,7 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 
 ## 7. How does the framework decide which node or agent runs next
 
-<span class="badge">intermediate</span>
-
-**Title.** Which node runs next
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.
 
@@ -358,9 +344,7 @@ Workflow next-node selection is Pregel super-step scheduling: each step `Channel
 
 ## 8. How do you version and roll back an agent's workflow definition, not just its prompts
 
-<span class="badge">intermediate</span>
-
-**Title.** Versioning & rolling back workflows
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.
 
@@ -406,9 +390,7 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 
 ## 9. How do you evaluate whether a framework will scale with your team, not just your first prototype
 
-<span class="badge">advanced</span>
-
-**Title.** Will a framework scale with your team
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.
 

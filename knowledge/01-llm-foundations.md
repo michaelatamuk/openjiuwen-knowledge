@@ -2,9 +2,7 @@
 
 ## 1. What's the difference between a token and a word?
 
-<span class="badge">basic</span>
-
-**Title.** Token vs word
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A token is the model's atomic unit — usually a sub-word — so one word may be one or several tokens.
 
@@ -50,9 +48,7 @@ The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `T
 
 ## 2. Why does tokenization affect cost and context limits
 
-<span class="badge">intermediate</span>
-
-**Title.** Why tokenization affects cost and context limits
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Cost and context are measured in tokens, not words — text that fragments more costs more and fills the window faster.
 
@@ -98,9 +94,7 @@ Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKEN
 
 ## 3. What is the difference between tokens and embeddings?
 
-<span class="badge">basic</span>
-
-**Title.** Tokens vs embeddings
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Tokens are the discrete input/output units; embeddings are continuous vectors that encode meaning for similarity search.
 
@@ -141,9 +135,7 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ## 4. Explain how self-attention works in a transformer
 
-<span class="badge">intermediate</span>
-
-**Title.** Self-attention
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Each token builds a context-aware representation by attending to every other token, weighting them by query–key similarity.
 
@@ -187,9 +179,7 @@ Not implemented — attention is delegated entirely to provider APIs or to Huggi
 
 ## 5. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
 
-<span class="badge">basic</span>
-
-**Title.** Positional encoding
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Attention is order-blind, so a position signal must be injected — added to embeddings (sinusoidal/learned) or applied as a rotation to Q/K (RoPE).
 
@@ -233,9 +223,7 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 
 ## 6. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
 
-<span class="badge">basic</span>
-
-**Title.** Encoder vs decoder
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Encoder-only reads bidirectionally for understanding; decoder-only generates left-to-right; encoder-decoder maps one sequence to another. GPT is decoder-only.
 
@@ -283,9 +271,7 @@ There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder
 
 ## 7. What's the difference between a model's context window and its training data cutoff
 
-<span class="badge">basic</span>
-
-**Title.** Context window vs cutoff
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** The context window is a per-call capacity limit; the training cutoff is a knowledge-date limit. A big window does not make the model current.
 
@@ -327,9 +313,7 @@ Model metadata here is operational only: model name, provider, context-window to
 
 ## 8. What happens when a conversation exceeds the model's context window
 
-<span class="badge">intermediate</span>
-
-**Title.** Exceeding the context window
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Either the provider rejects the request or you must shrink the prompt first — drop old turns, offload big tool outputs, or summarize.
 
@@ -379,9 +363,7 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 ## 9. Why does model performance sometimes degrade with very long context, even when the context fits
 
-<span class="badge">basic</span>
-
-**Title.** Long-context degradation
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Attention spreads thinner over more tokens and models use the middle poorly ('lost in the middle'), so a bigger context is not automatically better.
 
@@ -430,9 +412,7 @@ There is no explicit "lost-in-the-middle" mitigation; the system instead mechani
 
 ## 10. What does temperature actually control, mathematically, in the output distribution
 
-<span class="badge">basic</span>
-
-**Title.** Temperature
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.
 
@@ -477,9 +457,7 @@ Temperature is a **passthrough request parameter** — hosted APIs apply the mat
 
 ## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
 
-<span class="badge">basic</span>
-
-**Title.** Top-k vs top-p
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).
 
@@ -523,9 +501,7 @@ Top-p (nucleus) is implemented locally; top-k sampling is not. `GenerationConfig
 
 ## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
 
-<span class="badge">basic</span>
-
-**Title.** Greedy vs sampling
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.
 
@@ -568,9 +544,7 @@ Greedy is implemented but not argued. The local sampler returns `argmax` when `t
 
 ## 13. Why do LLMs struggle with tasks like counting or basic arithmetic
 
-<span class="badge">intermediate</span>
-
-**Title.** Counting and arithmetic
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.
 
@@ -613,9 +587,7 @@ The repo frames arithmetic/counting as a tool-augmentation problem. A canonical 
 
 ## 14. What is hallucination, and why does it happen even in a well-trained model
 
-<span class="badge">basic</span>
-
-**Title.** Hallucination
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.
 
@@ -660,9 +632,7 @@ The repo does not model or detect low-level hallucination; it implements downstr
 
 ## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
 
-<span class="badge">basic</span>
-
-**Title.** Wrong vs uncertain
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.
 
@@ -706,9 +676,7 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 
 ## 16. "How does the model know X" is really testing context window understanding
 
-<span class="badge">intermediate</span>
-
-**Title.** 'How does the model know X': context window understanding
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'How does the model know X' is really testing context-window understanding.
 

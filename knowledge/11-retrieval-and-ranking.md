@@ -2,9 +2,7 @@
 
 ## 1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion
 
-<span class="badge">intermediate</span>
-
-**Title.** Dense vs sparse + rank fusion
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Dense matches meaning but can miss rare exact terms; sparse (BM25) matches literal terms but fails on paraphrase; fuse both with reciprocal rank fusion.
 
@@ -53,9 +51,7 @@ Dense is `VectorRetriever`; sparse is `SparseRetriever`, which on Milvus is real
 
 ## 2. When keyword search outperforms semantic search
 
-<span class="badge">intermediate</span>
-
-**Title.** When keyword search wins
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Keyword wins on exact identifiers, codes, rare names, jargon, and small/distinctive corpora; dense wins on paraphrase and intent. Best is hybrid.
 
@@ -103,9 +99,7 @@ Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeB
 
 ## 3. Why a purely semantic system can fail on queries with exact codes, IDs, or names
 
-<span class="badge">intermediate</span>
-
-**Title.** Semantic misses exact codes
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Opaque tokens (codes, SKUs, UUIDs, rare names) carry little semantic signal, so a semantically close but wrong chunk can outrank the exact hit — and dense results are rarely empty, so no fallback fires.
 
@@ -150,9 +144,7 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 
 ## 4. How do you decide between retrieving 5 documents versus 20
 
-<span class="badge">intermediate</span>
-
-**Title.** Retrieve 5 vs 20
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Higher k raises recall but costs tokens/latency and can dilute; lower k is precise and cheap. Retrieve more then rerank down when you have a reranker.
 
@@ -194,9 +186,7 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 
 ## 5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system
 
-<span class="badge">advanced</span>
-
-**Title.** SQL + documents retrieval
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Keep paths explicit: route structured questions to a schema-aware text-to-SQL/table tool and unstructured to document retrieval, then merge and ground results.
 
@@ -239,9 +229,7 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 
 ## 6. What reranking adds that initial retrieval doesn't already do
 
-<span class="badge">intermediate</span>
-
-**Title.** What reranking adds
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** First-stage retrieval optimizes recall with cheap approximate similarity; a cross-encoder reranker scores candidates jointly with the query to reorder the top-k for precision — but only over candidates retrieval already returned.
 
@@ -284,9 +272,7 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 
 ## 7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test
 
-<span class="badge">intermediate</span>
-
-**Title.** Is the reranker helping?
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** You can't tell from order alone; on a labeled set, compare ranking metrics (NDCG/MRR/precision) with and without the reranker on the same candidates.
 
@@ -328,9 +314,7 @@ There is a real reranker stack (`StandardReranker`, `ChatReranker`, DashScope) a
 
 ## 8. Would you rerank every query, or only some, and how do you decide
 
-<span class="badge">intermediate</span>
-
-**Title.** Rerank every query?
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.
 
@@ -373,9 +357,7 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 ## 9. How much latency does reranking add?
 
-<span class="badge">intermediate</span>
-
-**Title.** Reranking latency
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Latency scales with candidate count and batching: a cross-encoder over ~50–100 candidates adds tens to low-hundreds of ms; an LLM-judge reranker is one call per document (O(N)).
 
@@ -417,9 +399,7 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 ## 10. When is reranking worth the latency cost?
 
-<span class="badge">advanced</span>
-
-**Title.** When reranking is worth the latency
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Rerank when precision@k dominates, the candidate set is bounded, and results are cacheable — not when latency/cost grow with N.
 
@@ -459,9 +439,7 @@ The reranker is optional (`reranker=None` by default), and the product `jiuwensw
 
 ## 11. Bi-encoder for retrieval vs. cross-encoder for reranking
 
-<span class="badge">intermediate</span>
-
-**Title.** Bi-encoder vs cross-encoder
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).
 
@@ -503,9 +481,7 @@ Retrieval is bi-encoder (query and docs embedded independently, compared by vect
 
 ## 12. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
 
-<span class="badge">intermediate</span>
-
-**Title.** Cutting tokens without losing quality
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.
 

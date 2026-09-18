@@ -2,9 +2,7 @@
 
 ## 1. Walking through a RAG pipeline end to end, query to final answer
 
-<span class="badge">intermediate</span>
-
-**Title.** RAG pipeline end to end
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Two halves — ingestion (parse → chunk → embed → index) and query (embed → retrieve → rerank → assemble → generate); every stage is separable and can fail.
 
@@ -48,9 +46,7 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 
 ## 2. The pipeline: query embedding, vector search, context assembly, prompt construction, generation
 
-<span class="badge">intermediate</span>
-
-**Title.** Pipeline stages
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** The same pipeline stage by stage: query embedding → vector search → context assembly → prompt construction → generation.
 
@@ -94,9 +90,7 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 
 ## 3. What is Modular RAG, and how is it different from a simple RAG pipeline
 
-<span class="badge">basic</span>
-
-**Title.** Modular RAG
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Simple RAG is a fixed chain; Modular RAG decomposes it into swappable modules (indexing, retrieval, fusion, reranking, query rewriting, generation) that can be routed and scheduled.
 
@@ -141,9 +135,7 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 
 ## 4. Deciding chunk size, and what breaks at each extreme
 
-<span class="badge">intermediate</span>
-
-**Title.** Choosing chunk size
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Too small loses context and splits answers; too large dilutes the embedding. Start at a few hundred tokens with modest overlap.
 
@@ -187,9 +179,7 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 
 ## 5. What happens if your chunks are too small or too large
 
-<span class="badge">intermediate</span>
-
-**Title.** Chunks too small or too large
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Too small: the answer splits and the answer-bearing chunk can be missed. Too large: the embedding blends topics, precision drops, and prompt cost rises.
 
@@ -231,9 +221,7 @@ The code guards the mechanics but not the quality: construction rejects `chunk_s
 
 ## 6. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
 
-<span class="badge">advanced</span>
-
-**Title.** Fixed-size vs semantic chunking
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Fixed-size is cheap and deterministic but cuts mid-sentence; structure/sentence-aware chunking keeps chunks coherent at the cost of variable size and extra processing.
 
@@ -278,9 +266,7 @@ True fixed-size is `CharChunker` (raw character windows via `CharSplitter`). Tok
 
 ## 7. Overlapping vs. non-overlapping chunks
 
-<span class="badge">intermediate</span>
-
-**Title.** Chunk overlap
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** A small overlap preserves meaning across a boundary; too much duplicates content, inflates the index, and returns near-identical hits.
 
@@ -321,9 +307,7 @@ Overlap is a first-class `chunk_overlap` integer (default 50) enforced on both p
 
 ## 8. Chunking structured content like tables, code, or nested headings without losing structure
 
-<span class="badge">intermediate</span>
-
-**Title.** Chunking tables, code, headings
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Capture structure at parse time and carry it as metadata — keep tables intact (row/column), preserve code boundaries, and split on headings.
 
@@ -368,9 +352,7 @@ Structure is preserved at parse time, not chunk time. Excel emits one `Document`
 
 ## 9. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
 
-<span class="badge">intermediate</span>
-
-**Title.** Answer cut across chunks
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** If the answer spans a boundary, the retrieved chunk holds only half of it. Fix with overlap, sentence/structure-aware splitting, and neighbor expansion at serve time.
 
@@ -413,9 +395,7 @@ Protection is inconsistent by chunker. `SentenceSplitter` builds chunks from who
 
 ## 10. Picking an embedding model, and whether bigger always means better retrieval
 
-<span class="badge">intermediate</span>
-
-**Title.** Choosing an embedding model
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Bigger isn't automatically better: fit to domain and language, use the right query/passage prefixes, pick an affordable dimension, and weigh latency/cost.
 
@@ -463,9 +443,7 @@ An `Embedding` ABC defines `embed_query`, `embed_documents`, and a `dimension` p
 
 ## 11. Should queries and documents use the same embedding model
 
-<span class="badge">intermediate</span>
-
-**Title.** Same embedding model for query & docs
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Yes — both sides must use the same model, and asymmetric models need the correct role prefix on each side, or the vectors aren't comparable.
 
@@ -513,9 +491,7 @@ In the KB pipeline they do: one `embed_model` instance is held on the KB, passed
 
 ## 12. Why swapping embedding models forces a full re-embedding of the corpus
 
-<span class="badge">intermediate</span>
-
-**Title.** Re-embedding after model swap
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Stored vectors belong to one model; a new model — even at the same dimension — is a different space, so every chunk must be re-embedded and the index rebuilt.
 
@@ -558,9 +534,7 @@ At index time `compute_chunk_embeddings` calls `embed_model.embed_documents` and
 
 ## 13. Multilingual documents: multilingual embedding models, translate at query or index time
 
-<span class="badge">intermediate</span>
-
-**Title.** Multilingual retrieval
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use a multilingual/alignment embedding so queries and docs share one space; otherwise translate at index or query time and store language metadata.
 
@@ -603,9 +577,7 @@ Effectively bilingual zh/en at the processing layer, with no translation. `Sente
 
 ## 14. Handling multiple document types and formats in the same system
 
-<span class="badge">intermediate</span>
-
-**Title.** Multiple document formats
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by type, preserving format-specific structure as metadata.
 
@@ -648,9 +620,7 @@ Format dispatch is an extension-keyed plugin registry loaded lazily by `AutoFile
 
 ## 15. RAG vs. pasting retrieved text into a long-context prompt
 
-<span class="badge">intermediate</span>
-
-**Title.** RAG vs pasting a long context
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Pasting whole documents is simpler and avoids chunking errors but is expensive, slow, and noisy; retrieval pays a one-time chunking/index cost and sends only relevant, citable chunks.
 
@@ -693,9 +663,7 @@ The KB is not budgeted against the model window. `KnowledgeRetrievalExecutable._
 
 ## 16. Simple RAG pipeline
 
-<span class="badge">intermediate</span>
-
-**Title.** Simple RAG pipeline
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** The most common starting point: embed the query, get top-k similar docs, stuff them into the prompt, and generate.
 
@@ -733,9 +701,7 @@ Implemented end to end as composable pieces rather than a packaged app: ingest v
 
 ## 17. Modular RAG with reranking
 
-<span class="badge">intermediate</span>
-
-**Title.** Modular RAG with reranking
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** The upgrade once simple RAG returns irrelevant context: retrieve a larger candidate set, rerank by relevance, and keep only the top results.
 
@@ -774,9 +740,7 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 ## 18. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
 
-<span class="badge">basic</span>
-
-**Title.** Agentic RAG
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.
 
@@ -825,9 +789,7 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 ## 19. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
 
-<span class="badge">advanced</span>
-
-**Title.** Preventing agentic RAG loops
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.
 

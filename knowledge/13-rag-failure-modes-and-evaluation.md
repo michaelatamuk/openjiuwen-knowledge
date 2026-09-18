@@ -2,9 +2,7 @@
 
 ## 1. How do you measure whether your retrieval step is actually working
 
-<span class="badge">intermediate</span>
-
-**Title.** Measuring retrieval
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use a labeled (query, relevant docs) set and ranked metrics — Recall@k, Precision@k, MRR, NDCG — and track zero-result rate.
 
@@ -47,9 +45,7 @@ None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG
 
 ## 2. Retrieval looks correct, answer is wrong: check if the chunk actually contains the answer
 
-<span class="badge">intermediate</span>
-
-**Title.** Chunk doesn't contain the answer
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'Looked relevant' isn't 'contains the answer': read the chunk and confirm the answer span is present; if not, retrieval failed; if yes, generation failed.
 
@@ -92,9 +88,7 @@ There is no tooling for "does the retrieved chunk contain the answer". The close
 
 ## 3. How do you handle hallucinations when retrieved context doesn't actually answer the question
 
-<span class="badge">intermediate</span>
-
-**Title.** Context doesn't answer the question
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Detect that the context is insufficient, then answer only from what's supported: gate on retrieval score/answerability, allow explicit 'I don't know', and verify claims against the context.
 
@@ -141,9 +135,7 @@ There is a retrieval score filter (`score_threshold`) but its default is `None`,
 
 ## 4. How do you handle retrieval when documents contain conflicting or outdated information on the same topic
 
-<span class="badge">intermediate</span>
-
-**Title.** Conflicting / outdated documents
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Apply precedence before generation — recency, source authority, or an explicit priority field; dedupe/reconcile; and surface the conflict (or abstain).
 
@@ -187,9 +179,7 @@ The retrieval layer has no notion of document time at all: `RetrievalResult`/`Te
 
 ## 5. No relevant documents exist: expected behavior is a confidence-gated "not enough information"
 
-<span class="badge">intermediate</span>
-
-**Title.** No relevant documents
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.
 
@@ -231,9 +221,7 @@ There is a retrieval score filter but its default is `None`, so out-of-scope chu
 
 ## 6. Same question, different answers on different days: non-deterministic reranking or embedding drift
 
-<span class="badge">intermediate</span>
-
-**Title.** Different answers on different days
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).
 
@@ -281,9 +269,7 @@ Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRe
 
 ## 7. Vocabulary mismatch, where the answer exists but uses different wording
 
-<span class="badge">intermediate</span>
-
-**Title.** Vocabulary mismatch
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.
 
@@ -326,9 +312,7 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 
 ## 8. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
 
-<span class="badge">intermediate</span>
-
-**Title.** Per-stage error handling
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.
 
@@ -375,9 +359,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 
 ## 9. Building a retrieval eval set without labeled relevant documents yet
 
-<span class="badge">advanced</span>
-
-**Title.** Building a retrieval eval set
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
 
@@ -420,9 +402,7 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 ## 10. "Design a RAG system" tests failure mode awareness, not architecture recall
 
-<span class="badge">advanced</span>
-
-**Title.** Design a RAG system: tests failure-mode awareness
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** 'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.
 
@@ -461,9 +441,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 ## 11. "The model made something up" is testing hallucination handling, not model quality
 
-<span class="badge">intermediate</span>
-
-**Title.** 'The model made something up': hallucination handling
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'The model made something up' is testing hallucination handling, not model quality.
 

@@ -2,9 +2,7 @@
 
 ## 1. What is prompt injection?
 
-<span class="badge">intermediate</span>
-
-**Title.** Prompt injection defenses
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.
 
@@ -50,9 +48,7 @@ Detection-side support exists but is not wired in: `core/security/guardrail/` pr
 
 ## 2. How do you defend against prompt injection?
 
-<span class="badge">advanced</span>
-
-**Title.** Defending against prompt injection
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.
 
@@ -94,9 +90,7 @@ The codebase separates prompt-level from enforced defenses. Prompt-level: `Safet
 
 ## 3. Handling untrusted content from a tool result or retrieved document
 
-<span class="badge">intermediate</span>
-
-**Title.** Untrusted tool output and documents
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.
 
@@ -143,9 +137,7 @@ Weakest area. Tool results are rendered through the tool's own `render_for_llm` 
 
 ## 4. How do you handle a user trying to jailbreak your system's guardrails
 
-<span class="badge">intermediate</span>
-
-**Title.** Handling jailbreak attempts
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.
 
@@ -194,9 +186,7 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 
 ## 5. How do you make sure a user only retrieves documents they're actually authorized to see
 
-<span class="badge">intermediate</span>
-
-**Title.** Per-user document authorization
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.
 
@@ -238,9 +228,7 @@ The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB
 
 ## 6. How do you prevent an agent from taking a destructive or irreversible action by mistake
 
-<span class="badge">intermediate</span>
-
-**Title.** Preventing destructive actions
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.
 
@@ -285,9 +273,7 @@ A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + 
 
 ## 7. How do you prevent a model from generating harmful or biased content
 
-<span class="badge">intermediate</span>
-
-**Title.** Preventing harmful or biased output
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.
 
@@ -336,9 +322,7 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 
 ## 8. Preventing sensitive data from leaking into a model's context or output logs
 
-<span class="badge">intermediate</span>
-
-**Title.** Preventing sensitive data leakage
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.
 
@@ -382,9 +366,7 @@ Actual model-context redaction exists only as a demo rail: `Sensitivedatasanitiz
 
 ## 9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
 
-<span class="badge">advanced</span>
-
-**Title.** Multi-tenant RAG isolation
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.
 
@@ -427,9 +409,7 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 
 ## 10. Security-adjacent questions are disguised as normal engineering questions
 
-<span class="badge">intermediate</span>
-
-**Title.** Security-adjacent questions in disguise
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Security-adjacent questions are disguised as normal engineering questions.
 
@@ -473,9 +453,7 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 
 ## 11. Any question about untrusted input is testing prompt injection awareness
 
-<span class="badge">intermediate</span>
-
-**Title.** Untrusted input: injection awareness
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Any question about untrusted input is testing prompt-injection awareness.
 

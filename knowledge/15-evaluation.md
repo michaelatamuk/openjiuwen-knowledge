@@ -2,9 +2,7 @@
 
 ## 1. How do you evaluate an LLM's output beyond "it looks correct"
 
-<span class="badge">intermediate</span>
-
-**Title.** Evaluating beyond 'looks correct'
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.
 
@@ -50,9 +48,7 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 
 ## 2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score
 
-<span class="badge">intermediate</span>
-
-**Title.** Retrieval vs generation, separately
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.
 
@@ -95,9 +91,7 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 
 ## 3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways
 
-<span class="badge">intermediate</span>
-
-**Title.** Why exact match fails
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.
 
@@ -140,9 +134,7 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 
 ## 4. Recall@k, and what a low score tells you about your retrieval setup
 
-<span class="badge">advanced</span>
-
-**Title.** Recall@k
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.
 
@@ -184,9 +176,7 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 
 ## 5. How does Precision@k differ from Recall@k?
 
-<span class="badge">intermediate</span>
-
-**Title.** Precision@k
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.
 
@@ -228,9 +218,7 @@ Precision@k is **absent**. The only precision present is classification/answer p
 
 ## 6. Why can precision and recall both look fine while the pipeline is broken?
 
-<span class="badge">intermediate</span>
-
-**Title.** Why precision and recall can both look fine
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.
 
@@ -270,9 +258,7 @@ The retrieval stack produces an ordered candidate list — and a cross-encoder c
 
 ## 7. MRR, and when it matters more than Recall@k
 
-<span class="badge">intermediate</span>
-
-**Title.** MRR
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.
 
@@ -314,9 +300,7 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 
 ## 8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
 
-<span class="badge">intermediate</span>
-
-**Title.** NDCG
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.
 
@@ -358,9 +342,7 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 
 ## 9. Faithfulness vs. relevance in RAG evaluation
 
-<span class="badge">intermediate</span>
-
-**Title.** Faithfulness vs relevance
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.
 
@@ -402,9 +384,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 ## 10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
 
-<span class="badge">intermediate</span>
-
-**Title.** Computing faithfulness
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.
 
@@ -447,9 +427,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 ## 11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
 
-<span class="badge">intermediate</span>
-
-**Title.** Measuring hallucination rate
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).
 
@@ -491,9 +469,7 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 
 ## 12. What is perplexity, and what does a lower score actually tell you
 
-<span class="badge">basic</span>
-
-**Title.** Perplexity
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.
 
@@ -536,9 +512,7 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 
 ## 13. Known limitations of using an LLM as a judge
 
-<span class="badge">intermediate</span>
-
-**Title.** LLM-as-judge limitations
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.
 
@@ -582,9 +556,7 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 
 ## 14. How do you evaluate when there's no ground truth answer, only a query and a corpus
 
-<span class="badge">intermediate</span>
-
-**Title.** Evaluating with no ground truth
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.
 
@@ -626,9 +598,7 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 
 ## 15. How would you build an eval dataset from scratch if you don't have one yet
 
-<span class="badge">advanced</span>
-
-**Title.** Building an eval dataset
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.
 
@@ -670,9 +640,7 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 
 ## 16. How many examples before eval results are statistically meaningful, not just noise
 
-<span class="badge">intermediate</span>
-
-**Title.** How many eval examples
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.
 
@@ -714,9 +682,7 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 ## 17. How would you compare two models for a specific task, not just a general leaderboard score
 
-<span class="badge">advanced</span>
-
-**Title.** Comparing two models
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.
 
@@ -760,9 +726,7 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 
 ## 18. Building a regression test suite to catch a quality drop before it ships
 
-<span class="badge">intermediate</span>
-
-**Title.** Regression test suite
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.
 
@@ -805,9 +769,7 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 ## 19. Evaluating continuously in production, not just once before launch
 
-<span class="badge">intermediate</span>
-
-**Title.** Continuous production eval
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.
 
@@ -855,9 +817,7 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 
 ## 20. How do you detect when your retrieval quality has degraded over time
 
-<span class="badge">intermediate</span>
-
-**Title.** Detecting retrieval degradation
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.
 
@@ -899,9 +859,7 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 
 ## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
 
-<span class="badge">advanced</span>
-
-**Title.** High eval, users still unhappy
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.
 
@@ -944,9 +902,7 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 
 ## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
 
-<span class="badge">intermediate</span>
-
-**Title.** Tying eval to business outcome
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.
 
@@ -989,9 +945,7 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 
 ## 23. "How do you know it's working" tests evaluation depth, not confidence
 
-<span class="badge">intermediate</span>
-
-**Title.** How do you know it's working: eval depth
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'How do you know it's working' tests evaluation depth, not confidence.
 
@@ -1031,9 +985,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 ## 24. "How do you know it's working" is testing evaluation depth
 
-<span class="badge">intermediate</span>
-
-**Title.** 'How do you know it's working': eval depth
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** 'How do you know it's working' is testing evaluation depth.
 

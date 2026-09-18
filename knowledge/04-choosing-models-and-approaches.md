@@ -2,9 +2,7 @@
 
 ## 1. Deciding when a problem actually needs an LLM versus a simpler rule-based system
 
-<span class="badge">intermediate</span>
-
-**Title.** When to use an LLM vs rules
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.
 
@@ -50,9 +48,7 @@ The codebase deliberately routes many decisions through deterministic code. The 
 
 ## 2. Larger model vs. smaller, faster one for a given task
 
-<span class="badge">intermediate</span>
-
-**Title.** Larger vs smaller model
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.
 
@@ -93,9 +89,7 @@ Model selection here is about availability and endpoint distribution, not task q
 
 ## 3. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
 
-<span class="badge">advanced</span>
-
-**Title.** Compare two approaches: tests tradeoff reasoning
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** 'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.
 

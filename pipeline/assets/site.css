@@ -35,6 +35,23 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+/* All badges neutral; distinguish by weight/contrast, not colour. */
+.md-typeset .badge-type {
+  font-weight: 500;
+  color: var(--md-default-fg-color--light, #7a7a7a);
+}
+.md-typeset .badge-basic,
+.md-typeset .badge-intermediate,
+.md-typeset .badge-advanced {
+  font-weight: 700;
+  color: var(--md-default-fg-color, #333);
+}
+.md-typeset .badge-title {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--md-default-fg-color--light, #8a8a8a);
+}
 
 /* Code-anchor tables inside technical detail: smaller and denser. */
 .md-typeset details table {

@@ -2,9 +2,7 @@
 
 ## 1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic
 
-<span class="badge">advanced</span>
-
-**Title.** Where cost concentrates
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Embedding is a one-time, change-only indexing cost; the recurring traffic-scaling cost is generation, especially input tokens from long context. Optimize generation.
 
@@ -47,9 +45,7 @@ Embedding is batched and effectively one-time: `APIEmbedding` chunks texts (`max
 
 ## 2. How would you reduce cost for a high-volume RAG system without degrading answer quality
 
-<span class="badge">advanced</span>
-
-**Title.** Reducing cost in high-volume RAG
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Cut the dominant input-token/generation cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts/context, and summarize history.
 
@@ -93,9 +89,7 @@ The product tracks provider-reported session cost and enforces a per-session cap
 
 ## 3. How do you control cost in a system where usage scales unpredictably
 
-<span class="badge">advanced</span>
-
-**Title.** Controlling unpredictable cost
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Bound the loop (iterations/rounds/time), cap tokens per request and session, let cheap models do cheap work, cache, offload/summarize context, and surface per-run cost to budget and alert.
 
@@ -143,9 +137,7 @@ The product tracks provider-reported session cost and enforces a per-session cap
 
 ## 4. First cut at 50% cost reduction: route simple queries to a smaller model, reduce top-k
 
-<span class="badge">intermediate</span>
-
-**Title.** First cut: 50% cost reduction
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Cheapest high-impact cuts: route easy queries to a smaller model, lower top-k, cache, shorten the prompt, and reduce the agent's iteration cap.
 
@@ -188,9 +180,7 @@ Model selection is about availability and endpoint distribution, not cost or que
 
 ## 5. Designing caching for repeated or semantically similar queries
 
-<span class="badge">intermediate</span>
-
-**Title.** Designing caching
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.
 
@@ -238,9 +228,7 @@ Caching is exact-match, not semantic. Core has a session KV-cache runtime with a
 
 ## 6. Reducing latency in a multi-step LLM pipeline
 
-<span class="badge">intermediate</span>
-
-**Title.** Reducing latency
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.
 
@@ -285,9 +273,7 @@ End-to-end streaming is supported (ReAct `stream` → session stream iterator �
 
 ## 7. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls
 
-<span class="badge">intermediate</span>
-
-**Title.** Threads vs processes for I/O-bound LLM calls
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.
 
@@ -330,9 +316,7 @@ The LLM path is single-process asyncio/anyio. `httpx.AsyncClient` instances shar
 
 ## 8. What happens to your architecture at 10x current traffic
 
-<span class="badge">advanced</span>
-
-**Title.** Architecture at 10x traffic
+<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.
 
@@ -377,9 +361,7 @@ The system has per-process bounded resources rather than elastic scaling. LLM HT
 
 ## 9. Scaling questions test whether you've thought past the demo
 
-<span class="badge">intermediate</span>
-
-**Title.** Scaling questions: thinking past the demo
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Scaling questions test whether you've thought past the demo.
 
@@ -418,9 +400,7 @@ Bounded resources exist per process: shared httpx pool (`max_connections=100`), 
 
 ## 10. What's your rollback plan if a prompt or model update degrades output quality?
 
-<span class="badge">advanced</span>
-
-**Title.** Rollback plan for a bad update
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
 **Summary.** Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).
 
@@ -464,9 +444,7 @@ Rollback exists for whole RSI **harness packages**: `rollback(installation_id)` 
 
 ## 11. A stakeholder wants to ship before your eval scores are ready, how do you handle it
 
-<span class="badge">intermediate</span>
-
-**Title.** Shipping before eval is ready
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **Summary.** Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.
 

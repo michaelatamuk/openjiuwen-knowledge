@@ -2,9 +2,7 @@
 
 ## 1. Token
 
-<span class="badge">basic</span>
-
-**Title.** Token
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** The smallest sub-word unit of text a model processes.
 
@@ -39,9 +37,7 @@ Counts tokens, never words, via a `TokenCounter`. `TiktokenCounter` maps model n
 
 ## 2. Embedding
 
-<span class="badge">basic</span>
-
-**Title.** Embedding
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A numeric vector representing the meaning of text, used for similarity search.
 
@@ -76,9 +72,7 @@ An `Embedding` ABC defines `embed_query`/`embed_documents`/`dimension`; provider
 
 ## 3. Context window
 
-<span class="badge">basic</span>
-
-**Title.** Context window
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** The maximum amount of text a model can process in a single request.
 
@@ -113,9 +107,7 @@ The context engine budgets the window (`effective_context_budget` = strictest of
 
 ## 4. Temperature
 
-<span class="badge">basic</span>
-
-**Title.** Temperature
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Controls sampling randomness; lower values produce more deterministic output.
 
@@ -150,9 +142,7 @@ A passthrough request param; the local HF/vLLM path implements `softmax(logits/T
 
 ## 5. Top-p (nucleus sampling)
 
-<span class="badge">basic</span>
-
-**Title.** Top-p (nucleus sampling)
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Limits token selection to the smallest set whose cumulative probability exceeds p.
 
@@ -187,9 +177,7 @@ Top-p is implemented locally (`top_p` default `1.0`); **top-k sampling is absent
 
 ## 6. RAG
 
-<span class="badge">basic</span>
-
-**Title.** RAG (retrieval-augmented generation)
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Giving a model external data by retrieving relevant passages and putting them in the prompt before generation.
 
@@ -226,9 +214,7 @@ Ingestion (`parse_files` → `chunk_documents` → `build_index`) plus query-tim
 
 ## 7. Chunking
 
-<span class="badge">basic</span>
-
-**Title.** Chunking
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Splitting documents into smaller pieces before embedding so retrieval returns relevant sections.
 
@@ -263,9 +249,7 @@ Char/token/hybrid chunkers with validation (`chunk_size>0`, `overlap<size`), tok
 
 ## 8. Vector database
 
-<span class="badge">basic</span>
-
-**Title.** Vector database
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A database built for similarity search over embeddings rather than exact-match queries.
 
@@ -300,9 +284,7 @@ Chroma (local, vector-only), Milvus (server, BM25 + hybrid + quantized indexes),
 
 ## 9. Reranking
 
-<span class="badge">basic</span>
-
-**Title.** Reranking
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Reordering retrieved documents by actual relevance (often a cross-encoder) after a broad initial retrieval.
 
@@ -338,9 +320,7 @@ A `Reranker` ABC with cross-encoder/LLM variants exists, but it is wired only in
 
 ## 10. Hallucination
 
-<span class="badge">basic</span>
-
-**Title.** Hallucination
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Confident but factually incorrect or unsupported output.
 
@@ -376,9 +356,7 @@ No hallucination/attribution detector. Mitigations exist separately: a verificat
 
 ## 11. Fine-tuning
 
-<span class="badge">basic</span>
-
-**Title.** Fine-tuning
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Further training a model on a specific dataset to adjust its behavior or style.
 
@@ -413,9 +391,7 @@ Real SFT + PPO via veRL, exporting versioned **LoRA/PEFT** adapters (no full fin
 
 ## 12. Prompt engineering
 
-<span class="badge">basic</span>
-
-**Title.** Prompt engineering
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Structuring input to get a reliable, specific output without changing the model.
 
@@ -450,9 +426,7 @@ System prompts are assembled from priority-ordered `PromptSection`s that rails c
 
 ## 13. Few-shot prompting
 
-<span class="badge">basic</span>
-
-**Title.** Few-shot prompting
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Providing a small number of examples in the prompt to guide output format or behavior.
 
@@ -487,9 +461,7 @@ The runtime agent is zero-shot; few-shot example injection exists only in the tu
 
 ## 14. Chain-of-thought prompting
 
-<span class="badge">basic</span>
-
-**Title.** Chain-of-thought prompting
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Asking the model to reason step by step before giving a final answer.
 
@@ -524,9 +496,7 @@ No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxil
 
 ## 15. Function calling
 
-<span class="badge">basic</span>
-
-**Title.** Function calling
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A model's ability to emit a structured request to invoke an external tool or API.
 
@@ -563,9 +533,7 @@ Cards become JSON Schema via the callable schema extractor, the ability manager 
 
 ## 16. Agent
 
-<span class="badge">basic</span>
-
-**Title.** Agent
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** A system where the model plans, calls tools, and decides its own next step in a loop.
 
@@ -602,9 +570,7 @@ The ReAct loop calls the model, executes tools on `tool_calls`, and returns when
 
 ## 17. Memory
 
-<span class="badge">basic</span>
-
-**Title.** Memory
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Context an agent retains across turns (short-term) or sessions (long-term).
 
@@ -639,9 +605,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 
 ## 18. Latency
 
-<span class="badge">basic</span>
-
-**Title.** Latency
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** The time between sending a request and receiving a complete response.
 
@@ -676,9 +640,7 @@ Streaming with per-call `ttft_ms`, parallel tool execution, KV/prefix cache affi
 
 ## 19. Quantization
 
-<span class="badge">basic</span>
-
-**Title.** Quantization
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Reducing a model's numerical precision to shrink size and speed up inference.
 
@@ -713,9 +675,7 @@ Model-weight quantization is **not implemented** here — it is a passthrough en
 
 ## 20. Prompt injection
 
-<span class="badge">basic</span>
-
-**Title.** Prompt injection
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **Summary.** Malicious or unintended instructions embedded in input or retrieved content that hijack the model.
 
