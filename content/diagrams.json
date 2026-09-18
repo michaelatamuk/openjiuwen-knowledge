@@ -75,11 +75,11 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    NEED[\"requirements\"] --> SCALE[\"scale + latency\"]\n    NEED --> FEAT[\"hybrid search + metadata filters\"]\n    NEED --> OPS[\"managed vs self-hosted · cost · data residency\"]\n    SCALE --> CHOICE[\"Chroma (local) · Milvus (server) · pgvector (relational)\"]\n    FEAT --> CHOICE\n    OPS --> CHOICE"
  },
- "05-7": {
+ "05-8": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> R[\"retrieve\"]\n    R --> E{\"enough to answer?\"}\n    E -->|no| R2[\"reformulate + retrieve again\"]\n    R2 --> CAP{\"hop budget reached?\"}\n    CAP -->|no| R\n    CAP -->|yes| STOP[\"stop and answer with what we have\"]\n    E -->|yes| ANS[\"answer\"]"
  },
- "05-9": {
+ "05-10": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
  },
@@ -190,5 +190,11 @@
  "05-3": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    subgraph L[\"linear chain\"]\n    A[\"step 1\"] --> B[\"step 2\"] --> C[\"step 3\"]\n    end\n    subgraph G[\"graph with conditional branches\"]\n    S[\"start\"] --> D{\"condition?\"}\n    D -->|\"yes\"| Y[\"branch A\"]\n    D -->|\"no\"| N[\"branch B\"]\n    Y --> E[\"join\"]\n    N --> E\n    end"
+ },
+ "05-4": {
+  "concept": "flowchart TD\n    I([\"input\"]) --> R[\"Reason: model call\"]\n    R --> D{\"tool calls?\"}\n    D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    D -->|\"no tool calls\"| O([\"answer\"])"
+ },
+ "05-5": {
+  "concept": "flowchart TD\n    subgraph PLAN[\"Plan everything upfront\"]\n    I1([\"input\"]) --> P[\"plan all steps\"] --> S1[\"step 1\"] --> S2[\"step 2\"] --> O1([\"answer\"])\n    end\n    subgraph LOOP[\"ReAct loop\"]\n    direction TB\n        I2([\"input\"]) --> R[\"Reason: model call\"]\n        R --> D{\"tool calls?\"}\n        D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    end\n    D -->|\"no tool calls\"| O2([\"answer\"])"
  }
 }

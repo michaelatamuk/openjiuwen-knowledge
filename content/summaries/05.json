@@ -28,14 +28,14 @@
  },
  "05-4": {
   "title": "ReAct pattern",
-  "tldr": "ReAct alternates thought → action → observation; interleaving lets each real tool result inform the next thought, correcting drift and grounding reasoning.",
+  "tldr": "ReAct alternates thought → action → observation, so each tool result informs the next reasoning step.",
   "points": [
-   "Loop: reason → act → observe.",
-   "Tool results become the next observation.",
-   "Interleaving corrects drift vs a big upfront plan."
+   "Alternates reason, act, observe.",
+   "Each observation feeds the next thought.",
+   "Repeats until there are no tool calls."
   ]
  },
- "05-5": {
+ "05-6": {
   "title": "Hard iteration limit",
   "tldr": "Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.",
   "points": [
@@ -44,7 +44,7 @@
    "Cap each nested loop; make caps configurable."
   ]
  },
- "05-6": {
+ "05-7": {
   "title": "What stops an agent",
   "tldr": "Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.",
   "points": [
@@ -53,7 +53,7 @@
    "Outer loop: stop evaluators + completion promise."
   ]
  },
- "05-7": {
+ "05-8": {
   "title": "How many retrieval hops",
   "tldr": "Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.",
   "points": [
@@ -62,7 +62,7 @@
    "Repetition detection + cost ceiling."
   ]
  },
- "05-9": {
+ "05-10": {
   "title": "Infinite tool-calling loop",
   "tldr": "Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.",
   "points": [
@@ -71,7 +71,7 @@
    "No-progress nudge/abort + token/time caps."
   ]
  },
- "05-10": {
+ "05-11": {
   "title": "Retrieve again or answer",
   "tldr": "Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.",
   "points": [
@@ -80,7 +80,7 @@
    "Stop on sufficient/no-next-question or the cap."
   ]
  },
- "05-11": {
+ "05-12": {
   "title": "'The agent is stuck': tests shipped experience",
   "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
   "points": [
@@ -90,7 +90,7 @@
    "Dedup rail + session cost cap."
   ]
  },
- "05-12": {
+ "05-13": {
   "title": "'Stuck in a loop': production experience",
   "tldr": "'The agent is stuck in a loop' is testing production experience.",
   "points": [
@@ -100,13 +100,22 @@
    "Dedup rail; idempotent=False default."
   ]
  },
- "05-8": {
+ "05-9": {
   "title": "Preventing an infinite retrieval/tool loop",
   "tldr": "Add repetition detection, tool-call dedup, a max-iteration cap, and a cost ceiling so a confused agent cannot loop forever.",
   "points": [
    "Detect repetition and duplicate tool calls.",
    "Bound the agent loop with max_iterations.",
    "Set a session cost ceiling."
+  ]
+ },
+ "05-5": {
+  "title": "Why interleave reasoning and actions",
+  "tldr": "A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.",
+  "points": [
+   "An upfront plan executes with no feedback.",
+   "Interleaving grounds each step in real results.",
+   "Adapts when reality differs from the plan."
   ]
  }
 }

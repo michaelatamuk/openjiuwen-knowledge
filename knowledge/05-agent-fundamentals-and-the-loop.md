@@ -127,23 +127,23 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 
 ---
 
-## 4. What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront
+## 4. What's the ReAct pattern?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**TL;DR.** ReAct alternates thought → action → observation; interleaving lets each real tool result inform the next thought, correcting drift and grounding reasoning.
+**TL;DR.** ReAct alternates thought → action → observation, so each tool result informs the next reasoning step.
 
 **Key points.**
 
-- Loop: reason → act → observe.
-- Tool results become the next observation.
-- Interleaving corrects drift vs a big upfront plan.
+- Alternates reason, act, observe.
+- Each observation feeds the next thought.
+- Repeats until there are no tool calls.
 
-**Concept.** ReAct alternates thought → action → observation. Interleaving lets each action's real result inform the next thought, which corrects drift and grounds reasoning in observed state. A fully upfront plan cannot react to what the tools actually return.
+**Concept.** ReAct alternates thought → action → observation. Each action's real result informs the next thought, so the agent grounds its reasoning in observed state rather than assumptions about it.
 
-![diagram](assets/diagrams/e73333a784a24a216a1c2c2c6434eba9eaf4b91c.png)
+![diagram](assets/diagrams/971c7b05dfe483d7b85ee7fc0d2cef8ab26c445c.png)
 
-**In Jiuwen.** Jiuwen's loop is exactly reason/act/observe: call the model, branch on whether it returned tool calls, execute the tools, and feed the results back as the next observation, repeating. The reasoning trace is preserved by copying the model's reasoning content into the assistant message, and the iteration count is exposed to rails.
+**In Jiuwen.** The loop is exactly reason/act/observe: model call, branch on tool_calls, execute the tools, feed ToolMessages back as the next observation, and repeat until there are no tool calls. The reasoning trace is retained by copying reasoning_content into the assistant message, and the iteration number is exposed to rails.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -167,7 +167,45 @@ The loop is exactly reason/act/observe: model call, branch on `tool_calls`, exec
 
 ---
 
-## 5. How do you set a hard limit on iterations or steps within a framework
+## 5. Why interleave reasoning and actions instead of planning everything upfront?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.
+
+**Key points.**
+
+- An upfront plan executes with no feedback.
+- Interleaving grounds each step in real results.
+- Adapts when reality differs from the plan.
+
+**Concept.** A fully upfront plan executes with no feedback, so it cannot adapt when reality differs. Interleaving feeds each observation back into the next reasoning step, which corrects drift and grounds the plan in what the tools actually returned.
+
+![diagram](assets/diagrams/a5765913ba8c7ee5fb7b8ea765f036612234df01.png)
+
+**In Jiuwen.** Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-decides based on the latest observation and is bounded by max_iterations (default 5). The deep agent's outer task loop is likewise iterative (todos updated as results arrive) rather than a fixed upfront plan.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-decides based on the latest observation and is bounded by `max_iterations` (default 5). The deep agent's outer task loop is likewise iterative — todos are updated as results arrive — rather than a fixed upfront plan.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793` | re-decides each turn from the latest observation |
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813` | acts, then loops on the result |
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations=5 bounds the loop |
+| `agent-core/openjiuwen/harness/deep_agent.py:2723` | outer task loop (iterative, hard ceiling) |
+
+</details>
+
+---
+
+## 6. How do you set a hard limit on iterations or steps within a framework
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -208,7 +246,7 @@ The inner ReAct loop is bounded by `ReActAgentConfig.max_iterations` (default 5)
 
 ---
 
-## 6. What decides when an agent stops and returns a final answer instead of calling another tool
+## 7. What decides when an agent stops and returns a final answer instead of calling another tool
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -249,7 +287,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 7. How do you decide how many retrieval hops are enough?
+## 8. How do you decide how many retrieval hops are enough?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -289,7 +327,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 8. How do you prevent a retrieval loop from running indefinitely and burning cost?
+## 9. How do you prevent a retrieval loop from running indefinitely and burning cost?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -326,7 +364,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 10. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -370,7 +408,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ---
 
-## 10. How does an agent decide when to retrieve again versus when it has enough context to answer
+## 11. How does an agent decide when to retrieve again versus when it has enough context to answer
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -407,7 +445,7 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 
 ---
 
-## 11. "The agent is stuck" tests whether you've shipped one, not studied one
+## 12. "The agent is stuck" tests whether you've shipped one, not studied one
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -447,7 +485,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 12. "The agent is stuck in a loop" is testing production experience
+## 13. "The agent is stuck in a loop" is testing production experience
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

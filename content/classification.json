@@ -48,13 +48,13 @@
  "05-2": "basic",
  "05-3": "basic",
  "05-4": "basic",
- "05-5": "intermediate",
  "05-6": "intermediate",
  "05-7": "intermediate",
- "05-9": "intermediate",
+ "05-8": "intermediate",
  "05-10": "intermediate",
  "05-11": "intermediate",
  "05-12": "intermediate",
+ "05-13": "intermediate",
  "06-1": "intermediate",
  "06-2": "intermediate",
  "06-3": "intermediate",
@@ -205,8 +205,9 @@
  "18-9": "advanced",
  "18-10": "intermediate",
  "18-11": "intermediate",
- "05-8": "intermediate",
+ "05-9": "intermediate",
  "11-10": "advanced",
  "15-6": "intermediate",
- "18-2": "advanced"
+ "18-2": "advanced",
+ "05-5": "intermediate"
 }

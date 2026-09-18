@@ -112,28 +112,11 @@ flowchart TD
 
 ---
 
-## 4. What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront
+## 4. What's the ReAct pattern?
 
-**General:** ReAct alternates thought → action → observation. Interleaving lets each action's real result inform the next thought, which corrects drift and grounds reasoning in observed state. A fully upfront plan cannot react to what the tools actually return.
+**General:** ReAct alternates thought → action → observation. Each action's real result informs the next thought, so the agent grounds its reasoning in observed state rather than assumptions about it.
 
 **Jiuwen:** The loop is exactly reason/act/observe: model call, branch on `tool_calls`, execute, feed `ToolMessage`s back as the next observation, repeat. The reasoning trace is retained by copying `reasoning_content` into the assistant message, and the iteration number is exposed to rails.
-
-**Why interleave:** a fully upfront plan executes with no feedback; ReAct feeds each observation back into the next reasoning step, so it can adapt when reality differs from the plan.
-
-```mermaid
-flowchart TD
-    subgraph PLAN["Plan everything upfront"]
-    I1(["input"]) --> P["plan all steps"] --> S1["step 1"] --> S2["step 2"] --> S3["step 3"] --> O1(["answer"])
-    end
-    subgraph LOOP["ReAct loop"]
-    direction TB
-        I2(["input"]) --> R["Reason: model call"]
-        R --> D{"tool calls?"}
-        D -->|yes| TA["Act: run tools"] --> OB["Observe: tool result"] --> R
-    end
-    D -->|"no tool calls"| O2(["answer"])
-    OB ~~~ O2
-```
 
 <details>
 <summary>Anchors</summary>
@@ -146,7 +129,25 @@ flowchart TD
 
 ---
 
-## 5. How do you set a hard limit on iterations or steps within a framework
+## 5. Why interleave reasoning and actions instead of planning everything upfront?
+
+**General:** A fully upfront plan executes with no feedback, so it cannot adapt when reality differs. Interleaving feeds each observation back into the next reasoning step, which corrects drift and grounds the plan in what the tools actually returned.
+
+**Jiuwen:** Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-decides based on the latest observation and is bounded by `max_iterations` (default 5). The deep agent's outer task loop is likewise iterative — todos are updated as results arrive — rather than a fixed upfront plan.
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793</code> — re-decides each turn from the latest observation<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813</code> — acts, then loops on the result<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations=5</code> bounds the loop<br>&bull; <code>agent-core/openjiuwen/harness/deep_agent.py:2723</code> — outer task loop (iterative, hard ceiling)</sub>
+
+</details>
+
+<sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
+
+
+---
+
+## 6. How do you set a hard limit on iterations or steps within a framework
 
 **General:** Cap the loop with a max-iteration/max-round counter, plus optional token and wall-clock budgets, and *enforce* them rather than only reporting. Nested loops need a cap at each level, and the caps should be configurable.
 
@@ -177,9 +178,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
 
+
 ---
 
-## 6. What decides when an agent stops and returns a final answer instead of calling another tool
+## 7. What decides when an agent stops and returns a final answer instead of calling another tool
 
 **General:** Usually the model itself: when it emits no tool calls, the answer is final. Around that sit hard limits — max iterations, token/time budgets, and explicit stop conditions — so a confused agent does not loop forever.
 
@@ -209,9 +211,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+
 ---
 
-## 7. How do you decide how many retrieval hops are enough?
+## 8. How do you decide how many retrieval hops are enough?
 
 **General:** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
 
@@ -235,9 +238,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
 
+
 ---
 
-## 8. How do you prevent a retrieval loop from running indefinitely and burning cost?
+## 9. How do you prevent a retrieval loop from running indefinitely and burning cost?
 
 **General:** Add repetition/loop detection, deduplicate identical tool calls, bound the agent's own loop with a max-iteration cap, and put a cost ceiling on the session. The failure mode is quiet: retries on a flaky call that never terminate, or token spend that climbs overnight.
 
@@ -263,7 +267,7 @@ flowchart TD
 
 ---
 
-## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 10. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 **General:** Cap iterations, detect repetition (same tool and arguments repeatedly), nudge or abort when no progress is made, and also cap rounds, tokens, and wall time. Detection should compare canonicalized arguments, not raw strings.
 
@@ -293,7 +297,7 @@ flowchart TD
 
 ---
 
-## 10. How does an agent decide when to retrieve again versus when it has enough context to answer
+## 11. How does an agent decide when to retrieve again versus when it has enough context to answer
 
 **General:** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
 
@@ -321,7 +325,7 @@ flowchart TD
 
 ---
 
-## 11. "The agent is stuck" tests whether you've shipped one, not studied one
+## 12. "The agent is stuck" tests whether you've shipped one, not studied one
 
 **General:** Infinite tool loops, retries on a flaky API that never terminate, token spend that quietly spikes overnight. Vague answers ("I'd add safeguards") don't land; concrete answers do — `max_iterations=5`, a token budget per session, a circuit breaker after N consecutive tool failures. A strong answer includes: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
@@ -346,7 +350,7 @@ flowchart TD
 
 ---
 
-## 12. "The agent is stuck in a loop" is testing production experience
+## 13. "The agent is stuck in a loop" is testing production experience
 
 **General:** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. This separates people who have run one from people who have read about one. A strong answer includes: a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
 
