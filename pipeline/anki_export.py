@@ -87,7 +87,9 @@ def main():
                 + "<h4>Jiuwen</h4>" + (md(q.get("jiuwenPlain", "")) or md(q.get("mechanism", "")))
                 + tech_html
             )
-            cards.append({"q": q["question"], "topic": t["title"] + " · " + t["id"], "a": back})
+            section = t.get("section", "")
+            topic_label = (section + " · " if section else "") + t["title"] + " · " + t["id"]
+            cards.append({"q": q["question"], "topic": topic_label, "a": back})
 
     os.makedirs(DIST, exist_ok=True)
     import csv

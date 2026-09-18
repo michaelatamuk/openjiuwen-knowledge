@@ -53,7 +53,7 @@ def main():
     book.add_item(style)
 
     images = {}
-    chapters, toc = [], []
+    chapters, toc_groups = [], {}
     for t in data["topics"]:
         fname = f"{t['id']}-{re.sub(r'[^a-z0-9]+','-',t['title'].lower()).strip('-')}.xhtml"
         parts = [f"<h1>{html.escape(t['title'])}</h1>"]
@@ -94,13 +94,14 @@ def main():
         ch.add_item(style)
         book.add_item(ch)
         chapters.append(ch)
-        toc.append((epub.Section(t["title"]), links))
+        toc_groups.setdefault(t.get("section", "") or t["title"], []).append(
+            (epub.Section(t["title"]), links))
 
     for name, p in images.items():
         with open(p, "rb") as fh:
             book.add_item(epub.EpubItem(uid="img_" + hashlib.sha1(name.encode()).hexdigest()[:10],
                                         file_name="images/" + name, media_type="image/png", content=fh.read()))
-    book.toc = toc
+    book.toc = [(epub.Section(section), items) for section, items in toc_groups.items()]
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
     book.spine = ["nav"] + chapters

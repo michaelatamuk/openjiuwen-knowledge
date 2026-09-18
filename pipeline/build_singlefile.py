@@ -75,7 +75,8 @@ header input{flex:0 1 260px;padding:8px 12px;border-radius:8px;border:0;font-siz
 header select{padding:8px;border-radius:8px;border:0;font-size:13px;max-width:200px}
 header button{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;font-size:13px;cursor:pointer}
 main{max-width:860px;margin:0 auto;padding:18px}
-h1.topic{margin:26px 0 8px;padding-top:10px;border-top:2px solid var(--line);font-size:21px}
+h1.section{margin:30px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+h1.topic{margin:14px 0 8px;padding-top:10px;border-top:2px solid var(--line);font-size:21px}
 .qa{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
 .qa h2{font-size:17px;margin:0 0 8px;cursor:pointer}
 .qa .title{display:inline-block;background:rgba(76,91,212,.14);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;margin-bottom:4px}
@@ -98,9 +99,14 @@ mark{background:#ffe680}
 def build():
     data = json.load(open(CONTENT, encoding="utf-8"))
     parts, opts = [], []
+    last_section = None
     for t in data["topics"]:
         tid = "t" + t["id"]
         opts.append(f'<option value="{tid}">{html.escape(t["title"])}</option>')
+        section = t.get("section", "")
+        if section and section != last_section:
+            parts.append(f'<h1 class="section">{html.escape(section)}</h1>')
+            last_section = section
         parts.append(f'<h1 class="topic" id="{tid}">{html.escape(t["title"])}</h1>')
         for q in t["questions"]:
             title = f'<div class="title">{html.escape(q["title"])}</div>' if q.get("title") else ""
