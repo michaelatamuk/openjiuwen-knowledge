@@ -23,12 +23,12 @@ to be read **offline / on a plane** on both Windows and Android.
 
 | Artifact | Path | Use |
 |---|---|---|
-| **Single-file HTML app** | `build/dist/jiuwenswarm-interview-offline.html` | Best phone/plane option: one file, no server, no internet. Search, tap-to-reveal, dark/light. |
+| **Single-file HTML app** | `build/dist/jiuwenswarm-knowledge-offline.html` | Best phone/plane option: one file, no server, no internet. Search, tap-to-reveal, dark/light. |
 | **Offline website** | `build/site/index.html` | Desktop reading (MkDocs Material): nav, search, dark mode. Fully local. |
-| **Anki deck** | `build/dist/jiuwen-interview.apkg` | Spaced repetition (Anki / AnkiDroid). |
-| **Anki CSV** | `build/dist/jiuwen-interview-anki.csv` | Same cards as plain import. |
-| **EPUB** | `build/dist/jiuwenswarm-interview.epub` | E-readers. |
-| **Obsidian vault** | `build/interview_questions-vault.zip` | Open as a vault: one note per topic. |
+| **Anki deck** | `build/dist/jiuwen-knowledge.apkg` | Spaced repetition (Anki / AnkiDroid). |
+| **Anki CSV** | `build/dist/jiuwen-knowledge-anki.csv` | Same cards as plain import. |
+| **EPUB** | `build/dist/jiuwenswarm-knowledge.epub` | E-readers. |
+| **Obsidian vault** | `build/knowledge-vault.zip` | Open as a vault: one note per topic. |
 | **App content** | `apps/android/app/src/main/assets/content.json` | Consumed by the Android app. |
 
 ## Build
@@ -83,11 +83,11 @@ python publish_site.py    # force-pushes build/site to origin gh-pages
 ## Read it
 
 **Windows**
-- Read: open `build/dist/jiuwenswarm-interview-offline.html`, or the site at `build/site/index.html`.
+- Read: open `build/dist/jiuwenswarm-knowledge-offline.html`, or the site at `build/site/index.html`.
 - Spaced repetition: install Anki, `File -> Import` the `.apkg` (or the CSV).
 
 **Android**
-- Copy `build/dist/jiuwenswarm-interview-offline.html` to the phone and open it
+- Copy `build/dist/jiuwenswarm-knowledge-offline.html` to the phone and open it
   in Chrome (works with no network).
 - Spaced repetition: install **AnkiDroid**, open the `.apkg`, sign in to AnkiWeb
   to sync with desktop.
@@ -108,7 +108,7 @@ The wiki is `build/site/` — one page per topic. Pick one:
      navigation **and** makes search work.
 2. **PWA (nicest phone feel).** Host `build/site/` on any static host, open it in
    Chrome, then *Add to Home screen* — an offline, app-like wiki.
-3. **Obsidian (no build).** Open `build/interview_questions-vault.zip` as a vault:
+3. **Obsidian (no build).** Open `build/knowledge-vault.zip` as a vault:
    separate notes per topic, links, search, fully offline.
 
 ## Study features

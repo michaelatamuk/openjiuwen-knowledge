@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """Build ONE self-contained offline HTML study app from content.json (the
 authored, layered model): Title -> Summary -> Key points -> Explanation ->
-concept diagram -> Jiuwen (plain) -> Technical detail (collapsed).
+concept diagram -> Jiuwen (plain) -> Technical detail (expanded).
 
 Browsers render Mermaid SVG correctly, so the HTML inlines SVG (crisp at any zoom).
 
-Output: build/dist/jiuwenswarm-interview-offline.html
+Output: build/dist/jiuwenswarm-knowledge-offline.html
 Run with an interpreter that has `markdown` (the mkdocs venv does).
 """
 import os
@@ -15,7 +15,7 @@ import html
 import base64
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 ASSETS = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
 DIST = os.path.join(ROOT, "build", "dist")
 CONTENT = os.path.join(ASSETS, "content.json")
@@ -113,7 +113,7 @@ def build():
             tech_block = ""
             if tech_text or q.get("citations") or tech:
                 tech_block = (
-                    "<details><summary>Technical detail (classes &amp; functions)</summary>"
+                    "<details open><summary>Technical detail (classes &amp; functions)</summary>"
                     + md(tech_text) + citations_html(q.get("citations", [])) + tech
                     + "</details>"
                 )
@@ -129,8 +129,8 @@ def build():
             )
     doc = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jiuwen Interview Prep - offline</title><style>{CSS}</style></head><body>
-<header><h1>Jiuwen Interview Prep</h1>
+<title>Jiuwen Knowledge Base - offline</title><style>{CSS}</style></head><body>
+<header><h1>Jiuwen Knowledge Base</h1>
 <select id="jump"><option value="">Jump to...</option>{''.join(opts)}</select>
 <input id="q" placeholder="search questions...">
 <button id="mode">Study mode</button></header>
@@ -147,7 +147,7 @@ mode.addEventListener('click',function(){{setMode(!document.body.classList.conta
 document.querySelectorAll('.qa>h2').forEach(function(h){{h.addEventListener('click',function(){{h.parentElement.classList.toggle('revealed');}});}});
 </script></body></html>"""
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, "jiuwenswarm-interview-offline.html")
+    out = os.path.join(DIST, "jiuwenswarm-knowledge-offline.html")
     open(out, "w", encoding="utf-8").write(doc)
     print(f"wrote {out} ({len(doc)//1024} KB, {sum(len(t['questions']) for t in data['topics'])} questions)")
 

@@ -2,9 +2,9 @@
 """Build Anki cards from content.json (the authored, layered model).
 
 Front: question. Back: key points + summary + explanation + concept diagram +
-Jiuwen (plain) + technical detail (collapsed). Concept diagrams are embedded PNGs.
+Jiuwen (plain) + technical detail (expanded). Concept diagrams are embedded PNGs.
 
-Outputs (build/dist/): jiuwen-interview.apkg, jiuwen-interview-anki.csv
+Outputs (build/dist/): jiuwen-knowledge.apkg, jiuwen-knowledge-anki.csv
 """
 import os
 import re
@@ -13,7 +13,7 @@ import html
 import hashlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 ASSETS = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
 DIST = os.path.join(ROOT, "build", "dist")
 CONTENT = os.path.join(ASSETS, "content.json")
@@ -75,7 +75,7 @@ def main():
                         media[os.path.basename(tp)] = tp
                         tech_img = diagram_img(tech["image"])
                 tech_html = (
-                    "<details><summary>Technical detail (classes &amp; functions)</summary>"
+                    "<details open><summary>Technical detail (classes &amp; functions)</summary>"
                     + md(tech_text) + cites + tech_img + "</details>"
                 )
             title = f'<div style="color:#4c5bd4;font-weight:700;font-size:13px">{html.escape(q["title"])}</div>' if q.get("title") else ""
@@ -91,7 +91,7 @@ def main():
 
     os.makedirs(DIST, exist_ok=True)
     import csv
-    with open(os.path.join(DIST, "jiuwen-interview-anki.csv"), "w", encoding="utf-8", newline="") as fh:
+    with open(os.path.join(DIST, "jiuwen-knowledge-anki.csv"), "w", encoding="utf-8", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["Question", "Topic", "Answer"])
         for c in cards:
@@ -103,7 +103,7 @@ def main():
         print("genanki not installed; CSV written")
         return
     mid = int(hashlib.sha1(b"jiuwen-qa-v2").hexdigest()[:8], 16)
-    did = int(hashlib.sha1(b"jiuwen-interview-prep").hexdigest()[:8], 16)
+    did = int(hashlib.sha1(b"jiuwen-knowledge-base").hexdigest()[:8], 16)
     model = genanki.Model(
         mid, "Jiuwen Q&A v2",
         fields=[{"name": "Question"}, {"name": "Topic"}, {"name": "Answer"}],
@@ -114,13 +114,13 @@ def main():
         }],
         css=".card{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;text-align:left;background:#fff;color:#222;line-height:1.5}code{background:#f2f2f2;padding:1px 4px;border-radius:4px}details{margin-top:8px}",
     )
-    deck = genanki.Deck(did, "Jiuwen Interview Prep")
+    deck = genanki.Deck(did, "Jiuwen Knowledge Base")
     for c in cards:
         guid = hashlib.sha1((c["topic"] + "|" + c["q"]).encode("utf-8")).hexdigest()
         deck.add_note(genanki.Note(model=model, guid=guid, fields=[c["q"], c["topic"], c["a"]]))
     pkg = genanki.Package(deck)
     pkg.media_files = list(media.values())
-    pkg.write_to_file(os.path.join(DIST, "jiuwen-interview.apkg"))
+    pkg.write_to_file(os.path.join(DIST, "jiuwen-knowledge.apkg"))
     print(f"wrote apkg + csv ({len(cards)} cards, {len(media)} images)")
 
 

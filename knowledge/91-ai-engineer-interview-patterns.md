@@ -17,7 +17,7 @@
 
 **Jiuwen.** The failure points are concrete: dense retrieval falls back to sparse only when it returns empty, not when it is wrong; score threshold defaults to none so weak chunks pass; the knowledge-base path never reranks; and metadata filters are dropped at the retriever boundary.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The failure points are concrete. Dense retrieval falls back to sparse only when it returns *empty*, not when it is wrong; `score_threshold` defaults to `None` so weak chunks pass; the KB path never reranks; and metadata `filters` are dropped at the retriever boundary, so an "authorized docs only" filter silently does nothing.
@@ -45,7 +45,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 **Jiuwen.** The relevant knobs are static and named: top-k defaults to 5 with no adaptive policy, reranking is not in the knowledge-base path, and model allocation is availability-based rather than cost or accuracy based, so routing easy queries to a smaller model is not automatic. Session cost is tracked and capped.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The relevant knobs are static and named: `top_k` defaults to 5 (no adaptive policy), reranking is not in the KB path, and model allocation is availability-based, not cost/accuracy-based — so "smaller model for easy queries" is not automatic. Session cost is tracked and capped when the provider reports cost.
@@ -73,7 +73,7 @@ The relevant knobs are static and named: `top_k` defaults to 5 (no adaptive poli
 
 **Jiuwen.** Concrete caps exist: ReAct max iterations (default 5, harness 15), agentic-retriever max iterations (default 2, clamped), an anomaly-detection rail (consecutive identical tool rounds trigger compaction or abort), and a tool-call dedup rail. A session cost cap is enforced.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRetriever.max_iter` (default 2, clamped), `ModelAnomalyDetectionRail` (consecutive identical tool rounds → compact/abort) and `ToolCallDeduplicationRail`. A session cost cap is enforced when the provider reports cost, and `ModelBackupRail` fails over. What is **missing** is a circuit breaker after N consecutive failures and a durable token budget on the retrieval loop.
@@ -101,7 +101,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 **Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI weighted rubric, `evaluator_pipeline` pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (`ci_gate.yaml` is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.
@@ -128,7 +128,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 **Jiuwen.** Bounded resources exist per process: a shared HTTP pool (100 connections), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded async queues, and parallel tool execution with resource lanes. What is missing is autoscaling and a distributed queue.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Bounded resources exist per process: shared httpx pool (`max_connections=100`), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded `asyncio.Queue`s, and parallel tool execution with resource lanes. What is missing is autoscaling, a distributed rate limiter, and any semantic response cache — so the design change at 10x is mostly "add replicas + a global limiter", which the repo does not provide.
@@ -156,7 +156,7 @@ Bounded resources exist per process: shared httpx pool (`max_connections=100`), 
 
 **Jiuwen.** This is the weakest area. Tool results are returned as a plain tool message with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory, while the enforced controls live in the shell and permission layers.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 This is the weakest area. Tool results are returned as plain `ToolMessage` with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory (`SafetyPromptRail` always allows), while the enforced controls live in the shell/permission layer (AST ASK floor, builtin deny rules) — not in retrieval. There is no mandatory untrusted-tool-result seam.
@@ -186,7 +186,7 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 
 **Jiuwen.** The closest code mechanisms are config flags, explicit human activation before hot-load, and RSI rollback with hash re-validation — plus a CI gate that is lint and type-check only. There is no eval-threshold release gate and no canary or percentage rollout.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The closest code mechanisms are config flags (`enable_*`), explicit human activation before hot-load, and RSI rollback with hash re-validation — plus a CI gate that is lint/type-check only. There is no eval-threshold release gate and no canary/percentage rollout, so the answer is supported only by flags, explicit activation, and manual rollback.

@@ -19,7 +19,7 @@
 
 **Jiuwen.** Jiuwen has several eval layers: the agent-evolution evaluator provides a base evaluator plus exact-match and LLM-judge metrics; the RSI judge uses a structured rubric with per-behavior scores, evidence, and penalties; the online RL judge scores turns with voting; and an example harness scores with a judge. There is no retrieval metric, no golden set, and the judges do not see retrieved context.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Several independent eval layers exist. `agent_evolving/evaluator/` provides `BaseEvaluator`/`DefaultEvaluator` plus `Metric`s: `ExactMatchMetric` (normalized string match) and `LLMAsJudgeMetric` (model judge returns 0/1 with a template). The RSI subsystem has a rigorous LLM-as-judge contract requiring a structured JSON verdict with per-behavior scores, evidence, weights, and forbidden-behavior penalties. The online RL judge scores single turns as reward with `num_votes` voting. PerStream uses GPT-3.5 as a judge and aggregates accuracy/score/latency/VRAM, and `rsi best_of_n` scores workspaces by test pass counts, diff size, and lint errors. `EvolutionPipeline` runs an agent against a benchmark for N iterations and reports pass rate/convergence.
@@ -50,7 +50,7 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 
 **Jiuwen.** In Jiuwen the two stages are structurally separate but also separately un-instrumented: retrieval has no quality metric (no recall, precision, MRR, or NDCG), and the answer-level judges never receive the retrieved context. So it can produce an end-to-end score but cannot attribute a failure to retrieval versus generation.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The stages are structurally separate but also separately un-instrumented. Retrieval (`core/retrieval`) has no quality metric of any kind (no Recall@k/Precision@k/MRR/NDCG). Generation has answer-level judges that do not receive the retrieved context. So the codebase can produce end-to-end grader scores (`evaluator_pipeline` `pass_rate`, RSI weighted score) but cannot say whether a failure was retrieval or generation.
@@ -81,7 +81,7 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 
 **Jiuwen.** There are two exact-match implementations: one normalizes case and whitespace but still requires full-string equality, and the RSI judge is strict equality with no normalization. Paraphrase is covered only by the LLM judges, so exact match should be reserved for constrained answers.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/strip/whitespace but still requires full-string equality; RSI's `ExactMatchJudger` is strict `==` with no normalization. The LLM judges cover paraphrase — the `LLMAsJudgeMetric` prompt judges semantic consistency, and PerStream's GPT judge explicitly accepts synonyms/paraphrases — but they are non-deterministic and uncalibrated, and there is no deterministic paraphrase-robust metric (e.g. normalized/embedding similarity).
@@ -112,7 +112,7 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 
 **Jiuwen.** Jiuwen has no Recall@k implementation. The only recall-looking code is a classification evaluator for the proactive-memory gate in an example, which is not ranked retrieval against gold documents. Recall must be computed externally with your own labeled set.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is no `Recall@k` implementation. The only recall-looking code is a **classification** evaluator for the proactive-memory gate in `examples/PerStream/src/eval/` ("TA (Recall)" = TP/(TP+FN) over proactive-memory moments), which is not ranking retrieval against gold documents. `recall_compressed_context` is named "recall" but is a BM25 lookup returning chunks, not a metric. Nothing computes retrieved-vs-relevant overlap at rank k.
@@ -143,7 +143,7 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 
 **Jiuwen.** Precision@k is absent; the only precision present is classification/answer precision in an example and a gate test. The retrieval stack returns an ordered candidate list but never scores how many of the top-k were relevant, so retrieval precision must be measured externally.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Precision@k is **absent**. The only precision present is classification/answer precision: PerStream's "TV (Precision)" = TP/(TP+FP) (how many predicted proactive moments were correct) and sklearn `precision_score` in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.
@@ -174,7 +174,7 @@ Precision@k is **absent**. The only precision present is classification/answer p
 
 **Jiuwen.** MRR is not implemented. The retrieval stack uses reciprocal rank fusion to merge candidate lists and a weighted score combination in the graph store — those are rank-fusion algorithms, not an evaluation metric — so MRR must be computed externally.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-rank helper. The retrieval stack uses Reciprocal **Rank Fusion** (`rrf_fusion`, `1/(k+rank)`) and a separate weighted score combination (`WeightedRankConfig`) in the graph store — rank-fusion algorithms, not an evaluation metric. The product's `bm25_rank_to_score` converts an FTS5 rank to a similarity score, also not MRR.
@@ -205,7 +205,7 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 
 **Jiuwen.** NDCG is absent: there is no discounted cumulative gain, no gain/discount term, and no graded relevance. Ranking code produces cross-encoder and fusion scores used to sort, but never evaluates an ordering against relevance grades.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and no graded relevance anywhere. Ranking code produces cross-encoder scores and RRF fusion scores used to sort, but never evaluates an ordering against relevance grades.
@@ -236,7 +236,7 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 
 **Jiuwen.** There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest is an accuracy evaluator that judges factual correctness with a rubric but never receives the retrieved context, so it cannot detect unsupported claims; faithfulness must be measured externally.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest concepts: symphony's `AccuracyEvaluator` judges factual correctness with a rubric about hallucination but does not receive the retrieved context, so it cannot detect unsupported-but-plausible claims; the reviewer rubric lists a `Correctness` dimension ("no hallucination") at weight 0.3; and the RSI judge accepts arbitrary `rubric`/`required_behaviors`, so a user *could* encode a groundedness rule, but none is defined.
@@ -267,7 +267,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 **Jiuwen.** Absent. No judge receives a retrieved source context for faithfulness: the agent-evolution judge template has question, expected answer, and model response but no context slot; the RSI judge carries task, reference, rubric, and evidence artifacts but no retrieved context. Faithfulness is not computable in-repo.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 **Absent.** No judge receives a retrieved source context for faithfulness. `agent_evolving`'s judge template has fields `[Question]`, `[Expected Answer]`, `[Model Response]` with no context/evidence slot; RSI's judge receives task/reference/rubric/evidence artifacts but no retrieval context and does no claim decomposition. Symphony's judge payload can incidentally include the message trace, but it is not a faithfulness pipeline.
@@ -298,7 +298,7 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 **Jiuwen.** Claim extraction and verification are absent: there is no atomic-claim decomposition, entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is told to cite concrete evidence and not invent observations, but it grades a supplied rubric rather than retrieved context.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Claim extraction and verification are **absent**. There is no atomic-claim decomposition, NLI/entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is instructed to cite concrete evidence and not invent observations, but grades supplied rubric behaviors rather than extracted claims; Symphony's `AccuracyEvaluator` asks an LLM to find factual errors but produces a single score with no claim-level decomposition.
@@ -329,7 +329,7 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 
 **Jiuwen.** Perplexity is absent: no perplexity or loss-based language-modeling metric is computed. The nearest primitives are token log-probabilities and a softmax over candidate logits used for retrieval or trie selection, not a perplexity score.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based language-modeling metric is computed anywhere. The nearest primitives are token log-probabilities and a softmax over candidate logits: candidate logits are normalized to probabilities for retrieval selection, per-completion `cumulative_logprob` is captured (used for generation summaries/RL) but not converted to perplexity, and `ChatReranker` exponentiates token logprobs for a yes/no rerank score. The only literal "perplexity" strings are the Perplexity web-search vendor, not the metric.
@@ -360,7 +360,7 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 
 **Jiuwen.** Jiuwen has four judge implementations. One is a single call that parses to true/false and converts exceptions to zero (conflating judge failure with a wrong answer); the RSI judge does one format retry on frozen evidence and guards against injecting prior output; the online judge uses voting. Bias mitigations are partial.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a single call, parses to `true/false`, and converts exceptions to `0.0` (conflating "judge failed" with "answer wrong"). RSI's judge does one format retry on frozen evidence and guards against injecting "prior output" as trusted data, but is still single-judgment. Symphony's `LLMJudgeEvaluator` is `temperature=0.0` with one repair retry. Only the online RL `JudgeScorer` uses `num_votes` parallel votes averaged together. None handles position bias or reports agreement.
@@ -391,7 +391,7 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 
 **Jiuwen.** Synthetic dataset generation is largely not runnable: the advertised dataset generator exists only as compiled bytecode, and its components are stubs that raise NotImplementedError. The one runnable label-free path is an example harness that generates and judges proactive-memory data.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Synthetic dataset generation is largely not runnable. The advertised `rsi/dataset_generator` (`DatasetGenerator`, "model-driven synthetic evaluation dataset generation") exists only as compiled bytecode; its `case_generator`/`task_analyzer`/`coverage_validator` sources are stubs raising `NotImplementedError`, and the harness explicitly "never generates a dataset". The one runnable label-free builder is the PerStream example, which generates QA/memory pairs from source datasets using GPT-4o-mini. There is no query-generation loop tied to the core evaluator.
@@ -422,7 +422,7 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 
 **Jiuwen.** The advertised dataset generator is not runnable source: the class exists only as bytecode and its helpers are stubs, and the harness never generates a dataset. The only runnable label-free approach is an example that generates and scores proactive-memory moments, so you must build the dataset yourself.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator` exists only as compiled bytecode, and `case_generator`/`task_analyzer`/`coverage_validator` are stubs raising `NotImplementedError`; the harness "never generates a dataset". The one runnable label-free builder is the PerStream example (`generate_dataset.sh` → GPT-4o-mini QA/memory generation). There is no query-generation loop integrated with the core evaluator.
@@ -453,7 +453,7 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 
 **Jiuwen.** There is no statistical reasoning. The closest is a confidence helper that buckets sample counts into qualitative labels (none, low, normal, high), a hard-coded heuristic rather than a confidence interval; aggregation reports sample counts and pass rates with no significance testing.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is no statistical reasoning. The closest construct is Symphony's `_confidence(sample_count)`, which buckets counts into qualitative labels (0→NONE, 1→LOW, <10→NORMAL, ≥10→HIGH) — a hard-coded heuristic, not a confidence interval. Aggregation reports `sample_count` and pass/fail counts but computes no standard error, bootstrap, or significance test.
@@ -484,7 +484,7 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 **Jiuwen.** Model selection here is infrastructure routing, not benchmark comparison: the models config defines a router across endpoints and model names with allocation strategies chosen by name, and routing scores health, rate, and latency — not task accuracy. So A/B model comparison must be done externally.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Model selection here is infrastructure routing, not benchmark comparison. `agent_teams/models/pool.py` defines `ModelRouterConfig` (one endpoint, many model names) and `IntelliRouterConfig` (many deployments behind a reliable client router), with allocator strategies chosen by `build_model_allocator`. IntelliRouter routes by adaptive multi-factor scoring (health, tokens, RPM, latency) and fails over — it does **not** choose by task accuracy. For comparing configs/attempts there is real per-task evaluation: `Trainer` evaluates each candidate on a validation set and keeps the highest score; `rsi best_of_n` ranks attempts by tests/diff/lint; the online judge uses `num_votes` voting. Comparing two models for a task therefore means running your own eval, not a leaderboard feature.
@@ -515,7 +515,7 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 
 **Jiuwen.** Tests split into fast deterministic unit tests (CI) and end-to-end system tests (usually skipped), with markers for smoke/happy-path versus deeper tests — there is no quality-regression gate in CI. Quality evaluation exists but offline and separate, without a baseline threshold.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system_tests/` (E2E, usually skipped). `pytest` defines markers `level0` ("smoke / happy-path; PR gate must stay green") and `level1`, with `testpaths=["tests"]`. Quality evaluation exists separately: `evaluator_pipeline` emits `pass_rate`/`improvement`/`converged`, and `Trainer` compares a candidate's validation score against `best_score` and commits only improvements. But the CI gate that blocks merges (`ci_gate.yaml`) declares only `lint` and `type-check` — no pytest gate and no eval threshold.
@@ -546,7 +546,7 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 **Jiuwen.** There is a live capture-and-score path, but it feeds online RL training, not quality monitoring: it stages each production completion and a judge attaches a score or user reward persisted to a trajectory store. Observability is span, error, and latency based, so there is no production quality monitoring or drift detection.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is a live capture-and-score path, but it serves **online RL training, not quality monitoring**: `CapturePipeline` stages each production completion and a judge later attaches an LLM score or user reward, persisting to a trajectory sample store. The product writes all spans into a per-session SQLite trajectory store (diagnostic, 7-day retention) for replay. There is no drift detection, no eval traffic-sampling policy, no dashboard, and no quality alert.
@@ -579,7 +579,7 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 
 **Jiuwen.** There is no retrieval-quality monitoring and no drift detection: production observability is span-based (error flag, per-session trajectory, cost and usage), i.e., error, latency, and trajectory rather than quality. Offline evaluation exists but does not track retrieval over time, so you would build this monitoring yourself.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is no retrieval-quality monitoring and no drift detection. Production observability is span-based: OTel spans with an error flag, a per-session trajectory store, and cost/usage facts — error/latency/trajectory, not quality. Offline evaluation exists (`rsi/evaluator`, `evaluator_pipeline`) but is not an online quality monitor, and there is no frozen retrieval metric to trend.
@@ -610,7 +610,7 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 
 **Jiuwen.** Feedback capture is partial, so the gap is not detectable in-product: explicit like/dislike exists only for proactive recommendations, and for normal chat feedback is inferred (a classifier judging whether a message is corrective and whether tasks succeeded). There is no in-product signal tying eval scores to user satisfaction.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Feedback capture is partial, so the gap is not detectable in-product. Explicit like/dislike exists only for **proactive recommendations** (`feedback_collector.record_feedback`); for normal chat, feedback is inferred (an LLM classifying whether a user message is corrective, and the online-RL judge consuming the next user turn as feedback). Session tracking records runtime outcome (`succeeded/failed/waiting_user`), which is execution success, not answer quality. There is no general thumbs-up/down or satisfaction signal to reconcile against eval scores.
@@ -641,7 +641,7 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 
 **Jiuwen.** Metrics here are engineering and task-completion, not business KPIs: a goal evaluator scores whether an objective is complete or blocked, a success detector maps a task to success, partial, or fail, and the pipeline aggregates pass rate and average score. The only business-adjacent tracking is infrastructure cost and usage, not outcomes.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator` scores whether an agent objective is `complete`/`blocked`; `SuccessDetector` maps a task to `success/partial/fail`; `evaluator_pipeline`/team verification aggregate `pass_rate`/`avg_score`. The only stakeholder-adjacent signal is **cost**: per-session tracking with an optional limit (`CostLimitExceededError`). There is no conversion, retention, engagement, or user-satisfaction mapping.

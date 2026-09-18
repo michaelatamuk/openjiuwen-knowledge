@@ -11,7 +11,7 @@ import json
 import csv
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 CONTENT = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets", "content.json")
 BUILD = os.path.join(ROOT, "build")
 

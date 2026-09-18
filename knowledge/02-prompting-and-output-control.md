@@ -18,7 +18,7 @@
 
 **Jiuwen.** Jiuwen assembles the system prompt as one string from priority-ordered, host-injectable sections; rails can add or remove sections before the model call, and the ReAct agent renders it once as a system message passed separately. User turns are admitted as separate user-message history, and the context engine windows system and context messages independently. Provider mapping differs: OpenAI keeps the system role in the message list, Anthropic lifts system to a top-level field, and the Responses API folds it into instructions.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The system prompt is a single assembled string from priority-ordered, host-injectable sections; rails mutate the `SystemPromptBuilder` (add/remove sections) before the model call, and `ReActAgent` renders it once as a `SystemMessage` passed as `system_messages`. User turns are admitted separately as `UserMessage` history; the context engine windows `system_messages` and `context_messages` independently. Provider mapping differs: OpenAI chat keeps `role:"system"` in the list, Anthropic lifts system content to the top-level `system` parameter (with an opt-in mid-conversation system path), and the Responses API folds system/developer into `instructions`.
@@ -51,7 +51,7 @@ The system prompt is a single assembled string from priority-ordered, host-injec
 
 **Jiuwen.** The runtime agent is fundamentally zero-shot: the system prompt is built from instruction-only sections and the model is steered by the ReAct tool loop, not worked examples. Few-shot machinery exists only in the tuning/evolution tooling, which formats cases into example blocks. Chain-of-thought appears in auxiliary prompts (a workflow questioner and the compaction prompt's analysis-then-summary), and reasoning-model output is preserved by parsing the reasoning content.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The runtime agent is fundamentally zero-shot: the system prompt is assembled from instruction-only `PromptSection`s (identity, safety, skills, tools, task guidance) and the model is steered through the ReAct tool-calling loop, not worked examples. Few-shot machinery exists only in the evolution/tuning tooling (`agent_evolving`, `dev_tools/tune`), which formats cases into example blocks and injects them as prompt gradients. Chain-of-thought appears in auxiliary prompts (workflow `questioner_comp` has an explicit "Let's think step by step") and implicitly in the compaction prompt's `<analysis>`-then-`<summary>` structure. Reasoning-model output is preserved: clients parse `reasoning_content`, and DeepSeek profiles inject an empty `reasoning_content` into assistant history.
@@ -85,7 +85,7 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 
 **Jiuwen.** The core harness has no native JSON or response-format mode; structured output is enforced by giving the model a single-use structured-output tool whose input schema is the caller's JSON Schema, so the provider's tool layer constrains the arguments. On success the arguments are captured and a finish rail ends the round; on failure the error is returned for self-correction, and the workflow engine validates the captured object. For text JSON, a JSON output parser strips a json code fence and loads the payload, returning nothing on decode failure.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The core harness has **no native `response_format`/JSON mode**; structured output is enforced by giving the model a single-use `structured_output` tool whose `ToolCard.input_params` is the caller's JSON Schema, so the provider's tool-use layer constrains arguments. On success the arguments are captured on the tool instance and a finish rail ends the round; on failure the error tool-result is returned for self-correction, and the workflow engine retries then validates the captured object with pydantic `model_validate` or `jsonschema.validate`. For text-based JSON (compression summaries), `JsonOutputParser` strips a ```` ```json ```` fence when present and `json.loads` the payload, returning `None` on decode failure rather than raising.
@@ -118,7 +118,7 @@ The core harness has **no native `response_format`/JSON mode**; structured outpu
 
 **Jiuwen.** Before executing, the ability manager parses the model's raw argument string, first trying JSON then repairing brackets and braces; unrecoverable JSON raises an error that is fed back to the model. The parsed dict is passed to the tool, where the function and MCP wrappers run schema validation (jsonschema with a Pydantic fallback) and fill defaults. The structured-output tool uses the caller's schema as its own input, so the same path constrains captured results.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
@@ -152,7 +152,7 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 
 **Jiuwen.** Prompts are assembled from named sections ordered by priority and extended with a mode filter; sections carry only name, priority, and category — no version or hash. Diagnostics exist but are not versioning. Prompt optimization overwrites the operator's prompts in place, and the only persistence is a checkpoint version storing operator state for resume. Real versioning and rollback exist only at the product's RSI harness-package level and in config migration.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPromptBuilder.add_section`/`build`), extended by `harness.prompts.builder` with a `PromptMode` filter, and JiuwenSwarm supplies a static priority registry. Sections carry only name/priority/category — no version, hash, or ID. Diagnostics exist (`PromptReport`) but are not versioning. Prompt optimization overwrites the operator's `system_prompt`/`user_prompt` in place; the only persistence is `EvolveCheckpoint.version` storing `operators_state` for resume. Real versioning/rollback exists only at the RSI harness-package level (content-addressed `installation_id`, `list_versions`, `rollback` with hash re-validation) and config migration.

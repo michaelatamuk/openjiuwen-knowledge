@@ -12,7 +12,7 @@ import html
 import shutil
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 ASSETS = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
 OUT = os.path.join(ROOT, "knowledge")
 CONTENT = os.path.join(ASSETS, "content.json")
@@ -91,7 +91,7 @@ def main():
                                      or (q.get("diagramTechnical", {}) or {}).get("svg", ""))
             tech_text = q.get("mechanism", "") if plain else ""
             if tech_text or q.get("citations") or tech_img:
-                lines.append("<details>")
+                lines.append("<details open>")
                 lines.append("<summary><b>Technical detail (classes &amp; functions)</b></summary>")
                 lines.append("")
                 if tech_text:

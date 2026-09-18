@@ -4,10 +4,10 @@
 Runs, in order:
     build_content_json.py   content.json + diagram assets for the app
     build_study.py          build/markdown -> build/docs -> build/site (+ site zip)
-    build_singlefile.py     build/dist/jiuwenswarm-interview-offline.html
+    build_singlefile.py     build/dist/jiuwenswarm-knowledge-offline.html
     anki_export.py          build/dist/*.apkg + *.csv
     build_epub.py           build/dist/*.epub
-    build_vault.py          build/interview_questions-vault.zip
+    build_vault.py          build/knowledge-vault.zip
 
 Options:
     --android       also run `gradlew assembleDebug` for the Android app
@@ -27,7 +27,7 @@ import sys
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 BUILD = os.path.join(ROOT, "build")
 APP = os.path.join(ROOT, "apps", "android")
 

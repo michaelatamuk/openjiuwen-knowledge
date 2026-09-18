@@ -9,7 +9,7 @@
         android:fillColor="#FFFFFF"
         android:pathData="M42,32 L66,32 A14,14 0 0 1 80,46 L80,62 A14,14 0 0 1 66,76 L42,76 A14,14 0 0 1 28,62 L28,46 A14,14 0 0 1 42,32 Z" />
 
-    <!-- question mark (interview Q&A) -->
+    <!-- question mark (Q&A) -->
     <path
         android:fillColor="#00000000"
         android:strokeColor="#4C5BD4"

@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 """Bundle the generated markdown into an Obsidian vault zip.
 
-The zip wraps the markdown output in a top-level `interview_questions/` folder
+The zip wraps the markdown output in a top-level `openjiuwen-knowledge/` folder
 so the whole thing opens directly as an Obsidian vault.
 
-Output: build/interview_questions-vault.zip
+Output: build/knowledge-vault.zip
 """
 import os
 import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 SRC = os.path.join(ROOT, "knowledge")
-OUT = os.path.join(ROOT, "build", "interview_questions-vault.zip")
-VAULT = "interview_questions"
+OUT = os.path.join(ROOT, "build", "knowledge-vault.zip")
+VAULT = "openjiuwen-knowledge"
 
 
 def main():

@@ -19,7 +19,7 @@
 
 **Jiuwen.** Jiuwen provides the ingestion pipeline, hybrid retrieval with rank fusion, optional rerankers (wired only into the graph store), and the context-plus-generation path through its workflow components; the product adds session cost tracking and a per-session cost cap. What a design must add on top: caching, autoscaling, reranking in the knowledge-base path, and production monitoring.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_index`), hybrid retrieval with RRF, optional rerankers (graph store only), and the context/generation path via `KnowledgeRetrievalComponent` + `LLMComponent`. Product adds session cost tracking and a per-session cost cap. Gaps a design must cover: no packaged end-to-end RAG agent, no token budgeting on retrieved context, no quality monitoring (only error/latency tracing), and no semantic response cache.
@@ -51,7 +51,7 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 **Jiuwen.** The contract is delete-by-document-id plus rebuild: indexers scan a document's chunk ids, delete them, then re-chunk, re-embed, and write (Milvus flushes in between to defeat eventual consistency); new documents append into the existing ANN index with no full re-index. The document id is a first-class scalar-indexed field. There is no code-aware or function-boundary chunker, so a codebase assistant would need to add that.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking supports char/token/hybrid but has no code-aware/function-boundary chunker.
@@ -83,7 +83,7 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 
 **Jiuwen.** Jiuwen supports metadata filtering at the store layer (Milvus expressions, Chroma where-clauses, PG JSONB), per-knowledge-base collections, a permission engine, and audit logging. But the retriever layer drops the configured filters — concrete retrievers hardcode filters to None — so permission-aware retrieval is not reachable through the knowledge-base path; you would have to re-plumb filters through the retriever.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`, PG JSONB) and per-KB collections (`kb_{kb_id}_chunks`), plus a permission engine and audit logging. But the retriever layer **drops** `RetrievalConfig.filters` — concrete retrievers hardcode `filters=None` — so permission-aware retrieval is not reachable through the KB path, and there is no document/chunk ACL field. Permission-aware retrieval would require re-plumbing filters through the retriever.
@@ -115,7 +115,7 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 
 **Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no sharding, partitioning, replication, or multi-collection fan-out in the repo — those are the backend's job.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no sharding, partitioning, replica, or multi-collection fan-out anywhere.
@@ -146,7 +146,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 **Jiuwen.** Jiuwen has no sharding or hash/range partitioning. The only partition-like unit is a per-knowledge-base collection plus a database-name field; there are no Milvus partition keys, no shard config, and no tenant-hash routing. So sharding would be handled entirely by the chosen backend, not by this code.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 **No sharding or hash/range partitioning.** The only partition-like unit is the per-KB collection (`kb_{kb_id}_chunks`/`_triples`) plus the `database_name` field. There are no Milvus partition keys, shard config, or tenant-hash routing.
@@ -177,7 +177,7 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 **Jiuwen.** Growth is handled by append-only batched writes into a pre-existing ANN index, so adding documents does not trigger a full re-index. Fast deletes and filters use a Milvus inverted scalar index on document and chunk ids, and a search-time recall knob scales with top-k. There is no query result cache and no reindex or compaction trigger.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Growth is handled by append-only batched writes into a pre-existing ANN index; existing vectors are untouched, so adding documents triggers no full re-index. Fast deletes/filters use the Milvus inverted scalar index on `document_id`/`chunk_id`. `get_search_params` derives `ef = top_k * efSearchFactor` per query (a search-time recall knob). `lazy_load` defers heavy module imports (Milvus/Chroma/parsers), not data. There is **no query result cache**, no reindex/compaction trigger, and no `ALTER INDEX` path — once the collection is created, ANN algorithm/params cannot change.
@@ -209,7 +209,7 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 
 **Jiuwen.** Three backends sit behind one factory: Chroma (local, vector-only — sparse and hybrid are rejected), Milvus (server, native BM25 and hybrid with rank fusion), and PostgreSQL plus pgvector (server, full-text sparse plus vector). The knowledge base selects the index type (hybrid by default), so hybrid requires Milvus or PG; Chroma is the small local choice.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Three backends behind one factory: Chroma (local persisted, **vector-only** — sparse/hybrid rejected), Milvus (server, native BM25 + hybrid with RRF), PostgreSQL+pgvector (server, `tsvector` sparse + vector). The KB selects the index type (`hybrid` default). So hybrid/RRF requires Milvus or PG; Chroma is the small/local choice.
@@ -242,7 +242,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 **Jiuwen.** The factory can create Chroma (local), Milvus (server, which fits hosted or self-managed), and PostgreSQL plus pgvector (self-managed relational). The choice is pure config; the repo provides no autoscaling, managed-service integration, or ops tooling, so the operational side is entirely on you.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 `create_vector_store` dispatches Chroma (local/embedded), Milvus (server, fits hosted or self-managed), and PostgreSQL+pgvector (self-managed relational). The choice is pure config; there is no autoscaling, managed-service integration, or ops tooling in-repo. Chroma local cannot do hybrid, so production hybrid means Milvus or PG.
@@ -274,7 +274,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 **Jiuwen.** There is no availability fallback for a down vector database: dense search does not catch exceptions, so a store failure propagates and fails the workflow node. Sparse searches silently return empty on error, hybrid has a same-database split-search fallback, and multi-KB retrieval swallows per-KB errors. There is no circuit breaker, health probe, or result cache.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 There is **no availability fallback** for a down vector DB. Dense `search()` does not catch exceptions — a store failure propagates through the retriever and fails the workflow node. Sparse searches silently return `[]` on error, Milvus hybrid has a same-DB split-search fallback, and `retrieve_multi_kb` swallows per-KB errors (empty list), which contains blast radius across KBs. There is no circuit breaker, health probe, or result cache.
@@ -306,7 +306,7 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 **Jiuwen.** The contract is delete-by-document-id plus rebuild: the Chroma and Milvus indexers do not upsert — they find a document's chunk ids, delete them, then re-chunk, re-embed, and write, flushing Milvus in between. The document id is a first-class scalar-indexed field enabling filter deletes. Postgres is the only store with native upsert, but no indexer wraps it, and a crash between delete and rebuild loses the document.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** upsert: they scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency). `doc_id` is a first-class field (`document_id`, scalar-inverted in Milvus) enabling filter deletes. PG is the only store with native upsert-by-primary-key (`INSERT ... ON CONFLICT (id) DO UPDATE`), but no PG indexer wraps it. There is no atomic/transactional replace — a crash between delete and rebuild loses the document, and chunk IDs are regenerated UUIDs each run so "same document" relies solely on `doc_id`.
@@ -338,7 +338,7 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 **Jiuwen.** The retrieval layer has no notion of document time: results carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins; there is no freshness mechanism in RAG, so staleness handling would have to be added.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry only text/score/metadata, parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
@@ -369,7 +369,7 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 
 **Jiuwen.** The knowledge-base path implements a dense-empty-to-sparse fallback but has no abstention: when both are empty it returns an empty list and the workflow component concatenates an empty context with no 'no answer' signal. Explicit abstention exists only in a separate retrieval subsystem, not in the KB RAG path.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 The KB path implements **dense-empty → sparse** fallback, but has **no abstention**: when both are empty it returns `[]` and the workflow component concatenates an empty context with no "no answer" signal. Explicit abstention (`is_abstain`, `abstain_no_backfill`) exists only in the separate Symphony progressive-retrieval engine, not in `core/retrieval` KB retrieval. `score_threshold` defaults to `None`.
@@ -401,7 +401,7 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 
 **Jiuwen.** Jiuwen provides streaming with per-call TTFT, parallel tool execution with resource lanes, KV/prefix cache affinity, a model failover rail, and an endpoint router. Reranking is optional and absent from the default knowledge-base path, so the rerank budget line is effectively zero unless you enable it; query-result caching is not provided.
 
-<details>
+<details open>
 <summary><b>Technical detail (classes &amp; functions)</b></summary>
 
 Provides streaming (ReAct → session → WebSocket frames) with per-call `ttft_ms`, parallel tool execution with resource lanes, KV/prefix cache affinity, a model backup/failover rail, and IntelliRouter for deployment selection. Reranking is **optional and absent from the default KB path** (graph store only), so the rerank budget is not spent unless wired. There is no latency/SLA-based routing or result cache.

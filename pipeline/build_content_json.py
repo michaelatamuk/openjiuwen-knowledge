@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Convert the interview markdown docs into a TYPED, LAYERED content.json (v2)
+"""Convert the knowledge markdown docs into a TYPED, LAYERED content.json (v2)
 for the native Android app, plus DIAGRAM assets.
 
 Diagrams now ship as SVG (light + dark) with parsed node geometry so the app can
@@ -19,7 +19,7 @@ import sys
 from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 OUT = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
 SVG_CACHE = os.path.join(ROOT, "build", ".mmd-cache")
 PNG_CACHE = os.path.join(ROOT, "build", ".mmd-png")

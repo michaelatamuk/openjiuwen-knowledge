@@ -27,11 +27,11 @@ The numbered `01`–`10` files were assembled from the archived docs: near-ident
 
 `pipeline/` builds an offline kit from these docs into `build/`:
 
-- `build/dist/jiuwenswarm-interview-offline.html` — one self-contained file with search, tap-to-reveal answers, and diagrams; works with no network on Windows and Android.
+- `build/dist/jiuwenswarm-knowledge-offline.html` — one self-contained file with search, tap-to-reveal answers, and diagrams; works with no network on Windows and Android.
 - `build/site/index.html` — a fully local website build (MkDocs Material) for desktop reading.
-- `build/dist/jiuwen-interview.apkg` — an Anki deck for spaced repetition (Anki / AnkiDroid).
-- `build/dist/jiuwenswarm-interview.epub` — an EPUB for e-readers.
-- `build/interview_questions-vault.zip` — an Obsidian vault.
+- `build/dist/jiuwen-knowledge.apkg` — an Anki deck for spaced repetition (Anki / AnkiDroid).
+- `build/dist/jiuwenswarm-knowledge.epub` — an EPUB for e-readers.
+- `build/knowledge-vault.zip` — an Obsidian vault.
 
 Rebuild instructions are in `pipeline/README.md`.
 

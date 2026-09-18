@@ -20,7 +20,7 @@ import zipfile
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 BUILD = os.path.join(ROOT, "build")
 DOCS = os.path.join(BUILD, "docs")
 SITE = os.path.join(BUILD, "site")

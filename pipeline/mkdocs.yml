@@ -1,5 +1,5 @@
-site_name: Jiuwen Interview Prep
-site_description: Offline study build of the Jiuwen interview question bank
+site_name: Jiuwen Knowledge Base
+site_description: Offline build of the Jiuwen AI-Engineering Knowledge Base
 docs_dir: ../build/docs
 site_dir: ../build/site
 use_directory_urls: false

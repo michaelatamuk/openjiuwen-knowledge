@@ -5,7 +5,7 @@ Title -> Summary -> Key points -> Explanation -> concept diagram -> Jiuwen
 (plain) -> Technical detail (as a labeled section; EPUB readers don't reliably
 support <details>). Diagrams are embedded PNGs.
 
-Output: build/dist/jiuwenswarm-interview.epub
+Output: build/dist/jiuwenswarm-knowledge.epub
 """
 import os
 import re
@@ -20,7 +20,7 @@ except Exception as e:
     raise SystemExit("needs markdown + ebooklib: " + str(e))
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
-ROOT = os.path.dirname(HERE)                         # .../interview_questions
+ROOT = os.path.dirname(HERE)                         # repo root
 ASSETS = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
 DIST = os.path.join(ROOT, "build", "dist")
 CONTENT = os.path.join(ASSETS, "content.json")
@@ -45,8 +45,8 @@ def md(t):
 def main():
     data = json.load(open(CONTENT, encoding="utf-8"))
     book = epub.EpubBook()
-    book.set_identifier("jiuwenswarm-interview-prep")
-    book.set_title("Jiuwenswarm Interview Prep")
+    book.set_identifier("jiuwenswarm-knowledge-base")
+    book.set_title("Jiuwen Knowledge Base")
     book.set_language("en")
     book.add_author("Jiuwenswarm")
     style = epub.EpubItem(uid="style", file_name="style/main.css", media_type="text/css", content=CSS)
@@ -105,7 +105,7 @@ def main():
     book.add_item(epub.EpubNav())
     book.spine = ["nav"] + chapters
     os.makedirs(DIST, exist_ok=True)
-    out = os.path.join(DIST, "jiuwenswarm-interview.epub")
+    out = os.path.join(DIST, "jiuwenswarm-knowledge.epub")
     epub.write_epub(out, book)
     print(f"wrote {out} ({os.path.getsize(out)//1024} KB, {len(chapters)} chapters, {len(images)} images)")
 
