@@ -37,6 +37,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -340,8 +341,8 @@ fun TechnicalDetail(
     if (text.isBlank() && citations.isEmpty() && diagram == null && sources.isEmpty()) return
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
-        TextButton(onClick = { open = !open }) {
-            Text(if (open) "Hide under the hood" else "Under the hood")
+        OutlinedButton(onClick = { open = !open }) {
+            Text(if (open) "Hide under the hood" else "Show under the hood")
         }
         if (open) {
             if (text.isNotBlank()) {
