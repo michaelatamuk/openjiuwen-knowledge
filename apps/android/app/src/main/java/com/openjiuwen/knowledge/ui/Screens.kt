@@ -355,8 +355,6 @@ fun QuestionScreen(repo: Repo, questionId: String) {
     val q by repo.question(questionId).collectAsStateWithLifecycle(null)
     val card by repo.card(questionId).collectAsStateWithLifecycle(null)
     val bookmarks by repo.bookmarkIds().collectAsStateWithLifecycle(emptyList())
-    val note by repo.note(questionId).collectAsStateWithLifecycle(null)
-    var noteText by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val isBookmarked = bookmarks.contains(questionId)
 
@@ -413,19 +411,6 @@ fun QuestionScreen(repo: Repo, questionId: String) {
         Spacer(Modifier.height(12.dp))
         LinearProgressIndicator(progress = { ((card?.state ?: 0).coerceIn(0, 3)) / 3f },
             modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(16.dp))
-        Text("Your note", style = MaterialTheme.typography.titleSmall)
-        OutlinedTextField(
-            value = noteText ?: note?.text ?: "",
-            onValueChange = { noteText = it },
-            modifier = Modifier.fillMaxWidth(), minLines = 2,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        )
-        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-            TextButton(onClick = {
-                scope.launch { repo.saveNote(questionId, noteText ?: note?.text ?: ""); noteText = null }
-            }) { Text("Save note") }
-        }
     }
 }
 
