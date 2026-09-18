@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -338,6 +340,8 @@ fun TechnicalDetail(
     var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
         TextButton(onClick = { open = !open }) {
+            Icon(if (open) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
+            Spacer(Modifier.width(6.dp))
             Text(if (open) "Hide under the hood" else "Under the hood")
         }
         if (open) {

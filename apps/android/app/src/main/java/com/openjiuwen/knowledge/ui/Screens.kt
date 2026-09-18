@@ -186,11 +186,10 @@ fun StudyScreen(repo: Repo, onOpen: (String) -> Unit) {
             Spacer(Modifier.height(12.dp))
 
             if (reveal >= 1) {
-                if (item.question.title.isNotBlank())
-                    Text(item.question.title, style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 if (item.question.tldr.isNotBlank()) {
-                    Spacer(Modifier.height(4.dp))
+                    Text("TL;DR", style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.height(2.dp))
                     Text(item.question.tldr, style = MaterialTheme.typography.bodyMedium)
                 }
                 Spacer(Modifier.height(8.dp))
@@ -369,7 +368,6 @@ fun QuestionScreen(repo: Repo, questionId: String) {
     val diagrams = remember(item) { repo.diagrams(item) }
     val techDiagram = remember(item) { repo.diagramTechnical(item) }
     val meta = remember(item) { repo.meta(item) }
-    val prov = remember(item) { repo.provenance(item) }
     val topics by repo.topics.collectAsStateWithLifecycle(emptyList())
     val topic = topics.find { it.id == item.topicId }
 
@@ -395,6 +393,9 @@ fun QuestionScreen(repo: Repo, questionId: String) {
         MetaLine(item.type, meta.difficulty)
         if (item.tldr.isNotBlank()) {
             Spacer(Modifier.height(8.dp))
+            Text("TL;DR", style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.height(2.dp))
             Text(item.tldr, style = MaterialTheme.typography.bodyMedium)
         }
         Spacer(Modifier.height(12.dp))
@@ -409,9 +410,6 @@ fun QuestionScreen(repo: Repo, questionId: String) {
         TechnicalDetail(if (plainJ.isBlank()) "" else item.mechanism, citations, techDiagram, repo.provenance(item).sources)
         BulletList("Pitfalls", pitfalls)
         BulletList("Likely follow-ups", followups)
-        Spacer(Modifier.height(8.dp))
-        Text("${meta.difficulty} · ${meta.tags.joinToString()} · reviewed ${prov.reviewedAt}",
-            style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))
         LinearProgressIndicator(progress = { ((card?.state ?: 0).coerceIn(0, 3)) / 3f },
             modifier = Modifier.fillMaxWidth())
