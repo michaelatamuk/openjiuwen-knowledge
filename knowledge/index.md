@@ -2,6 +2,9 @@
 
 Concepts and how the Jiuwen codebase implements them — organized by topic, with offline study formats. Every entry pairs a short framework-agnostic **General** answer with a **Jiuwen** answer describing how this codebase implements it (or explicitly does not), plus a diagram and `file:line` **Anchors**.
 
+**Browse online:** https://michaelatamuk.github.io/openjiuwen-knowledge/
+**Android app:** [download the latest APK](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest) (offline study app; debug-signed)
+
 ## Structure
 
 ```
@@ -18,7 +21,7 @@ openjiuwen-knowledge/
   build/                        generated artifacts — site, EPUB, Anki, … (gitignored)
 ```
 
-The numbered `01`–`10` files were assembled from the archived docs: near-identical and same-concept questions were merged, so each question appears once. Patterns and the glossary are reference material, not questions.
+The numbered `01`–`10` files were assembled from the archived docs: near-identical and same-concept questions were merged, so each question appears once. The glossary and the pattern sections (`90`–`93`) are key material in their own right.
 
 ## Study offline (plane / phone)
 
@@ -34,7 +37,7 @@ Rebuild instructions are in `pipeline/README.md`.
 
 ## Read in this order
 
-The numbered files are in recommended study order: foundations → prompting → RAG → agents → evaluation → production → security → fine-tuning → general, with reference docs first (glossary) and last (architecture patterns).
+The numbered files are in recommended study order: foundations → prompting → RAG → agents → evaluation → production → security → fine-tuning → general, with the glossary first and the architecture patterns last.
 
 | File | Questions | Focus |
 |---|---|---|
@@ -49,7 +52,7 @@ The numbered files are in recommended study order: foundations → prompting →
 | [09-fine-tuning-and-customization.md](09-fine-tuning-and-customization.md) | 6 | Full FT vs LoRA, instruction tuning, when to fine-tune, small-dataset risk |
 | [10-general-engineering.md](10-general-engineering.md) | 5 | Model selection, framework/team fit, rule-based vs LLM, release safety, stakeholder tradeoffs |
 
-## Reference docs
+## Glossary and patterns
 
 | File | Scope |
 |---|---|

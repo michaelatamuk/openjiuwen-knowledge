@@ -51,8 +51,7 @@ nav:
   - Security & safety: 08-security-and-safety.md
   - Fine-tuning: 09-fine-tuning-and-customization.md
   - General engineering: 10-general-engineering.md
-  - Reference:
-      - Terms glossary: 90-llm-terms-glossary.md
-      - AI engineer patterns: 91-ai-engineer-interview-patterns.md
-      - LLM interview patterns: 92-llm-interview-patterns.md
-      - LLM architecture patterns: 93-llm-architecture-patterns.md
+  - LLM terms glossary: 90-llm-terms-glossary.md
+  - AI engineer patterns: 91-ai-engineer-interview-patterns.md
+  - LLM interview patterns: 92-llm-interview-patterns.md
+  - LLM architecture patterns: 93-llm-architecture-patterns.md
