@@ -112,7 +112,9 @@ def main():
     readme = os.path.join(ROOT, "README.md")
     if os.path.isfile(readme):
         text = open(readme, encoding="utf-8").read()
-        text = text.replace("](README.md)", "](index.md)").replace("](source/README.md)", "](index.md)")
+        text = (text.replace("](README.md)", "](index.md)")
+                    .replace("](source/README.md)", "](index.md)")
+                    .replace("](content/topics/", "]("))
         open(os.path.join(OUT, "index.md"), "w", encoding="utf-8", newline="\n").write(text)
     print(f"wrote {len(data['topics'])} markdown files to {OUT}")
 

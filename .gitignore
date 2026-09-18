@@ -19,3 +19,7 @@ __pycache__/
 *.py[cod]
 .venv/
 node_modules/
+
+# IDE / editor
+.idea/
+.vscode/
