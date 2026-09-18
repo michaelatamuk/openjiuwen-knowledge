@@ -63,20 +63,28 @@ def main():
             tech_html = ""
             plain = q.get("jiuwenPlain", "")
             tech_text = q.get("mechanism", "") if plain else ""
-            if tech_text or q.get("citations") or tech.get("image"):
-                cites = "".join(
-                    f'<div><code>{html.escape(c.get("ref",""))}</code> {html.escape(c.get("desc",""))}</div>'
-                    for c in q.get("citations", [])
-                )
-                tech_img = ""
+            sources = q.get("provenance", {}).get("sources") or []
+            if tech_text or q.get("citations") or tech.get("image") or sources:
+                tparts = []
+                if tech_text:
+                    tparts.append("<h4>Implementation</h4>" + md(tech_text))
+                if q.get("citations"):
+                    rows = "".join(
+                        f'<tr><td class="a"><code>{html.escape(c.get("ref",""))}</code></td>'
+                        f'<td>{html.escape(c.get("desc",""))}</td></tr>'
+                        for c in q.get("citations", []))
+                    tparts.append("<h4>Code anchors</h4><table class='anchors'>" + rows + "</table>")
                 if tech.get("image"):
                     tp = os.path.join(ASSETS, tech["image"].replace("/", os.sep))
                     if os.path.isfile(tp):
                         media[os.path.basename(tp)] = tp
-                        tech_img = diagram_img(tech["image"])
+                        tparts.append("<h4>Implementation diagram</h4>" + diagram_img(tech["image"]))
+                if sources:
+                    tparts.append("<h4>Canonical source</h4><div class='cite'>"
+                                  + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
                 tech_html = (
-                    "<details open><summary>Technical detail (classes &amp; functions)</summary>"
-                    + md(tech_text) + cites + tech_img + "</details>"
+                    "<details><summary>Jiuwen technical detail (classes &amp; functions)</summary>"
+                    + "".join(tparts) + "</details>"
                 )
             title = f'<div style="color:#4c5bd4;font-weight:700;font-size:13px">{html.escape(q["title"])}</div>' if q.get("title") else ""
             summary = f'<p style="color:#333">{html.escape(q.get("tldr",""))}</p>' if q.get("tldr") else ""
@@ -114,7 +122,7 @@ def main():
             "qfmt": '<div style="color:#3f51b5;font-size:12px;font-weight:700">{{Topic}}</div><div style="font-size:18px;font-weight:600">{{Question}}</div>',
             "afmt": '{{FrontSide}}<hr id="answer">{{Answer}}',
         }],
-        css=".card{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;text-align:left;background:#fff;color:#222;line-height:1.5}code{background:#f2f2f2;padding:1px 4px;border-radius:4px}details{margin-top:8px}",
+        css=".card{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;text-align:left;background:#fff;color:#222;line-height:1.5}code{background:#f2f2f2;padding:1px 4px;border-radius:4px}details{margin-top:8px}h4{margin:.6em 0 .15em;font-size:14px;color:#4c5bd4}table.anchors{width:100%;border-collapse:collapse;font-size:13px}table.anchors td{border-bottom:1px solid #e5e5e5;padding:2px 4px;vertical-align:top}table.anchors td.a{white-space:nowrap}table.anchors code{font-size:12px;word-break:break-all}.cite{font-size:12px;color:#555}",
     )
     deck = genanki.Deck(did, "Jiuwen Knowledge Base")
     for c in cards:

@@ -1,81 +1,56 @@
 {
  "09-1": {
-  "title": "Prompt injection defenses",
-  "tldr": "Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.",
+  "title": "Supervisor vs peer-to-peer",
+  "tldr": "A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.",
   "points": [
-   "Direct and indirect injection.",
-   "Treat content as data, not instructions.",
-   "Delimit/label untrusted content.",
-   "Enforce privilege outside the model."
+   "Supervisor: top-down, workers-as-tools.",
+   "Peer-to-peer: shared board/bus, equals.",
+   "Different control and failure modes."
   ]
  },
  "09-2": {
-  "title": "Untrusted tool output and documents",
-  "tldr": "Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.",
+  "title": "Multi-agent communication",
+  "tldr": "Either a shared blackboard (task board/state) plus a message bus, or direct messaging; messages should be persisted and ordered for auditability, with routing (direct/broadcast/mentions).",
   "points": [
-   "Treat as data, not instructions.",
-   "Delimit and label as data.",
-   "Strip control/escape sequences.",
-   "Re-check permissions before privileged actions."
+   "Shared board + message bus.",
+   "Or direct message passing.",
+   "Persist and order; support routing."
   ]
  },
  "09-3": {
-  "title": "Handling jailbreak attempts",
-  "tldr": "Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.",
+  "title": "Agent output as another's input",
+  "tldr": "Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.",
   "points": [
-   "Assume the model can be manipulated.",
-   "Detect/block known patterns.",
-   "Permission-check privileged actions.",
-   "Sandbox and log."
+   "Subagent/tool call returns the value.",
+   "Handoff transfers control + context.",
+   "Shared board/bus carries the artifact."
   ]
  },
  "09-4": {
-  "title": "Per-user document authorization",
-  "tldr": "Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.",
+  "title": "Conflicting/redundant results",
+  "tldr": "Give each unit of work one owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign instead of release, dedupe dispatch, and isolate workspaces.",
   "points": [
-   "ACL metadata on every chunk.",
-   "Mandatory identity-derived filter.",
-   "Pre-filter in the store, not post-hoc."
+   "Single owner per task.",
+   "Atomic claim; reassign not release.",
+   "Dedupe dispatch; isolate workspaces."
   ]
  },
  "09-5": {
-  "title": "Preventing destructive actions",
-  "tldr": "Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.",
+  "title": "Debugging a multi-agent failure",
+  "tldr": "You need per-agent attribution: a trace/span tree where every agent, model, and tool call is a span with agent identity, plus durable conversation/task history to reconstruct order.",
   "points": [
-   "Classify by risk.",
-   "Deny known-dangerous patterns.",
-   "Approve the ambiguous middle.",
-   "Prefer reversible ops; fail closed."
+   "Per-agent span attribution.",
+   "Trace model/tool calls per member.",
+   "Durable history to reconstruct order."
   ]
  },
  "09-6": {
-  "title": "Preventing harmful or biased output",
-  "tldr": "Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.",
+  "title": "When multi-agent is overkill",
+  "tldr": "Multi-agent is justified when workstreams are genuinely independent, scopes differ (tools/permissions), or specialization would otherwise fight for one context; otherwise a single well-designed agent is simpler.",
   "points": [
-   "Safety instruction in the system prompt.",
-   "Input/output moderation.",
-   "Policy filters on output.",
-   "Red-team refusal behavior."
-  ]
- },
- "09-7": {
-  "title": "Preventing sensitive data leakage",
-  "tldr": "Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.",
-  "points": [
-   "Scrub secrets before model/logs.",
-   "Redact log fields (not drop whole events).",
-   "Gate secret-like egress.",
-   "Provider zero-retention."
-  ]
- },
- "09-8": {
-  "title": "Multi-tenant RAG isolation",
-  "tldr": "Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.",
-  "points": [
-   "Separate index per tenant (strongest).",
-   "Tenant key + mandatory pre-filter.",
-   "Row-level security.",
-   "Filter inside the store."
+   "Justified: independent parallel workstreams.",
+   "Justified: distinct tool/permission scopes.",
+   "Otherwise: a single agent is simpler."
   ]
  }
 }

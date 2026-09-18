@@ -132,5 +132,15 @@
    "Approximations — logprobs, entropy, self-consistency — are all imperfect.",
    "Abstention only helps if it correlates with being wrong."
   ]
+ },
+ "01-15": {
+  "title": "'How does the model know X': context window understanding",
+  "tldr": "'How does the model know X' is really testing context-window understanding.",
+  "points": [
+   "Strictest-bound budget.",
+   "Offload large tool results.",
+   "Multi-stage compaction.",
+   "FIFO drop beyond message cap."
+  ]
  }
 }

@@ -19,16 +19,28 @@
 
 **Jiuwen.** Jiuwen provides the ingestion pipeline, hybrid retrieval with rank fusion, optional rerankers (wired only into the graph store), and the context-plus-generation path through its workflow components; the product adds session cost tracking and a per-session cost cap. What a design must add on top: caching, autoscaling, reranking in the knowledge-base path, and production monitoring.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_index`), hybrid retrieval with RRF, optional rerankers (graph store only), and the context/generation path via `KnowledgeRetrievalComponent` + `LLMComponent`. Product adds session cost tracking and a per-session cost cap. Gaps a design must cover: no packaged end-to-end RAG agent, no token budgeting on retrieved context, no quality monitoring (only error/latency tracing), and no semantic response cache.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96/110/182` — ingest/retrieve pipeline<br>&bull; `agent-core/openjiuwen/core/retrieval/utils/fusion.py:15` — RRF hybrid merge<br>&bull; `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109/243` — context assembly<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47` — exact tool result cache</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96/110/182` | ingest/retrieve pipeline |
+| `agent-core/openjiuwen/core/retrieval/utils/fusion.py:15` | RRF hybrid merge |
+| `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109/243` | context assembly |
+| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | session cost cap |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47` | exact tool result cache |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -51,16 +63,27 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 **Jiuwen.** The contract is delete-by-document-id plus rebuild: indexers scan a document's chunk ids, delete them, then re-chunk, re-embed, and write (Milvus flushes in between to defeat eventual consistency); new documents append into the existing ANN index with no full re-index. The document id is a first-class scalar-indexed field. There is no code-aware or function-boundary chunker, so a codebase assistant would need to add that.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking supports char/token/hybrid but has no code-aware/function-boundary chunker.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:219` — update_documents; :74 add_documents appends<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/chroma_indexer.py:198` — update_index = delete + build; :217 delete by doc_id<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:209` — delete + flush + rebuild; :346 INVERTED scalar index<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19` — structural no-split guard</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:219` | update_documents; :74 add_documents appends |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/chroma_indexer.py:198` | update_index = delete + build; :217 delete by doc_id |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:209` | delete + flush + rebuild; :346 INVERTED scalar index |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19` | structural no-split guard |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -83,16 +106,28 @@ The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, d
 
 **Jiuwen.** Jiuwen supports metadata filtering at the store layer (Milvus expressions, Chroma where-clauses, PG JSONB), per-knowledge-base collections, a permission engine, and audit logging. But the retriever layer drops the configured filters — concrete retrievers hardcode filters to None — so permission-aware retrieval is not reachable through the knowledge-base path; you would have to re-plumb filters through the retriever.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`, PG JSONB) and per-KB collections (`kb_{kb_id}_chunks`), plus a permission engine and audit logging. But the retriever layer **drops** `RetrievalConfig.filters` — concrete retrievers hardcode `filters=None` — so permission-aware retrieval is not reachable through the KB path, and there is no document/chunk ACL field. Permission-aware retrieval would require re-plumbing filters through the retriever.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:53` — RetrievalConfig.filters; agent-core/openjiuwen/core/retrieval/retriever/base.py:19 — abstract retrieve has no filters; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186 — KB passes filters; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88 / agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81 — hardcoded filters=None<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215` — Milvus filter expr; agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265 — where; agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:474 — JSONB<br>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` — kb_{kb_id}_chunks<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` — check_permission (tool/file/net, not retrieval)<br>&bull; `agent-core/openjiuwen/core/common/security/user_config.py:69` — sensitive-path config (filesystem, not doc ACL)</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/common/config.py:53` | RetrievalConfig.filters; agent-core/openjiuwen/core/retrieval/retriever/base.py:19 — abstract retrieve has no filters; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186 — KB passes filters; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88 / agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81 — hardcoded filters=None |
+| `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215` | Milvus filter expr; agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265 — where; agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:474 — JSONB |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks |
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` | check_permission (tool/file/net, not retrieval) |
+| `agent-core/openjiuwen/core/common/security/user_config.py:69` | sensitive-path config (filesystem, not doc ACL) |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -115,16 +150,29 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 
 **Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no sharding, partitioning, replication, or multi-collection fan-out in the repo — those are the backend's job.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no sharding, partitioning, replica, or multi-collection fan-out anywhere.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` — create_vector_store (Milvus/Chroma/PGVector); agent-core/openjiuwen/core/retrieval/common/config.py:67 — store type enum<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:433` — index type AUTOINDEX/HNSW/IVF/FLAT/SCANN; :346 inverted scalar indexes<br>&bull; `agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282` — MilvusHNSW (M=30, efConstruction=360); :100 IVFFlat defaults; :164 SCANN<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:203` — HNSW index; agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37 — pgvector defaults<br>&bull; `agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47` — Chroma HNSW defaults<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/base.py:57` — add(..., batch_size=128)</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` | create_vector_store (Milvus/Chroma/PGVector); agent-core/openjiuwen/core/retrieval/common/config.py:67 — store type enum |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:433` | index type AUTOINDEX/HNSW/IVF/FLAT/SCANN; :346 inverted scalar indexes |
+| `agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282` | MilvusHNSW (M=30, efConstruction=360); :100 IVFFlat defaults; :164 SCANN |
+| `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:203` | HNSW index; agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37 — pgvector defaults |
+| `agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47` | Chroma HNSW defaults |
+| `agent-core/openjiuwen/core/retrieval/vector_store/base.py:57` | add(..., batch_size=128) |
+
+**Canonical source**
+
+<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -146,16 +194,26 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 **Jiuwen.** Jiuwen has no sharding or hash/range partitioning. The only partition-like unit is a per-knowledge-base collection plus a database-name field; there are no Milvus partition keys, no shard config, and no tenant-hash routing. So sharding would be handled entirely by the chosen backend, not by this code.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 **No sharding or hash/range partitioning.** The only partition-like unit is the per-KB collection (`kb_{kb_id}_chunks`/`_triples`) plus the `database_name` field. There are no Milvus partition keys, shard config, or tenant-hash routing.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` — kb_{kb_id}_chunks<br>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:79` — database_name<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:512` — delete_table/drop granularity only</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:79` | database_name |
+| `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:512` | delete_table/drop granularity only |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -177,16 +235,28 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 
 **Jiuwen.** Growth is handled by append-only batched writes into a pre-existing ANN index, so adding documents does not trigger a full re-index. Fast deletes and filters use a Milvus inverted scalar index on document and chunk ids, and a search-time recall knob scales with top-k. There is no query result cache and no reindex or compaction trigger.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Growth is handled by append-only batched writes into a pre-existing ANN index; existing vectors are untouched, so adding documents triggers no full re-index. Fast deletes/filters use the Milvus inverted scalar index on `document_id`/`chunk_id`. `get_search_params` derives `ef = top_k * efSearchFactor` per query (a search-time recall knob). `lazy_load` defers heavy module imports (Milvus/Chroma/parsers), not data. There is **no query result cache**, no reindex/compaction trigger, and no `ALTER INDEX` path — once the collection is created, ANN algorithm/params cannot change.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:519` — _ensure_loaded lazy load; :144 index_type change guard; :117 get_search_params ef dial; :199 flush after write<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:321` — _ensure_collection no-op if exists; :346 inverted scalar indexes<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:157` — reflects existing table; :203 index created once<br>&bull; `agent-core/openjiuwen/core/retrieval/lazy_load.py:143` — lazy_load (module imports)<br>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74` — add_documents appends via build_index</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:519` | _ensure_loaded lazy load; :144 index_type change guard; :117 get_search_params ef dial; :199 flush after write |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:321` | _ensure_collection no-op if exists; :346 inverted scalar indexes |
+| `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:157` | reflects existing table; :203 index created once |
+| `agent-core/openjiuwen/core/retrieval/lazy_load.py:143` | lazy_load (module imports) |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74` | add_documents appends via build_index |
+
+**Canonical source**
+
+<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -209,18 +279,31 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 
 **Jiuwen.** Three backends sit behind one factory: Chroma (local, vector-only — sparse and hybrid are rejected), Milvus (server, native BM25 and hybrid with rank fusion), and PostgreSQL plus pgvector (server, full-text sparse plus vector). The knowledge base selects the index type (hybrid by default), so hybrid requires Milvus or PG; Chroma is the small local choice.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Three backends behind one factory: Chroma (local persisted, **vector-only** — sparse/hybrid rejected), Milvus (server, native BM25 + hybrid with RRF), PostgreSQL+pgvector (server, `tsvector` sparse + vector). The KB selects the index type (`hybrid` default). So hybrid/RRF requires Milvus or PG; Chroma is the small/local choice.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` — factory dispatch; agent-core/openjiuwen/core/retrieval/common/config.py:67 — StoreType = Milvus | Chroma | PGVector<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` — PersistentClient (local); agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — MilvusClient(uri=...) (server); agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — create_async_engine(...)<br>&bull; `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` — Chroma rejects sparse/hybrid in local mode<br>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:32/60` — index types hybrid/bm25/vector</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` | factory dispatch; agent-core/openjiuwen/core/retrieval/common/config.py:67 — StoreType = Milvus \| Chroma \| PGVector |
+| `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` | PersistentClient (local); agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — MilvusClient(uri=...) (server); agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — create_async_engine(...) |
+| `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` | Chroma rejects sparse/hybrid in local mode |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:32/60` | index types hybrid/bm25/vector |
+
+**Implementation diagram**
 
 ![diagram](assets/diagrams/6abca665976ef1d20b7cbc7aef0a5ca57f968b55.png)
 
-</details>
+**Canonical source**
 
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
+
+</details>
 
 ---
 
@@ -242,16 +325,27 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 **Jiuwen.** The factory can create Chroma (local), Milvus (server, which fits hosted or self-managed), and PostgreSQL plus pgvector (self-managed relational). The choice is pure config; the repo provides no autoscaling, managed-service integration, or ops tooling, so the operational side is entirely on you.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 `create_vector_store` dispatches Chroma (local/embedded), Milvus (server, fits hosted or self-managed), and PostgreSQL+pgvector (self-managed relational). The choice is pure config; there is no autoscaling, managed-service integration, or ops tooling in-repo. Chroma local cannot do hybrid, so production hybrid means Milvus or PG.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` — factory<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` — local; agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — server; agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — relational<br>&bull; `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` — Chroma rejects hybrid<br>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:67` — StoreType</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` | factory |
+| `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` | local; agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — server; agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — relational |
+| `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` | Chroma rejects hybrid |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:67` | StoreType |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -274,16 +368,27 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 **Jiuwen.** There is no availability fallback for a down vector database: dense search does not catch exceptions, so a store failure propagates and fails the workflow node. Sparse searches silently return empty on error, hybrid has a same-database split-search fallback, and multi-KB retrieval swallows per-KB errors. There is no circuit breaker, health probe, or result cache.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 There is **no availability fallback** for a down vector DB. Dense `search()` does not catch exceptions — a store failure propagates through the retriever and fails the workflow node. Sparse searches silently return `[]` on error, Milvus hybrid has a same-DB split-search fallback, and `retrieve_multi_kb` swallows per-KB errors (empty list), which contains blast radius across KBs. There is no circuit breaker, health probe, or result cache.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:357` — hybrid_search → _hybrid_search_fallback; :284 sparse_search returns []; :519 _ensure_loaded timeouts<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:326` — sparse/text returns [] on error<br>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:300` — retrieve_multi_kb swallows per-KB errors<br>&bull; `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:123` — re-raises build_error</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:357` | hybrid_search → _hybrid_search_fallback; :284 sparse_search returns []; :519 _ensure_loaded timeouts |
+| `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:326` | sparse/text returns [] on error |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:300` | retrieve_multi_kb swallows per-KB errors |
+| `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:123` | re-raises build_error |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -306,16 +411,29 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 **Jiuwen.** The contract is delete-by-document-id plus rebuild: the Chroma and Milvus indexers do not upsert — they find a document's chunk ids, delete them, then re-chunk, re-embed, and write, flushing Milvus in between. The document id is a first-class scalar-indexed field enabling filter deletes. Postgres is the only store with native upsert, but no indexer wraps it, and a crash between delete and rebuild loses the document.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** upsert: they scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency). `doc_id` is a first-class field (`document_id`, scalar-inverted in Milvus) enabling filter deletes. PG is the only store with native upsert-by-primary-key (`INSERT ... ON CONFLICT (id) DO UPDATE`), but no PG indexer wraps it. There is no atomic/transactional replace — a crash between delete and rebuild loses the document, and chunk IDs are regenerated UUIDs each run so "same document" relies solely on `doc_id`.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/knowledge_base.py:176/184` — abstract delete_documents / update_documents<br>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:192` — delete_documents; :219 update_documents<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/chroma_indexer.py:198` — update_index = delete + build; :217 delete by doc_id; :142 duplicate guard<br>&bull; `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:209` — delete + flush + rebuild; :231 filter delete document_id == doc_id<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:300` — INSERT ... ON CONFLICT DO UPDATE<br>&bull; `agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:253` — delete chunk + triple index; :294 update = delete + re-add</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/knowledge_base.py:176/184` | abstract delete_documents / update_documents |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:192` | delete_documents; :219 update_documents |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/chroma_indexer.py:198` | update_index = delete + build; :217 delete by doc_id; :142 duplicate guard |
+| `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:209` | delete + flush + rebuild; :231 filter delete document_id == doc_id |
+| `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:300` | INSERT ... ON CONFLICT DO UPDATE |
+| `agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:253` | delete chunk + triple index; :294 update = delete + re-add |
+
+**Canonical source**
+
+<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -338,16 +456,27 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 **Jiuwen.** The retrieval layer has no notion of document time: results carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins; there is no freshness mechanism in RAG, so staleness handling would have to be added.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry only text/score/metadata, parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/common/retrieval_result.py:23` — no timestamp field; agent-core/openjiuwen/core/retrieval/common/document.py:30 — TextChunk<br>&bull; `agent-core/openjiuwen/core/retrieval/utils/fusion.py:39` — RRF by text/rank; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:313 — max-score merge<br>&bull; `agent-core/openjiuwen/core/memory/manage/update/mem_update_checker.py:22/252` — memory-only conflict (newest wins)<br>&bull; `agent-core/openjiuwen/agent_evolving/experience/scorer.py:219` — calc_freshness (experiences only)</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/common/retrieval_result.py:23` | no timestamp field; agent-core/openjiuwen/core/retrieval/common/document.py:30 — TextChunk |
+| `agent-core/openjiuwen/core/retrieval/utils/fusion.py:39` | RRF by text/rank; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:313 — max-score merge |
+| `agent-core/openjiuwen/core/memory/manage/update/mem_update_checker.py:22/252` | memory-only conflict (newest wins) |
+| `agent-core/openjiuwen/agent_evolving/experience/scorer.py:219` | calc_freshness (experiences only) |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -369,16 +498,27 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 
 **Jiuwen.** The knowledge-base path implements a dense-empty-to-sparse fallback but has no abstention: when both are empty it returns an empty list and the workflow component concatenates an empty context with no 'no answer' signal. Explicit abstention exists only in a separate retrieval subsystem, not in the KB RAG path.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The KB path implements **dense-empty → sparse** fallback, but has **no abstention**: when both are empty it returns `[]` and the workflow component concatenates an empty context with no "no answer" signal. Explicit abstention (`is_abstain`, `abstain_no_backfill`) exists only in the separate Symphony progressive-retrieval engine, not in `core/retrieval` KB retrieval. `score_threshold` defaults to `None`.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:83` — dense-empty → sparse; agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:97 — same<br>&bull; `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241` — empty results → empty context<br>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:47` — score_threshold defaults None<br>&bull; `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305` — is_abstain; agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94; agent-core/openjiuwen/symphony/retrieval/search/runtime/progressive.py:1060 — abstain_no_backfill</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:83` | dense-empty → sparse; agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:97 — same |
+| `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241` | empty results → empty context |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:47` | score_threshold defaults None |
+| `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305` | is_abstain; agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94; agent-core/openjiuwen/symphony/retrieval/search/runtime/progressive.py:1060 — abstain_no_backfill |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -401,15 +541,27 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 
 **Jiuwen.** Jiuwen provides streaming with per-call TTFT, parallel tool execution with resource lanes, KV/prefix cache affinity, a model failover rail, and an endpoint router. Reranking is optional and absent from the default knowledge-base path, so the rerank budget line is effectively zero unless you enable it; query-result caching is not provided.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Provides streaming (ReAct → session → WebSocket frames) with per-call `ttft_ms`, parallel tool execution with resource lanes, KV/prefix cache affinity, a model backup/failover rail, and IntelliRouter for deployment selection. Reranking is **optional and absent from the default KB path** (graph store only), so the rerank budget is not spent unless wired. There is no latency/SLA-based routing or result cache.
 
-<sub>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:336` — parallel_tool_calls; :1758 ttft_ms; :2938 stream<br>&bull; `agent-core/openjiuwen/core/single_agent/ability_manager.py:431/467` — parallel batches + parallel_safe lanes<br>&bull; `agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9` — ModelBackupRail.on_model_exception failover<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/session/kv_cache/kv_cache_model_provider.py:80` — KV/prefix affinity<br>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182` — KB path calls no reranker</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:336` | parallel_tool_calls; :1758 ttft_ms; :2938 stream |
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:431/467` | parallel batches + parallel_safe lanes |
+| `agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9` | ModelBackupRail.on_model_exception failover |
+| `jiuwenswarm/jiuwenswarm/server/runtime/session/kv_cache/kv_cache_model_provider.py:80` | KV/prefix affinity |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182` | KB path calls no reranker |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---

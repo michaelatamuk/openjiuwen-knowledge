@@ -3,7 +3,7 @@
 > Every concept answered twice: the general idea, and how the Jiuwen codebase
 > actually implements it.
 
-207 entries · 14 sections · readable as a website, EPUB, Anki deck, or offline Android app.
+205 entries · 18 topics in 6 sections · readable as a website, EPUB, Anki deck, or offline Android app.
 
 ## Start here
 
@@ -19,7 +19,7 @@ Each entry is layered so you can stop as soon as you have your answer:
 1. **Title, Summary, Key points** — a ten-second pass.
 2. **Explanation** — the framework-agnostic answer, plus a concept diagram.
 3. **Jiuwen** — how this codebase implements it, in plain language (or an explicit "it doesn't").
-4. **Technical detail** — the classes, functions, and `file:line` anchors.
+4. **Jiuwen technical detail** — the classes, functions, and `file:line` anchors (this part is specific to the Jiuwen codebase).
 
 A real entry looks like this:
 
@@ -35,33 +35,35 @@ A real entry looks like this:
 
 ## Contents
 
-### Foundations (39)
-- [LLM foundations](01-llm-foundations.md) — 14
-- [Prompting and output control](02-prompting-and-output-control.md) — 5
+### Model foundations (44)
+- [LLM foundations](01-llm-foundations.md) — 15
+- [Prompting and output control](02-prompting-and-output-control.md) — 6
 - [LLM terms glossary](03-llm-terms-glossary.md) — 20
+- [Choosing models and approaches](04-choosing-models-and-approaches.md) — 3
 
-### Agents (45)
-- [Agents, tools and memory](04-agents-tools-and-memory.md) — 45
+### Agents (51)
+- [Agent fundamentals and the loop](05-agent-fundamentals-and-the-loop.md) — 11
+- [Tools and function calling](06-tools-and-function-calling.md) — 10
+- [Planning, memory and state](07-planning-memory-and-state.md) — 15
+- [Agent frameworks](08-agent-frameworks.md) — 9
+- [Multi-agent systems](09-multi-agent-systems.md) — 6
 
-### Retrieval and RAG (54)
-- [RAG and retrieval](05-rag-and-retrieval.md) — 41
-- [RAG system design](06-rag-system-design.md) — 13
+### RAG (60)
+- [RAG pipelines and patterns](10-rag-pipelines-and-patterns.md) — 19
+- [Retrieval and ranking](11-retrieval-and-ranking.md) — 11
+- [Query understanding](12-query-understanding.md) — 6
+- [RAG failure modes and evaluation](13-rag-failure-modes-and-evaluation.md) — 11
+- [RAG system design](14-rag-system-design.md) — 13
 
-### Quality and operations (29)
-- [Evaluation](07-evaluation.md) — 21
-- [Production, cost and scale](08-production-cost-and-scale.md) — 8
+### Evaluation and production (34)
+- [Evaluation](15-evaluation.md) — 23
+- [Production, cost and scale](16-production-cost-and-scale.md) — 11
 
-### Trust and safety (8)
-- [Security and safety](09-security-and-safety.md) — 8
+### Model adaptation (6)
+- [Fine-tuning and customization](17-fine-tuning-and-customization.md) — 6
 
-### Customization and engineering (11)
-- [Fine-tuning and customization](10-fine-tuning-and-customization.md) — 6
-- [General engineering](11-general-engineering.md) — 5
-
-### Patterns (21)
-- [AI engineer interview patterns](12-ai-engineer-interview-patterns.md) — 7
-- [LLM interview patterns](13-llm-interview-patterns.md) — 7
-- [LLM architecture patterns](14-llm-architecture-patterns.md) — 7
+### Safety and security (10)
+- [Security and safety](18-security-and-safety.md) — 10
 
 ## Formats
 

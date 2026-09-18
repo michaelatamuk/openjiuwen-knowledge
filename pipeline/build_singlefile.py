@@ -45,17 +45,15 @@ def inline_img(rel):
     return f'<div class="diagram"><img src="data:image/png;base64,{data}" alt="diagram"></div>'
 
 
-def citations_html(cites):
+def anchors_table(cites):
     if not cites:
         return ""
-    chips = "".join(
-        f'<span class="chip"><code>{html.escape(c.get("symbol") or c.get("ref",""))}</code>'
-        f'<span class="chipbody">{html.escape(c.get("ref",""))}'
-        + (f' — {html.escape(c.get("desc",""))}' if c.get("desc") else "")
-        + "</span></span>"
+    rows = "".join(
+        f'<tr><td class="a"><code>{html.escape(c.get("ref",""))}</code></td>'
+        f'<td>{html.escape(c.get("desc",""))}</td></tr>'
         for c in cites
     )
-    return f'<div class="chips">{chips}</div>'
+    return f'<table class="anchors"><tbody>{rows}</tbody></table>'
 
 
 def points_html(points):
@@ -89,9 +87,12 @@ body:not(.study) .answer{display:block}
 details{margin:8px 0}summary{cursor:pointer;color:var(--accent);font-weight:600}
 .diagram{text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0}
 .diagram svg{max-width:100%;height:auto}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
-.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px}
-.chipbody{display:none}
+.tech-t{color:var(--accent);font-weight:700;margin:12px 0 4px;font-size:13px}
+table.anchors{width:100%;border-collapse:collapse;font-size:12px}
+table.anchors td{border-bottom:1px solid var(--line);padding:3px 6px;vertical-align:top}
+table.anchors td.a{white-space:nowrap}
+table.anchors code{font-size:11px;word-break:break-all}
+.src{font-size:12px;color:var(--muted)}
 mark{background:#ffe680}
 """
 
@@ -116,12 +117,22 @@ def build():
             plain = q.get("jiuwenPlain", "")
             jiu = md(plain) or md(q.get("mechanism", ""))
             tech_text = q.get("mechanism", "") if plain else ""
+            tparts = []
+            if tech_text:
+                tparts.append('<div class="tech-t">Implementation</div>' + md(tech_text))
+            if q.get("citations"):
+                tparts.append('<div class="tech-t">Code anchors</div>' + anchors_table(q["citations"]))
+            if tech:
+                tparts.append('<div class="tech-t">Implementation diagram</div>' + tech)
+            srcs = q.get("provenance", {}).get("sources") or []
+            if srcs:
+                tparts.append('<div class="tech-t">Canonical source</div><div class="src">'
+                              + "".join(f'<code>{html.escape(s)}</code> ' for s in srcs) + "</div>")
             tech_block = ""
-            if tech_text or q.get("citations") or tech:
+            if tparts:
                 tech_block = (
-                    "<details open><summary>Technical detail (classes &amp; functions)</summary>"
-                    + md(tech_text) + citations_html(q.get("citations", [])) + tech
-                    + "</details>"
+                    "<details><summary>Jiuwen technical detail (classes &amp; functions)</summary>"
+                    + "".join(tparts) + "</details>"
                 )
             parts.append(
                 f'<section class="qa"><h2>{html.escape(q["question"])}</h2>{title}{summary}'

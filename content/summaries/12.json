@@ -1,71 +1,56 @@
 {
  "12-1": {
-  "title": "Design a RAG system: tests failure-mode awareness",
-  "tldr": "'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.",
+  "title": "Query rewriting vs expansion",
+  "tldr": "Rewriting makes a query self-contained (coreference, typos, prior-turn reliance); expansion adds terms/synonyms or a hypothetical answer (HyDE) to bridge vocabulary gaps.",
   "points": [
-   "Dense fallback only on empty, not on wrong.",
-   "score_threshold defaults none → weak chunks pass.",
-   "KB path never reranks.",
-   "Metadata filters dropped at the retriever."
+   "Rewriting: coreference/ellipsis, typos, drop turn dependence.",
+   "Expansion: synonyms or a hypothetical answer (HyDE).",
+   "Rewriting for multi-turn/malformed; expansion for vocabulary mismatch."
   ]
  },
  "12-2": {
-  "title": "Compare two approaches: tests tradeoff reasoning",
-  "tldr": "'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.",
+  "title": "Handling vague queries",
+  "tldr": "Detect ambiguity and either ask a clarifying question or rewrite to the most likely intent; cheap path is a rewrite, interactive path is a clarification turn.",
   "points": [
-   "top_k defaults 5, no adaptive policy.",
-   "Reranking absent from the KB path.",
-   "Model allocation is availability-based.",
-   "Session cost tracked and capped."
+   "Rewrite resolves coreference/ellipsis for free.",
+   "Ask a clarification only when it changes the retrieval target.",
+   "Don't blindly retrieve on an ambiguous query."
   ]
  },
  "12-3": {
-  "title": "'The agent is stuck': tests shipped experience",
-  "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
+  "title": "Decomposing multi-part questions",
+  "tldr": "Split a compound question into independently answerable sub-questions, retrieve for each (often in parallel), then synthesize.",
   "points": [
-   "ReAct max_iterations (5; harness 15).",
-   "Agentic retriever max iter (2, clamped).",
-   "Anomaly rail: identical rounds → compact/abort.",
-   "Dedup rail + session cost cap."
+   "Break 'compare A and B on X and Y' into sub-questions.",
+   "Retrieve per sub-question; merge and dedupe.",
+   "Synthesize across the sub-answers."
   ]
  },
  "12-4": {
-  "title": "How do you know it's working: eval depth",
-  "tldr": "'How do you know it's working' tests evaluation depth, not confidence.",
+  "title": "Multi-hop retrieval",
+  "tldr": "Multi-hop runs more than one retrieval step, using the first hop's result to form the next query, because the answer needs a bridging entity not present in the original question.",
   "points": [
-   "Offline answer-level eval exists.",
-   "No retrieval metric layer.",
-   "No faithfulness/claim scoring.",
-   "No CI quality gate."
+   "The answer needs a bridging entity/fact.",
+   "Each hop feeds the next query.",
+   "Single-pass fails when the link isn't in the query."
   ]
  },
  "12-5": {
-  "title": "Scaling questions: thinking past the demo",
-  "tldr": "Scaling questions test whether you've thought past the demo.",
+  "title": "Multi-document questions",
+  "tldr": "Retrieve a candidate set per sub-query or entity, merge and deduplicate, and let the generator synthesize across them (or add an aggregation step).",
   "points": [
-   "Per-process bounded resources.",
-   "Shared HTTP pool + embedding/sub-agent semaphores.",
-   "Missing: autoscaling, distributed queues."
+   "Per-sub-query retrieval, then merge/dedupe.",
+   "Ranked-list fusion across queries.",
+   "Generator synthesizes across documents."
   ]
  },
  "12-6": {
-  "title": "Security-adjacent questions in disguise",
-  "tldr": "Security-adjacent questions are disguised as normal engineering questions.",
+  "title": "When to skip RAG",
+  "tldr": "Skip retrieval for general knowledge the model already holds, when latency/cost matter and the corpus won't add signal, or for conversational turns — but you need a way to decide.",
   "points": [
-   "Tool results not framed as untrusted.",
-   "Sanitizers exist, unused.",
-   "Prompt safety is advisory.",
-   "Real control is the shell/permission layer."
-  ]
- },
- "12-7": {
-  "title": "Stakeholder questions: judgment under pressure",
-  "tldr": "Stakeholder questions test judgment under pressure, not technical depth.",
-  "points": [
-   "Config flags (enable_*) gate behavior.",
-   "Human activation before hot-load.",
-   "RSI rollback with hash re-validation.",
-   "No eval-threshold gate or canary."
+   "Skip for general knowledge, reasoning, or code the model knows.",
+   "Skip when the corpus adds no signal and cost/latency matter.",
+   "Decide with a classifier or a sufficiency check."
   ]
  }
 }

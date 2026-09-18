@@ -35,6 +35,11 @@ h3{font-size:1em;color:#4c5bd4;margin:.8em 0 .2em}
 code{font-family:monospace;background:#f2f2f2;padding:0 2px}
 .diagram{text-align:center;margin:.6em 0}.diagram img{max-width:100%}
 .cite{font-size:.8em;color:#555}
+h4{font-size:.9em;color:#4c5bd4;margin:.7em 0 .15em}
+table.anchors{width:100%;border-collapse:collapse;font-size:.8em}
+table.anchors td{border-bottom:1px solid #ddd;padding:2px 4px;vertical-align:top}
+table.anchors td.a{white-space:nowrap}
+table.anchors code{font-size:.85em;word-break:break-all}
 """
 
 
@@ -74,16 +79,28 @@ def main():
             tech = ""
             plain = q.get("jiuwenPlain", "")
             tech_text = q.get("mechanism", "") if plain else ""
-            if tech_text or q.get("citations"):
-                cites = "".join(f'<div class="cite"><code>{html.escape(x.get("ref",""))}</code> {html.escape(x.get("desc",""))}</div>' for x in q.get("citations", []))
-                timg = ""
-                td = q.get("diagramTechnical", {}) or {}
+            sources = q.get("provenance", {}).get("sources") or []
+            td = q.get("diagramTechnical", {}) or {}
+            if tech_text or q.get("citations") or sources or td.get("image"):
+                tparts = ["<h3>Jiuwen technical detail (classes &amp; functions)</h3>"]
+                if tech_text:
+                    tparts.append("<h4>Implementation</h4>" + md(tech_text))
+                if q.get("citations"):
+                    rows = "".join(
+                        f'<tr><td class="a"><code>{html.escape(x.get("ref",""))}</code></td>'
+                        f'<td>{html.escape(x.get("desc",""))}</td></tr>'
+                        for x in q.get("citations", []))
+                    tparts.append("<h4>Code anchors</h4><table class='anchors'>" + rows + "</table>")
                 if td.get("image"):
                     tp = os.path.join(ASSETS, td["image"].replace("/", os.sep))
                     if os.path.isfile(tp):
                         images[os.path.basename(tp)] = tp
-                        timg = f'<div class="diagram"><img src="images/{os.path.basename(tp)}"/></div>'
-                tech = "<h3>Technical detail (classes &amp; functions)</h3>" + md(tech_text) + cites + timg
+                        tparts.append("<h4>Implementation diagram</h4>"
+                                      f'<div class="diagram"><img src="images/{os.path.basename(tp)}"/></div>')
+                if sources:
+                    tparts.append("<h4>Canonical source</h4><div class='cite'>"
+                                  + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
+                tech = "".join(tparts)
             parts.append(
                 f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{title}{summary}{pts}'
                 f'<h3>Explanation</h3>{md(q.get("explain",""))}{concept}'

@@ -45,5 +45,15 @@
    "Support activate/rollback and A/B without redeploying.",
    "Log the prompt version alongside outputs."
   ]
+ },
+ "02-6": {
+  "title": "Prompt behavior: versioning and testing",
+  "tldr": "Any prompt behavior question is secretly a versioning and testing question.",
+  "points": [
+   "Sections carry name/priority/category, no version.",
+   "Optimization overwrites in place.",
+   "Diagnostics ≠ versioning.",
+   "Rollback only at harness-package level."
+  ]
  }
 }

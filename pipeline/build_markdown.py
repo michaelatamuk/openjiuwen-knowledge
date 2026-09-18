@@ -19,12 +19,14 @@ CONTENT = os.path.join(ASSETS, "content.json")
 
 FNAME = {
     "01": "01-llm-foundations", "02": "02-prompting-and-output-control",
-    "03": "03-llm-terms-glossary", "04": "04-agents-tools-and-memory",
-    "05": "05-rag-and-retrieval", "06": "06-rag-system-design",
-    "07": "07-evaluation", "08": "08-production-cost-and-scale",
-    "09": "09-security-and-safety", "10": "10-fine-tuning-and-customization",
-    "11": "11-general-engineering", "12": "12-ai-engineer-interview-patterns",
-    "13": "13-llm-interview-patterns", "14": "14-llm-architecture-patterns",
+    "03": "03-llm-terms-glossary", "04": "04-choosing-models-and-approaches",
+    "05": "05-agent-fundamentals-and-the-loop", "06": "06-tools-and-function-calling",
+    "07": "07-planning-memory-and-state", "08": "08-agent-frameworks",
+    "09": "09-multi-agent-systems", "10": "10-rag-pipelines-and-patterns",
+    "11": "11-retrieval-and-ranking", "12": "12-query-understanding",
+    "13": "13-rag-failure-modes-and-evaluation", "14": "14-rag-system-design",
+    "15": "15-evaluation", "16": "16-production-cost-and-scale",
+    "17": "17-fine-tuning-and-customization", "18": "18-security-and-safety",
 }
 
 
@@ -35,12 +37,12 @@ def slug(s):
 def anchors_md(cites):
     if not cites:
         return ""
-    parts = []
+    rows = ["| Code anchor | What it points to |", "|---|---|"]
     for c in cites:
         ref = c.get("ref", "")
-        desc = c.get("desc", "")
-        parts.append(f"&bull; `{ref}`" + (f" — {desc}" if desc else ""))
-    return "<br>".join(parts)
+        desc = (c.get("desc", "") or "").replace("|", "\\|")
+        rows.append(f"| `{ref}` | {desc} |")
+    return "\n".join(rows)
 
 
 def write_diagram(rel):
@@ -90,21 +92,22 @@ def main():
             tech_img = write_diagram((q.get("diagramTechnical", {}) or {}).get("image", "")
                                      or (q.get("diagramTechnical", {}) or {}).get("svg", ""))
             tech_text = q.get("mechanism", "") if plain else ""
-            if tech_text or q.get("citations") or tech_img:
-                lines.append("<details open>")
-                lines.append("<summary><b>Technical detail (classes &amp; functions)</b></summary>")
+            sources = q.get("provenance", {}).get("sources") or []
+            if tech_text or q.get("citations") or tech_img or sources:
+                lines.append('<details markdown="1">')
+                lines.append("<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>")
                 lines.append("")
                 if tech_text:
-                    lines += [tech_text, ""]
+                    lines += ["**Implementation**", "", tech_text, ""]
                 if q.get("citations"):
-                    lines += [f"<sub>{anchors_md(q['citations'])}</sub>", ""]
+                    lines += ["**Code anchors**", "", anchors_md(q["citations"]), ""]
                 if tech_img:
-                    lines += [tech_img, ""]
+                    lines += ["**Implementation diagram**", "", tech_img, ""]
+                if sources:
+                    srcs = ", ".join(f"`{s}`" for s in sources)
+                    lines += ["**Canonical source**", "", f"<sub>{srcs}</sub>", ""]
                 lines.append("</details>")
                 lines.append("")
-            if q.get("provenance", {}).get("sources"):
-                srcs = ", ".join(f"`{s}`" for s in q["provenance"]["sources"])
-                lines += [f"<sub>_Canonical source: {srcs}_</sub>", ""]
             lines += ["---", ""]
         fname = FNAME.get(t["id"], f"{t['id']}-{slug(t['title'])}") + ".md"
         open(os.path.join(OUT, fname), "w", encoding="utf-8", newline="\n").write("\n".join(lines).rstrip() + "\n")

@@ -1,6 +1,5 @@
 # Security and safety
 
-8 unique questions, deduplicated from the archived docs. Each `##` is one question; identical questions from other docs were merged. Full source files are in `source/`.
 ## 1. What prompt injection is, and how you'd defend against it
 
 **General:** Prompt injection is untrusted input containing instructions that hijack the model (direct user input, or indirect via retrieved/tool content). Defenses: treat content as data not instructions, delimit/label untrusted content, never let it trigger privileged actions without a permission re-check, and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
@@ -216,3 +215,48 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+## 9. Security-adjacent questions are disguised as normal engineering questions
+
+**General:** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
+
+**Jiuwen:** This is the weakest area. Tool results are returned as plain `ToolMessage` with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory (`SafetyPromptRail` always allows), while the enforced controls live in the shell/permission layer (AST ASK floor, builtin deny rules) — not in retrieval. There is no mandatory untrusted-tool-result seam.
+
+```mermaid
+flowchart TD
+    U["tool result / retrieved doc"] --> MSG["ToolMessage (no untrusted framing)"]
+    MSG --> M["model context"]
+    SAN["sanitize.py"] -.->|"no production callers"| MSG
+    SAFE["SafetyPromptRail: advisory (always allow)"] -.-> M
+    PE["permission engine + shell AST: enforced"] -.-> U
+    U -.->|"absent"| SEAM["mandatory untrusted-data seam"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code> — <code>ToolMessage</code> built with no untrusted wrapper; <code>:431</code> parallel path<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code> — sanitizer (no production callers)<br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16/41</code> — <code>SafetyPromptRail</code> (advisory, always allows)<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code> — <code>check_permission</code> (enforced tool/file/net)<br>&bull; <code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code> — reverse-shell deny</sub>
+
+</details>
+
+## 10. Any question about untrusted input is testing prompt injection awareness
+
+**General:** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
+
+**Jiuwen:** Weakest area. Tool results are plain `ToolMessage` with no untrusted-data framing, `sanitize.py` has no production callers, the injection detector is unregistered, and `SafetyPromptRail` is advisory. The real controls are in the shell/permission layer (substitution blocking, AST ASK floor, builtin deny rules).
+
+```mermaid
+flowchart TD
+    U["tool result / retrieved doc"] --> MSG["ToolMessage (no untrusted framing)"]
+    MSG --> M["model context"]
+    SAN["sanitize.py"] -.->|"no production callers"| MSG
+    DET["injection detector"] -.->|"unregistered in prod"| MSG
+    ENF["shell + permission engine: enforced"] -.-> U
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code> — <code>ToolMessage</code> with no wrapper<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code> — no production callers<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code> — <code>PromptInjectionGuardrail</code> (unregistered)<br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code> — advisory safety rail<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409</code> — shell AST ASK floor</sub>
+
+</details>

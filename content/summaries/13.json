@@ -1,15 +1,98 @@
 {
  "13-1": {
-  "title": "'How does the model know X': context window understanding",
-  "tldr": "'How does the model know X' is really testing context-window understanding.",
+  "title": "Measuring retrieval",
+  "tldr": "Use a labeled (query, relevant docs) set and ranked metrics — Recall@k, Precision@k, MRR, NDCG — and track zero-result rate.",
   "points": [
-   "Strictest-bound budget.",
-   "Offload large tool results.",
-   "Multi-stage compaction.",
-   "FIFO drop beyond message cap."
+   "Recall@k: did the relevant docs make the top-k?",
+   "Precision@k / MRR / NDCG: how high and how well-ordered the hits are.",
+   "Track zero-result rate and score distributions in production.",
+   "Judge retrieval separately from generation."
   ]
  },
  "13-2": {
+  "title": "Chunk doesn't contain the answer",
+  "tldr": "'Looked relevant' isn't 'contains the answer': read the chunk and confirm the answer span is present; if not, retrieval failed; if yes, generation failed.",
+  "points": [
+   "First check: is the answer actually in the retrieved chunk?",
+   "No → retrieval failure (chunking, index, query mismatch).",
+   "Yes → generation/grounding failure."
+  ]
+ },
+ "13-3": {
+  "title": "Context doesn't answer the question",
+  "tldr": "Detect that the context is insufficient, then answer only from what's supported: gate on retrieval score/answerability, allow explicit 'I don't know', and verify claims against the context.",
+  "points": [
+   "Detect insufficient context (score/answerability gate).",
+   "Allow explicit abstention ('I don't know').",
+   "Ground/verify claims against the context."
+  ]
+ },
+ "13-4": {
+  "title": "Conflicting / outdated documents",
+  "tldr": "Apply precedence before generation — recency, source authority, or an explicit priority field; dedupe/reconcile; and surface the conflict (or abstain).",
+  "points": [
+   "Precedence: newest / most authoritative / priority field.",
+   "Dedupe and reconcile conflicting facts.",
+   "Surface the conflict or abstain rather than guess."
+  ]
+ },
+ "13-5": {
+  "title": "No relevant documents",
+  "tldr": "When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.",
+  "points": [
+   "Gate on retrieval score or answerability.",
+   "Abstain or ask a clarifying question.",
+   "Don't generate from out-of-scope chunks."
+  ]
+ },
+ "13-6": {
+  "title": "Different answers on different days",
+  "tldr": "Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).",
+  "points": [
+   "Sampling: pin temperature 0 and use a seed.",
+   "Remote rerankers may be non-deterministic.",
+   "Embedding drift: fingerprint the model and re-index on change."
+  ]
+ },
+ "13-7": {
+  "title": "Vocabulary mismatch",
+  "tldr": "The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.",
+  "points": [
+   "Semantic embeddings match paraphrases.",
+   "Query expansion / synonyms.",
+   "HyDE: retrieve with a generated hypothetical answer.",
+   "Hybrid search catches exact terms."
+  ]
+ },
+ "13-8": {
+  "title": "Per-stage error handling",
+  "tldr": "Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.",
+  "points": [
+   "Typed errors per stage.",
+   "Explicit fallbacks (empty result, pre-rerank order).",
+   "Degrade, don't abort the whole pipeline."
+  ]
+ },
+ "13-9": {
+  "title": "Building a retrieval eval set",
+  "tldr": "Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.",
+  "points": [
+   "Mine real queries from logs.",
+   "Label via LLM judge or a strong model's citations.",
+   "Or synthesize queries from known documents (doc = gold)."
+  ]
+ },
+ "13-10": {
+  "title": "Design a RAG system: tests failure-mode awareness",
+  "tldr": "'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.",
+  "points": [
+   "Dense fallback only on empty, not on wrong.",
+   "score_threshold defaults none → weak chunks pass.",
+   "KB path never reranks.",
+   "Metadata filters dropped at the retriever."
+  ]
+ },
+ "13-11": {
   "title": "'The model made something up': hallucination handling",
   "tldr": "'The model made something up' is testing hallucination handling, not model quality.",
   "points": [
@@ -17,56 +100,6 @@
    "Reviewer correctness dimension.",
    "No answerability gate/abstention.",
    "No faithfulness judge with context."
-  ]
- },
- "13-3": {
-  "title": "A-vs-B comparisons: tradeoff reasoning",
-  "tldr": "Any A-vs-B comparison is testing tradeoff reasoning, not the 'right' answer.",
-  "points": [
-   "top_k defaults 5.",
-   "No reranking in the KB path.",
-   "Allocation is availability-based.",
-   "Session cost tracked and capped."
-  ]
- },
- "13-4": {
-  "title": "'Stuck in a loop': production experience",
-  "tldr": "'The agent is stuck in a loop' is testing production experience.",
-  "points": [
-   "ReAct max_iterations (5; harness 15).",
-   "Agentic retriever max_iter (2, clamped).",
-   "Anomaly rail compact/abort.",
-   "Dedup rail; idempotent=False default."
-  ]
- },
- "13-5": {
-  "title": "Prompt behavior: versioning and testing",
-  "tldr": "Any prompt behavior question is secretly a versioning and testing question.",
-  "points": [
-   "Sections carry name/priority/category, no version.",
-   "Optimization overwrites in place.",
-   "Diagnostics ≠ versioning.",
-   "Rollback only at harness-package level."
-  ]
- },
- "13-6": {
-  "title": "'How do you know it's working': eval depth",
-  "tldr": "'How do you know it's working' is testing evaluation depth.",
-  "points": [
-   "Offline answer-level eval exists.",
-   "No faithfulness/relevance metric.",
-   "No retrieval metric layer.",
-   "No CI quality gate."
-  ]
- },
- "13-7": {
-  "title": "Untrusted input: injection awareness",
-  "tldr": "Any question about untrusted input is testing prompt-injection awareness.",
-  "points": [
-   "Tool results are plain messages.",
-   "Sanitizers unused; detector unregistered.",
-   "Safety rail is advisory.",
-   "Real control: shell/permission layer."
   ]
  }
 }

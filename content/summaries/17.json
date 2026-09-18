@@ -1,0 +1,57 @@
+{
+ "17-1": {
+  "title": "Pretraining vs fine-tuning",
+  "tldr": "Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.",
+  "points": [
+   "Pretraining: self-supervised, general, expensive.",
+   "Fine-tuning: task adaptation with labels.",
+   "Jiuwen's default evolution tunes prompts, not weights."
+  ]
+ },
+ "17-2": {
+  "title": "Instruction tuning",
+  "tldr": "Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.",
+  "points": [
+   "Pretraining: next/masked token, not instruction-following.",
+   "Instruction tuning: supervised on instruction/response pairs.",
+   "Produces an assistant that follows instructions."
+  ]
+ },
+ "17-3": {
+  "title": "Full fine-tuning vs LoRA",
+  "tldr": "Full fine-tuning updates every weight (most capacity, but the full model in memory and easy to overfit/drift). LoRA freezes the base and trains small low-rank adapters (cheap, portable).",
+  "points": [
+   "Full: updates all weights, high cost/capacity.",
+   "LoRA: freezes base, trains low-rank adapters.",
+   "LoRA is cheaper and portable."
+  ]
+ },
+ "17-4": {
+  "title": "Fine-tune vs a longer prompt",
+  "tldr": "Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.",
+  "points": [
+   "Hard-to-specify behavior (style/schema).",
+   "Compress a long few-shot prompt into weights.",
+   "Many labeled examples exist."
+  ]
+ },
+ "17-5": {
+  "title": "RAG vs fine-tuning",
+  "tldr": "RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).",
+  "points": [
+   "RAG: knowledge at query time, fresh/auditable.",
+   "Fine-tuning: behavior/style baked into weights.",
+   "Often combine them."
+  ]
+ },
+ "17-6": {
+  "title": "Risk of fine-tuning on a narrow dataset",
+  "tldr": "Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.",
+  "points": [
+   "Overfitting to the sample.",
+   "Catastrophic forgetting.",
+   "Brittleness to new inputs.",
+   "Amplified bias / format lock-in."
+  ]
+ }
+}

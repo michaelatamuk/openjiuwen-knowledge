@@ -1,57 +1,177 @@
 {
- "10-1": {
-  "title": "Pretraining vs fine-tuning",
-  "tldr": "Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.",
+ "10-18": {
+  "title": "Agentic RAG",
+  "tldr": "A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.",
   "points": [
-   "Pretraining: self-supervised, general, expensive.",
-   "Fine-tuning: task adaptation with labels.",
-   "Jiuwen's default evolution tunes prompts, not weights."
+   "Fixed: retrieve once, then generate.",
+   "Agentic: decide whether/when to retrieve again.",
+   "Loop until sufficient or capped."
+  ]
+ },
+ "10-19": {
+  "title": "Preventing agentic RAG loops",
+  "tldr": "Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.",
+  "points": [
+   "Round cap + sufficiency gate.",
+   "Detect repeated queries/results.",
+   "Token/cost budget; cache/dedupe."
+  ]
+ },
+ "10-1": {
+  "title": "RAG pipeline end to end",
+  "tldr": "Two halves — ingestion (parse → chunk → embed → index) and query (embed → retrieve → rerank → assemble → generate); every stage is separable and can fail.",
+  "points": [
+   "Ingestion: parse files, chunk, embed, and write vectors to the store.",
+   "Query: embed the query, retrieve top-k (dense and/or sparse), rerank, assemble context.",
+   "Generation sees only the assembled context; cite from it.",
+   "Quality drops can come from any stage — isolate them."
   ]
  },
  "10-2": {
-  "title": "Instruction tuning",
-  "tldr": "Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.",
+  "title": "Pipeline stages",
+  "tldr": "The same pipeline stage by stage: query embedding → vector search → context assembly → prompt construction → generation.",
   "points": [
-   "Pretraining: next/masked token, not instruction-following.",
-   "Instruction tuning: supervised on instruction/response pairs.",
-   "Produces an assistant that follows instructions."
+   "Embed the query with the same model used for the index.",
+   "Vector search returns top-k candidate chunks.",
+   "Assemble the hits into a context string and build the prompt.",
+   "Generate the answer from that context."
   ]
  },
  "10-3": {
-  "title": "Full fine-tuning vs LoRA",
-  "tldr": "Full fine-tuning updates every weight (most capacity, but the full model in memory and easy to overfit/drift). LoRA freezes the base and trains small low-rank adapters (cheap, portable).",
+  "title": "Modular RAG",
+  "tldr": "Simple RAG is a fixed chain; Modular RAG decomposes it into swappable modules (indexing, retrieval, fusion, reranking, query rewriting, generation) that can be routed and scheduled.",
   "points": [
-   "Full: updates all weights, high cost/capacity.",
-   "LoRA: freezes base, trains low-rank adapters.",
-   "LoRA is cheaper and portable."
+   "Simple RAG: retrieve → stuff → generate, fixed order.",
+   "Modular RAG: interchangeable modules with routing/orchestration.",
+   "Lets you add rewriting, reranking, or iteration per query."
   ]
  },
  "10-4": {
-  "title": "Fine-tune vs a longer prompt",
-  "tldr": "Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.",
+  "title": "Choosing chunk size",
+  "tldr": "Too small loses context and splits answers; too large dilutes the embedding. Start at a few hundred tokens with modest overlap.",
   "points": [
-   "Hard-to-specify behavior (style/schema).",
-   "Compress a long few-shot prompt into weights.",
-   "Many labeled examples exist."
+   "Small chunks: precise but may lack context or split the answer.",
+   "Large chunks: richer context but a diluted, multi-topic embedding.",
+   "Start ~a few hundred tokens with small overlap; tune by measuring."
   ]
  },
  "10-5": {
-  "title": "RAG vs fine-tuning",
-  "tldr": "RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).",
+  "title": "Chunks too small or too large",
+  "tldr": "Too small: the answer splits and the answer-bearing chunk can be missed. Too large: the embedding blends topics, precision drops, and prompt cost rises.",
   "points": [
-   "RAG: knowledge at query time, fresh/auditable.",
-   "Fine-tuning: behavior/style baked into weights.",
-   "Often combine them."
+   "Small: context lost, answer split, more index overhead.",
+   "Large: embedding averages topics, precision down, prompt budget wasted.",
+   "The code guards mechanics (invalid values, limits), not retrieval quality."
   ]
  },
  "10-6": {
-  "title": "Risk of fine-tuning on a narrow dataset",
-  "tldr": "Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.",
+  "title": "Fixed-size vs semantic chunking",
+  "tldr": "Fixed-size is cheap and deterministic but cuts mid-sentence; structure/sentence-aware chunking keeps chunks coherent at the cost of variable size and extra processing.",
   "points": [
-   "Overfitting to the sample.",
-   "Catastrophic forgetting.",
-   "Brittleness to new inputs.",
-   "Amplified bias / format lock-in."
+   "Fixed-size: deterministic and cheap, but fragments mid-sentence/mid-table.",
+   "Semantic/structure-aware: split on real boundaries; coherent, variable size.",
+   "Best: sentence/structure-aware with a cap, not raw character windows."
+  ]
+ },
+ "10-7": {
+  "title": "Chunk overlap",
+  "tldr": "A small overlap preserves meaning across a boundary; too much duplicates content, inflates the index, and returns near-identical hits.",
+  "points": [
+   "Overlap keeps boundary-spanning answers retrievable.",
+   "Too much overlap duplicates text and crowds out diverse hits.",
+   "Non-overlapping is cheaper but risks losing the boundary fact."
+  ]
+ },
+ "10-8": {
+  "title": "Chunking tables, code, headings",
+  "tldr": "Capture structure at parse time and carry it as metadata — keep tables intact (row/column), preserve code boundaries, and split on headings.",
+  "points": [
+   "Preserve structure at parse time, not chunk time.",
+   "Tables: keep rows/columns whole or serialize per record.",
+   "Code: split on function/class boundaries and keep fences.",
+   "Headings: use them as split boundaries."
+  ]
+ },
+ "10-9": {
+  "title": "Answer cut across chunks",
+  "tldr": "If the answer spans a boundary, the retrieved chunk holds only half of it. Fix with overlap, sentence/structure-aware splitting, and neighbor expansion at serve time.",
+  "points": [
+   "Boundary cuts produce half-answers that still rank.",
+   "Overlap + sentence/structure-aware chunking reduce it.",
+   "At serve time, expand a hit with its neighbors."
+  ]
+ },
+ "10-10": {
+  "title": "Choosing an embedding model",
+  "tldr": "Bigger isn't automatically better: fit to domain and language, use the right query/passage prefixes, pick an affordable dimension, and weigh latency/cost.",
+  "points": [
+   "Domain + language fit beats raw size.",
+   "Asymmetric models need correct query/passage prefixes.",
+   "Dimension drives storage/latency; a smaller in-domain model can win.",
+   "Evaluate recall on your data, not a leaderboard."
+  ]
+ },
+ "10-11": {
+  "title": "Same embedding model for query & docs",
+  "tldr": "Yes — both sides must use the same model, and asymmetric models need the correct role prefix on each side, or the vectors aren't comparable.",
+  "points": [
+   "One model embeds both queries and documents.",
+   "Asymmetric models: apply query vs passage prefixes.",
+   "Mixing models or dropping prefixes degrades retrieval."
+  ]
+ },
+ "10-12": {
+  "title": "Re-embedding after model swap",
+  "tldr": "Stored vectors belong to one model; a new model — even at the same dimension — is a different space, so every chunk must be re-embedded and the index rebuilt.",
+  "points": [
+   "Vectors from different models aren't comparable.",
+   "Same dimension does not mean same space.",
+   "Re-embed the whole corpus and rebuild the index."
+  ]
+ },
+ "10-13": {
+  "title": "Multilingual retrieval",
+  "tldr": "Use a multilingual/alignment embedding so queries and docs share one space; otherwise translate at index or query time and store language metadata.",
+  "points": [
+   "Prefer a multilingual/alignment embedding model.",
+   "Otherwise translate at index or query time.",
+   "Store language metadata to route and evaluate per language."
+  ]
+ },
+ "10-14": {
+  "title": "Multiple document formats",
+  "tldr": "Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by type, preserving format-specific structure as metadata.",
+  "points": [
+   "One record shape: text + metadata + id.",
+   "Parser per format behind a registry.",
+   "Keep format-specific structure as metadata."
+  ]
+ },
+ "10-15": {
+  "title": "RAG vs pasting a long context",
+  "tldr": "Pasting whole documents is simpler and avoids chunking errors but is expensive, slow, and noisy; retrieval pays a one-time chunking/index cost and sends only relevant, citable chunks.",
+  "points": [
+   "Paste: simple, no chunking bugs, but costly/slow/noisy.",
+   "RAG: cheaper per call, citable, scales past the window.",
+   "Choose by cost, latency, and need to cite."
+  ]
+ },
+ "10-16": {
+  "title": "Simple RAG pipeline",
+  "tldr": "The most common starting point: embed the query, get top-k similar docs, stuff them into the prompt, and generate.",
+  "points": [
+   "Embed query → vector search top-k.",
+   "Stuff docs into the prompt.",
+   "LLM generates the answer."
+  ]
+ },
+ "10-17": {
+  "title": "Modular RAG with reranking",
+  "tldr": "The upgrade once simple RAG returns irrelevant context: retrieve a larger candidate set, rerank by relevance, and keep only the top results.",
+  "points": [
+   "Retrieve a larger candidate set.",
+   "Rerank by query relevance.",
+   "Keep only the top results."
   ]
  }
 }

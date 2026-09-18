@@ -197,7 +197,7 @@ fun StudyScreen(repo: Repo, onOpen: (String) -> Unit) {
             if (reveal >= 3) {
                 val plainJ = item.question.jiuwenPlain
                 Section("Jiuwen", plainJ.ifBlank { item.question.mechanism })
-                TechnicalDetail(if (plainJ.isBlank()) "" else item.question.mechanism, citations, techDiagram)
+                TechnicalDetail(if (plainJ.isBlank()) "" else item.question.mechanism, citations, techDiagram, repo.provenance(item.question).sources)
                 TextButton(onClick = { onOpen(item.question.id) }) { Text("Open full topic page") }
             }
         }
@@ -313,7 +313,7 @@ fun QuestionScreen(repo: Repo, questionId: String) {
         }
         val plainJ = item.jiuwenPlain
         Section("Jiuwen", plainJ.ifBlank { item.mechanism })
-        TechnicalDetail(if (plainJ.isBlank()) "" else item.mechanism, citations, techDiagram)
+        TechnicalDetail(if (plainJ.isBlank()) "" else item.mechanism, citations, techDiagram, repo.provenance(item).sources)
         BulletList("Pitfalls", pitfalls)
         BulletList("Likely follow-ups", followups)
         Spacer(Modifier.height(8.dp))

@@ -1,0 +1,109 @@
+{
+ "16-1": {
+  "title": "Where cost concentrates",
+  "tldr": "Embedding is a one-time, change-only indexing cost; the recurring traffic-scaling cost is generation, especially input tokens from long context. Optimize generation.",
+  "points": [
+   "Embedding = one-time indexing cost.",
+   "Generation scales with traffic.",
+   "Input tokens dominate with long context."
+  ]
+ },
+ "16-2": {
+  "title": "Reducing cost in high-volume RAG",
+  "tldr": "Cut the dominant input-token/generation cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts/context, and summarize history.",
+  "points": [
+   "Rerank down to a smaller k.",
+   "Cache exact and semantic.",
+   "Route easy queries to smaller models.",
+   "Shorten prompts/context; summarize history."
+  ]
+ },
+ "16-3": {
+  "title": "Controlling unpredictable cost",
+  "tldr": "Bound the loop (iterations/rounds/time), cap tokens per request and session, let cheap models do cheap work, cache, offload/summarize context, and surface per-run cost to budget and alert.",
+  "points": [
+   "Bound iterations/time.",
+   "Cap tokens per request/session.",
+   "Cheap models for cheap work.",
+   "Surface per-run cost."
+  ]
+ },
+ "16-4": {
+  "title": "First cut: 50% cost reduction",
+  "tldr": "Cheapest high-impact cuts: route easy queries to a smaller model, lower top-k, cache, shorten the prompt, and reduce the agent's iteration cap.",
+  "points": [
+   "Route easy queries to a smaller model.",
+   "Lower top-k.",
+   "Cache.",
+   "Shorten prompt; lower iteration cap."
+  ]
+ },
+ "16-5": {
+  "title": "Designing caching",
+  "tldr": "Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.",
+  "points": [
+   "Exact-match response cache.",
+   "Provider prefix/prompt cache.",
+   "Embedding cache.",
+   "Semantic cache with a similarity threshold."
+  ]
+ },
+ "16-6": {
+  "title": "Reducing latency",
+  "tldr": "Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.",
+  "points": [
+   "Stream (optimize TTFT).",
+   "Parallelize independent steps.",
+   "Cache prompts/embeddings.",
+   "Route easy steps to faster models."
+  ]
+ },
+ "16-7": {
+  "title": "Threads vs processes for I/O-bound LLM calls",
+  "tldr": "For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.",
+  "points": [
+   "I/O-bound → concurrency, not processes.",
+   "Async is most efficient.",
+   "Multiprocessing only for CPU-bound work."
+  ]
+ },
+ "16-8": {
+  "title": "Architecture at 10x traffic",
+  "tldr": "You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.",
+  "points": [
+   "Provider rate limits/429s first.",
+   "Serialized tool/DB access.",
+   "Memory pressure from context.",
+   "Connection pools."
+  ]
+ },
+ "16-9": {
+  "title": "Scaling questions: thinking past the demo",
+  "tldr": "Scaling questions test whether you've thought past the demo.",
+  "points": [
+   "Per-process bounded resources.",
+   "Shared HTTP pool + embedding/sub-agent semaphores.",
+   "Missing: autoscaling, distributed queues."
+  ]
+ },
+ "16-10": {
+  "title": "Rollback plan for a bad update",
+  "tldr": "Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).",
+  "points": [
+   "Version prompts/models.",
+   "Ship behind flag/canary.",
+   "One-command rollback.",
+   "Gate on eval; monitor quality."
+  ]
+ },
+ "16-11": {
+  "title": "Shipping before eval is ready",
+  "tldr": "Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.",
+  "points": [
+   "Ship behind flag/canary.",
+   "Define rollback and cap blast radius.",
+   "Minimal offline eval gate.",
+   "Monitoring to detect drops."
+  ]
+ }
+}

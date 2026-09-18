@@ -1,11 +1,52 @@
 {
   "sections": [
-    { "title": "Foundations", "topics": ["01", "02", "03"] },
-    { "title": "Agents", "topics": ["04"] },
-    { "title": "Retrieval & RAG", "topics": ["05", "06"] },
-    { "title": "Quality & operations", "topics": ["07", "08"] },
-    { "title": "Trust & safety", "topics": ["09"] },
-    { "title": "Customization & engineering", "topics": ["10", "11"] },
-    { "title": "Patterns", "topics": ["12", "13", "14"] }
+    {
+      "title": "Model foundations",
+      "topics": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ]
+    },
+    {
+      "title": "Agents",
+      "topics": [
+        "05",
+        "06",
+        "07",
+        "08",
+        "09"
+      ]
+    },
+    {
+      "title": "RAG",
+      "topics": [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ]
+    },
+    {
+      "title": "Evaluation & production",
+      "topics": [
+        "15",
+        "16"
+      ]
+    },
+    {
+      "title": "Model adaptation",
+      "topics": [
+        "17"
+      ]
+    },
+    {
+      "title": "Safety & security",
+      "topics": [
+        "18"
+      ]
+    }
   ]
 }

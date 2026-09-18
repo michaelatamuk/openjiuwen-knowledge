@@ -345,22 +345,43 @@ fun DiagramView(data: DiagramData, citations: List<CitationDto>) {
     }
 }
 
+@Composable
+private fun TechTitle(title: String) {
+    Text(title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 10.dp, bottom = 2.dp))
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun TechnicalDetail(text: String, citations: List<CitationDto>, diagram: DiagramData? = null) {
-    if (text.isBlank() && citations.isEmpty() && diagram == null) return
-    var open by remember { mutableStateOf(true) }
+fun TechnicalDetail(
+    text: String,
+    citations: List<CitationDto>,
+    diagram: DiagramData? = null,
+    sources: List<String> = emptyList(),
+) {
+    if (text.isBlank() && citations.isEmpty() && diagram == null && sources.isEmpty()) return
+    var open by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxWidth()) {
         TextButton(onClick = { open = !open }) {
-            Text(if (open) "Hide technical detail" else "Technical detail (classes & functions)")
+            Text(if (open) "Hide Jiuwen technical detail" else "Jiuwen technical detail (classes & functions)")
         }
         if (open) {
-            if (text.isNotBlank()) MarkdownText(text)
-            Spacer(Modifier.height(6.dp))
-            CitationChips(citations)
+            if (text.isNotBlank()) {
+                TechTitle("Implementation")
+                MarkdownText(text)
+            }
+            if (citations.isNotEmpty()) {
+                TechTitle("Code anchors")
+                CitationChips(citations)
+            }
             if (diagram != null) {
-                Spacer(Modifier.height(8.dp))
+                TechTitle("Implementation diagram")
                 DiagramView(diagram, citations)
+            }
+            if (sources.isNotEmpty()) {
+                TechTitle("Canonical source")
+                Text(sources.joinToString(", "), style = MaterialTheme.typography.labelSmall,
+                    fontFamily = FontFamily.Monospace)
             }
         }
     }

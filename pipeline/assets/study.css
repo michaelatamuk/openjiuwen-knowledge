@@ -30,3 +30,21 @@ body.study-on .qa-reveal {
 }
 body.study-on .qa-answer { display: none; }
 body.study-on .qa-answer.revealed { display: block; }
+
+/* Code-anchor tables inside technical detail: smaller and denser. */
+.md-typeset details table {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  display: table;
+  width: 100%;
+}
+.md-typeset details table th,
+.md-typeset details table td {
+  padding: 0.25em 0.5em;
+  border: 0;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+}
+.md-typeset details table code {
+  font-size: 0.72em;
+  word-break: break-all;
+}

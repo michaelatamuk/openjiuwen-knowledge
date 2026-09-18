@@ -356,7 +356,7 @@ def main():
     authored_d = json.load(open(DIAGRAMS_JSON, encoding="utf-8"))
     order, section_of = load_sections()
     files = sorted(f for f in glob.glob(os.path.join(TOPICS, "*.md"))
-                   if re.match(r"^(0[1-9]|1[0-4])-", os.path.basename(f)))
+                   if re.match(r"^(0[1-9]|1[0-8])-", os.path.basename(f)))
     os.makedirs(os.path.join(OUT, "diagrams"), exist_ok=True)
     today = date.today().isoformat()
     topics, missing, total, rendered, pending = [], 0, 0, 0, 0

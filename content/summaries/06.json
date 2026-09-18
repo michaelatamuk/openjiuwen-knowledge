@@ -1,128 +1,92 @@
 {
  "06-1": {
-  "title": "RAG for customer support (100k/day)",
-  "tldr": "Start from rate/SLA, then pick components: ingestion, hybrid retrieval, reranking, generation, caching, observability. 100k/day is ~1.2 QPS average with bursts.",
+  "title": "Function calling under the hood",
+  "tldr": "Tool schemas (name, description, JSON-Schema params) go in the request; the model returns a structured tool_calls list; the host validates args, executes, and feeds results back.",
   "points": [
-   "Budget from QPS + latency SLA.",
-   "Ingestion: parse → chunk → embed → index.",
-   "Hybrid retrieval + reranker + generation + cache.",
-   "Observability and per-session cost caps."
+   "Send tool schemas with the request.",
+   "Model returns structured tool_calls (not prose).",
+   "Host validates args, runs the tool, feeds the result back."
   ]
  },
  "06-2": {
-  "title": "Codebase assistant (daily changes)",
-  "tldr": "Make re-indexing incremental and event-driven: stable IDs per file/chunk, delete-by-ID on change, append new chunks, and trigger on commit/CI — avoid full re-embeds except on model/index changes.",
+  "title": "Registering tools",
+  "tldr": "Register a tool with name, description, and parameter schema; the framework collects them into the model request in the provider's tool format; returned tool calls are dispatched.",
   "points": [
-   "Stable doc/chunk IDs; delete-by-ID on change.",
-   "Append new chunks (no full re-index).",
-   "Trigger into indexing from commit/CI.",
-   "Structure-aware chunks (function boundaries)."
+   "Register name + description + schema.",
+   "Framework builds the provider tool list.",
+   "Model tool calls are parsed and dispatched."
   ]
  },
  "06-3": {
-  "title": "Legal document search (confidential)",
-  "tldr": "Access control dominates, then scale: every chunk carries an ACL and every query is filtered by the caller's permissions inside the vector search (pre-filter), not after.",
+  "title": "Unsupported tool",
+  "tldr": "Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.",
   "points": [
-   "ACL on every chunk (owner/matter/tenant).",
-   "Pre-filter queries by caller permissions.",
-   "Per-tenant/matter isolation + audit logging.",
-   "Then scale: ANN, quantization, sharding."
+   "Wrap any function as a tool.",
+   "Custom tool class for transport/auth.",
+   "MCP for external tool servers."
   ]
  },
  "06-4": {
-  "title": "Scaling 10K → 10M documents",
-  "tldr": "Small scale: a local index (Chroma/FAISS). Large scale: a dedicated vector DB with tuned ANN (HNSW/IVF/quantization), sharding/replication, and batch ingestion — and you tune recall vs latency.",
+  "title": "Failed or malformed tool call",
+  "tldr": "Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).",
   "points": [
-   "Small: local in-process index.",
-   "Large: server vector DB, tuned ANN + quantization.",
-   "Sharding/partitioning, replication, batch ingest.",
-   "Tune recall vs latency per query."
+   "Catch and classify retryable vs not.",
+   "Return a structured, model-readable error.",
+   "Repair broken payloads when possible."
   ]
  },
  "06-5": {
-  "title": "Sharding a vector DB",
-  "tldr": "Options: partition by key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate and route by collection. Plan for metadata routing and rebalancing.",
+  "title": "Retry without duplicate effects",
+  "tldr": "Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.",
   "points": [
-   "Partition by tenant/category.",
-   "Hash/range shard across nodes.",
-   "Route queries; plan rebalancing."
+   "Mark non-idempotent tools; never blind-retry.",
+   "Idempotency keys make repeats detectable.",
+   "Retry reads/idempotent ops only."
   ]
  },
  "06-6": {
-  "title": "Fast retrieval as the DB grows",
-  "tldr": "Append-only incremental indexing into a pre-built ANN index avoids rebuilds; deletes/filters stay fast with scalar/inverted indexes; search-time parameters tune recall vs latency without reindexing.",
+  "title": "Custom per-tool retry policy",
+  "tldr": "Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.",
   "points": [
-   "Append-only writes; no full rebuild.",
-   "Scalar/inverted indexes for fast deletes/filters.",
-   "Search-time params (ef/nprobe) tune the dial."
+   "Per-tool override: attempts, backoff, timeout.",
+   "Keep the idempotency safety default.",
+   "Central policy with per-tool hooks."
   ]
  },
  "06-7": {
-  "title": "Choosing a vector store",
-  "tldr": "Choose by scale and features: local/embedded for prototypes; a managed vector DB for scale and hybrid; pgvector when you already run Postgres and want one datastore.",
+  "title": "Concurrent tool calls",
+  "tldr": "Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.",
   "points": [
-   "Local/embedded for prototypes.",
-   "Managed vector DB for scale + hybrid.",
-   "pgvector for one relational datastore + joins.",
-   "Evaluate hybrid, filtering, ops cost, lock-in."
+   "Group the turn's tool calls; run them concurrently.",
+   "Bound concurrency (semaphore/pool).",
+   "Respect ordering for conflicting writes."
   ]
  },
  "06-8": {
-  "title": "Hosted vs self-managed vector DB",
-  "tldr": "Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.",
+  "title": "Step timeout or error",
+  "tldr": "Bound each step with a timeout, classify errors, convert failures into data (an observation) so the loop can adapt, and propagate fatal errors with cleanup.",
   "points": [
-   "Hosted: less ops, elastic, lock-in, cost scales.",
-   "Self-managed: control, cost, residency, you run it.",
-   "Decide by ops capacity, sensitivity, volume."
+   "Timeout each step.",
+   "Classify retryable vs fatal.",
+   "Convert failure into a model-readable result."
   ]
  },
  "06-9": {
-  "title": "Vector DB down: fallback",
-  "tldr": "Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.",
+  "title": "Cost with repeated tool calls",
+  "tldr": "Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.",
   "points": [
-   "Fail fast with a clear error, or",
-   "Fall back to sparse/cached/replica, or",
-   "Disable retrieval and answer with a caveat.",
-   "Add circuit breaker + health checks."
+   "Bound loop: iterations/rounds/time.",
+   "Cap tokens; route cheap work to small models.",
+   "Cache; watch retries and large tool outputs."
   ]
  },
  "06-10": {
-  "title": "Updating/deleting an indexed doc",
-  "tldr": "Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.",
+  "title": "Agentic tool-calling pattern",
+  "tldr": "The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.",
   "points": [
-   "Stable doc id + delete-by-id.",
-   "Update = delete + re-insert (or upsert).",
-   "Chunk ids tied to the doc id.",
-   "Atomicity and consistency are the hard parts."
-  ]
- },
- "06-11": {
-  "title": "Never serving stale information",
-  "tldr": "Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.",
-  "points": [
-   "Timestamps/versions on documents.",
-   "Recency preference or a freshness filter.",
-   "Tombstone superseded versions; propagate deletes.",
-   "Surface recency to the generator."
-  ]
- },
- "06-12": {
-  "title": "Zero relevant documents",
-  "tldr": "Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.",
-  "points": [
-   "Detect: score threshold / answerability.",
-   "Abstain or ask a clarifying question.",
-   "Optional fallbacks: sparse, graph hop."
-  ]
- },
- "06-13": {
-  "title": "Sub-500ms budget",
-  "tldr": "Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.",
-  "points": [
-   "Retrieval tens of ms; rerank tens–low-hundreds.",
-   "Generation dominates — stream for TTFT.",
-   "Cache embeddings/results; parallelize tools.",
-   "Skip rerank when latency-bound."
+   "Model emits structured tool calls.",
+   "Runtime executes and feeds back results.",
+   "Loops until the model answers."
   ]
  }
 }

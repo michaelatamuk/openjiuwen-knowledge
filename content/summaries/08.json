@@ -1,80 +1,86 @@
 {
  "08-1": {
-  "title": "Where cost concentrates",
-  "tldr": "Embedding is a one-time, change-only indexing cost; the recurring traffic-scaling cost is generation, especially input tokens from long context. Optimize generation.",
+  "title": "What a framework gives you",
+  "tldr": "Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.",
   "points": [
-   "Embedding = one-time indexing cost.",
-   "Generation scales with traffic.",
-   "Input tokens dominate with long context."
+   "Session/state across turns.",
+   "Context trimming/compression.",
+   "Tool registry + control loop.",
+   "Streaming, tracing, guardrails."
   ]
  },
  "08-2": {
-  "title": "Reducing cost in high-volume RAG",
-  "tldr": "Cut the dominant input-token/generation cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts/context, and summarize history.",
+  "title": "Graph vs role frameworks",
+  "tldr": "Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).",
   "points": [
-   "Rerank down to a smaller k.",
-   "Cache exact and semantic.",
-   "Route easy queries to smaller models.",
-   "Shorten prompts/context; summarize history."
+   "Graph: explicit nodes/edges, deterministic routing.",
+   "Role: agents with roles that collaborate.",
+   "Trade control for flexibility."
   ]
  },
  "08-3": {
-  "title": "Controlling unpredictable cost",
-  "tldr": "Bound the loop (iterations/rounds/time), cap tokens per request and session, let cheap models do cheap work, cache, offload/summarize context, and surface per-run cost to budget and alert.",
+  "title": "Choosing a framework",
+  "tldr": "Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.",
   "points": [
-   "Bound iterations/time.",
-   "Cap tokens per request/session.",
-   "Cheap models for cheap work.",
-   "Surface per-run cost."
+   "Explicit graph + durable state → LangGraph.",
+   "Role/team collaboration → CrewAI.",
+   "Managed agent SDK for hosted agents.",
+   "Match the framework to the control shape."
   ]
  },
  "08-4": {
-  "title": "First cut: 50% cost reduction",
-  "tldr": "Cheapest high-impact cuts: route easy queries to a smaller model, lower top-k, cache, shorten the prompt, and reduce the agent's iteration cap.",
+  "title": "Heavier framework vs custom",
+  "tldr": "Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.",
   "points": [
-   "Route easy queries to a smaller model.",
-   "Lower top-k.",
-   "Cache.",
-   "Shorten prompt; lower iteration cap."
+   "Heavy: batteries included, more config/learning.",
+   "Light: transparent, you build plumbing.",
+   "Choose by team size, rate of change, control needs."
   ]
  },
  "08-5": {
-  "title": "Designing caching",
-  "tldr": "Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.",
+  "title": "Unnecessary abstraction",
+  "tldr": "The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.",
   "points": [
-   "Exact-match response cache.",
-   "Provider prefix/prompt cache.",
-   "Embedding cache.",
-   "Semantic cache with a similarity threshold."
+   "Single model call doesn't need a framework.",
+   "Forcing business logic into nodes/agents is a smell.",
+   "A straight line disguised as a graph."
   ]
  },
  "08-6": {
-  "title": "Reducing latency",
-  "tldr": "Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.",
+  "title": "When abstractions don't fit",
+  "tldr": "Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.",
   "points": [
-   "Stream (optimize TTFT).",
-   "Parallelize independent steps.",
-   "Cache prompts/embeddings.",
-   "Route easy steps to faster models."
+   "Implement the base interface directly.",
+   "Call the primitive (model/tool) without the wrapper.",
+   "Override hooks or replace a component."
   ]
  },
  "08-7": {
-  "title": "Threads vs processes for I/O-bound LLM calls",
-  "tldr": "For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.",
+  "title": "Which node runs next",
+  "tldr": "A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.",
   "points": [
-   "I/O-bound → concurrency, not processes.",
-   "Async is most efficient.",
-   "Multiprocessing only for CPU-bound work."
+   "Ready = input channels satisfied.",
+   "Run ready nodes concurrently.",
+   "Route outputs; repeat until quiescent."
   ]
  },
  "08-8": {
-  "title": "Architecture at 10x traffic",
-  "tldr": "You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.",
+  "title": "Versioning & rolling back workflows",
+  "tldr": "Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.",
   "points": [
-   "Provider rate limits/429s first.",
-   "Serialized tool/DB access.",
-   "Memory pressure from context.",
-   "Connection pools."
+   "Version the whole definition, not just prompts.",
+   "Immutable versions + content hash.",
+   "Activate/list/rollback atomically."
+  ]
+ },
+ "08-9": {
+  "title": "Will a framework scale with your team",
+  "tldr": "Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.",
+  "points": [
+   "Declarative registration and plugins.",
+   "Stable extension contracts.",
+   "Provider/config abstraction.",
+   "Schema'd config + docs."
   ]
  }
 }

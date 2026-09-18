@@ -151,3 +151,26 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai, llm-applied._</sub>
+
+---
+
+## 6. Any prompt behavior question is secretly a versioning and testing question
+
+**General:** treating prompts like code (not one-off strings), testing prompt changes against a fixed eval set, a rollback plan when a change degrades output, and tracking which prompt version produced which output in logs. A strong answer includes: version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and be able to roll back in one step.
+
+**Jiuwen:** Prompts are assembled from named `PromptSection`s that carry only name/priority/category/carrier (no version/hash); optimization overwrites them in place; `PromptReport` is diagnostics, not versioning. Rollback exists only at the RSI **harness-package** level, and the CI gate has no eval threshold. Logs carry spans but not a prompt-version identifier.
+
+```mermaid
+flowchart TD
+    P["prompt change"] --> V["version + hash (absent for prompts)"]
+    P --> E["fixed eval set (absent; offline evaluators only)"]
+    P --> R["rollback (RSI package only)"]
+    P --> L["log prompt version with output (absent)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/prompts/builder.py:24</code> — <code>PromptSection</code> (no version); <code>:219</code> <code>build</code><br>&bull; <code>agent-core/openjiuwen/harness/prompts/report.py:58</code> — <code>PromptReport</code> diagnostics<br>&bull; <code>agent-core/openjiuwen/agent_evolving/checkpointing/manager.py:43</code> — checkpoint version (operator state)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code> — package-level rollback<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — no eval gate</sub>
+
+</details>

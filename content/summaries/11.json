@@ -1,50 +1,102 @@
 {
  "11-1": {
-  "title": "When to use an LLM vs rules",
-  "tldr": "Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.",
+  "title": "Dense vs sparse + rank fusion",
+  "tldr": "Dense matches meaning but can miss rare exact terms; sparse (BM25) matches literal terms but fails on paraphrase; fuse both with reciprocal rank fusion.",
   "points": [
-   "Rules: enumerable, auditable, reproducible.",
-   "LLM: semantic, ambiguous, open-ended.",
-   "Prefer rules; add the LLM where needed."
+   "Dense: embeddings, semantic match; weak on exact tokens.",
+   "Sparse/BM25: literal term match; weak on paraphrase.",
+   "Fuse with RRF: combine ranks, not raw scores.",
+   "Weighting is often ignored in favor of RRF."
   ]
  },
  "11-2": {
-  "title": "Larger vs smaller model",
-  "tldr": "Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.",
+  "title": "When keyword search wins",
+  "tldr": "Keyword wins on exact identifiers, codes, rare names, jargon, and small/distinctive corpora; dense wins on paraphrase and intent. Best is hybrid.",
   "points": [
-   "Large for reasoning/ambiguity.",
-   "Small/fast for classification/extraction/routing.",
-   "Measure quality per task; weigh latency/cost."
+   "Exact codes/IDs/names favor keyword.",
+   "Paraphrase/intent favor dense.",
+   "Combine both to cover each other's blind spots."
   ]
  },
  "11-3": {
-  "title": "Will a framework scale with your team",
-  "tldr": "Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.",
+  "title": "Semantic misses exact codes",
+  "tldr": "Opaque tokens (codes, SKUs, UUIDs, rare names) carry little semantic signal, so a semantically close but wrong chunk can outrank the exact hit — and dense results are rarely empty, so no fallback fires.",
   "points": [
-   "Declarative registration and plugins.",
-   "Stable extension contracts.",
-   "Provider/config abstraction.",
-   "Schema'd config + docs."
+   "Short opaque tokens embed to near-random neighbors.",
+   "A wrong-but-close chunk can rank above the exact hit.",
+   "Fix: metadata/exact filtering, a sparse leg, or an exact-match boost."
   ]
  },
  "11-4": {
-  "title": "Rollback plan for a bad update",
-  "tldr": "Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).",
+  "title": "Retrieve 5 vs 20",
+  "tldr": "Higher k raises recall but costs tokens/latency and can dilute; lower k is precise and cheap. Retrieve more then rerank down when you have a reranker.",
   "points": [
-   "Version prompts/models.",
-   "Ship behind flag/canary.",
-   "One-command rollback.",
-   "Gate on eval; monitor quality."
+   "More docs → recall up, tokens/latency up.",
+   "Fewer docs → precision, lower cost.",
+   "Ideal: retrieve many, rerank to few (needs a wired reranker)."
   ]
  },
  "11-5": {
-  "title": "Shipping before eval is ready",
-  "tldr": "Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.",
+  "title": "SQL + documents retrieval",
+  "tldr": "Keep paths explicit: route structured questions to a schema-aware text-to-SQL/table tool and unstructured to document retrieval, then merge and ground results.",
   "points": [
-   "Ship behind flag/canary.",
-   "Define rollback and cap blast radius.",
-   "Minimal offline eval gate.",
-   "Monitoring to detect drops."
+   "Structured → text-to-SQL/table query (validatable).",
+   "Unstructured → document retrieval.",
+   "Merge and ground; don't flatten tables into text."
+  ]
+ },
+ "11-6": {
+  "title": "What reranking adds",
+  "tldr": "First-stage retrieval optimizes recall with cheap approximate similarity; a cross-encoder reranker scores candidates jointly with the query to reorder the top-k for precision — but only over candidates retrieval already returned.",
+  "points": [
+   "Retrieval: recall, cheap, approximate.",
+   "Rerank: precision, joint query+doc scoring, expensive.",
+   "Cannot recover what retrieval never returned."
+  ]
+ },
+ "11-7": {
+  "title": "Is the reranker helping?",
+  "tldr": "You can't tell from order alone; on a labeled set, compare ranking metrics (NDCG/MRR/precision) with and without the reranker on the same candidates.",
+  "points": [
+   "Order alone isn't evidence.",
+   "Compare ranked metrics on the same candidate set.",
+   "If NDCG doesn't improve, it's just reordering."
+  ]
+ },
+ "11-8": {
+  "title": "Rerank every query?",
+  "tldr": "Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.",
+  "points": [
+   "Rerank when precision matters and candidates are bounded.",
+   "Skip exact-match, high-volume, latency-critical queries.",
+   "Decide per query, not globally."
+  ]
+ },
+ "11-9": {
+  "title": "Reranking latency",
+  "tldr": "Latency scales with candidate count and batching: a cross-encoder over ~50–100 candidates adds tens to low-hundreds of ms; an LLM-judge reranker is one call per document (O(N)).",
+  "points": [
+   "Cross-encoder: one batched call over N candidates.",
+   "LLM-judge: one call per doc — much slower.",
+   "Weigh added latency against precision gain."
+  ]
+ },
+ "11-10": {
+  "title": "Bi-encoder vs cross-encoder",
+  "tldr": "Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).",
+  "points": [
+   "Bi-encoder: independent embeddings, scalable retrieval.",
+   "Cross-encoder: joint scoring, higher precision, per-pair cost.",
+   "Use bi-encoder to retrieve, cross-encoder to rerank."
+  ]
+ },
+ "11-11": {
+  "title": "Cutting tokens without losing quality",
+  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
+  "points": [
+   "Retrieve many, rerank to few (needs a reranker).",
+   "Summarize long chunks before insertion.",
+   "Trim conversation history."
   ]
  }
 }

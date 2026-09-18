@@ -1,192 +1,137 @@
 {
  "07-1": {
-  "title": "Evaluating beyond 'looks correct'",
-  "tldr": "Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.",
+  "title": "Task decomposition",
+  "tldr": "Either ask the model to emit a plan/todo list up front, or decompose lazily and revise; store it as structured tasks that can be marked in-progress/done.",
   "points": [
-   "Automatic metrics where deterministic (EM, F1, tests).",
-   "LLM-as-judge with a rubric for open-ended quality.",
-   "Human review on a sample.",
-   "Held-out set + regression tracking."
+   "Model emits a plan/todo list.",
+   "Or decompose lazily and revise.",
+   "Store as structured tasks with status."
   ]
  },
  "07-2": {
-  "title": "Retrieval vs generation, separately",
-  "tldr": "An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.",
+  "title": "Changing the plan mid-run",
+  "tldr": "Allow plan mutation during the run — add, reorder, cancel, replace tasks — and support steering with new instructions; keep the authoritative plan separate from live state.",
   "points": [
-   "Separate stages → attribution.",
-   "A retrieval miss can't be fixed by the generator.",
-   "Retrieved-but-wrong = generation/grounding."
+   "Mutate: add/reorder/cancel/replace tasks.",
+   "Steer with new instructions.",
+   "Reconcile plan vs live state."
   ]
  },
  "07-3": {
-  "title": "Why exact match fails",
-  "tldr": "Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.",
+  "title": "Single-step vs planning agent",
+  "tldr": "Two axes: single-step vs multi-step (how many model↔tool cycles) and reactive vs planning (whether an explicit plan is kept and updated).",
   "points": [
-   "Requires full-string equality.",
-   "Brittle to wording, articles, ordering.",
-   "Use only on constrained answers; judge for paraphrase."
+   "Axis 1: number of model/tool cycles.",
+   "Axis 2: explicit plan vs none.",
+   "The two are independent."
   ]
  },
  "07-4": {
-  "title": "Recall@k",
-  "tldr": "Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.",
+  "title": "Planner-executor pattern",
+  "tldr": "A planner produces the steps; one or more executors carry them out, often with a supervisor re-planning — useful when planning needs a global view and execution is parallel/specialized.",
   "points": [
-   "Recall@k = relevant-in-top-k / total relevant.",
-   "Low → retrieval (embedding/chunking/query) is failing.",
-   "Distinguishes missing content from ranking issues."
+   "Planner produces steps.",
+   "Executors carry them out.",
+   "Supervisor re-plans; parallel/specialized execution."
   ]
  },
  "07-5": {
-  "title": "Precision@k",
-  "tldr": "Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.",
+  "title": "State across steps",
+  "tldr": "A state object threaded through (or held per session) that each step reads/writes; conversation history is usually separate from working state; persist via checkpoints.",
   "points": [
-   "Precision@k = relevant-in-top-k / k.",
-   "Higher k → recall up, precision usually down.",
-   "Both can look fine while real quality is poor."
+   "Working state object per session.",
+   "Separate conversation history from task state.",
+   "Checkpoint for persistence."
   ]
  },
  "07-6": {
-  "title": "MRR",
-  "tldr": "Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.",
+  "title": "Pause and resume an agent",
+  "tldr": "Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.",
   "points": [
-   "MRR = mean of 1/rank of first relevant hit.",
-   "Best when one strong hit is needed (lookup/FAQ).",
-   "Complements recall/NDCG."
+   "Durable checkpoint or interrupt signal.",
+   "Preserve state while unwinding.",
+   "Resume by reload or replay."
   ]
  },
  "07-7": {
-  "title": "NDCG",
-  "tldr": "Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.",
+  "title": "Human-in-the-loop approval",
+  "tldr": "Route sensitive steps through a permission check returning allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and remember/persist rules; fail closed on unknown.",
   "points": [
-   "Discount by position (log2 rank+1).",
-   "Normalize by the ideal ranking.",
-   "Supports graded relevance."
+   "Permission check: allow/ask/deny.",
+   "Pause on ask; resume with the decision.",
+   "Persist allow rules; fail closed."
   ]
  },
  "07-8": {
-  "title": "Faithfulness vs relevance",
-  "tldr": "Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.",
+  "title": "Short vs long-term memory",
+  "tldr": "Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.",
   "points": [
-   "Relevance: context vs query.",
-   "Faithfulness: answer vs context.",
-   "Both are needed; they fail differently."
+   "Short-term: live context window.",
+   "Long-term: durable, cross-session.",
+   "Long-term is retrieved into the turn."
   ]
  },
  "07-9": {
-  "title": "Computing faithfulness",
-  "tldr": "Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.",
+  "title": "What to store vs discard",
+  "tldr": "Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.",
   "points": [
-   "Decompose the answer into atomic claims.",
-   "Verify each against the retrieved source.",
-   "Average → faithfulness score."
+   "Keep durable/reused/preference facts.",
+   "Discard transient and contradicted.",
+   "LLM extract then dedupe/resolve."
   ]
  },
  "07-10": {
-  "title": "Measuring hallucination rate",
-  "tldr": "Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).",
+  "title": "Bounding memory growth",
+  "tldr": "Bound on multiple axes: hard-drop/truncate oldest context, offload large blobs, compact old tool results, summarize/archive, and cap stored long-term entries.",
   "points": [
-   "Extract claims from the answer.",
-   "Verify each against retrieved context.",
-   "Rate = unsupported / total claims."
+   "FIFO/truncate oldest context.",
+   "Offload large blobs; compact tool results.",
+   "Summarize/archive; cap long-term entries."
   ]
  },
  "07-11": {
-  "title": "Perplexity",
-  "tldr": "Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.",
+  "title": "Summarizing history safely",
+  "tldr": "Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.",
   "points": [
-   "Exponential of average negative log-likelihood.",
-   "Lower = more predictable; compare on the same text.",
-   "Not a task/quality metric."
+   "Recent turns verbatim.",
+   "Structured summary, not free prose.",
+   "Re-inject durable state (plan, status, files)."
   ]
  },
  "07-12": {
-  "title": "LLM-as-judge limitations",
-  "tldr": "Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.",
+  "title": "Planner–executor pattern",
+  "tldr": "A planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response.",
   "points": [
-   "Biases: position, verbosity, self-preference.",
-   "Noisy, non-deterministic, gameable.",
-   "Mitigate: swap positions, vote, calibrate with humans."
+   "Planner decomposes the task.",
+   "Executors carry out subtasks.",
+   "Results are combined."
   ]
  },
  "07-13": {
-  "title": "Evaluating with no ground truth",
-  "tldr": "Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.",
+  "title": "Critic or reflection loop",
+  "tldr": "A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.",
   "points": [
-   "Synthetic queries from known docs (doc = gold).",
-   "LLM judge with a rubric.",
-   "Pairwise / few-shot judging."
+   "Draft, then critique.",
+   "Revise on failure.",
+   "Adds a verification step."
   ]
  },
  "07-14": {
-  "title": "Building an eval dataset",
-  "tldr": "Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.",
+  "title": "Memory-augmented agent",
+  "tldr": "Context across sessions: short-term is the active window; long-term is a store of past interactions; retrieval decides what long-term memory returns.",
   "points": [
-   "Mine real queries from logs.",
-   "Synthetic queries (doc = gold).",
-   "Or LLM answers with citations as gold."
+   "Short-term = active context window.",
+   "Long-term = persisted store.",
+   "Retrieval brings memory back."
   ]
  },
  "07-15": {
-  "title": "How many eval examples",
-  "tldr": "Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.",
+  "title": "Router pattern",
+  "tldr": "One entry point decides which subsystem handles the request: the query is classified and routed to a specialized agent or tool.",
   "points": [
-   "~100–200 for a usable single-metric signal.",
-   "Comparing systems needs power for the effect size.",
-   "Report confidence/variance, not a bare mean."
-  ]
- },
- "07-16": {
-  "title": "Comparing two models",
-  "tldr": "Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.",
-  "points": [
-   "Same held-out set, same prompts/decoding.",
-   "Task-appropriate metrics.",
-   "Compare accuracy + latency + cost."
-  ]
- },
- "07-17": {
-  "title": "Regression test suite",
-  "tldr": "Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.",
-  "points": [
-   "Fast unit tests for components.",
-   "Quality eval on a fixed dataset.",
-   "Baseline + fail on regression."
-  ]
- },
- "07-18": {
-  "title": "Continuous production eval",
-  "tldr": "Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.",
-  "points": [
-   "Sample live traffic; score on a schedule.",
-   "Alert on quality drops, not just errors.",
-   "Watch drift in queries and hit rates."
-  ]
- },
- "07-19": {
-  "title": "Detecting retrieval degradation",
-  "tldr": "Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.",
-  "points": [
-   "Zero-result rate + score distributions.",
-   "Periodic re-run of a frozen set.",
-   "Slice per query type/language."
-  ]
- },
- "07-20": {
-  "title": "High eval, users still unhappy",
-  "tldr": "The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.",
-  "points": [
-   "Eval set not representative of real usage.",
-   "Missing adversarial/long-tail/slices.",
-   "Metric rewards the wrong thing."
-  ]
- },
- "07-21": {
-  "title": "Tying eval to business outcome",
-  "tldr": "Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.",
-  "points": [
-   "Pick the business proxy (success, deflection, cost).",
-   "Correlate the offline metric to the proxy.",
-   "Use the offline metric as the fast proxy."
+   "Classify the query.",
+   "Route to a specialized handler.",
+   "Avoid one generic prompt."
   ]
  }
 }

@@ -19,6 +19,7 @@ theme:
   features:
     - navigation.top
     - navigation.tracking
+    - navigation.expand
     - search.highlight
     - search.suggest
     - content.code.copy
@@ -41,24 +42,27 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Foundations:
+  - Model foundations:
       - LLM foundations: 01-llm-foundations.md
       - Prompting & output: 02-prompting-and-output-control.md
       - LLM terms glossary: 03-llm-terms-glossary.md
+      - Choosing models & approaches: 04-choosing-models-and-approaches.md
   - Agents:
-      - Agents, tools & memory: 04-agents-tools-and-memory.md
-  - Retrieval & RAG:
-      - RAG & retrieval: 05-rag-and-retrieval.md
-      - RAG system design: 06-rag-system-design.md
-  - Quality & operations:
-      - Evaluation: 07-evaluation.md
-      - Production & scale: 08-production-cost-and-scale.md
-  - Trust & safety:
-      - Security & safety: 09-security-and-safety.md
-  - Customization & engineering:
-      - Fine-tuning: 10-fine-tuning-and-customization.md
-      - General engineering: 11-general-engineering.md
-  - Patterns:
-      - AI engineer interview patterns: 12-ai-engineer-interview-patterns.md
-      - LLM interview patterns: 13-llm-interview-patterns.md
-      - LLM architecture patterns: 14-llm-architecture-patterns.md
+      - Agent fundamentals & the loop: 05-agent-fundamentals-and-the-loop.md
+      - Tools & function calling: 06-tools-and-function-calling.md
+      - Planning, memory & state: 07-planning-memory-and-state.md
+      - Agent frameworks: 08-agent-frameworks.md
+      - Multi-agent systems: 09-multi-agent-systems.md
+  - RAG:
+      - RAG pipelines & patterns: 10-rag-pipelines-and-patterns.md
+      - Retrieval & ranking: 11-retrieval-and-ranking.md
+      - Query understanding: 12-query-understanding.md
+      - RAG failure modes & evaluation: 13-rag-failure-modes-and-evaluation.md
+      - RAG system design: 14-rag-system-design.md
+  - Evaluation & production:
+      - Evaluation: 15-evaluation.md
+      - Production & scale: 16-production-cost-and-scale.md
+  - Model adaptation:
+      - Fine-tuning: 17-fine-tuning-and-customization.md
+  - Safety & security:
+      - Security & safety: 18-security-and-safety.md

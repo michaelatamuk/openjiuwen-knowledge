@@ -1,6 +1,5 @@
 # Production, cost and scale
 
-8 unique questions, deduplicated from the archived docs. Each `##` is one question; identical questions from other docs were merged. Full source files are in `source/`.
 ## 1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic
 
 **General:** Embedding is a one-time (or change-only) indexing cost and is cheap per token; the recurring, traffic-scaling cost is generation — especially input tokens when you stuff long context. So optimization effort should go to the generation loop (fewer iterations, smaller context, cheaper model) more than to embeddings. Measure input vs output tokens separately.
@@ -217,3 +216,75 @@ flowchart TD
 **Gap.** No HPA/autoscaling, no global/distributed rate limiter or admission control, no cross-tenant bulkheads. Connection caps and cost totals are per-process, so N replicas multiply the effective limit.
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, genai._</sub>
+
+## 9. Scaling questions test whether you've thought past the demo
+
+**General:** "What happens at 10x traffic" is asked because most architectures don't survive it. If nothing changes in your design when asked, that's the signal they're waiting for. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. A strong answer includes: identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
+
+**Jiuwen:** Bounded resources exist per process: shared httpx pool (`max_connections=100`), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded `asyncio.Queue`s, and parallel tool execution with resource lanes. What is missing is autoscaling, a distributed rate limiter, and any semantic response cache — so the design change at 10x is mostly "add replicas + a global limiter", which the repo does not provide.
+
+```mermaid
+flowchart TD
+    X["10x traffic"] --> P["bounded conn pool (100)"]
+    X --> S["semaphores: embeddings 50 · sub-agents 10"]
+    X --> Q["bounded asyncio.Queue (backpressure)"]
+    X --> PT["parallel tool calls (resource lanes)"]
+    X -.->|"absent"| A["autoscaling · distributed limiter · semantic cache"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/common/clients/connector_pool.py:21</code> — <code>limit: 100</code>, <code>limit_per_host: 30</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:55</code> — concurrency semaphore<br>&bull; <code>agent-core/openjiuwen/core/runner/message_queue_inmemory.py:34</code> — bounded queue; <code>agent-core/openjiuwen/harness/subagent_runtime/activity_events.py:53</code> — bounded activity queue<br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:431</code> — <code>_execute_parallel_tool_tasks</code>; <code>:467</code> <code>parallel_safe</code> lanes<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:773</code> — exact embedding cache (no semantic cache)</sub>
+
+</details>
+
+## 10. What's your rollback plan if a prompt or model update degrades output quality?
+
+**General:** Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, and gate broad rollout on a fixed eval. Monitor quality (not just errors) so you detect the degradation, and keep the previous version warm.
+
+**Jiuwen:** Rollback exists for whole RSI **harness packages**: `rollback(installation_id)` refuses while tasks are active, validates the target hash, hot-reloads the prior version, and compensates if the pointer write fails — exposed over the WebSocket protocol. Behavior is gated by `enable_*` flags and a human `accept`/`reject` activation step. But there is **no prompt-level rollback** and no eval-threshold release gate, so a bad prompt change is only reversible if it was packaged as a harness version.
+
+```mermaid
+flowchart TD
+    BAD["bad prompt/model update"] --> PKG["RSI harness rollback: validate hash + hot reload (package-level)"]
+    BAD --> FLAG["enable_* flags + human accept/reject activation"]
+    BAD -.->|"absent"| P["prompt-level rollback · eval-threshold gate · canary"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code> — <code>rollback</code>; <code>:682</code> <code>_assert_rollback_allowed</code>; <code>:694</code> validate target hash<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/rsi/rsi_handlers.py:218/224</code> — versions list + rollback RPC<br>&bull; <code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448</code> — <code>enable_*</code> flags<br>&bull; <code>agent-core/openjiuwen/auto_harness/stages/activate.py:118</code> — explicit <code>accept</code>/<code>reject</code><br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — no eval gate</sub>
+
+</details>
+
+
+
+<sub>_Canonical source: `source/llm-applied-interview-questions_for_engineers.md`; also covered in: llm-applied._</sub>
+
+## 11. A stakeholder wants to ship before your eval scores are ready, how do you handle it
+
+**General:** This is mostly process. De-risk instead of refusing: ship behind a flag or to a small canary, define a rollback path, cap the blast radius, agree on a minimal offline eval before broad rollout, and add monitoring so a quality drop is caught quickly. Make the tradeoff explicit (what's unmeasured, what the fallback is) and put a date on the missing eval.
+
+**Jiuwen:** The closest code mechanisms are CI gates and explicit human activation, not an eval-score gate. The auto-harness `CIGateRunner` loads gates from `ci_gate.yaml` and returns pass/fail; the activate stage requires an explicit user `accept`/`reject` before an extension is hot-loaded; and the product's RSI harness activation supports rollback (refuses while tasks are active, validates the target hash, hot-loads the old version). Behavior gating is done with `enable_*` config flags. There is no release gate tied to eval thresholds and no canary/percentage rollout.
+
+```mermaid
+flowchart TD
+    SHIP{"ship before evals ready"} --> FLAG["config enable_* flags (opt-in behavior)"]
+    SHIP --> CI["CI gate: lint/type-check (no eval threshold)"]
+    SHIP --> ACT["activate stage: explicit accept/reject"]
+    SHIP --> RB["RSI rollback: validate hash + hot reload"]
+    SHIP -.->|"absent"| CANARY["canary / staged rollout / eval-threshold gate"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:168</code> load gates; <code>:1153</code> run + aggregate <code>passed</code><br>&bull; <code>agent-core/openjiuwen/auto_harness/stages/activate.py:118</code> — explicit <code>accept</code>/<code>reject</code> interaction before hot-load<br>&bull; <code>agent-core/openjiuwen/auto_harness/stages/merge.py:95</code> — static-check retry (max 3) then fail-fast<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code> <code>rollback</code>; <code>:682</code> <code>_assert_rollback_allowed</code>; <code>:694</code> validate target hash<br>&bull; <code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448</code> — <code>enable_*</code> config flags</sub>
+
+</details>
+
+**Gap.** No eval-threshold release gate and no canary/percentage rollout; the decision is human process, supported only by feature flags, explicit activation, CI checks, and manual rollback.
+
+<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>

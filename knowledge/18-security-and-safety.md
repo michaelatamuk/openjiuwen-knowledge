@@ -19,18 +19,33 @@
 
 **Jiuwen.** Jiuwen separates prompt-level from enforced defenses. Prompt-level: a safety rail injects a bilingual safety section before each call (instruction, not control). Enforced: shell command and process substitution is blocked before execution, and the permission engine merges tool policy, file guard, and net guard by strictest. Enforcement exists for actions, while content framing is weak.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The codebase separates prompt-level from enforced defenses. Prompt-level: `SafetyPromptRail` injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution, the permission engine merges tiered tool policy + file guard + net guard by "strictest" and floors risky shell structures to ASK, and builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths. A pluggable guardrail framework exists for injection detection, and the auto-harness adds an input heuristic that force-finishes on "ignore previous instructions".
 
-<sub>&bull; `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` — SafetyPromptRail; :38 injects safety section; agent-core/openjiuwen/harness/prompts/sections/safety.py:14 — static safety text<br>&bull; `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` — substitution regex; :40 check_injection blocks<br>&bull; `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` — reverse-shell deny; :35 disk deny; :99 shutdown; :148 sensitive paths<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588` — tiered policy; :409 shell AST floor; :502 ASK fallback; agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82 — deterministic parse; agent-core/openjiuwen/harness/security/permission_engine/core.py:272 — merge<br>&bull; `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` — PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:184 — default patterns<br>&bull; `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` — input heuristic → request_force_finish</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | SafetyPromptRail; :38 injects safety section; agent-core/openjiuwen/harness/prompts/sections/safety.py:14 — static safety text |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | substitution regex; :40 check_injection blocks |
+| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell deny; :35 disk deny; :99 shutdown; :148 sensitive paths |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588` | tiered policy; :409 shell AST floor; :502 ASK fallback; agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82 — deterministic parse; agent-core/openjiuwen/harness/security/permission_engine/core.py:272 — merge |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:184 — default patterns |
+| `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` | input heuristic → request_force_finish |
+
+**Implementation diagram**
 
 ![diagram](assets/diagrams/25d85df4b8bd1c43944f8ca35b28fbd241af199f.png)
 
-</details>
+**Canonical source**
 
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`_</sub>
+<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
+
+</details>
 
 ---
 
@@ -53,18 +68,31 @@ The codebase separates prompt-level from enforced defenses. Prompt-level: `Safet
 
 **Jiuwen.** This is the weakest area. Tool results are rendered through the tool's own renderer and wrapped in a plain tool message with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist but have no production callers.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Weakest area. Tool results are rendered through the tool's own `render_for_llm` and wrapped in a plain `ToolMessage` with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist (`sanitize.py`) but have no production callers. The only untrusted-data defenses are prompt-level: the auto-harness input heuristic scans all input messages (tool-role messages already in the transcript included), and the personal-context pipeline instructs its summarizer to treat supplied content as untrusted data (one internal call). There is no mandatory untrusted-tool-result seam.
 
-<sub>&bull; `agent-core/openjiuwen/core/single_agent/ability_manager.py:266` — _render_tool_result; :1612 builds ToolMessage with no untrusted wrapper; :1281 after-tool rewrite adds no label<br>&bull; `agent-core/openjiuwen/harness/prompts/sanitize.py:11` — sanitize_path; :20 sanitize_user_content (no production callers)<br>&bull; `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` — heuristic runs before model call<br>&bull; `agent-core/openjiuwen/harness/personal_context/context_pipeline.py:9237` — prompt-level "untrusted source data, never instructions"; agent-core/openjiuwen/harness/personal_context/agent_support.py:792 — same for the subagent path</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:266` | _render_tool_result; :1612 builds ToolMessage with no untrusted wrapper; :1281 after-tool rewrite adds no label |
+| `agent-core/openjiuwen/harness/prompts/sanitize.py:11` | sanitize_path; :20 sanitize_user_content (no production callers) |
+| `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` | heuristic runs before model call |
+| `agent-core/openjiuwen/harness/personal_context/context_pipeline.py:9237` | prompt-level "untrusted source data, never instructions"; agent-core/openjiuwen/harness/personal_context/agent_support.py:792 — same for the subagent path |
+
+**Implementation diagram**
 
 ![diagram](assets/diagrams/6b2ba19562ed75f76e0c140e193f1c0c37285142.png)
 
-</details>
+**Canonical source**
 
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`_</sub>
+<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
+
+</details>
 
 ---
 
@@ -87,18 +115,33 @@ Weakest area. Tool results are rendered through the tool's own `render_for_llm` 
 
 **Jiuwen.** There is no dedicated jailbreak subsystem, but four independent mechanisms. A rule-based injection detector matches ignore/disregard-previous-instructions and role-change patterns, but the guardrail is unregistered in production. The auto-harness permission engine and shell blocking are enforced. Pattern detection exists but is not wired in.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromptInjectionBackend` matches `ignore.*previous.*instructions`, `disregard.*prior.*commands`, `system.*prompt`, `you.*are.*now`, `act.*as`, `forget.*everything` — but the guardrail is unregistered in production. The auto-harness `SecurityRail` heuristic (production-registered only in the auto-harness factory) scans messages for suspicious patterns and force-finishes the run. Shell command substitution is hard-blocked, and the permission engine floors risky/unknown shell structures and interpreter sinks to ASK, with builtin rules denying reverse shells, shutdown, and sensitive paths, while recursive/forced delete (`rm -rf`) is floored to ASK rather than denied.
 
-<sub>&bull; `agent-core/openjiuwen/core/security/guardrail/backends.py:184` — default injection patterns; :127 RuleBasedPromptInjectionBackend<br>&bull; `agent-core/openjiuwen/auto_harness/rails/security_rail.py:28` — _SUSPICIOUS_PATTERNS; :129 scan + request_force_finish; agent-core/openjiuwen/auto_harness/agents/factory.py:178 — production registration path<br>&bull; `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` — _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; :71 destructive-command warnings<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` — shell AST ASK floor; :502 ASK fallback; :694 interpreter-sink ASK<br>&bull; `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` — reverse-shell DENY; :99 shutdown; :148 sensitive paths<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/core.py:246` — strictest merge; agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57 PermissionInterruptRail</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:184` | default injection patterns; :127 RuleBasedPromptInjectionBackend |
+| `agent-core/openjiuwen/auto_harness/rails/security_rail.py:28` | _SUSPICIOUS_PATTERNS; :129 scan + request_force_finish; agent-core/openjiuwen/auto_harness/agents/factory.py:178 — production registration path |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; :71 destructive-command warnings |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor; :502 ASK fallback; :694 interpreter-sink ASK |
+| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell DENY; :99 shutdown; :148 sensitive paths |
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:246` | strictest merge; agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57 PermissionInterruptRail |
+
+**Implementation diagram**
 
 ![diagram](assets/diagrams/3ca3866534d62f739069c9b9ac3fc3cf4012b2fb.png)
 
-</details>
+**Canonical source**
 
-<sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`_</sub>
+<sub>`source/genai-interview-questions_for_engineers.md`</sub>
+
+</details>
 
 ---
 
@@ -120,16 +163,27 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 
 **Jiuwen.** The store layer supports metadata filters (Milvus expressions, Chroma where, PG JSONB), plus a permission engine and audit logging. But retrieval filters are dropped at the retriever boundary: concrete retrievers hardcode no filters and the abstract retrieve has no filter argument. Authorization filters are not enforced in retrieval.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB) and there is a permission engine and audit logging. But `RetrievalConfig.filters` is **dropped at the retriever boundary** (concrete retrievers hardcode `filters=None`; the abstract `Retriever.retrieve` has no `filters` param), and documents/chunks have **no ACL field**. So permission-aware retrieval is not reachable through the KB path; the permission engine guards tool/file/net execution, not retrieval.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:53` — RetrievalConfig.filters; agent-core/openjiuwen/core/retrieval/retriever/base.py:19 — no filters param; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186 — KB passes it; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88/agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81 — filters=None<br>&bull; `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215` — , agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265, agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:332 — store-level filters<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` — check_permission (tool/file/net)<br>&bull; `agent-core/openjiuwen/core/retrieval/common/document.py:30` — no ACL field on TextChunk</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/common/config.py:53` | RetrievalConfig.filters; agent-core/openjiuwen/core/retrieval/retriever/base.py:19 — no filters param; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186 — KB passes it; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88/agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81 — filters=None |
+| `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215` | , agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265, agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:332 — store-level filters |
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` | check_permission (tool/file/net) |
+| `agent-core/openjiuwen/core/retrieval/common/document.py:30` | no ACL field on TextChunk |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -152,16 +206,29 @@ The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB
 
 **Jiuwen.** A layered permission engine returns allow, ask, or deny, merging tool policy, file guard, and net guard by strictest. Tool policy is tiered and falls back to ask when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ask. Destructive actions can be gated by approval.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + file guard + net guard by `strictest`. Tool policy is tiered and falls back to ASK when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ASK. Builtin rules deny reverse shells, fork bombs, disk writes, and shutdown/reboot, and deny sensitive paths like `~/.ssh/**` and `**/.env`. Injection via backticks/`$()` is blocked before execution.
 
-<sub>&bull; `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` — check_permission merge<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:502/588` — tiered policy, ASK fallback<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82` — tree-sitter shell parse<br>&bull; `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` — risky-structure ASK floor<br>&bull; `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:10/148` — builtin deny rules + sensitive paths<br>&bull; `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:40` — injection blocking</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` | check_permission merge |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:502/588` | tiered policy, ASK fallback |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82` | tree-sitter shell parse |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | risky-structure ASK floor |
+| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:10/148` | builtin deny rules + sensitive paths |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:40` | injection blocking |
+
+**Canonical source**
+
+<sub>`source/ai-agent-interview-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -184,18 +251,33 @@ A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + 
 
 **Jiuwen.** Two layers. Prompt-level (advisory): a safety rail is production-registered and appends a static bilingual safety section to the system prompt on each call, then always allows — it never inspects or rewrites content. Enforced-but-unwired: a guardrail package provides base guardrails. Output moderation is not active.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered and, on each model call, appends a static bilingual safety section to the system prompt then always returns allow — it never inspects or rewrites content. Enforced-but-unwired: `core/security/guardrail/` provides `BaseGuardrail` + backends; `PromptInjectionGuardrail` can raise `AbortError`/`GuardrailError` on risky input/output, and an optional local `AutoModelForSequenceClassification` / QwenGuard classifier exists — but none has a production caller. There is no bias, toxicity, or content-policy detector anywhere.
 
-<sub>&bull; `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` — SafetyPromptRail; :38 injects section; :41 always returns allow<br>&bull; `agent-core/openjiuwen/harness/prompts/sections/safety.py:14` — (CN) / :26 (EN) — static safety text; :44 build_safety_section; :57 priority<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:93` — production import of SecurityRail; :8577 _build_security_rail(); jiuwenswarm/jiuwenswarm/agents/harness/team/team_runtime_inheritance.py:248 — team members create SecurityRail()<br>&bull; `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` — PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/guardrail.py:378 — raises AbortError/GuardrailError<br>&bull; `agent-core/openjiuwen/core/security/guardrail/backends.py:445` — LocalModelBackend (AutoModelForSequenceClassification); agent-core/openjiuwen/core/security/guardrail/context.py:207 — QwenGuardParser<br>&bull; `agent-core/openjiuwen/harness/rails/security/base_security_rail.py:58` — SecurityReject/SecurityInterrupt/SecurityAlert</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | SafetyPromptRail; :38 injects section; :41 always returns allow |
+| `agent-core/openjiuwen/harness/prompts/sections/safety.py:14` | (CN) / :26 (EN) — static safety text; :44 build_safety_section; :57 priority |
+| `jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:93` | production import of SecurityRail; :8577 _build_security_rail(); jiuwenswarm/jiuwenswarm/agents/harness/team/team_runtime_inheritance.py:248 — team members create SecurityRail() |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/guardrail.py:378 — raises AbortError/GuardrailError |
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:445` | LocalModelBackend (AutoModelForSequenceClassification); agent-core/openjiuwen/core/security/guardrail/context.py:207 — QwenGuardParser |
+| `agent-core/openjiuwen/harness/rails/security/base_security_rail.py:58` | SecurityReject/SecurityInterrupt/SecurityAlert |
+
+**Implementation diagram**
 
 ![diagram](assets/diagrams/6e0d4cf6d1388ac3b6dc22d77b0ebeae56dfe292.png)
 
-</details>
+**Canonical source**
 
-<sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`_</sub>
+<sub>`source/genai-interview-questions_for_engineers.md`</sub>
+
+</details>
 
 ---
 
@@ -218,16 +300,28 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 
 **Jiuwen.** Actual model-context redaction exists only as a demo rail that regex-redacts keys, tokens, and bearer strings in history and responses. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, and a security demo has its own redaction. Model-context redaction is not production-wide.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 Actual model-context redaction exists only as a demo rail: `SensitivedatasanitizeRail` regex-redacts keys/tokens/bearer strings in history and responses, replacing with `[REDACTED]`. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, the auto-permission audit writer redacts secret-like text before appending JSONL, and the auto-permission rule engine *detects* secret-like egress payloads to force ASK/DENY rather than redact. There is no built-in sensitive-data guardrail.
 
-<sub>&bull; `agent-core/examples/security_rail_demo/SensitiveDataSanitize/rail.py:27` — sensitive regexes; :60 run_security_check; :96 _sanitize_output rewrites history/response<br>&bull; `agent-core/openjiuwen/core/common/logging/events.py:920` — sanitize_event_for_logging; :932 sensitive field list; :951 <REDACTED>; agent-core/openjiuwen/core/common/logging/base_impl.py:114 _sanitize_message<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/persistent_audit.py:50` — secret-like pattern; :262 _sanitize_audit_text; :289 combined detection<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/auto_decision.py:35` — egress secret patterns; :82 redacted risk labels<br>&bull; `agent-core/openjiuwen/core/security/guardrail/builtin.py` — only PromptInjectionGuardrail (no sensitive-data guardrail)</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/examples/security_rail_demo/SensitiveDataSanitize/rail.py:27` | sensitive regexes; :60 run_security_check; :96 _sanitize_output rewrites history/response |
+| `agent-core/openjiuwen/core/common/logging/events.py:920` | sanitize_event_for_logging; :932 sensitive field list; :951 <REDACTED>; agent-core/openjiuwen/core/common/logging/base_impl.py:114 _sanitize_message |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/persistent_audit.py:50` | secret-like pattern; :262 _sanitize_audit_text; :289 combined detection |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/auto_decision.py:35` | egress secret patterns; :82 redacted risk labels |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py` | only PromptInjectionGuardrail (no sensitive-data guardrail) |
+
+**Canonical source**
+
+<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
 
 </details>
-
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`_</sub>
 
 ---
 
@@ -250,15 +344,114 @@ Actual model-context redaction exists only as a demo rail: `Sensitivedatasanitiz
 
 **Jiuwen.** The only separation primitive is the collection name derived from the knowledge-base id plus a configurable database name — this isolates knowledge bases, not tenants. If tenants share a knowledge-base id, their chunks land in the same collection with no tenant column. Multi-tenant isolation is not enforced by default.
 
-<details open>
-<summary><b>Technical detail (classes &amp; functions)</b></summary>
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
 
 The only separation primitive is the collection name derived from `kb_id` (`kb_{kb_id}_chunks`/`_triples`) plus a configurable `database_name` — this isolates **knowledge bases, not tenants**; if tenants share a `kb_id`, their chunks land in the same collection with no tenant column. The product tracks `user_id` in auth sessions but never propagates it into retrieval. There is no tenant/namespace field on documents, and the retriever drops filters, so per-tenant pre-filtering is not available.
 
-<sub>&bull; `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` — kb_{kb_id}_chunks; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:196 — kb_{kb_id}_triples<br>&bull; `agent-core/openjiuwen/core/retrieval/common/config.py:75` — VectorStoreConfig(database_name, collection_name, …)<br>&bull; `jiuwenswarm/jiuwenswarm/common/auth/session_store.py:198` — user_id in auth session (not retrieval)<br>&bull; `jiuwenswarm/jiuwenswarm/gateway/app_gateway.py:660` — WS user_id for routing/sandbox (not KB scoping)</sub>
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:196 — kb_{kb_id}_triples |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:75` | VectorStoreConfig(database_name, collection_name, …) |
+| `jiuwenswarm/jiuwenswarm/common/auth/session_store.py:198` | user_id in auth session (not retrieval) |
+| `jiuwenswarm/jiuwenswarm/gateway/app_gateway.py:660` | WS user_id for routing/sandbox (not KB scoping) |
+
+**Canonical source**
+
+<sub>`source/rag-system-design-interview-questions_for_engineers.md`</sub>
 
 </details>
 
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`_</sub>
+---
+
+## 9. Security-adjacent questions are disguised as normal engineering questions
+
+**Title.** Security-adjacent questions in disguise
+
+**Summary.** Security-adjacent questions are disguised as normal engineering questions.
+
+**Key points.**
+
+- Tool results not framed as untrusted.
+- Sanitizers exist, unused.
+- Prompt safety is advisory.
+- Real control is the shell/permission layer.
+
+**General.** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
+
+![diagram](assets/diagrams/bd23a2c582f0d84607fa39f87399c2cd80d3fe7e.png)
+
+**Jiuwen.** This is the weakest area. Tool results are returned as a plain tool message with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory, while the enforced controls live in the shell and permission layers.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+This is the weakest area. Tool results are returned as plain `ToolMessage` with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory (`SafetyPromptRail` always allows), while the enforced controls live in the shell/permission layer (AST ASK floor, builtin deny rules) — not in retrieval. There is no mandatory untrusted-tool-result seam.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1612` | ToolMessage built with no untrusted wrapper; :431 parallel path |
+| `agent-core/openjiuwen/harness/prompts/sanitize.py:20` | sanitizer (no production callers) |
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16/41` | SafetyPromptRail (advisory, always allows) |
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:272` | check_permission (enforced tool/file/net) |
+| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell deny |
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/f2fc8022c1cc50f211ec29fab1824742dacac291.png)
+
+</details>
+
+---
+
+## 10. Any question about untrusted input is testing prompt injection awareness
+
+**Title.** Untrusted input: injection awareness
+
+**Summary.** Any question about untrusted input is testing prompt-injection awareness.
+
+**Key points.**
+
+- Tool results are plain messages.
+- Sanitizers unused; detector unregistered.
+- Safety rail is advisory.
+- Real control: shell/permission layer.
+
+**General.** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
+
+![diagram](assets/diagrams/d8e7aec4eea44ece4306dd59b3cfb07cf003a653.png)
+
+**Jiuwen.** Weakest area. Tool results are plain messages with no untrusted-data framing, the sanitizer has no production callers, the injection detector is unregistered, and the safety rail is advisory. The real controls are in the shell and permission layer (substitution blocking, AST ask floor).
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+Weakest area. Tool results are plain `ToolMessage` with no untrusted-data framing, `sanitize.py` has no production callers, the injection detector is unregistered, and `SafetyPromptRail` is advisory. The real controls are in the shell/permission layer (substitution blocking, AST ASK floor, builtin deny rules).
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1612` | ToolMessage with no wrapper |
+| `agent-core/openjiuwen/harness/prompts/sanitize.py:20` | no production callers |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail (unregistered) |
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | advisory safety rail |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor |
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/c5c60909f90d09df5c1b6d9691dae96044b253e9.png)
+
+</details>
 
 ---
