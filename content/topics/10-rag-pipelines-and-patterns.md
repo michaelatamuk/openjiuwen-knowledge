@@ -31,6 +31,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, rag-1._</sub>
 
+---
+
 ## 2. The pipeline: query embedding, vector search, context assembly, prompt construction, generation
 
 **General:** Ingest: parse → chunk → embed → index. Query: embed the query → retrieve top-k (dense and/or sparse) → rerank → assemble the retrieved context into the prompt → generate → optionally cite. Each stage is separable; failures and quality drops can occur at any of them.
@@ -62,6 +64,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
 
+---
+
 ## 3. What is Modular RAG, and how is it different from a simple RAG pipeline
 
 **General:** A simple RAG pipeline is a fixed linear chain (retrieve → stuff → generate). Modular RAG decomposes it into interchangeable modules — indexing, retrieval, fusion, reranking, query rewriting, generation, orchestration — with routing and scheduling, so you can swap or add modules (rewrite, rerank, iterative/multi-hop retrieval) and branch conditionally per query. It is "RAG as a configurable graph of components" rather than one hardcoded path. The cost is more moving parts and the need for a router/orchestrator.
@@ -87,6 +91,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
+
+---
 
 ## 4. Deciding chunk size, and what breaks at each extreme
 
@@ -118,6 +124,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: engineering, rag-retrieval, llm-applied, rag-1, rag-practical._</sub>
 
+---
+
 ## 5. What happens if your chunks are too small or too large
 
 **General:** Too small: each chunk lacks the context to answer, the answer gets split across chunks, and recall of the *answer-bearing* chunk drops while index size/overhead grows. Too large: the embedding averages multiple topics so relevance dilutes, retrieval precision drops, and each hit wastes prompt tokens; it can also exceed the embedding model's max sequence length and get truncated. Both extremes lower end-to-end quality, for opposite reasons.
@@ -140,6 +148,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
+
+---
 
 ## 6. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
 
@@ -166,6 +176,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-practical, rag-retrieval._</sub>
 
+---
+
 ## 7. Overlapping vs. non-overlapping chunks
 
 **General:** A small overlap preserves context that straddles a boundary, improving recall for answers that span a cut; too much overlap duplicates content, inflates the index, and can return near-identical hits that crowd out diverse results. Non-overlapping is cheaper and deduplicated but risks losing boundary context.
@@ -190,6 +202,8 @@ flowchart LR
 </details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-1, rag-retrieval._</sub>
+
+---
 
 ## 8. Chunking structured content like tables, code, or nested headings without losing structure
 
@@ -220,6 +234,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
 
+---
+
 ## 9. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
 
 **General:** If the answer spans a chunk boundary, the chunk that ranks may contain only half of it, so the model sees an incomplete fact. Remedies: overlap chunks, split on sentence/structure boundaries rather than fixed characters, and at serve time expand a hit with its neighbors. Sentence-aware chunking with overlap is the common fix; fixed-character splitting is the usual culprit.
@@ -246,6 +262,8 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
+
+---
 
 ## 10. Picking an embedding model, and whether bigger always means better retrieval
 
@@ -278,6 +296,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-1, rag-practical, rag-retrieval._</sub>
 
+---
+
 ## 11. Should queries and documents use the same embedding model
 
 **General:** Yes — queries and documents must be embedded by the same model, and for asymmetric models you must also apply the correct role prefix (e.g. `query:` vs `passage:`) to each side. Mixing models produces incomparable vectors; dropping the role prefix on an instruction-tuned model measurably degrades retrieval.
@@ -305,6 +325,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
 
+---
+
 ## 12. Why swapping embedding models forces a full re-embedding of the corpus
 
 **General:** Stored vectors are the output of one specific model. A different model — even at the same dimension — projects into a different space, so old and new vectors are not comparable; distance computations become meaningless. You must re-embed every chunk (and often rebuild the index, since the vector width may change too). Good systems persist a model fingerprint/version with the index so a mismatch is detected rather than silently corrupted.
@@ -329,6 +351,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-practical, rag-retrieval._</sub>
+
+---
 
 ## 13. Multilingual documents: multilingual embedding models, translate at query or index time
 
@@ -355,6 +379,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
 
+---
+
 ## 14. Handling multiple document types and formats in the same system
 
 **General:** Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by MIME/extension, and preserve format-specific structure as metadata. Chunking and indexing then operate on the uniform record. The risks are silent format gaps (a parser that drops structure) and mixed semantics (tables vs prose) needing different chunk policies.
@@ -378,6 +404,8 @@ flowchart LR
 </details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-2, rag-retrieval, rag-system._</sub>
+
+---
 
 ## 15. RAG vs. pasting retrieved text into a long-context prompt
 
@@ -405,6 +433,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
 
+---
+
 ## 16. Simple RAG pipeline
 
 **General:** the most common starting point. Query is embedded → a vector database returns top-k similar documents → documents are stuffed into a prompt → the LLM generates the answer. Used for: FAQ bots, internal document search, basic knowledge assistants.
@@ -424,6 +454,8 @@ flowchart LR
 
 </details>
 
+---
+
 ## 17. Modular RAG with reranking
 
 **General:** the upgrade once simple RAG returns irrelevant context. A retriever pulls a larger candidate set, a reranker reorders by actual relevance to the query, and only the top results enter the prompt. Used for: legal, medical, or research tools where retrieval accuracy affects trust.
@@ -442,6 +474,8 @@ flowchart LR
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:37/41</code> — <code>Reranker</code> ABC<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23</code> — <code>StandardReranker</code> (<code>/rerank</code>)<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:458</code> — reranker applied only in graph store<br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code> — KB path calls no reranker<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code> — <code>top_k: int = 5</code></sub>
 
 </details>
+
+---
 
 ## 18. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
 
@@ -469,6 +503,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
 
+---
+
 ## 19. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
 
 **General:** Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, and put a token/cost budget on the retrieval loop itself. Cache retrieval results and dedupe identical queries. Alert on loops.
@@ -495,5 +531,32 @@ flowchart TD
 **Gap.** No retrieval token/cost budget; `_link_triples`/`_link_passages` issue one request per triple (`asyncio.gather` with no concurrency limit), and the tool-loop guards do not cover these calls.
 
 
+
+<sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
+
+---
+
+## 20. How does an agent decide when to retrieve again versus when it has enough context to answer
+
+**General:** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
+
+**Jiuwen:** This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the accumulated `TripleMemory.triples_str`, and the rewrite history, and returns `{"sufficient": bool, "next_question": str|null}`. If sufficient or no next question, `_rewrite` returns `None`, which breaks the loop; otherwise the next question is appended. The hard stop is `turn >= max_iter` before `_rewrite` is called.
+
+```mermaid
+flowchart TD
+    Q["query + TripleMemory.triples_str + rewrite history"] --> RW["_REWRITE_PROMPT → {sufficient, next_question}"]
+    RW -->|"sufficient or null"| STOP["break loop"]
+    RW -->|"false + question"| NEXT["append → retrieve again"]
+    Q -.->|"judged on triples only, not passages"| X["no confidence/token-cost stopping rule"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51</code> — <code>_REWRITE_PROMPT</code> JSON contract; <code>:326</code> <code>_rewrite</code>; <code>:341</code> history formatting; <code>:364</code> <code>sufficient</code>/<code>next_question</code>; <code>:244/290</code> append-and-continue<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16</code> — <code>triples_str</code> fed to the prompt<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67</code> — prompt to differentiate/simplify later questions</sub>
+
+</details>
+
+**Gap.** Sufficiency is judged on triples only, not the actual passages; no confidence score; a JSON parse failure returns `None` (silent early stop).
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>

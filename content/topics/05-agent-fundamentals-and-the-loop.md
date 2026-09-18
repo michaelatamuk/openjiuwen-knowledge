@@ -144,7 +144,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
-
 ---
 
 ## 6. How do you set a hard limit on iterations or steps within a framework
@@ -178,7 +177,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
 
-
 ---
 
 ## 7. What decides when an agent stops and returns a final answer instead of calling another tool
@@ -211,63 +209,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
-
 ---
 
-## 8. How do you decide how many retrieval hops are enough?
-
-**General:** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
-
-**Jiuwen:** `AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
-
-```mermaid
-flowchart TD
-    R["round"] --> C1{"turn >= max_iter (default 2)?"}
-    C1 -->|yes| STOP["stop"]
-    C1 -->|no| S{"_rewrite sufficient?"}
-    S -->|true| STOP
-    S -->|"false + next_question"| R
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133</code> — `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question`<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37</code> — `max_length < 1` raises; `:402` `graph_hops` default 2</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
-
-
----
-
-## 9. How do you prevent a retrieval loop from running indefinitely and burning cost?
-
-**General:** Add repetition/loop detection, deduplicate identical tool calls, bound the agent's own loop with a max-iteration cap, and put a cost ceiling on the session. The failure mode is quiet: retries on a flaky call that never terminate, or token spend that climbs overnight.
-
-**Jiuwen:** `ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and compacts or aborts; `ToolCallDeduplicationRail` short-circuits duplicate calls via `_skip_tool`; the ReAct loop is bounded by `max_iterations` (default 5). These harness guards are **not wired into `AgenticRetriever`**, which has no loop detector beyond its turn cap.
-
-```mermaid
-flowchart TD
-    L["runaway loop / spend"] --> D["ToolCallDeduplicationRail: duplicate call → skip"]
-    L --> A["ModelAnomalyDetectionRail: identical rounds → compact/abort"]
-    L --> I["ReAct max_iterations"]
-    L -.->|"absent"| CB["no loop detector inside AgenticRetriever"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:418</code> — loop bailout `AbortError`; `:466` `_find_tool_loop_compact_range`<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:128</code> — `_skip_tool` duplicate suppression<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code> — `for iteration in range(..., max_iterations)`</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
-
-
----
-
-## 10. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 8. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 **General:** Cap iterations, detect repetition (same tool and arguments repeatedly), nudge or abort when no progress is made, and also cap rounds, tokens, and wall time. Detection should compare canonicalized arguments, not raw strings.
 
@@ -294,38 +238,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, genai, llm-applied._</sub>
 
-
 ---
 
-## 11. How does an agent decide when to retrieve again versus when it has enough context to answer
-
-**General:** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
-
-**Jiuwen:** This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the accumulated `TripleMemory.triples_str`, and the rewrite history, and returns `{"sufficient": bool, "next_question": str|null}`. If sufficient or no next question, `_rewrite` returns `None`, which breaks the loop; otherwise the next question is appended. The hard stop is `turn >= max_iter` before `_rewrite` is called.
-
-```mermaid
-flowchart TD
-    Q["query + TripleMemory.triples_str + rewrite history"] --> RW["_REWRITE_PROMPT → {sufficient, next_question}"]
-    RW -->|"sufficient or null"| STOP["break loop"]
-    RW -->|"false + question"| NEXT["append → retrieve again"]
-    Q -.->|"judged on triples only, not passages"| X["no confidence/token-cost stopping rule"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51</code> — <code>_REWRITE_PROMPT</code> JSON contract; <code>:326</code> <code>_rewrite</code>; <code>:341</code> history formatting; <code>:364</code> <code>sufficient</code>/<code>next_question</code>; <code>:244/290</code> append-and-continue<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16</code> — <code>triples_str</code> fed to the prompt<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67</code> — prompt to differentiate/simplify later questions</sub>
-
-</details>
-
-**Gap.** Sufficiency is judged on triples only, not the actual passages; no confidence score; a JSON parse failure returns `None` (silent early stop).
-
-<sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
-
-
----
-
-## 12. "The agent is stuck" tests whether you've shipped one, not studied one
+## 9. "The agent is stuck" tests whether you've shipped one, not studied one
 
 **General:** Infinite tool loops, retries on a flaky API that never terminate, token spend that quietly spikes overnight. Vague answers ("I'd add safeguards") don't land; concrete answers do — `max_iterations=5`, a token budget per session, a circuit breaker after N consecutive tool failures. A strong answer includes: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
@@ -347,10 +262,9 @@ flowchart TD
 
 </details>
 
-
 ---
 
-## 13. "The agent is stuck in a loop" is testing production experience
+## 10. "The agent is stuck in a loop" is testing production experience
 
 **General:** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. This separates people who have run one from people who have read about one. A strong answer includes: a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
 

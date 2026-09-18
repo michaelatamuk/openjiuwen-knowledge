@@ -230,3 +230,81 @@ There is no skip-retrieval classifier. `RetrievalConfig.agentic` is opt-in (defa
 </details>
 
 ---
+
+## 7. How do you decide how many retrieval hops are enough?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.
+
+**Key points.**
+
+- Stop when evidence is sufficient.
+- Hard hop cap as a backstop.
+- Repetition detection + cost ceiling.
+
+**Concept.** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
+
+![diagram](assets/diagrams/1084ac1077c40bd6eb8a6cf15e9ef5ccbc8ca266.png)
+
+**In Jiuwen.** Three caps: the agentic retriever's max iterations (default 2, hard-clamped) breaks the loop at the limit; a beam search caps graph hops (default 2); and a rewrite prompt returns a sufficiency flag plus an optional next question, which stops the loop when sufficient or when no next question is produced.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/6a5d37740697623b79f14b94573e6f9f238d5666.png)
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question` |
+| `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37` | `max_length < 1` raises; `:402` `graph_hops` default 2 |
+
+</details>
+
+---
+
+## 8. Router pattern
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** One entry point decides which subsystem handles the request: the query is classified and routed to a specialized agent or tool.
+
+**Key points.**
+
+- Classify the query.
+- Route to a specialized handler.
+- Avoid one generic prompt.
+
+**Concept.** one entry point decides which subsystem handles the request. The query is classified and routed to a specialized agent/tool (SQL agent, search agent, summarization agent), so one generic prompt does not handle everything poorly. Used for: mixed workloads where one prompt can't cover all request types.
+
+![diagram](assets/diagrams/4265d5e656a79d88f426269a5b9e713edec6bb76.png)
+
+**In Jiuwen.** There is no query-classification router. Routing that exists is model tool choice (the model picks memory search, retrieval, or other tools), and the intelli-router is model-endpoint routing (health, rate, latency), not query routing.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+There is **no query-classification router**. Routing that exists is model tool choice (the model picks `memory_search` / retrieval / other tools), and `IntelliRouter` is model-**endpoint** routing (health/rate/latency), not query routing. `AgenticRetriever` derives its mode from `index_type`, not from the query.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167` | tool the model chooses |
+| `agent-core/openjiuwen/agent_teams/models/allocator.py:559` | build_model_allocator (endpoint strategies) |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/intelli_router_model_client.py:32` | ReliableRouter |
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:155` | mode from index_type, not the query |
+
+</details>
+
+---

@@ -25,6 +25,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
 
+---
+
 ## 2. Larger model vs. smaller, faster one for a given task
 
 **General:** Match model capability to task difficulty: use a large model for reasoning/ambiguity and a small/fast one for classification, extraction, routing, and formatting. Measure quality per task and weigh latency and cost; route by task, and fall back to the larger model only when needed. A leaderboard score is a prior, not a per-task decision.
@@ -52,6 +54,8 @@ flowchart TD
 **Gap.** Routing is not accuracy-based and has no cost/latency/quality-based selection. Choosing a smaller cheap model is a caller/human decision expressed as a `model_name` hint.
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
+
+---
 
 ## 3. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
 

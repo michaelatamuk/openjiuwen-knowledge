@@ -22,6 +22,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
 
+---
+
 ## 2. Retrieval looks correct, answer is wrong: check if the chunk actually contains the answer
 
 **General:** "Looked relevant" is not "contains the answer". The first diagnostic is to read the retrieved chunks and confirm the answer span is actually present — if it is not, retrieval failed (bad chunking, wrong index, query mismatch); if it is present but the answer is wrong, the problem is generation or grounding. This is why faithfulness evaluation needs the retrieved context, not just answer-vs-reference.
@@ -45,6 +47,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-1, rag-practical._</sub>
+
+---
 
 ## 3. How do you handle hallucinations when retrieved context doesn't actually answer the question
 
@@ -73,6 +77,8 @@ flowchart TD
 **Gap.** No RAG-side answerable-from-context gate and no "I don't know" path; `score_threshold` has no default and verification is a separate, non-blocking review layer.
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai, llm-applied, rag-1._</sub>
+
+---
 
 ## 4. How do you handle retrieval when documents contain conflicting or outdated information on the same topic
 
@@ -103,6 +109,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2, rag-practical._</sub>
 
+---
+
 ## 5. No relevant documents exist: expected behavior is a confidence-gated "not enough information"
 
 **General:** When retrieval returns nothing relevant, the system should abstain rather than answer from noise: gate on a retrieval-score threshold or an explicit answerability check, and return "not enough information" (or ask a clarifying question). Without this, the model will still produce a fluent answer from irrelevant context.
@@ -126,6 +134,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-1, rag-practical._</sub>
+
+---
 
 ## 6. Same question, different answers on different days: non-deterministic reranking or embedding drift
 
@@ -151,6 +161,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
 
+---
+
 ## 7. Vocabulary mismatch, where the answer exists but uses different wording
 
 **General:** The document says "myocardial infarction", the user says "heart attack". Mitigations: better embeddings (semantic match), query expansion/synonyms, HyDE (generate a hypothetical answer and retrieve with it), and hybrid search so exact terms still match. Pure dense handles paraphrase but not rare terms; pure sparse handles rare terms but not paraphrase.
@@ -175,6 +187,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-practical, rag-retrieval._</sub>
+
+---
 
 ## 8. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
 
@@ -203,37 +217,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
 
-## 9. Building a retrieval eval set without labeled relevant documents yet
+---
 
-**General:** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
-
-**Jiuwen:** There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (`eval_proactive_dataset.py` runs inference; `score_proactive_judge.py:annotate` uses an LLM to judge memory moments). `tests/unit_tests/core/retrieval/` contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.
-
-```mermaid
-flowchart TD
-    LOGS["real queries / user questions"] --> CAN["candidate chunks"]
-    DOCS["known documents"] --> SYN["synthetic queries (doc = gold)"]
-    CAN --> J["LLM judge relevance"]
-    CAN --> ANS["answer + cite (RAGAS-style)"]
-    J --> SET["small labeled eval set (50–200, multiple query types)"]
-    SYN --> SET
-    ANS --> SET
-    SET --> MET["Recall@k · Precision@k · MRR · nDCG"]
-    MET -.->|"absent in codebase; closest = PerStream memory LLM judge"| X["no retrieval eval path"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35</code> — <code>annotate(...)</code> LLM judge (memory, not retrieval)<br>&bull; <code>agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121</code> — <code>run_inference</code>, dataset build for memory task<br>&bull; <code>agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py</code> — mock-based unit fixtures<br>&bull; <code>agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py</code> — mock-based agentic test<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code> — <code>rewrite</code> (query generation from user input, not eval-set synthesis)</sub>
-
-</details>
-
-
-
-<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
-
-## 10. "Design a RAG system" tests failure mode awareness, not architecture recall
+## 9. "Design a RAG system" tests failure mode awareness, not architecture recall
 
 **General:** Drawing embed → retrieve → rerank → generate is table stakes. The real follow-up is "retrieval returned the wrong chunk — why?", expecting chunk-size mismatch, embedding drift, or a query that doesn't semantically match the source wording. Naming failure points unprompted separates a memorized diagram from someone who has debugged one. A strong answer includes: point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
 
@@ -255,7 +241,9 @@ flowchart TD
 
 </details>
 
-## 11. "The model made something up" is testing hallucination handling, not model quality
+---
+
+## 10. "The model made something up" is testing hallucination handling, not model quality
 
 **General:** how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. The interviewer wants a system answer, not "the model isn't good enough". A strong answer includes: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
 

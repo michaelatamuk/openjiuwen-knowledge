@@ -17,6 +17,9 @@ interface TopicDao {
 
     @Query("SELECT COUNT(*) FROM topics")
     suspend fun count(): Int
+
+    @Query("DELETE FROM topics")
+    suspend fun clear()
 }
 
 @Dao
@@ -38,6 +41,9 @@ interface QuestionDao {
 
     @Query("SELECT * FROM questions WHERE searchBlob LIKE '%'||:q||'%' ORDER BY topicId, number LIMIT 60")
     fun search(q: String): Flow<List<QuestionEntity>>
+
+    @Query("DELETE FROM questions")
+    suspend fun clear()
 }
 
 @Dao
@@ -74,6 +80,12 @@ interface CardDao {
 
     @Query("SELECT AVG(CASE WHEN state >= 2 THEN 1.0 ELSE 0.0 END) FROM cards")
     fun observeMastery(): Flow<Double?>
+
+    @Query("SELECT * FROM cards")
+    suspend fun all(): List<CardEntity>
+
+    @Query("DELETE FROM cards")
+    suspend fun clear()
 }
 
 @Dao

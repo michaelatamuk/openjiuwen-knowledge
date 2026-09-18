@@ -9,6 +9,15 @@
    "Enforce privilege outside the model."
   ]
  },
+ "18-2": {
+  "title": "Defending against prompt injection",
+  "tldr": "Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.",
+  "points": [
+   "Treat content as data, not instructions.",
+   "Re-check permissions before privileged actions.",
+   "Enforce controls outside the model (shell/permission)."
+  ]
+ },
  "18-3": {
   "title": "Untrusted tool output and documents",
   "tldr": "Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.",
@@ -96,15 +105,6 @@
    "Sanitizers unused; detector unregistered.",
    "Safety rail is advisory.",
    "Real control: shell/permission layer."
-  ]
- },
- "18-2": {
-  "title": "Defending against prompt injection",
-  "tldr": "Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.",
-  "points": [
-   "Treat content as data, not instructions.",
-   "Re-check permissions before privileged actions.",
-   "Enforce controls outside the model (shell/permission)."
   ]
  }
 }

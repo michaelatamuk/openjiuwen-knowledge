@@ -1,22 +1,4 @@
 {
- "10-18": {
-  "title": "Agentic RAG",
-  "tldr": "A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.",
-  "points": [
-   "Fixed: retrieve once, then generate.",
-   "Agentic: decide whether/when to retrieve again.",
-   "Loop until sufficient or capped."
-  ]
- },
- "10-19": {
-  "title": "Preventing agentic RAG loops",
-  "tldr": "Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.",
-  "points": [
-   "Round cap + sufficiency gate.",
-   "Detect repeated queries/results.",
-   "Token/cost budget; cache/dedupe."
-  ]
- },
  "10-1": {
   "title": "RAG pipeline end to end",
   "tldr": "Two halves — ingestion (parse → chunk → embed → index) and query (embed → retrieve → rerank → assemble → generate); every stage is separable and can fail.",
@@ -172,6 +154,33 @@
    "Retrieve a larger candidate set.",
    "Rerank by query relevance.",
    "Keep only the top results."
+  ]
+ },
+ "10-18": {
+  "title": "Agentic RAG",
+  "tldr": "A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.",
+  "points": [
+   "Fixed: retrieve once, then generate.",
+   "Agentic: decide whether/when to retrieve again.",
+   "Loop until sufficient or capped."
+  ]
+ },
+ "10-19": {
+  "title": "Preventing agentic RAG loops",
+  "tldr": "Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.",
+  "points": [
+   "Round cap + sufficiency gate.",
+   "Detect repeated queries/results.",
+   "Token/cost budget; cache/dedupe."
+  ]
+ },
+ "10-20": {
+  "title": "Retrieve again or answer",
+  "tldr": "Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.",
+  "points": [
+   "Sufficiency judgment on accumulated evidence.",
+   "If not sufficient, produce the next query.",
+   "Stop on sufficient/no-next-question or the cap."
   ]
  }
 }

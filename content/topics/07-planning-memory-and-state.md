@@ -27,6 +27,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+---
+
 ## 2. How do you handle a task where the plan needs to change mid-execution based on a tool's result
 
 **General:** Allow plan mutation during the run: the agent can add, reorder, cancel, or replace tasks, and can be steered by new instructions. Track the authoritative plan separately from the live state so they can be reconciled.
@@ -58,6 +60,8 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
+
+---
 
 ## 3. What's the difference between a single-step agent and a multi-step planning agent
 
@@ -125,6 +129,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+---
+
 ## 4. What's the planner-executor pattern, and when do you need it
 
 **General:** A planner produces the plan/steps; one or more executors carry them out, often with a supervisor re-planning. Useful when planning needs a global view while execution is parallelizable or specialized, and when separating "decide" from "do" improves reliability.
@@ -152,6 +158,8 @@ flowchart TB
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+---
+
 ## 5. How does a framework track state across multiple steps in an agent's execution
 
 **General:** A state object (dict or dataclass) is threaded through the steps or held per session; each node reads and writes it. Conversation history is usually separate from working state. Frameworks persist state via checkpoints so a run can be resumed or audited.
@@ -178,6 +186,8 @@ flowchart TD
 **Gap.** Two different classes are both named `StateCollection` (agent vs workflow) with different shapes. Context messages are persisted only on explicit `save_contexts`/compression, not every step, so a crash between saves loses in-memory turns. `InMemoryState.set_state` silently ignores empty state, which can mask empty restores.
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
+
+---
 
 ## 6. How would you pause an agent mid-execution and resume it later with the same state
 
@@ -213,6 +223,8 @@ sequenceDiagram
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
+---
+
 ## 7. How would you add human-in-the-loop approval before a specific step executes
 
 **General:** Route sensitive steps through a permission check that returns allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and optionally remember or persist allow rules. Fail closed: unknown should mean "ask", not "allow".
@@ -243,6 +255,8 @@ flowchart TD
 **Gap.** The whole permission path is opt-in: `build_permission_interrupt_rail` returns `None` unless `permissions.enabled` is truthy, and `check_permission` short-circuits to ALLOW when the engine is disabled. There is no class literally named `ToolSecurityRail` — the file is `tool_security_rail.py` but the class is `PermissionInterruptRail`. Permanent persist falls back to writing YAML only when no host hook is supplied. `PlanApprovalRail` is not an interrupt — it stores pending state and appends a marker; enforcement lives in the product server layer.
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
+
+---
 
 ## 8. What's the difference between short-term and long-term memory in an agent
 
@@ -276,6 +290,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+---
+
 ## 9. How do you decide what to store in memory versus what to discard
 
 **General:** Keep durable, reused, preference-like, and decision-relevant facts; discard transient chatter, redundant restatements, and stale/contradicted entries. Most systems extract candidates with an LLM, then dedupe and resolve conflicts against existing memory.
@@ -306,6 +322,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
+
+---
 
 ## 10. How do you prevent memory from growing unbounded across a long session
 
@@ -339,6 +357,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
+---
+
 ## 11. How would you summarize conversation history without losing important details
 
 **General:** Keep the most recent turns verbatim, summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose, and re-inject the durable state (plan, task status, key artifacts) separately so it is not lost inside a summary. Boundary markers separate summary from live turns, and the summary should be updated incrementally so each pass only processes new messages.
@@ -369,6 +389,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: ai-agent, llm-fund._</sub>
 
+---
+
 ## 12. Planner–executor pattern
 
 **General:** a planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response. Common in multi-step agent systems. Used for: research assistants, report generation, multi-source data analysis.
@@ -392,6 +414,8 @@ flowchart TD
 
 </details>
 
+---
+
 ## 13. Critic or reflection loop
 
 **General:** a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.
@@ -412,6 +436,8 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> allowlist; <code>agent-core/openjiuwen/harness/subagents/verification_agent.py:51</code> — PASS/FAIL/PARTIAL<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279</code> — review dimensions + rework thresholds<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric judge</sub>
 
 </details>
+
+---
 
 ## 14. Memory-augmented agent
 
@@ -434,26 +460,3 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code> — <code>SessionModelContext</code>; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11</code> — <code>ContextMessageBuffer</code><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:183/805</code> — product hybrid index<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — <code>memory_search</code>; <code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code> — when to call</sub>
 
 </details>
-
-## 15. Router pattern
-
-**General:** one entry point decides which subsystem handles the request. The query is classified and routed to a specialized agent/tool (SQL agent, search agent, summarization agent), so one generic prompt does not handle everything poorly. Used for: mixed workloads where one prompt can't cover all request types.
-
-**Jiuwen:** There is **no query-classification router**. Routing that exists is model tool choice (the model picks `memory_search` / retrieval / other tools), and `IntelliRouter` is model-**endpoint** routing (health/rate/latency), not query routing. `AgenticRetriever` derives its mode from `index_type`, not from the query.
-
-```mermaid
-flowchart TD
-    Q["query"] --> C{"classify + route"}
-    C -.->|"absent"| X["no query router"]
-    Q --> TOOL["model tool choice (memory_search / retrieval / …)"]
-    Q --> EP["IntelliRouter: endpoint routing (health/rate/latency)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — tool the model chooses<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code> — <code>build_model_allocator</code> (endpoint strategies)<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/intelli_router_model_client.py:32</code> — <code>ReliableRouter</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:155</code> — mode from <code>index_type</code>, not the query</sub>
-
-</details>
-
----

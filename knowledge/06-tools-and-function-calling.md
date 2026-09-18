@@ -348,50 +348,7 @@ Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout re
 
 ---
 
-## 9. Controlling cost when an agent can call tools repeatedly
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.
-
-**Key points.**
-
-- Bound loop: iterations/rounds/time.
-- Cap tokens; route cheap work to small models.
-- Cache; watch retries and large tool outputs.
-
-**Concept.** Bound the loop (max iterations/rounds/time), cap tokens, make cheap models do cheap work, cache, and surface per-run cost so it can be budgeted. Retries and huge tool outputs are common hidden cost sources.
-
-![diagram](assets/diagrams/576f418bd616c4786498692797a567709bc9320b.png)
-
-**In Jiuwen.** The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, the limit is set only when provider cost metadata is available, and a check raises when exceeded. Core limits repeated calls (iteration caps and anomaly/dedup rails), and tool outputs are offloaded or compacted to control token cost.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png)
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | raise_if_session_cost_limit_exceeded; :196 set_session_cost_limit (requires provider cost) |
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15 |
-| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | tool-loop threshold + bailout |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts |
-
-</details>
-
----
-
-## 10. Agentic tool-calling pattern
+## 9. Agentic tool-calling pattern
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -424,6 +381,50 @@ This is the ReAct loop plus the ability manager. Cards become JSON Schema via th
 | `agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078` | tool list + dispatch |
 | `agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20` | card → JSON Schema |
 | `agent-core/openjiuwen/core/foundation/tool/function/function.py:82` | argument validation |
+
+</details>
+
+---
+
+## 10. How does the framework validate a tool call's structured output before executing it
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.
+
+**Key points.**
+
+- json.loads → bracket/quote repair → otherwise a readable error.
+- Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.
+- Return the error to the model so it can self-correct.
+
+**Concept.** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
+
+![diagram](assets/diagrams/ad4fba8d12f4016b60b9192fd65c682dadffdacb.png)
+
+**In Jiuwen.** Before executing, the ability manager parses the model's raw argument string, first trying JSON then repairing brackets and braces; unrecoverable JSON raises an error that is fed back to the model. The parsed dict is passed to the tool, where the function and MCP wrappers run schema validation (jsonschema with a Pydantic fallback) and fill defaults. The structured-output tool uses the caller's schema as its own input, so the same path constrains captured results.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png)
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:482` | _repair_tool_arguments_json(); :537 _parse_tool_arguments_with_repair(); :1419 execution path rewrites tool_call.arguments |
+| `agent-core/openjiuwen/core/foundation/tool/function/function.py:76` | LocalFunction.invoke; :82 validation via SchemaUtils.format_with_schema |
+| `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema() (jsonschema → Pydantic fallback); :23 format_with_schema(); :49 calls validate then fills defaults |
+| `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208` | MCPTool.invoke validates MCP args via the same path |
+| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82` | input_params = schema_json; :86 invoke |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard.input_params is the schema source |
 
 </details>
 

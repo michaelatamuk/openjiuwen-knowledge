@@ -31,11 +31,11 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    REQ[\"want structured output\"] --> CONSTRAIN[\"constrain generation: JSON schema / tool mode\"]\n    CONSTRAIN --> GEN[\"model generates\"]\n    GEN --> VALID{\"valid against schema?\"}\n    VALID -->|yes| OK[\"use the object\"]\n    VALID -->|no| RETRY[\"return error → model retries\"]"
  },
- "02-4": {
+ "06-10": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    RAW[\"model tool-call arguments (string)\"] --> PARSE{\"valid JSON?\"}\n    PARSE -->|no| REPAIR[\"repair brackets / quotes\"]\n    PARSE -->|yes| SCHEMA\n    REPAIR -->|\"still broken\"| ERR[\"readable error → back to model\"]\n    REPAIR --> SCHEMA[\"validate against the tool's schema\"]\n    SCHEMA -->|valid| RUN[\"run function (defaults filled)\"]\n    SCHEMA -->|invalid| ERR"
  },
- "02-5": {
+ "02-4": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    P[\"prompt version\"] --> VCS[\"source control / prompt store\"]\n    VCS --> ID[\"immutable id / content hash\"]\n    ID --> DEPLOY[\"activate or roll back without redeploying\"]\n    DEPLOY --> LOG[\"log version with model + params + outputs\"]"
  },
@@ -75,11 +75,11 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    NEED[\"requirements\"] --> SCALE[\"scale + latency\"]\n    NEED --> FEAT[\"hybrid search + metadata filters\"]\n    NEED --> OPS[\"managed vs self-hosted · cost · data residency\"]\n    SCALE --> CHOICE[\"Chroma (local) · Milvus (server) · pgvector (relational)\"]\n    FEAT --> CHOICE\n    OPS --> CHOICE"
  },
- "05-8": {
+ "12-7": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> R[\"retrieve\"]\n    R --> E{\"enough to answer?\"}\n    E -->|no| R2[\"reformulate + retrieve again\"]\n    R2 --> CAP{\"hop budget reached?\"}\n    CAP -->|no| R\n    CAP -->|yes| STOP[\"stop and answer with what we have\"]\n    E -->|yes| ANS[\"answer\"]"
  },
- "05-10": {
+ "05-8": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
  },
@@ -139,7 +139,7 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    A[\"agentic retrieval\"] --> L{\"need to retrieve again?\"}\n    L -->|no| ANS[\"answer\"]\n    L -->|yes| CAP{\"hop / cost budget left?\"}\n    CAP -->|no| STOP[\"stop and answer\"]\n    CAP -->|yes| R[\"retrieve\"]"
  },
- "06-9": {
+ "16-12": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    TOOLS[\"agent calls tools repeatedly\"] --> CAPS[\"cap iterations + token/step budget\"]\n    TOOLS --> CACHE[\"cache / dedup identical calls\"]\n    TOOLS --> ROUTE[\"route simple calls to a cheaper model\"]\n    CAPS --> SAVE[\"bounded cost\"]\n    CACHE --> SAVE\n    ROUTE --> SAVE"
  },

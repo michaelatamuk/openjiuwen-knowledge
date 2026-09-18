@@ -24,6 +24,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
+---
+
 ## 2. Design a RAG pipeline for a codebase assistant that needs to stay current as code changes daily
 
 **General:** Make re-indexing incremental and event-driven: a stable ID per file/chunk, delete-by-ID on change, append new chunks, and a trigger on commit/CI. Avoid full re-embeds except on model/index changes. Keep chunk boundaries structure-aware (functions/classes) and include file paths/branches as metadata so the assistant can cite and filter.
@@ -46,6 +48,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 3. Design a document search system for a legal firm with millions of confidential documents
 
@@ -70,6 +74,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 4. How retrieval architecture changes from 10,000 to 10 million documents
 
@@ -97,6 +103,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-1, rag-retrieval, rag-system._</sub>
 
+---
+
 ## 5. How do you shard or partition a vector database as it grows
 
 **General:** Options: partition by a key (tenant/category) so queries hit one partition; shard by hash/range across nodes; or replicate + route by collection. Most vector DBs expose partition keys or collections; plan for metadata routing and rebalancing. Sharding trades query fan-out for per-shard size.
@@ -117,6 +125,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 6. Keeping retrieval fast as the vector database grows, without a full re-index
 
@@ -141,6 +151,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
 
+---
+
 ## 7. What database would you choose for the vector store, and why that one over the alternatives
 
 **General:** Choose by scale and features, not familiarity: local/embedded (FAISS/Chroma) for prototypes; a managed vector DB (Pinecone / Zilliz Cloud) for scale and hybrid search; or pgvector when you already run Postgres and want one datastore, transactions, and metadata joins. Evaluate hybrid support, filtering, operational cost, and lock-in.
@@ -163,6 +175,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 8. How do you decide between a hosted vector database and a self-managed one at scale
 
@@ -189,6 +203,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
+---
+
 ## 9. What happens to the user experience if the vector database is down, what's your fallback
 
 **General:** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/BM25 or a replica), or disable retrieval and answer from parametric knowledge with a caveat. Add a circuit breaker, health checks, and timeouts so one dependency cannot hang the request. Replicate the index so a single node is not a SPOF.
@@ -212,6 +228,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 10. Handling a document updated or deleted after it's already indexed
 
@@ -237,6 +255,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-1, rag-practical, rag-retrieval, rag-system._</sub>
 
+---
+
 ## 11. How would you design the system so users never get an answer based on stale, outdated information
 
 **General:** Attach timestamps/versions to documents, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, and surface recency to the generator. Propagate deletes promptly from the source (event-driven) so the index matches source-of-truth, and reconcile periodically.
@@ -258,6 +278,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 12. How do you design for the case where retrieval returns zero relevant documents
 
@@ -284,6 +306,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
+
+---
 
 ## 13. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
 

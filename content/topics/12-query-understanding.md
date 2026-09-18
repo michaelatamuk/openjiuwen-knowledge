@@ -25,6 +25,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
 
+---
+
 ## 2. How would you handle a vague or ambiguous user query before it even reaches retrieval
 
 **General:** Detect ambiguity and either ask a clarifying question or rewrite to the most likely intent. The cheap path is a rewrite that resolves coreference/ellipsis; the interactive path is a clarification turn when the ambiguity would change the retrieval target. Most production systems rewrite by default and clarify only when confidence is low.
@@ -46,6 +48,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
+
+---
 
 ## 3. How would you decompose a complex, multi-part question into smaller retrievable sub-questions
 
@@ -71,6 +75,8 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2, rag-retrieval._</sub>
+
+---
 
 ## 4. What is multi-hop retrieval, and when does single-pass retrieval fail to answer a question
 
@@ -101,6 +107,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2, rag-retrieval._</sub>
 
+---
+
 ## 5. Handling a question requiring information from multiple documents
 
 **General:** Retrieve a candidate set per sub-query or per entity, then merge and deduplicate, and let the generator synthesize across them (or do an aggregation/summarization step). The hard parts are merging ranked lists from different queries, keeping per-document provenance for citation, and ensuring no single document dominates. Recall must be high because every needed document must be present.
@@ -128,6 +136,8 @@ flowchart TD
 **Gap.** No explicit cross-document synthesis or evidence-linking step; merging is score/rank fusion, not reasoning over combined docs.
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-2, rag-retrieval._</sub>
+
+---
 
 ## 6. When to skip RAG and rely on parametric knowledge instead
 
@@ -158,3 +168,52 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-2, rag-practical._</sub>
+
+---
+
+## 7. How do you decide how many retrieval hops are enough?
+
+**General:** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
+
+**Jiuwen:** `AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
+
+```mermaid
+flowchart TD
+    R["round"] --> C1{"turn >= max_iter (default 2)?"}
+    C1 -->|yes| STOP["stop"]
+    C1 -->|no| S{"_rewrite sufficient?"}
+    S -->|true| STOP
+    S -->|"false + next_question"| R
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133</code> — `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question`<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37</code> — `max_length < 1` raises; `:402` `graph_hops` default 2</sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
+
+---
+
+## 8. Router pattern
+
+**General:** one entry point decides which subsystem handles the request. The query is classified and routed to a specialized agent/tool (SQL agent, search agent, summarization agent), so one generic prompt does not handle everything poorly. Used for: mixed workloads where one prompt can't cover all request types.
+
+**Jiuwen:** There is **no query-classification router**. Routing that exists is model tool choice (the model picks `memory_search` / retrieval / other tools), and `IntelliRouter` is model-**endpoint** routing (health/rate/latency), not query routing. `AgenticRetriever` derives its mode from `index_type`, not from the query.
+
+```mermaid
+flowchart TD
+    Q["query"] --> C{"classify + route"}
+    C -.->|"absent"| X["no query router"]
+    Q --> TOOL["model tool choice (memory_search / retrieval / …)"]
+    Q --> EP["IntelliRouter: endpoint routing (health/rate/latency)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — tool the model chooses<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code> — <code>build_model_allocator</code> (endpoint strategies)<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/intelli_router_model_client.py:32</code> — <code>ReliableRouter</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:155</code> — mode from <code>index_type</code>, not the query</sub>
+
+</details>

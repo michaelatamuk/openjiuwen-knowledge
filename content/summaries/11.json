@@ -81,24 +81,6 @@
    "Weigh added latency against precision gain."
   ]
  },
- "11-11": {
-  "title": "Bi-encoder vs cross-encoder",
-  "tldr": "Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).",
-  "points": [
-   "Bi-encoder: independent embeddings, scalable retrieval.",
-   "Cross-encoder: joint scoring, higher precision, per-pair cost.",
-   "Use bi-encoder to retrieve, cross-encoder to rerank."
-  ]
- },
- "11-12": {
-  "title": "Cutting tokens without losing quality",
-  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
-  "points": [
-   "Retrieve many, rerank to few (needs a reranker).",
-   "Summarize long chunks before insertion.",
-   "Trim conversation history."
-  ]
- },
  "11-10": {
   "title": "When reranking is worth the latency",
   "tldr": "Rerank when precision@k dominates, the candidate set is bounded, and results are cacheable — not when latency/cost grow with N.",
@@ -106,6 +88,15 @@
    "Worth it when precision@k matters more than latency.",
    "Worth it when the candidate set is bounded/cacheable.",
    "Unbounded reranking is usually not worth it."
+  ]
+ },
+ "11-11": {
+  "title": "Bi-encoder vs cross-encoder",
+  "tldr": "Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).",
+  "points": [
+   "Bi-encoder: independent embeddings, scalable retrieval.",
+   "Cross-encoder: joint scoring, higher precision, per-pair cost.",
+   "Use bi-encoder to retrieve, cross-encoder to rerank."
   ]
  }
 }

@@ -1,6 +1,7 @@
 # Prompting and output control
 
 5 unique questions, deduplicated from the archived docs. Each `##` is one question; identical questions from other docs were merged. Full source files are in `source/`.
+
 ## 1. What's the difference between a system prompt and a user prompt
 
 **General:** The system prompt sets persistent role, rules, persona, and constraints for the whole conversation; the user prompt is the per-turn request. Providers give the system message higher priority and apply it consistently, while user turns are the changing input. Some APIs (Anthropic) pass system content as a separate top-level field rather than a role in the message list.
@@ -28,6 +29,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: genai, llm-fund._</sub>
+
+---
 
 ## 2. Zero-shot vs. few-shot vs. chain-of-thought, when does each actually improve output
 
@@ -64,6 +67,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: genai, llm-fund, llm-applied._</sub>
 
+---
+
 ## 3. How do you get consistent, parseable output like JSON from an LLM
 
 **General:** Layer the guarantees: prefer a provider JSON/schema mode or tool/function calling with a JSON Schema so the model is constrained at generation time; validate against the schema; on failure, return the validation error to the model for a retry; only then parse. Fenced or free-text JSON should be a last resort with tolerant extraction and repair.
@@ -96,36 +101,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: genai, llm-fund._</sub>
 
-## 4. How does the framework validate a tool call's structured output before executing it
+---
 
-**General:** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
-
-**Jiuwen:** Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
-
-```mermaid
-flowchart TD
-    RAW["model tool-call arguments (string)"] --> P{"json.loads ok?"}
-    P -->|no| REP["_repair_tool_arguments_json (balance brackets)"]
-    P -->|yes| D
-    REP -->|"still broken"| ERR["AbilityExecutionError → back to model"]
-    REP -->|fixed| D["parsed dict → tool.invoke"]
-    D --> V["SchemaUtils.format_with_schema → validate_with_schema"]
-    V -->|valid| RUN["function runs (defaults filled)"]
-    V -->|invalid| ERR
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code> — <code>_repair_tool_arguments_json()</code>; <code>:537</code> <code>_parse_tool_arguments_with_repair()</code>; <code>:1419</code> execution path rewrites <code>tool_call.arguments</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:76</code> — <code>LocalFunction.invoke</code>; <code>:82</code> validation via <code>SchemaUtils.format_with_schema</code><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema()</code> (jsonschema → Pydantic fallback); <code>:23</code> <code>format_with_schema()</code>; <code>:49</code> calls validate then fills defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208</code> — <code>MCPTool.invoke</code> validates MCP args via the same path<br>&bull; <code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82</code> — <code>input_params = schema_json</code>; <code>:86</code> <code>invoke</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard.input_params</code> is the schema source</sub>
-
-</details>
-
-**Gap.** Validation is skipped only when `input_params` is `None` (the default `{}` still enters validation). The JSON repair only balances brackets/quotes — it does not fix unquoted barewords or trailing commas, which raise and round-trip an error to the model. Schema validation lives inside the tool (`LocalFunction`/`MCPTool`), so a raw `Tool` subclass that does not call `SchemaUtils` gets no automatic argument validation.
-
-<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
-
-## 5. How do you version prompts the same way you'd version code
+## 4. How do you version prompts the same way you'd version code
 
 **General:** Treat prompts as versioned artifacts: store them in source control (or a prompt store), give each version an immutable ID/content hash, track diffs and metadata, allow activate/rollback without redeploying, and tie a version to the model/parameters it was tested with. Ideally prompts are assembled from composable, individually versioned pieces.
 
@@ -154,7 +132,7 @@ flowchart TD
 
 ---
 
-## 6. Any prompt behavior question is secretly a versioning and testing question
+## 5. Any prompt behavior question is secretly a versioning and testing question
 
 **General:** treating prompts like code (not one-off strings), testing prompt changes against a fixed eval set, a rollback plan when a change degrades output, and tracking which prompt version produced which output in logs. A strong answer includes: version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and be able to roll back in one step.
 

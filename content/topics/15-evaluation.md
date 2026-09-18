@@ -166,7 +166,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-1, rag-retrieval._</sub>
 
-
 ---
 
 ## 7. MRR, and when it matters more than Recall@k
@@ -191,7 +190,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-retrieval._</sub>
-
 
 ---
 
@@ -218,7 +216,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
 
 ---
 
@@ -249,7 +246,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, llm-applied, rag-1, genai, rag-eval._</sub>
 
-
 ---
 
 ## 10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
@@ -277,7 +273,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-
 ---
 
 ## 11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
@@ -304,7 +299,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
 
 ---
 
@@ -334,7 +328,6 @@ flowchart TD
 **Gap.** No token-loss averaging, no length normalization, no corpus-level perplexity.
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
-
 
 ---
 
@@ -368,7 +361,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, rag-eval._</sub>
 
-
 ---
 
 ## 14. How do you evaluate when there's no ground truth answer, only a query and a corpus
@@ -398,7 +390,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-
 ---
 
 ## 15. How would you build an eval dataset from scratch if you don't have one yet
@@ -426,7 +417,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-
 ---
 
 ## 16. How many examples before eval results are statistically meaningful, not just noise
@@ -451,7 +441,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
 
 ---
 
@@ -485,7 +474,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-
 ---
 
 ## 18. Building a regression test suite to catch a quality drop before it ships
@@ -513,7 +501,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, rag-eval, rag-1._</sub>
 
-
 ---
 
 ## 19. Evaluating continuously in production, not just once before launch
@@ -539,7 +526,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: ai-agent, rag-eval, rag-system._</sub>
-
 
 ---
 
@@ -567,7 +553,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
 
-
 ---
 
 ## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
@@ -593,7 +578,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-
 ---
 
 ## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
@@ -617,7 +601,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
 
 ---
 
@@ -643,7 +626,6 @@ flowchart TD
 
 </details>
 
-
 ---
 
 ## 24. "How do you know it's working" is testing evaluation depth
@@ -667,3 +649,35 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — no context input; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12</code> — exact match<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — benchmark eval<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — lint/type-check only; <code>agent-core/pyproject.toml:236</code> — markers not invoked<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code> (operations, not quality)</sub>
 
 </details>
+
+---
+
+## 25. Building a retrieval eval set without labeled relevant documents yet
+
+**General:** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
+
+**Jiuwen:** There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (`eval_proactive_dataset.py` runs inference; `score_proactive_judge.py:annotate` uses an LLM to judge memory moments). `tests/unit_tests/core/retrieval/` contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.
+
+```mermaid
+flowchart TD
+    LOGS["real queries / user questions"] --> CAN["candidate chunks"]
+    DOCS["known documents"] --> SYN["synthetic queries (doc = gold)"]
+    CAN --> J["LLM judge relevance"]
+    CAN --> ANS["answer + cite (RAGAS-style)"]
+    J --> SET["small labeled eval set (50–200, multiple query types)"]
+    SYN --> SET
+    ANS --> SET
+    SET --> MET["Recall@k · Precision@k · MRR · nDCG"]
+    MET -.->|"absent in codebase; closest = PerStream memory LLM judge"| X["no retrieval eval path"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35</code> — <code>annotate(...)</code> LLM judge (memory, not retrieval)<br>&bull; <code>agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121</code> — <code>run_inference</code>, dataset build for memory task<br>&bull; <code>agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py</code> — mock-based unit fixtures<br>&bull; <code>agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py</code> — mock-based agentic test<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code> — <code>rewrite</code> (query generation from user input, not eval-set synthesis)</sub>
+
+</details>
+
+
+
+<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>

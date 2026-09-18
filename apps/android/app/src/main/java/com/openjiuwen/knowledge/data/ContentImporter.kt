@@ -1,19 +1,31 @@
 package com.openjiuwen.knowledge.data
 
 import android.content.Context
+import androidx.room.withTransaction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.security.MessageDigest
 
 object ContentImporter {
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private const val PREFS = "content"
+    private const val KEY_HASH = "content_hash"
 
-    /** Import the bundled content.json into Room on first launch. */
+    /**
+     * Import the bundled content.json into Room when it is absent or has changed
+     * since the last import. Study progress (card scheduling) is preserved for
+     * questions that still exist.
+     */
     suspend fun importIfNeeded(context: Context, db: AppDatabase) {
-        if (db.questions().count() > 0) return
-        val text = context.assets.open("content.json").bufferedReader().use { it.readText() }
-        val root = json.decodeFromString<ContentRoot>(text)
+        val bytes = context.assets.open("content.json").use { it.readBytes() }
+        val hash = MessageDigest.getInstance("SHA-1").digest(bytes)
+            .joinToString("") { "%02x".format(it) }
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (prefs.getString(KEY_HASH, null) == hash && db.questions().count() > 0) return
+
+        val root = json.decodeFromString<ContentRoot>(String(bytes, Charsets.UTF_8))
 
         val topics = root.topics.mapIndexed { i, t -> TopicEntity(t.id, t.title, i, t.section) }
         val questions = ArrayList<QuestionEntity>()
@@ -53,8 +65,16 @@ object ContentImporter {
                 cards.add(CardEntity(questionId = q.id))
             }
         }
-        db.topics().insertAll(topics)
-        db.questions().insertAll(questions)
-        db.cards().insertAll(cards)
+
+        val prior = db.cards().all().associateBy { it.questionId }
+        db.withTransaction {
+            db.topics().clear()
+            db.questions().clear()
+            db.cards().clear()
+            db.topics().insertAll(topics)
+            db.questions().insertAll(questions)
+            db.cards().insertAll(cards.map { prior[it.questionId] ?: it })
+        }
+        prefs.edit().putString(KEY_HASH, hash).apply()
     }
 }

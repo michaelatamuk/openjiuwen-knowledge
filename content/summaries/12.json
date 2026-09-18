@@ -52,5 +52,23 @@
    "Skip when the corpus adds no signal and cost/latency matter.",
    "Decide with a classifier or a sufficiency check."
   ]
+ },
+ "12-7": {
+  "title": "How many retrieval hops",
+  "tldr": "Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.",
+  "points": [
+   "Stop when evidence is sufficient.",
+   "Hard hop cap as a backstop.",
+   "Repetition detection + cost ceiling."
+  ]
+ },
+ "12-8": {
+  "title": "Router pattern",
+  "tldr": "One entry point decides which subsystem handles the request: the query is classified and routed to a specialized agent or tool.",
+  "points": [
+   "Classify the query.",
+   "Route to a specialized handler.",
+   "Avoid one generic prompt."
+  ]
  }
 }

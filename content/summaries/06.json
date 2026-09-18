@@ -72,21 +72,21 @@
   ]
  },
  "06-9": {
-  "title": "Cost with repeated tool calls",
-  "tldr": "Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.",
-  "points": [
-   "Bound loop: iterations/rounds/time.",
-   "Cap tokens; route cheap work to small models.",
-   "Cache; watch retries and large tool outputs."
-  ]
- },
- "06-10": {
   "title": "Agentic tool-calling pattern",
   "tldr": "The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.",
   "points": [
    "Model emits structured tool calls.",
    "Runtime executes and feeds back results.",
    "Loops until the model answers."
+  ]
+ },
+ "06-10": {
+  "title": "Validating tool-call output",
+  "tldr": "Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.",
+  "points": [
+   "json.loads → bracket/quote repair → otherwise a readable error.",
+   "Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.",
+   "Return the error to the model so it can self-correct."
   ]
  }
 }

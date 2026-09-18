@@ -29,6 +29,8 @@ sequenceDiagram
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent, genai, llm-applied, engineering._</sub>
 
+---
+
 ## 2. How does a framework register and expose tools to the underlying model
 
 **General:** You register a tool with a name, description, and parameter schema; the framework collects registered tools into the model request in the provider's tool format; the model returns tool calls that the framework dispatches. Auto-deriving the schema from a function signature is the convenience that makes this usable.
@@ -56,6 +58,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
+---
+
 ## 3. How do you handle a tool that a framework doesn't natively support
 
 **General:** The framework should let you wrap an arbitrary function as a tool, define a custom tool class for custom transport/auth, or connect an external tool server through a protocol such as MCP. If none of those is possible, that is a real limitation.
@@ -82,6 +86,8 @@ flowchart TD
 **Gap.** `@tool` exposes no `idempotent`/`parallel_safe`/`properties` arguments, so a decorator-created tool cannot directly declare retry/timeout policy — pass a prebuilt `card=` or mutate `card` afterward. `LocalFunction` accepts only a `func` (and optional `render`); tools needing custom transport/auth must subclass `Tool` or use `RestfulApi`/`MCPTool`. `AbilityManager._execute_single_tool_call` treats a bare `McpServerConfig` name as unimplemented, so MCP must be registered/materialized before execution.
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
+
+---
 
 ## 4. How do you handle a tool call that fails or returns malformed output
 
@@ -115,6 +121,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
 
+---
+
 ## 5. Designing retry logic that doesn't cause duplicate side effects on a tool call
 
 **General:** Never blindly retry non-idempotent actions (payments, emails, writes). Mark side-effecting tools, use idempotency keys so a repeated call is recognized, and prefer retry only for reads or explicitly idempotent operations. Bound retries with backoff. On ambiguity, surface to a human rather than guess.
@@ -146,6 +154,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering._</sub>
 
+---
+
 ## 6. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
 
 **General:** Retry policy should be per-tool and overridable: an idempotency flag, max attempts, backoff, and timeout. A single global retry that ignores non-idempotency is dangerous, but so is a per-tool override that silently disables the framework's safety defaults.
@@ -176,6 +186,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
+---
+
 ## 7. Handling concurrent API calls when an agent needs to call multiple tools at once
 
 **General:** When a turn contains several independent tool calls, run them concurrently with async tasks rather than a serial `for` loop, but bound the concurrency (semaphore/pool), respect per-resource ordering (two writes to the same file must not interleave), and mark which tools are safe to parallelize. Failures in one call should not silently cancel the others unless you want fail-fast semantics.
@@ -203,6 +215,8 @@ flowchart TD
 **Gap.** Parallelism is per-turn only, with no token-budget-aware or priority scheduling; MCP calls share the pool with no per-server backpressure.
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
+
+---
 
 ## 8. How does the framework handle a step that times out or throws an error
 
@@ -233,36 +247,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
-## 9. Controlling cost when an agent can call tools repeatedly
+---
 
-**General:** Bound the loop (max iterations/rounds/time), cap tokens, make cheap models do cheap work, cache, and surface per-run cost so it can be budgeted. Retries and huge tool outputs are common hidden cost sources.
-
-**Jiuwen:** The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
-
-```mermaid
-flowchart TD
-    M["model call"] --> D{"tool calls?"}
-    D -->|yes| T["run tools"]
-    T --> L{"loop guard: repeated (tool,args)"}
-    L -->|"threshold"| CMP["compact / abort"]
-    T --> M
-    SESS["session cost cap (usage_cost.py)"] -.->|"pre-flight + mid-stream"| M
-    BUD["team BudgetLedger token ceiling"] -.-> T
-    ITER["max_iterations 5 / 15"] -.-> M
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — <code>raise_if_session_cost_limit_exceeded</code>; <code>:196</code> <code>set_session_cost_limit</code> (requires provider cost)<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations</code>; <code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default 15<br>&bull; <code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27</code> — <code>BudgetLedger</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90</code> — tool-loop threshold + bailout<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — cross-turn repeat counter; <code>agent-core/openjiuwen/harness/goal/evaluation.py:298</code> — <code>max_attempts</code></sub>
-
-</details>
-
-**Gap.** Cost enforcement is inert unless the provider reports cost metadata, and totals/limits are per-process (not shared across replicas). No cost-aware model downgrade or per-tool hard token budget in the core single-agent path.
-
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
-
-## 10. Agentic tool-calling pattern
+## 9. Agentic tool-calling pattern
 
 **General:** the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.
 
@@ -287,3 +274,34 @@ sequenceDiagram
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813</code> — loop / answer / execute<br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078</code> — tool list + dispatch<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code> — card → JSON Schema<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:82</code> — argument validation</sub>
 
 </details>
+
+---
+
+## 10. How does the framework validate a tool call's structured output before executing it
+
+**General:** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
+
+**Jiuwen:** Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
+
+```mermaid
+flowchart TD
+    RAW["model tool-call arguments (string)"] --> P{"json.loads ok?"}
+    P -->|no| REP["_repair_tool_arguments_json (balance brackets)"]
+    P -->|yes| D
+    REP -->|"still broken"| ERR["AbilityExecutionError → back to model"]
+    REP -->|fixed| D["parsed dict → tool.invoke"]
+    D --> V["SchemaUtils.format_with_schema → validate_with_schema"]
+    V -->|valid| RUN["function runs (defaults filled)"]
+    V -->|invalid| ERR
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code> — <code>_repair_tool_arguments_json()</code>; <code>:537</code> <code>_parse_tool_arguments_with_repair()</code>; <code>:1419</code> execution path rewrites <code>tool_call.arguments</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:76</code> — <code>LocalFunction.invoke</code>; <code>:82</code> validation via <code>SchemaUtils.format_with_schema</code><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema()</code> (jsonschema → Pydantic fallback); <code>:23</code> <code>format_with_schema()</code>; <code>:49</code> calls validate then fills defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208</code> — <code>MCPTool.invoke</code> validates MCP args via the same path<br>&bull; <code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82</code> — <code>input_params = schema_json</code>; <code>:86</code> <code>invoke</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard.input_params</code> is the schema source</sub>
+
+</details>
+
+**Gap.** Validation is skipped only when `input_params` is `None` (the default `{}` still enters validation). The JSON repair only balances brackets/quotes — it does not fix unquoted barewords or trailing commas, which raise and round-trip an error to the model. Schema validation lives inside the tool (`LocalFunction`/`MCPTool`), so a raw `Tool` subclass that does not call `SchemaUtils` gets no automatic argument validation.
+
+<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>

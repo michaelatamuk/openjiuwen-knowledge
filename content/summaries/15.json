@@ -45,6 +45,15 @@
    "Both can look fine while real quality is poor."
   ]
  },
+ "15-6": {
+  "title": "Why precision and recall can both look fine",
+  "tldr": "Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.",
+  "points": [
+   "Wrong embedding/chunking → nothing relevant ranked.",
+   "Corpus lacks the answer → nothing to retrieve.",
+   "Plausible output is not quality; measure it."
+  ]
+ },
  "15-7": {
   "title": "MRR",
   "tldr": "Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.",
@@ -209,13 +218,13 @@
    "No CI quality gate."
   ]
  },
- "15-6": {
-  "title": "Why precision and recall can both look fine",
-  "tldr": "Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.",
+ "15-25": {
+  "title": "Building a retrieval eval set",
+  "tldr": "Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.",
   "points": [
-   "Wrong embedding/chunking → nothing relevant ranked.",
-   "Corpus lacks the answer → nothing to retrieve.",
-   "Plausible output is not quality; measure it."
+   "Mine real queries from logs.",
+   "Label via LLM judge or a strong model's citations.",
+   "Or synthesize queries from known documents (doc = gold)."
   ]
  }
 }

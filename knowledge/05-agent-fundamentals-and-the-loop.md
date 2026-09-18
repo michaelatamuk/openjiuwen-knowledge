@@ -287,84 +287,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 8. How do you decide how many retrieval hops are enough?
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Use a sufficiency check to stop when evidence answers the question, and cap hops with a hard limit plus repetition and cost guards.
-
-**Key points.**
-
-- Stop when evidence is sufficient.
-- Hard hop cap as a backstop.
-- Repetition detection + cost ceiling.
-
-**Concept.** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
-
-![diagram](assets/diagrams/1084ac1077c40bd6eb8a6cf15e9ef5ccbc8ca266.png)
-
-**In Jiuwen.** Three caps: the agentic retriever's max iterations (default 2, hard-clamped) breaks the loop at the limit; a beam search caps graph hops (default 2); and a rewrite prompt returns a sufficiency flag plus an optional next question, which stops the loop when sufficient or when no next question is produced.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/6a5d37740697623b79f14b94573e6f9f238d5666.png)
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question` |
-| `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37` | `max_length < 1` raises; `:402` `graph_hops` default 2 |
-
-</details>
-
----
-
-## 9. How do you prevent a retrieval loop from running indefinitely and burning cost?
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Add repetition detection, tool-call dedup, a max-iteration cap, and a cost ceiling so a confused agent cannot loop forever.
-
-**Key points.**
-
-- Detect repetition and duplicate tool calls.
-- Bound the agent loop with max_iterations.
-- Set a session cost ceiling.
-
-**Concept.** Add repetition/loop detection, deduplicate identical tool calls, bound the agent's own loop with a max-iteration cap, and put a cost ceiling on the session. The failure mode is quiet: retries on a flaky call that never terminate, or token spend that climbs overnight.
-
-![diagram](assets/diagrams/c26205b0d6e51fad4ee9c2b6a12eccc0b3c5bbcf.png)
-
-**In Jiuwen.** The harness guards are not wired into AgenticRetriever: ModelAnomalyDetectionRail compacts/aborts on identical tool rounds, ToolCallDeduplicationRail skips duplicate calls, and the ReAct loop is bounded by max_iterations (default 5). No loop detector runs inside the retriever itself.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and compacts or aborts; `ToolCallDeduplicationRail` short-circuits duplicate calls via `_skip_tool`; the ReAct loop is bounded by `max_iterations` (default 5). These harness guards are **not wired into `AgenticRetriever`**, which has no loop detector beyond its turn cap.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:418` | loop bailout `AbortError`; `:466` `_find_tool_loop_compact_range` |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:128` | `_skip_tool` duplicate suppression |
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | `for iteration in range(..., max_iterations)` |
-
-</details>
-
----
-
-## 10. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 8. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -408,44 +331,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ---
 
-## 11. How does an agent decide when to retrieve again versus when it has enough context to answer
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.
-
-**Key points.**
-
-- Sufficiency judgment on accumulated evidence.
-- If not sufficient, produce the next query.
-- Stop on sufficient/no-next-question or the cap.
-
-**Concept.** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
-
-![diagram](assets/diagrams/d87522fc4f4f9c9d8d89e9291e0877d7ad62ec8c.png)
-
-**In Jiuwen.** This is the agentic retriever's rewrite step: a prompt receives the query, the accumulated facts, and the rewrite history, and returns a sufficiency flag plus an optional next question. If it is sufficient or there is no next question, the rewrite returns nothing and the loop breaks; otherwise the next question drives another retrieval round.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the accumulated `TripleMemory.triples_str`, and the rewrite history, and returns `{"sufficient": bool, "next_question": str|null}`. If sufficient or no next question, `_rewrite` returns `None`, which breaks the loop; otherwise the next question is appended. The hard stop is `turn >= max_iter` before `_rewrite` is called.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51` | _REWRITE_PROMPT JSON contract; :326 _rewrite; :341 history formatting; :364 sufficient/next_question; :244/290 append-and-continue |
-| `agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16` | triples_str fed to the prompt |
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67` | prompt to differentiate/simplify later questions |
-
-</details>
-
----
-
-## 12. "The agent is stuck" tests whether you've shipped one, not studied one
+## 9. "The agent is stuck" tests whether you've shipped one, not studied one
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -485,7 +371,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 13. "The agent is stuck in a loop" is testing production experience
+## 10. "The agent is stuck in a loop" is testing production experience
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

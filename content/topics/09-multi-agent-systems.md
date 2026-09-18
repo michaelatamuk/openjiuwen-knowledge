@@ -35,6 +35,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
+---
+
 ## 2. How does a framework handle communication between multiple agents
 
 **General:** Either a shared blackboard (task board/state) plus a message bus, or direct message passing. Messages should be persistent and ordered for auditability, with routing (direct, broadcast, mentions). Direct handoffs must carry enough context and be bounded.
@@ -67,6 +69,8 @@ sequenceDiagram
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
 
+---
+
 ## 3. How does the framework handle one agent's output becoming another agent's input
 
 **General:** Either a call returns the value (subagent/tool), or a handoff transfers control and context, or a shared board/bus carries the artifact. The framework must define how results and context propagate, and whether propagation is automatic or requires the consumer to re-read.
@@ -95,6 +99,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
+---
+
 ## 4. How do you prevent multiple agents from producing conflicting or redundant results
 
 **General:** Give each unit of work a single owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign rather than release (to avoid race windows), dedupe dispatch, and isolate workspaces so edits don't collide.
@@ -120,6 +126,8 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
+
+---
 
 ## 5. How do you debug a failure when it's unclear which agent in the chain caused it
 
@@ -148,6 +156,8 @@ flowchart TB
 **Gap.** There is no automated causal/root-cause analysis — spans provide attribution, and TraceHound's `tracehound.analyze` is an LLM overlay, not deterministic blame. Leader events carry no `member_name`, so leader-vs-single-agent attribution relies on role heuristics. Subagents are excluded from team identity and inherit attribution only by span nesting. Trajectory capture is opt-in, and logs carry no trace/span id by default.
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
+
+---
 
 ## 6. When is a multi-agent system overkill compared to a single well-designed agent
 

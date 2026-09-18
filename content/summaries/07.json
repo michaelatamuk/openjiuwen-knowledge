@@ -124,14 +124,5 @@
    "Long-term = persisted store.",
    "Retrieval brings memory back."
   ]
- },
- "07-15": {
-  "title": "Router pattern",
-  "tldr": "One entry point decides which subsystem handles the request: the query is classified and routed to a specialized agent or tool.",
-  "points": [
-   "Classify the query.",
-   "Route to a specialized handler.",
-   "Avoid one generic prompt."
-  ]
  }
 }

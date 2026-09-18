@@ -28,15 +28,6 @@
   ]
  },
  "02-4": {
-  "title": "Validating tool-call output",
-  "tldr": "Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.",
-  "points": [
-   "json.loads → bracket/quote repair → otherwise a readable error.",
-   "Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.",
-   "Return the error to the model so it can self-correct."
-  ]
- },
- "02-5": {
   "title": "Versioning prompts",
   "tldr": "Treat prompts like code: immutable IDs/hashes, diffs, activate/rollback without redeploying, and tie each version to the model and parameters it was tested with.",
   "points": [
@@ -46,7 +37,7 @@
    "Log the prompt version alongside outputs."
   ]
  },
- "02-6": {
+ "02-5": {
   "title": "Prompt behavior: versioning and testing",
   "tldr": "Any prompt behavior question is secretly a versioning and testing question.",
   "points": [

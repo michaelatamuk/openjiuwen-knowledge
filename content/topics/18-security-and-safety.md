@@ -50,7 +50,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied._</sub>
 
-
 ---
 
 ## 3. Handling untrusted content from a tool result or retrieved document
@@ -77,7 +76,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
-
 
 ---
 
@@ -107,7 +105,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai._</sub>
 
-
 ---
 
 ## 5. How do you make sure a user only retrieves documents they're actually authorized to see
@@ -133,7 +130,6 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
-
 
 ---
 
@@ -173,7 +169,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
-
 ---
 
 ## 7. How do you prevent a model from generating harmful or biased content
@@ -200,7 +195,6 @@ flowchart TD
 **Gap.** The ML guardrail and content classifier are implemented but have no production callers; only `SafetyPromptRail` (advisory) is mounted. No bias/toxicity/content-policy detection exists.
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai._</sub>
-
 
 ---
 
@@ -232,7 +226,6 @@ flowchart LR
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai._</sub>
 
-
 ---
 
 ## 9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
@@ -260,7 +253,6 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
-
 ---
 
 ## 10. Security-adjacent questions are disguised as normal engineering questions
@@ -285,7 +277,6 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code> — <code>ToolMessage</code> built with no untrusted wrapper; <code>:431</code> parallel path<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code> — sanitizer (no production callers)<br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16/41</code> — <code>SafetyPromptRail</code> (advisory, always allows)<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code> — <code>check_permission</code> (enforced tool/file/net)<br>&bull; <code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code> — reverse-shell deny</sub>
 
 </details>
-
 
 ---
 

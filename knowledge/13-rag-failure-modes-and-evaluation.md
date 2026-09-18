@@ -325,46 +325,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 
 ---
 
-## 9. Building a retrieval eval set without labeled relevant documents yet
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
-
-**Key points.**
-
-- Mine real queries from logs.
-- Label via LLM judge or a strong model's citations.
-- Or synthesize queries from known documents (doc = gold).
-
-**Concept.** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
-
-![diagram](assets/diagrams/d8d020da2a0703d725bd5e991703c39309fd0b48.png)
-
-**In Jiuwen.** There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (`eval_proactive_dataset.py` runs inference; `score_proactive_judge.py:annotate` uses an LLM to judge memory moments). `tests/unit_tests/core/retrieval/` contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35` | annotate(...) LLM judge (memory, not retrieval) |
-| `agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121` | run_inference, dataset build for memory task |
-| `agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py` | mock-based unit fixtures |
-| `agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py` | mock-based agentic test |
-| `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | rewrite (query generation from user input, not eval-set synthesis) |
-
-</details>
-
----
-
-## 10. "Design a RAG system" tests failure mode awareness, not architecture recall
+## 9. "Design a RAG system" tests failure mode awareness, not architecture recall
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
@@ -403,7 +364,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 ---
 
-## 11. "The model made something up" is testing hallucination handling, not model quality
+## 10. "The model made something up" is testing hallucination handling, not model quality
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

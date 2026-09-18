@@ -74,15 +74,6 @@
   ]
  },
  "13-9": {
-  "title": "Building a retrieval eval set",
-  "tldr": "Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.",
-  "points": [
-   "Mine real queries from logs.",
-   "Label via LLM judge or a strong model's citations.",
-   "Or synthesize queries from known documents (doc = gold)."
-  ]
- },
- "13-10": {
   "title": "Design a RAG system: tests failure-mode awareness",
   "tldr": "'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.",
   "points": [
@@ -92,7 +83,7 @@
    "Metadata filters dropped at the retriever."
   ]
  },
- "13-11": {
+ "13-10": {
   "title": "'The model made something up': hallucination handling",
   "tldr": "'The model made something up' is testing hallucination handling, not model quality.",
   "points": [

@@ -105,5 +105,23 @@
    "Minimal offline eval gate.",
    "Monitoring to detect drops."
   ]
+ },
+ "16-12": {
+  "title": "Cost with repeated tool calls",
+  "tldr": "Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.",
+  "points": [
+   "Bound loop: iterations/rounds/time.",
+   "Cap tokens; route cheap work to small models.",
+   "Cache; watch retries and large tool outputs."
+  ]
+ },
+ "16-13": {
+  "title": "Cutting tokens without losing quality",
+  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
+  "points": [
+   "Retrieve many, rerank to few (needs a reranker).",
+   "Summarize long chunks before insertion.",
+   "Trim conversation history."
+  ]
  }
 }

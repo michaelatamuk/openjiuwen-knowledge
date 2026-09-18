@@ -765,3 +765,40 @@ Caps exist (`AgenticRetriever.max_iter` default 2 clamped, `graph_hops`/`max_len
 </details>
 
 ---
+
+## 20. How does an agent decide when to retrieve again versus when it has enough context to answer
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.
+
+**Key points.**
+
+- Sufficiency judgment on accumulated evidence.
+- If not sufficient, produce the next query.
+- Stop on sufficient/no-next-question or the cap.
+
+**Concept.** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
+
+![diagram](assets/diagrams/d87522fc4f4f9c9d8d89e9291e0877d7ad62ec8c.png)
+
+**In Jiuwen.** This is the agentic retriever's rewrite step: a prompt receives the query, the accumulated facts, and the rewrite history, and returns a sufficiency flag plus an optional next question. If it is sufficient or there is no next question, the rewrite returns nothing and the loop breaks; otherwise the next question drives another retrieval round.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the accumulated `TripleMemory.triples_str`, and the rewrite history, and returns `{"sufficient": bool, "next_question": str|null}`. If sufficient or no next question, `_rewrite` returns `None`, which breaks the loop; otherwise the next question is appended. The hard stop is `turn >= max_iter` before `_rewrite` is called.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51` | _REWRITE_PROMPT JSON contract; :326 _rewrite; :341 history formatting; :364 sufficient/next_question; :244/290 append-and-continue |
+| `agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16` | triples_str fed to the prompt |
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67` | prompt to differentiate/simplify later questions |
+
+</details>
+
+---
