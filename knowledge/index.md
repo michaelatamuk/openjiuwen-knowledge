@@ -1,66 +1,79 @@
 # Jiuwen AI-Engineering Knowledge Base
 
-A grounded AI-engineering reference. Every entry pairs a framework-agnostic
-answer with how the **Jiuwen** codebase actually implements it, anchored by
-`file:line` links into the source.
+> Every concept answered twice: the general idea, and how the Jiuwen codebase
+> actually implements it.
 
-**207 entries · 14 sections · readable offline**
+207 entries · 14 sections · readable as a website, EPUB, Anki deck, or offline Android app.
 
 ## Start here
 
-- **Read online** — [michaelatamuk.github.io/openjiuwen-knowledge](https://michaelatamuk.github.io/openjiuwen-knowledge/)
-- **Read on GitHub** — jump to [LLM foundations](01-llm-foundations.md) or browse [Sections](#sections)
-- **Download** — [latest release](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest): Android APK · EPUB · single-file HTML · Anki deck + CSV · Obsidian vault
-- **Rebuild** — see [Rebuilding](#rebuilding)
+- **Website** — [michaelatamuk.github.io/openjiuwen-knowledge](https://michaelatamuk.github.io/openjiuwen-knowledge/) (search, navigation, dark mode)
+- **On GitHub** — the same content as markdown in [`knowledge/`](#contents)
+- **Download** — [latest release](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest): Android app, EPUB, single-file HTML, Anki deck, Obsidian vault
+- **Build it** — see [Building](#building)
 
-## What this is
+## How an entry reads
 
-- **Two answers per concept.** The **General** half transfers to any stack. The
-  **Jiuwen** half maps the concept to one real codebase, with `path:line` anchors
-  — and says so explicitly when a mechanism is absent, config-gated, or inert.
-- **Deduplicated.** 18 source documents were merged so each concept appears once,
-  with provenance back to the originals.
-- **Self-contained.** Diagrams are pre-rendered PNGs — no Mermaid runtime, no
-  CDN, no network is needed to read any format.
+Each entry is layered so you can stop as soon as you have your answer:
 
-It is useful for onboarding, design reviews, and self-study. The Jiuwen half is
-specific to this codebase and does not transfer to other stacks.
+1. **Title, Summary, Key points** — a ten-second pass.
+2. **Explanation** — the framework-agnostic answer, plus a concept diagram.
+3. **Jiuwen** — how this codebase implements it, in plain language (or an explicit "it doesn't").
+4. **Technical detail** — the classes, functions, and `file:line` anchors.
 
-## Sections
+A real entry looks like this:
 
-| Section | Entries | Files |
-|---|---|---|
-| **Foundations** | 39 | [01 LLM foundations](01-llm-foundations.md) · [02 Prompting & output](02-prompting-and-output-control.md) · [90 LLM terms glossary](90-llm-terms-glossary.md) |
-| **Retrieval & RAG** | 54 | [03 RAG & retrieval](03-rag-and-retrieval.md) · [04 RAG system design](04-rag-system-design.md) |
-| **Agents** | 45 | [05 Agents, tools & memory](05-agents-tools-and-memory.md) |
-| **Evaluation & operations** | 29 | [06 Evaluation](06-evaluation.md) · [07 Production, cost & scale](07-production-cost-and-scale.md) |
-| **Trust & safety** | 8 | [08 Security & safety](08-security-and-safety.md) |
-| **Adaptation & engineering** | 11 | [09 Fine-tuning & customization](09-fine-tuning-and-customization.md) · [10 General engineering](10-general-engineering.md) |
-| **Patterns** | 21 | [91 AI engineer patterns](91-ai-engineer-interview-patterns.md) · [92 LLM patterns](92-llm-interview-patterns.md) · [93 LLM architecture patterns](93-llm-architecture-patterns.md) |
+> **What's the difference between a system prompt and a user prompt**
+>
+> **Summary.** The system prompt sets persistent role and rules; the user prompt is the per-turn request.
+>
+> **Explanation.** The system prompt sets persistent role, rules, persona, and constraints for the whole conversation; the user prompt is the per-turn request. Providers give the system message higher priority, and some APIs pass it as a separate top-level field.
+>
+> **Jiuwen.** Jiuwen assembles the system prompt as one string from priority-ordered, host-injectable sections; rails can add or remove sections before the model call, and the ReAct agent renders it once as a system message passed separately.
+>
+> **Technical detail.** `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1504` — builds one `SystemMessage`; `anthropic_model_client.py:379` — lifts system into top-level blocks.
 
-## How to read an entry
+## Contents
 
-Each entry is layered, fastest pass first:
+### Foundations (39)
+- [LLM foundations](01-llm-foundations.md) — 14
+- [Prompting and output control](02-prompting-and-output-control.md) — 5
+- [LLM terms glossary](90-llm-terms-glossary.md) — 20
 
-1. **Title / Summary / Key points** — the quick pass.
-2. **Explanation (General)** — the framework-agnostic answer, plus a concept diagram.
-3. **Jiuwen** — how this codebase implements the mechanism, in plain language.
-4. **Technical detail** — the `path:line` anchors and the implementation diagram.
+### Retrieval and RAG (54)
+- [RAG and retrieval](03-rag-and-retrieval.md) — 41
+- [RAG system design](04-rag-system-design.md) — 13
 
-Every entry also names its canonical source document and the other documents
-that covered it.
+### Agents (45)
+- [Agents, tools and memory](05-agents-tools-and-memory.md) — 45
+
+### Evaluation and operations (29)
+- [Evaluation](06-evaluation.md) — 21
+- [Production, cost and scale](07-production-cost-and-scale.md) — 8
+
+### Trust and safety (8)
+- [Security and safety](08-security-and-safety.md) — 8
+
+### Adaptation and engineering (11)
+- [Fine-tuning and customization](09-fine-tuning-and-customization.md) — 6
+- [General engineering](10-general-engineering.md) — 5
+
+### Patterns (21)
+- [AI engineer patterns](91-ai-engineer-interview-patterns.md) — 7
+- [LLM patterns](92-llm-interview-patterns.md) — 7
+- [LLM architecture patterns](93-llm-architecture-patterns.md) — 7
 
 ## Formats
 
-| Format | Best for | Where |
-|---|---|---|
-| **Website** | Desktop reading: nav, search, dark mode | [openjiuwen-knowledge](https://michaelatamuk.github.io/openjiuwen-knowledge/) |
-| **Markdown** | Reading on GitHub, diffing, the source of truth | `knowledge/` in this repository |
-| **Single-file HTML** | Phone / plane: one file, search, tap-to-reveal | release `jiuwenswarm-knowledge-offline.html` |
-| **EPUB** | E-readers | release `jiuwenswarm-knowledge.epub` |
-| **Anki deck** | Spaced repetition (Anki / AnkiDroid) | release `jiuwen-knowledge.apkg` |
-| **Obsidian vault** | Linked notes, local search | release `knowledge-vault.zip` |
-| **Android app** | Native offline study (Kotlin, Room, FSRS) | release `jiuwen-study-2.0-debug.apk` |
+- **Website** — [openjiuwen-knowledge](https://michaelatamuk.github.io/openjiuwen-knowledge/), built with MkDocs Material.
+- **Markdown** — `knowledge/` in this repository, one file per section.
+- **Single-file HTML** — one offline file with search and tap-to-reveal answers.
+- **EPUB** — for e-readers.
+- **Anki deck / CSV** — spaced repetition in Anki or AnkiDroid.
+- **Obsidian vault** — linked notes with local search.
+- **Android app** — native offline study app (Kotlin, Room, FSRS).
+
+Everything except the website is attached to the [latest release](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest).
 
 ## Repository layout
 
@@ -71,20 +84,20 @@ openjiuwen-knowledge/
 │   ├── index.md            this README, rendered as the site home
 │   └── assets/diagrams/    rendered diagrams
 ├── content/                authored source
-│   ├── topics/             the section documents (General + Jiuwen + anchors)
+│   ├── topics/             the section documents
 │   ├── summaries/          per-section Title / Summary / Key points
 │   ├── jiuwen/             per-section plain-language Jiuwen answers
 │   └── diagrams.json       concept-vs-technical diagram assignments
 ├── source/                 the 18 original documents, archived unchanged
-├── pipeline/               build + publish scripts, MkDocs config
-├── apps/android/           native offline study app (Kotlin, Room, FSRS)
-└── build/                  generated artifacts — site, HTML, EPUB, Anki, … (gitignored)
+├── pipeline/               build and publish scripts, MkDocs config
+├── apps/android/           the native offline study app
+└── build/                  generated artifacts (gitignored)
 ```
 
 `knowledge/` is generated from `content/` and committed, so the readable version
 is available directly on GitHub. `build/` is disposable.
 
-## Rebuilding
+## Building
 
 ```bash
 # one-time toolchain
@@ -98,11 +111,11 @@ python publish_site.py         # publish build/site to the gh-pages branch
 cd ../apps/android && ./gradlew assembleDebug   # the Android app
 ```
 
-Requires Python 3.11+, Node with `@mermaid-js/mermaid-cli` for diagram rendering
-(cached under `build/`), and the Android SDK + a JDK for the app. See
-`pipeline/README.md` for individual stages and options.
+Requires Python 3.11+, Node with `@mermaid-js/mermaid-cli` (diagram rendering is
+cached under `build/`), and the Android SDK plus a JDK for the app. Individual
+stages are documented in `pipeline/README.md`.
 
-## Grounding & provenance
+## Grounding and provenance
 
 - **Anchors** are `path:line` into the Jiuwen source. They may drift as the code
   changes; they were verified to resolve when written, and their contents
@@ -110,8 +123,9 @@ Requires Python 3.11+, Node with `@mermaid-js/mermaid-cli` for diagram rendering
   says so rather than implying it works.
 - **Layers.** "The framework" is `agent-core/openjiuwen` — the thin `core/` SDK
   plus the heavier `harness/`, `agent_teams/`, `extensions/`, and `auto_harness/`
-  layers. The product built on it is `jiuwenswarm/jiuwenswarm/`. Answers state
+  layers. The product built on it is `jiuwenswarm/jiuwenswarm/`. Answers say
   which layer carries a mechanism.
-- **Originals.** The uncompressed source documents are archived unchanged under
-  `source/`. The numbered sections were assembled from them: near-identical and
-  same-concept material was merged, so each concept appears once.
+- **Originals.** The 18 source documents are archived unchanged under `source/`.
+  The sections were assembled from them: near-identical and same-concept material
+  was merged, so each concept appears once, and every entry names its canonical
+  source.
