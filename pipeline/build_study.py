@@ -38,7 +38,7 @@ def prep():
     shutil.copytree(MD_DIR, DOCS)
     # study-mode assets
     os.makedirs(os.path.join(DOCS, "assets"), exist_ok=True)
-    for a in glob.glob(os.path.join(ASSETS, "study.*")):
+    for a in glob.glob(os.path.join(ASSETS, "site.*")):
         shutil.copyfile(a, os.path.join(DOCS, "assets", os.path.basename(a)))
     print("prepared docs from", MD_DIR)
 

@@ -36,9 +36,9 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra_css:
-  - assets/study.css
+  - assets/site.css
 extra_javascript:
-  - assets/study.js
+  - assets/site.js
 
 nav:
   - Home: index.md
