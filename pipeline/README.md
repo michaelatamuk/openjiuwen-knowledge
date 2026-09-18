@@ -1,9 +1,10 @@
 # Offline study kit — build pipeline
 
-Everything under `build/` is generated from `../content/topics` (plus the
-authored layers in `../content/summaries`, `../content/jiuwen`, and
-`../content/diagrams.json`). It is designed to be read **offline / on a plane**
-on both Windows and Android.
+`knowledge/` (the readable knowledge base) and everything under `build/` are
+generated from `../content/topics` (plus the authored layers in
+`../content/summaries`, `../content/jiuwen`, and `../content/diagrams.json`).
+`knowledge/` is committed; `build/` is disposable and gitignored. It is designed
+to be read **offline / on a plane** on both Windows and Android.
 
 ## Layout
 
@@ -13,6 +14,7 @@ on both Windows and Android.
 | `content/summaries/*.json` | authored title / summary / key points, per topic |
 | `content/jiuwen/*.json` | authored plain-language Jiuwen answers, per topic |
 | `content/diagrams.json` | concept-vs-technical diagram assignments |
+| `knowledge/*.md` | the compiled, layered knowledge base (committed) |
 | `pipeline/` | these build scripts + `mkdocs.yml` |
 | `apps/android/` | native offline study app (consumes `content.json`) |
 | `build/` | every generated artifact (gitignored) |
@@ -53,15 +55,16 @@ Run a single stage directly if you prefer:
 
 ```bash
 python build_content_json.py   # content.json + diagrams  (needs mmdc on PATH or $MMDC)
-python build_study.py          # markdown -> build/markdown, site -> build/site (+ site zip)
+python build_study.py          # knowledge -> build/docs, site -> build/site (+ site zip)
 python build_singlefile.py     # single-file HTML
 python anki_export.py          # Anki .apkg + csv
 python build_epub.py           # EPUB
 python build_vault.py          # Obsidian vault zip
 ```
 
-`build_study.py` copies `build/markdown` into `build/docs`, so both are
-disposable. Everything under `build/` is regenerated and is gitignored.
+`build_markdown.py` writes the compiled knowledge base to `knowledge/` (committed).
+`build_study.py` copies `knowledge/` into `build/docs`, so `build/` is disposable
+and gitignored.
 
 Helpers: `lint_mermaid.py` (Mermaid syntax check), `diagram_audit.py`
 (concept-vs-Jiuwen report → `build/diagram_audit.csv`), `serve.py` (serve

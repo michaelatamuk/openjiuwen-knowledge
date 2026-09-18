@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Generate layered markdown from content.json (single source of truth).
 
-Writes build/markdown/<id>-<slug>.md + index.md + assets/diagrams/*.png, so the
+Writes knowledge/<id>-<slug>.md + index.md + assets/diagrams/*.png, so the
 MkDocs site, the Obsidian vault and GitHub all show Title -> Summary -> Key
 points -> Explanation -> concept diagram -> Jiuwen (plain) -> Technical detail.
 """
@@ -14,7 +14,7 @@ import shutil
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
 ROOT = os.path.dirname(HERE)                         # .../interview_questions
 ASSETS = os.path.join(ROOT, "apps", "android", "app", "src", "main", "assets")
-OUT = os.path.join(ROOT, "build", "markdown")
+OUT = os.path.join(ROOT, "knowledge")
 CONTENT = os.path.join(ASSETS, "content.json")
 
 FNAME = {
@@ -114,7 +114,7 @@ def main():
         text = open(readme, encoding="utf-8").read()
         text = (text.replace("](README.md)", "](index.md)")
                     .replace("](source/README.md)", "](index.md)")
-                    .replace("](content/topics/", "]("))
+                    .replace("](knowledge/", "]("))
         open(os.path.join(OUT, "index.md"), "w", encoding="utf-8", newline="\n").write(text)
     print(f"wrote {len(data['topics'])} markdown files to {OUT}")
 

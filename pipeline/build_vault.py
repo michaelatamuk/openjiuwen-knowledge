@@ -11,14 +11,14 @@ import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))   # .../pipeline
 ROOT = os.path.dirname(HERE)                         # .../interview_questions
-SRC = os.path.join(ROOT, "build", "markdown")
+SRC = os.path.join(ROOT, "knowledge")
 OUT = os.path.join(ROOT, "build", "interview_questions-vault.zip")
 VAULT = "interview_questions"
 
 
 def main():
     if not os.path.isdir(SRC):
-        raise SystemExit("build/markdown not found. Run build_markdown.py first.")
+        raise SystemExit("knowledge/ not found. Run build_markdown.py first.")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     if os.path.isfile(OUT):
         os.remove(OUT)

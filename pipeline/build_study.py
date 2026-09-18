@@ -27,7 +27,7 @@ SITE = os.path.join(BUILD, "site")
 DIST = os.path.join(BUILD, "dist")
 ASSETS = os.path.join(HERE, "assets")
 CONFIG = os.path.join(HERE, "mkdocs.yml")
-MD_DIR = os.path.join(BUILD, "markdown")
+MD_DIR = os.path.join(ROOT, "knowledge")
 
 
 def prep():
