@@ -349,7 +349,7 @@ fun DiagramView(data: DiagramData, citations: List<CitationDto>) {
 @Composable
 fun TechnicalDetail(text: String, citations: List<CitationDto>, diagram: DiagramData? = null) {
     if (text.isBlank() && citations.isEmpty() && diagram == null) return
-    var open by remember { mutableStateOf(false) }
+    var open by remember { mutableStateOf(true) }
     Column(Modifier.fillMaxWidth()) {
         TextButton(onClick = { open = !open }) {
             Text(if (open) "Hide technical detail" else "Technical detail (classes & functions)")
