@@ -2,6 +2,8 @@
 
 ## 1. What's the difference between a chatbot and an agent
 
+<span class="badge">foundational</span>
+
 **Title.** Chatbot vs agent
 
 **Summary.** A chatbot maps one input to one model reply; an agent runs a loop (model → tools → results → repeat) until a stopping condition.
@@ -47,6 +49,8 @@ There is no separate `Chatbot` class; the distinction is structural. A single mo
 
 ## 2. What's the difference between a workflow and an agent
 
+<span class="badge">foundational</span>
+
 **Title.** Workflow vs agent
 
 **Summary.** A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.
@@ -91,6 +95,8 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 ---
 
 ## 3. What's the difference between a linear chain and a graph with conditional branches
+
+<span class="badge">foundational</span>
 
 **Title.** Linear chain vs conditional graph
 
@@ -141,6 +147,8 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 
 ## 4. What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront
 
+<span class="badge">foundational</span>
+
 **Title.** ReAct pattern
 
 **Summary.** ReAct alternates thought → action → observation; interleaving lets each real tool result inform the next thought, correcting drift and grounding reasoning.
@@ -184,6 +192,8 @@ The loop is exactly reason/act/observe: model call, branch on `tool_calls`, exec
 ---
 
 ## 5. How do you set a hard limit on iterations or steps within a framework
+
+<span class="badge">intermediate</span>
 
 **Title.** Hard iteration limit
 
@@ -230,6 +240,8 @@ The inner ReAct loop is bounded by `ReActAgentConfig.max_iterations` (default 5)
 
 ## 6. What decides when an agent stops and returns a final answer instead of calling another tool
 
+<span class="badge">intermediate</span>
+
 **Title.** What stops an agent
 
 **Summary.** Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.
@@ -273,7 +285,9 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 7. How do you decide how many retrieval hops are enough, and how do you prevent the system from looping indefinitely
+## 7. How do you decide how many retrieval hops are enough?
+
+<span class="badge">intermediate</span>
 
 **Title.** How many retrieval hops
 
@@ -285,7 +299,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 - Hard hop cap as a backstop.
 - Repetition detection + cost ceiling.
 
-**General.** Use a sufficiency check — decide whether the accumulated evidence answers the question — and stop when it does; cap the hops with a hard limit as a backstop. Add repetition/loop detection and a cost ceiling so a confused retriever cannot burn tokens. Prefer a dynamic stop (sufficiency) with a static cap (max hops).
+**General.** Use a sufficiency check: decide whether the accumulated evidence already answers the question, and stop when it does. Back that with a hard hop cap so a confused retriever cannot keep going. Good design pairs a dynamic stop (sufficiency) with a static cap (max hops).
 
 ![diagram](assets/diagrams/1084ac1077c40bd6eb8a6cf15e9ef5ccbc8ca266.png)
 
@@ -296,21 +310,18 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 **Implementation**
 
-Three caps. `AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. `TripleBeamSearch.max_length` defaults to 2 and rejects `<1`. Sufficiency: `_rewrite` sends `_REWRITE_PROMPT`, which returns `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Beyond retrieval, `ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and compacts or aborts, `ToolCallDeduplicationRail` short-circuits duplicate calls, and the ReAct loop is bounded by `max_iterations`.
+`AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (invalid values fall back to 2); each loop breaks at `turn >= max_iter`. The sufficiency decision comes from `_rewrite`, which sends `_REWRITE_PROMPT` and parses `{"sufficient": bool, "next_question": str|null}`; only `sufficient=false` with a non-empty question continues. Graph retrieval uses `TripleBeamSearch.max_length` / `graph_hops` (default 2, rejects `<1`).
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | max_iter=2; :148 invalid-value fallback; :241/287 turn-cap break; :364 parses sufficient/next_question |
-| `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37` | max_length < 1 raises; :402 graph_hops default 2 |
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:418` | loop bailout AbortError; :466 _find_tool_loop_compact_range |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:128` | _skip_tool duplicate suppression |
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | for iteration in range(..., max_iterations) |
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | `max_iter=2`; `:148` invalid-value fallback; `:241/287` turn-cap break; `:364` parses `sufficient`/`next_question` |
+| `agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:37` | `max_length < 1` raises; `:402` `graph_hops` default 2 |
 
 **Implementation diagram**
 
-![diagram](assets/diagrams/0d396a92a66c6b3cda0f0742948dd4b4061687ff.png)
+![diagram](assets/diagrams/6a5d37740697623b79f14b94573e6f9f238d5666.png)
 
 **Canonical source**
 
@@ -320,7 +331,52 @@ Three caps. `AgenticRetriever.max_iter` defaults to 2 and is hard-clamped (inval
 
 ---
 
-## 8. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 8. How do you prevent a retrieval loop from running indefinitely and burning cost?
+
+<span class="badge">intermediate</span>
+
+**Title.** Preventing an infinite retrieval/tool loop
+
+**Summary.** Add repetition detection, tool-call dedup, a max-iteration cap, and a cost ceiling so a confused agent cannot loop forever.
+
+**Key points.**
+
+- Detect repetition and duplicate tool calls.
+- Bound the agent loop with max_iterations.
+- Set a session cost ceiling.
+
+**General.** Add repetition/loop detection, deduplicate identical tool calls, bound the agent's own loop with a max-iteration cap, and put a cost ceiling on the session. The failure mode is quiet: retries on a flaky call that never terminate, or token spend that climbs overnight.
+
+![diagram](assets/diagrams/c26205b0d6e51fad4ee9c2b6a12eccc0b3c5bbcf.png)
+
+**Jiuwen.** The harness guards are not wired into AgenticRetriever: ModelAnomalyDetectionRail compacts/aborts on identical tool rounds, ToolCallDeduplicationRail skips duplicate calls, and the ReAct loop is bounded by max_iterations (default 5). No loop detector runs inside the retriever itself.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+`ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and compacts or aborts; `ToolCallDeduplicationRail` short-circuits duplicate calls via `_skip_tool`; the ReAct loop is bounded by `max_iterations` (default 5). These harness guards are **not wired into `AgenticRetriever`**, which has no loop detector beyond its turn cap.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:418` | loop bailout `AbortError`; `:466` `_find_tool_loop_compact_range` |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:128` | `_skip_tool` duplicate suppression |
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | `for iteration in range(..., max_iterations)` |
+
+**Canonical source**
+
+<sub>`source/rag-part2-interview-questions_for_engineers.md`</sub>
+
+</details>
+
+---
+
+## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
+
+<span class="badge">intermediate</span>
 
 **Title.** Infinite tool-calling loop
 
@@ -368,7 +424,9 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ---
 
-## 9. How does an agent decide when to retrieve again versus when it has enough context to answer
+## 10. How does an agent decide when to retrieve again versus when it has enough context to answer
+
+<span class="badge">intermediate</span>
 
 **Title.** Retrieve again or answer
 
@@ -409,7 +467,9 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 
 ---
 
-## 10. "The agent is stuck" tests whether you've shipped one, not studied one
+## 11. "The agent is stuck" tests whether you've shipped one, not studied one
+
+<span class="badge">intermediate</span>
 
 **Title.** 'The agent is stuck': tests shipped experience
 
@@ -449,7 +509,9 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 11. "The agent is stuck in a loop" is testing production experience
+## 12. "The agent is stuck in a loop" is testing production experience
+
+<span class="badge">intermediate</span>
 
 **Title.** 'Stuck in a loop': production experience
 

@@ -1,15 +1,23 @@
 {
  "01-1": {
   "title": "Token vs word",
-  "tldr": "Tokens are sub-word units, and cost and context are counted in tokens — so the same word count can cost very differently across languages and content types.",
+  "tldr": "A token is the model's atomic unit — usually a sub-word — so one word may be one or several tokens.",
   "points": [
-   "English averages ~4 chars/token, but code, JSON, and non-English text fragment into many more.",
-   "Rare or long words and symbols split into several tokens; common words stay one.",
-   "Context limits and billing are token-based, not word-based.",
-   "Tokenization is why models miscount letters."
+   "A token is the model's atomic input/output unit.",
+   "One word can be several tokens; rare/long words and code fragment more.",
+   "Tokenization explains character-level mistakes (miscounting letters)."
   ]
  },
  "01-2": {
+  "title": "Why tokenization affects cost and context limits",
+  "tldr": "Cost and context are measured in tokens, not words — text that fragments more costs more and fills the window faster.",
+  "points": [
+   "Cost and context are counted in tokens, not words.",
+   "More fragmentation → more tokens → higher cost, faster window fill.",
+   "Token counts also drive chunking and compaction thresholds."
+  ]
+ },
+ "01-3": {
   "title": "Tokens vs embeddings",
   "tldr": "Tokens are the discrete input/output units; embeddings are continuous vectors that encode meaning for similarity search.",
   "points": [
@@ -18,7 +26,7 @@
    "You embed chunks (token sequences), but they are different abstractions."
   ]
  },
- "01-3": {
+ "01-4": {
   "title": "Self-attention",
   "tldr": "Each token builds a context-aware representation by attending to every other token, weighting them by query–key similarity.",
   "points": [
@@ -28,7 +36,7 @@
    "Stacked layers build increasingly abstract context."
   ]
  },
- "01-4": {
+ "01-5": {
   "title": "Positional encoding",
   "tldr": "Attention is order-blind, so a position signal must be injected — added to embeddings (sinusoidal/learned) or applied as a rotation to Q/K (RoPE).",
   "points": [
@@ -38,7 +46,7 @@
    "Modern LLMs mostly use RoPE variants."
   ]
  },
- "01-5": {
+ "01-6": {
   "title": "Encoder vs decoder",
   "tldr": "Encoder-only reads bidirectionally for understanding; decoder-only generates left-to-right; encoder-decoder maps one sequence to another. GPT is decoder-only.",
   "points": [
@@ -47,7 +55,7 @@
    "Encoder-decoder (T5): input→output tasks such as translation."
   ]
  },
- "01-6": {
+ "01-7": {
   "title": "Context window vs cutoff",
   "tldr": "The context window is a per-call capacity limit; the training cutoff is a knowledge-date limit. A big window does not make the model current.",
   "points": [
@@ -56,7 +64,7 @@
    "Fitting a document does not mean the model knows post-cutoff facts."
   ]
  },
- "01-7": {
+ "01-8": {
   "title": "Exceeding the context window",
   "tldr": "Either the provider rejects the request or you must shrink the prompt first — drop old turns, offload big tool outputs, or summarize.",
   "points": [
@@ -66,7 +74,7 @@
    "Otherwise the call is rejected or silently truncated."
   ]
  },
- "01-8": {
+ "01-9": {
   "title": "Long-context degradation",
   "tldr": "Attention spreads thinner over more tokens and models use the middle poorly ('lost in the middle'), so a bigger context is not automatically better.",
   "points": [
@@ -76,7 +84,7 @@
    "Mitigate with retrieval, reranking, and ordering."
   ]
  },
- "01-9": {
+ "01-10": {
   "title": "Temperature",
   "tldr": "Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.",
   "points": [
@@ -86,7 +94,7 @@
    "Use T = 0 for extraction/classification, higher for creative work."
   ]
  },
- "01-10": {
+ "01-11": {
   "title": "Top-k vs top-p",
   "tldr": "Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).",
   "points": [
@@ -95,7 +103,7 @@
    "Often combined; top-p usually adapts better."
   ]
  },
- "01-11": {
+ "01-12": {
   "title": "Greedy vs sampling",
   "tldr": "Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.",
   "points": [
@@ -104,7 +112,7 @@
    "Extraction/classification → greedy; open-ended → sampling."
   ]
  },
- "01-12": {
+ "01-13": {
   "title": "Counting and arithmetic",
   "tldr": "Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.",
   "points": [
@@ -113,7 +121,7 @@
    "Fix it with tool use (calculator/code), not a bigger prompt."
   ]
  },
- "01-13": {
+ "01-14": {
   "title": "Hallucination",
   "tldr": "Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.",
   "points": [
@@ -123,7 +131,7 @@
    "It is a property of the objective, not a bug you patch in the weights."
   ]
  },
- "01-14": {
+ "01-15": {
   "title": "Wrong vs uncertain",
   "tldr": "They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.",
   "points": [
@@ -133,7 +141,7 @@
    "Abstention only helps if it correlates with being wrong."
   ]
  },
- "01-15": {
+ "01-16": {
   "title": "'How does the model know X': context window understanding",
   "tldr": "'How does the model know X' is really testing context-window understanding.",
   "points": [

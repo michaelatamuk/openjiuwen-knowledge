@@ -29,6 +29,7 @@ SUMMARIES = os.path.join(CONTENT_DIR, "summaries")
 JIUWEN = os.path.join(CONTENT_DIR, "jiuwen")
 DIAGRAMS_JSON = os.path.join(CONTENT_DIR, "diagrams.json")
 SECTIONS_JSON = os.path.join(CONTENT_DIR, "sections.json")
+CLASSIFICATION_JSON = os.path.join(CONTENT_DIR, "classification.json")
 
 MH = re.compile(r"^##\s*(?:(\d+)\.\s*)?(.+)$")
 DIAGRAM = re.compile(r"```mermaid\r?\n(.*?)```", re.S)
@@ -355,6 +356,9 @@ def main():
     authored_j = load_merge(JIUWEN)
     authored_d = json.load(open(DIAGRAMS_JSON, encoding="utf-8"))
     order, section_of = load_sections()
+    classification = {}
+    if os.path.isfile(CLASSIFICATION_JSON):
+        classification = json.load(open(CLASSIFICATION_JSON, encoding="utf-8"))
     files = sorted(f for f in glob.glob(os.path.join(TOPICS, "*.md"))
                    if re.match(r"^(0[1-9]|1[0-8])-", os.path.basename(f)))
     os.makedirs(os.path.join(OUT, "diagrams"), exist_ok=True)
@@ -430,7 +434,8 @@ def main():
                 "diagram": diagram,
                 "diagrams": diagrams,
                 "diagramTechnical": diagram_tech,
-                "meta": {"difficulty": "advanced" if qtype in ("design", "compare", "mechanism") else "core",
+                "meta": {"difficulty": classification.get(
+                             key, "advanced" if qtype in ("design", "compare", "mechanism") else "core"),
                          "tags": [prefix],
                          "related": [f"{prefix}-{j}" for j in (qi - 1, qi + 1) if 1 <= j <= n]},
                 "provenance": {"sources": sources, "reviewedAt": today},

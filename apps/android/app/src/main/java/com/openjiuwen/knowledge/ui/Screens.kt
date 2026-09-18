@@ -1,6 +1,8 @@
 package com.openjiuwen.knowledge.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,6 +27,7 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -47,6 +51,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.openjiuwen.knowledge.data.MetaDto
 import com.openjiuwen.knowledge.data.QuestionEntity
 import com.openjiuwen.knowledge.data.Repo
 import com.openjiuwen.knowledge.data.StudyItem
@@ -244,11 +249,36 @@ fun ExploreScreen(repo: Repo, onTopic: (String) -> Unit) {
 }
 
 @Composable
+private fun BadgeChip(text: String) {
+    Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(999.dp))
+            .padding(horizontal = 8.dp, vertical = 2.dp))
+}
+
+@Composable
+private fun MetaBadges(meta: MetaDto) {
+    if (meta.difficulty.isBlank()) return
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { BadgeChip(meta.difficulty) }
+}
+
+@Composable
 fun TopicScreen(repo: Repo, topicId: String, onQuestion: (String) -> Unit) {
     val questions by repo.questionsForTopic(topicId).collectAsStateWithLifecycle(emptyList())
+    var filter by remember { mutableStateOf("all") }
+    val filtered = if (filter == "all") questions else questions.filter { repo.meta(it).difficulty == filter }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(questions, key = { it.id }) { q ->
+        item {
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("all", "foundational", "intermediate", "advanced").forEach { f ->
+                    FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(f) })
+                }
+            }
+        }
+        items(filtered, key = { it.id }) { q ->
             Card(Modifier.fillMaxWidth().clickable { onQuestion(q.id) }) {
                 Column(Modifier.padding(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -258,6 +288,8 @@ fun TopicScreen(repo: Repo, topicId: String, onQuestion: (String) -> Unit) {
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(q.question, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(6.dp))
+                    MetaBadges(repo.meta(q))
                 }
             }
         }
@@ -296,6 +328,9 @@ fun QuestionScreen(repo: Repo, questionId: String) {
                 Icon(if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder, "Bookmark")
             }
         }
+        Spacer(Modifier.height(6.dp))
+        MetaBadges(meta)
+        Spacer(Modifier.height(6.dp))
         if (item.title.isNotBlank())
             Text(item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary)

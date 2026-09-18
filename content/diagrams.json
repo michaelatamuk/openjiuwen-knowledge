@@ -3,15 +3,19 @@
   "technical": "__existing__",
   "concept": "flowchart LR\n    TEXT[\"raw text\"] --> TOK[\"tokenizer (BPE / unigram)\"]\n    TOK --> ONE[\"common word = 1 token\"]\n    TOK --> MANY[\"rare / long word, code, non-English = many tokens\"]\n    ONE --> COST[\"cost & context counted in TOKENS\"]\n    MANY --> COST"
  },
- "01-5": {
+ "01-2": {
+  "concept": "flowchart LR\n    F[\"text\"] --> N[\"fragmentation → # tokens\"]\n    N --> C[\"cost per request\"]\n    N --> W[\"context window fills faster\"]\n    N --> K[\"chunk / compaction thresholds\"]",
+  "technical": "flowchart LR\n    N[\"token count (TokenCounter)\"] --> CB[\"context budget = DEFAULT_CONTEXT_MAX_TOKENS\"]\n    N --> OF[\"tool-result offload budget (per round)\"]\n    N --> CO[\"cost: usage_metadata input/output/cache tokens\"]\n    N --> CH[\"chunk size / retrieval chunking\"]"
+ },
+ "01-6": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    IN[\"input text\"] --> ENC[\"encoder (bidirectional)\"]\n    ENC --> UND[\"understanding: classify · embed · extract\"]\n    PRE[\"prompt\"] --> DEC[\"decoder (autoregressive)\"]\n    DEC --> GEN[\"generation: next token\"]\n    ENC --> ED[\"encoder-decoder: input → output (translate · summarize)\"]"
  },
- "01-7": {
+ "01-8": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    IN[\"conversation exceeds the context window\"] --> PRE{\"shrink before sending\"}\n    PRE --> DROP[\"drop oldest turns, keep recent\"]\n    PRE --> OFF[\"offload large tool outputs\"]\n    PRE --> SUM[\"summarize old turns into memory\"]\n    DROP --> SEND[\"send smaller prompt\"]\n    OFF --> SEND\n    SUM --> SEND\n    SEND -->|still too long| ERR[\"provider rejects → force compaction & retry\"]"
  },
- "01-8": {
+ "01-9": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    LONG[\"long context that fits the window\"] --> DIL[\"attention diluted across more tokens\"]\n    LONG --> MID[\"middle of context used poorly (lost in the middle)\"]\n    LONG --> DIS[\"distractors can override instructions\"]\n    DIL --> HARM[\"worse answers even though it fits\"]\n    MID --> HARM\n    DIS --> HARM\n    HARM --> FIX[\"retrieve less · rerank · put key info at the ends\"]"
  },
@@ -75,7 +79,7 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> R[\"retrieve\"]\n    R --> E{\"enough to answer?\"}\n    E -->|no| R2[\"reformulate + retrieve again\"]\n    R2 --> CAP{\"hop budget reached?\"}\n    CAP -->|no| R\n    CAP -->|yes| STOP[\"stop and answer with what we have\"]\n    E -->|yes| ANS[\"answer\"]"
  },
- "05-8": {
+ "05-9": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
  },
@@ -139,7 +143,7 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    TOOLS[\"agent calls tools repeatedly\"] --> CAPS[\"cap iterations + token/step budget\"]\n    TOOLS --> CACHE[\"cache / dedup identical calls\"]\n    TOOLS --> ROUTE[\"route simple calls to a cheaper model\"]\n    CAPS --> SAVE[\"bounded cost\"]\n    CACHE --> SAVE\n    ROUTE --> SAVE"
  },
- "15-18": {
+ "15-19": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    TRAFFIC[\"live traffic\"] --> SAMPLE[\"sample + log\"]\n    SAMPLE --> METRICS[\"quality metrics (groundedness · relevance · task success)\"]\n    METRICS --> ALERT{\"regression?\"}\n    ALERT -->|yes| ROLLBACK[\"alert / roll back\"]\n    ALERT -->|no| MONITOR[\"keep monitoring\"]"
  },
@@ -155,15 +159,15 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    SRC[\"untrusted text: tool output · retrieved doc · user\"] --> ATTACK[\"hidden instructions\"]\n    ATTACK --> MODEL[\"model may follow them\"]\n    DEF[\"defenses: treat as data · delimit · enforce outside the model\"] --> SAFE[\"safe behavior\"]\n    ATTACK -.->|mitigated by| DEF"
  },
- "18-2": {
+ "18-3": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    U[\"tool result / retrieved doc\"] --> WRAP[\"wrap + label as untrusted data\"]\n    WRAP --> MODEL[\"model reads it as data, not instructions\"]\n    MODEL --> GUARD[\"actions gated by permissions outside the model\"]"
  },
- "18-3": {
+ "18-4": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    U[\"user tries to bypass guardrails\"] --> DEF[\"defense in depth\"]\n    DEF --> POLICY[\"policy / safety prompt\"]\n    DEF --> CLASS[\"input / output classifiers\"]\n    DEF --> ENFORCE[\"enforce privileged actions outside the model\"]"
  },
- "18-6": {
+ "18-7": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    GEN[\"model output\"] --> CHECK[\"safety checks (policy · classifier)\"]\n    CHECK -->|unsafe| BLOCK[\"block / rewrite / safe fallback\"]\n    CHECK -->|ok| RETURN[\"return\"]"
  },
@@ -175,11 +179,11 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    INJ[\"prompt injection\"] --> WHY[\"untrusted content carries instructions\"]\n    WHY --> RISK[\"model may act on them\"]\n    RISK --> DEF[\"treat as data + enforce controls outside the model\"]"
  },
- "18-9": {
+ "18-10": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    Q[\"seemingly normal question (tool output, retrieved doc)\"] --> REAL[\"really testing: prompt-injection awareness\"]\n    REAL --> ANSWER[\"treat tool / retrieved content as untrusted data\"]"
  },
- "18-10": {
+ "18-11": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    IN[\"question about untrusted input\"] --> REAL[\"tests prompt-injection awareness\"]\n    REAL --> GOOD[\"treat as data · sanitize · enforce outside the model\"]"
  },

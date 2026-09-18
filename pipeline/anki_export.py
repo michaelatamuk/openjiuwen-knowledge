@@ -88,8 +88,11 @@ def main():
                 )
             title = f'<div style="color:#4c5bd4;font-weight:700;font-size:13px">{html.escape(q["title"])}</div>' if q.get("title") else ""
             summary = f'<p style="color:#333">{html.escape(q.get("tldr",""))}</p>' if q.get("tldr") else ""
+            mp = q.get("meta", {}) or {}
+            diff = mp.get("difficulty", "")
+            badges = f'<div class="badges"><span class="badge">{html.escape(diff)}</span></div>' if diff else ""
             back = (
-                title + summary + points(q.get("points", []))
+                badges + title + summary + points(q.get("points", []))
                 + "<h4>Explanation</h4>" + md(q.get("explain", ""))
                 + img
                 + "<h4>Jiuwen</h4>" + (md(q.get("jiuwenPlain", "")) or md(q.get("mechanism", "")))
@@ -97,7 +100,8 @@ def main():
             )
             section = t.get("section", "")
             topic_label = (section + " · " if section else "") + t["title"] + " · " + t["id"]
-            cards.append({"q": q["question"], "topic": topic_label, "a": back})
+            cards.append({"q": q["question"], "topic": topic_label, "a": back,
+                          "topicId": t["id"], "diff": diff})
 
     os.makedirs(DIST, exist_ok=True)
     import csv
@@ -122,12 +126,16 @@ def main():
             "qfmt": '<div style="color:#3f51b5;font-size:12px;font-weight:700">{{Topic}}</div><div style="font-size:18px;font-weight:600">{{Question}}</div>',
             "afmt": '{{FrontSide}}<hr id="answer">{{Answer}}',
         }],
-        css=".card{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;text-align:left;background:#fff;color:#222;line-height:1.5}code{background:#f2f2f2;padding:1px 4px;border-radius:4px}details{margin-top:8px}h4{margin:.6em 0 .15em;font-size:14px;color:#4c5bd4}table.anchors{width:100%;border-collapse:collapse;font-size:13px}table.anchors td{border-bottom:1px solid #e5e5e5;padding:2px 4px;vertical-align:top}table.anchors td.a{white-space:nowrap}table.anchors code{font-size:12px;word-break:break-all}.cite{font-size:12px;color:#555}",
+        css=".card{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;text-align:left;background:#fff;color:#222;line-height:1.5}code{background:#f2f2f2;padding:1px 4px;border-radius:4px}details{margin-top:8px}h4{margin:.6em 0 .15em;font-size:14px;color:#4c5bd4}table.anchors{width:100%;border-collapse:collapse;font-size:13px}table.anchors td{border-bottom:1px solid #e5e5e5;padding:2px 4px;vertical-align:top}table.anchors td.a{white-space:nowrap}table.anchors code{font-size:12px;word-break:break-all}.cite{font-size:12px;color:#555}.badges{margin:.2em 0 .4em}.badge{display:inline-block;padding:0 6px;margin-right:4px;border:1px solid #98a4e0;border-radius:9px;color:#3f51b5;font-size:11px;font-weight:700;text-transform:uppercase}",
     )
     deck = genanki.Deck(did, "Jiuwen Knowledge Base")
     for c in cards:
         guid = hashlib.sha1((c["topic"] + "|" + c["q"]).encode("utf-8")).hexdigest()
-        deck.add_note(genanki.Note(model=model, guid=guid, fields=[c["q"], c["topic"], c["a"]]))
+        tags = [f"topic::{c['topicId']}"]
+        if c.get("diff"):
+            tags.append(f"difficulty::{c['diff']}")
+        deck.add_note(genanki.Note(model=model, guid=guid,
+                                   fields=[c["q"], c["topic"], c["a"]], tags=tags))
     pkg = genanki.Package(deck)
     pkg.media_files = list(media.values())
     pkg.write_to_file(os.path.join(DIST, "jiuwen-knowledge.apkg"))

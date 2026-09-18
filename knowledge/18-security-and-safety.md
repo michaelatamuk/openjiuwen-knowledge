@@ -1,6 +1,8 @@
 # Security and safety
 
-## 1. What prompt injection is, and how you'd defend against it
+## 1. What is prompt injection?
+
+<span class="badge">intermediate</span>
 
 **Title.** Prompt injection defenses
 
@@ -13,7 +15,7 @@
 - Delimit/label untrusted content.
 - Enforce privilege outside the model.
 
-**General.** Prompt injection is untrusted input containing instructions that hijack the model (direct user input, or indirect via retrieved/tool content). Defenses: treat content as data not instructions, delimit/label untrusted content, never let it trigger privileged actions without a permission re-check, and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
+**General.** Untrusted input containing instructions that hijack the model. It is **direct** when the user types the malicious instruction, and **indirect** when it arrives inside retrieved documents, tool results, or any content the model reads.
 
 ![diagram](assets/diagrams/7541896f017731df954e0976d07cb54e3f063ec0.png)
 
@@ -24,22 +26,19 @@
 
 **Implementation**
 
-The codebase separates prompt-level from enforced defenses. Prompt-level: `SafetyPromptRail` injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution, the permission engine merges tiered tool policy + file guard + net guard by "strictest" and floors risky shell structures to ASK, and builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths. A pluggable guardrail framework exists for injection detection, and the auto-harness adds an input heuristic that force-finishes on "ignore previous instructions".
+Detection-side support exists but is not wired in: `core/security/guardrail/` provides `PromptInjectionGuardrail` with default regex patterns, and the auto-harness adds an input heuristic that force-finishes on “ignore previous instructions”. The configurable guardrail has **no production registration**, so detection is not active by default.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | SafetyPromptRail; :38 injects safety section; agent-core/openjiuwen/harness/prompts/sections/safety.py:14 — static safety text |
-| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | substitution regex; :40 check_injection blocks |
-| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell deny; :35 disk deny; :99 shutdown; :148 sensitive paths |
-| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588` | tiered policy; :409 shell AST floor; :502 ASK fallback; agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82 — deterministic parse; agent-core/openjiuwen/harness/security/permission_engine/core.py:272 — merge |
-| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:184 — default patterns |
-| `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` | input heuristic → request_force_finish |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | `PromptInjectionGuardrail` |
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:184` | default patterns |
+| `agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119` | input heuristic → `request_force_finish` |
 
 **Implementation diagram**
 
-![diagram](assets/diagrams/25d85df4b8bd1c43944f8ca35b28fbd241af199f.png)
+![diagram](assets/diagrams/0c9d421192bb3bf38c8d73776f6dc4853542ab9f.png)
 
 **Canonical source**
 
@@ -49,7 +48,53 @@ The codebase separates prompt-level from enforced defenses. Prompt-level: `Safet
 
 ---
 
-## 2. Handling untrusted content from a tool result or retrieved document
+## 2. How do you defend against prompt injection?
+
+<span class="badge">advanced</span>
+
+**Title.** Defending against prompt injection
+
+**Summary.** Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.
+
+**Key points.**
+
+- Treat content as data, not instructions.
+- Re-check permissions before privileged actions.
+- Enforce controls outside the model (shell/permission).
+
+**General.** Treat content as data, not instructions; delimit and label untrusted content; never let it trigger privileged actions without a permission re-check; and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
+
+![diagram](assets/diagrams/a3975b70c370b1562d3f9b22381902cc0b67a01b.png)
+
+**Jiuwen.** Prompt-level defense is SafetyPromptRail (advice only). Enforced controls live in the shell/permission layer: substitution blocking, a tiered tool policy merged by strictest with an ASK floor for risky shell structures, and builtin deny rules for reverse shells, disk writes, shutdown, and sensitive paths.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+The codebase separates prompt-level from enforced defenses. Prompt-level: `SafetyPromptRail` injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution; the permission engine merges tool policy + file guard + net guard by “strictest” and floors risky shell structures to ASK; builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | `SafetyPromptRail`; `:38` injects safety section; `harness/prompts/sections/safety.py:14` static text |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | substitution regex; `:40` `check_injection` blocks |
+| `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell deny; `:35` disk; `:99` shutdown; `:148` sensitive paths |
+| `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588` | tiered policy; `:409` shell AST floor; `:502` ASK fallback; `shell_ast.py:82` parse; `core.py:272` merge |
+
+**Canonical source**
+
+<sub>`source/ai-engineer-technical-questions_for_engineers.md`</sub>
+
+</details>
+
+---
+
+## 3. Handling untrusted content from a tool result or retrieved document
+
+<span class="badge">intermediate</span>
 
 **Title.** Untrusted tool output and documents
 
@@ -96,7 +141,9 @@ Weakest area. Tool results are rendered through the tool's own `render_for_llm` 
 
 ---
 
-## 3. How do you handle a user trying to jailbreak your system's guardrails
+## 4. How do you handle a user trying to jailbreak your system's guardrails
+
+<span class="badge">intermediate</span>
 
 **Title.** Handling jailbreak attempts
 
@@ -145,7 +192,9 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 
 ---
 
-## 4. How do you make sure a user only retrieves documents they're actually authorized to see
+## 5. How do you make sure a user only retrieves documents they're actually authorized to see
+
+<span class="badge">intermediate</span>
 
 **Title.** Per-user document authorization
 
@@ -187,7 +236,9 @@ The store layer supports metadata filters (Milvus expr, Chroma `where`, PG JSONB
 
 ---
 
-## 5. How do you prevent an agent from taking a destructive or irreversible action by mistake
+## 6. How do you prevent an agent from taking a destructive or irreversible action by mistake
+
+<span class="badge">intermediate</span>
 
 **Title.** Preventing destructive actions
 
@@ -232,7 +283,9 @@ A layered permission engine returns `ALLOW`/`ASK`/`DENY`, merging tool policy + 
 
 ---
 
-## 6. How do you prevent a model from generating harmful or biased content
+## 7. How do you prevent a model from generating harmful or biased content
+
+<span class="badge">intermediate</span>
 
 **Title.** Preventing harmful or biased output
 
@@ -281,7 +334,9 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 
 ---
 
-## 7. Preventing sensitive data from leaking into a model's context or output logs
+## 8. Preventing sensitive data from leaking into a model's context or output logs
+
+<span class="badge">intermediate</span>
 
 **Title.** Preventing sensitive data leakage
 
@@ -325,7 +380,9 @@ Actual model-context redaction exists only as a demo rail: `Sensitivedatasanitiz
 
 ---
 
-## 8. Design a multi-tenant RAG system where each customer's data must stay isolated from others
+## 9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
+
+<span class="badge">advanced</span>
 
 **Title.** Multi-tenant RAG isolation
 
@@ -368,7 +425,9 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 
 ---
 
-## 9. Security-adjacent questions are disguised as normal engineering questions
+## 10. Security-adjacent questions are disguised as normal engineering questions
+
+<span class="badge">intermediate</span>
 
 **Title.** Security-adjacent questions in disguise
 
@@ -412,7 +471,9 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 
 ---
 
-## 10. Any question about untrusted input is testing prompt injection awareness
+## 11. Any question about untrusted input is testing prompt injection awareness
+
+<span class="badge">intermediate</span>
 
 **Title.** Untrusted input: injection awareness
 

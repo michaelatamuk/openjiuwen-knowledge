@@ -9,7 +9,7 @@
    "Enforce privilege outside the model."
   ]
  },
- "18-2": {
+ "18-3": {
   "title": "Untrusted tool output and documents",
   "tldr": "Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.",
   "points": [
@@ -19,7 +19,7 @@
    "Re-check permissions before privileged actions."
   ]
  },
- "18-3": {
+ "18-4": {
   "title": "Handling jailbreak attempts",
   "tldr": "Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.",
   "points": [
@@ -29,7 +29,7 @@
    "Sandbox and log."
   ]
  },
- "18-4": {
+ "18-5": {
   "title": "Per-user document authorization",
   "tldr": "Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.",
   "points": [
@@ -38,7 +38,7 @@
    "Pre-filter in the store, not post-hoc."
   ]
  },
- "18-5": {
+ "18-6": {
   "title": "Preventing destructive actions",
   "tldr": "Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.",
   "points": [
@@ -48,7 +48,7 @@
    "Prefer reversible ops; fail closed."
   ]
  },
- "18-6": {
+ "18-7": {
   "title": "Preventing harmful or biased output",
   "tldr": "Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.",
   "points": [
@@ -58,7 +58,7 @@
    "Red-team refusal behavior."
   ]
  },
- "18-7": {
+ "18-8": {
   "title": "Preventing sensitive data leakage",
   "tldr": "Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.",
   "points": [
@@ -68,7 +68,7 @@
    "Provider zero-retention."
   ]
  },
- "18-8": {
+ "18-9": {
   "title": "Multi-tenant RAG isolation",
   "tldr": "Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.",
   "points": [
@@ -78,7 +78,7 @@
    "Filter inside the store."
   ]
  },
- "18-9": {
+ "18-10": {
   "title": "Security-adjacent questions in disguise",
   "tldr": "Security-adjacent questions are disguised as normal engineering questions.",
   "points": [
@@ -88,7 +88,7 @@
    "Real control is the shell/permission layer."
   ]
  },
- "18-10": {
+ "18-11": {
   "title": "Untrusted input: injection awareness",
   "tldr": "Any question about untrusted input is testing prompt-injection awareness.",
   "points": [
@@ -96,6 +96,15 @@
    "Sanitizers unused; detector unregistered.",
    "Safety rail is advisory.",
    "Real control: shell/permission layer."
+  ]
+ },
+ "18-2": {
+  "title": "Defending against prompt injection",
+  "tldr": "Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.",
+  "points": [
+   "Treat content as data, not instructions.",
+   "Re-check permissions before privileged actions.",
+   "Enforce controls outside the model (shell/permission)."
   ]
  }
 }

@@ -2,6 +2,8 @@
 
 ## 1. How do you evaluate an LLM's output beyond "it looks correct"
 
+<span class="badge">intermediate</span>
+
 **Title.** Evaluating beyond 'looks correct'
 
 **Summary.** Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.
@@ -48,6 +50,8 @@ Several independent eval layers exist. `agent_evolving/evaluator/` provides `Bas
 
 ## 2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score
 
+<span class="badge">intermediate</span>
+
 **Title.** Retrieval vs generation, separately
 
 **Summary.** An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.
@@ -90,6 +94,8 @@ The stages are structurally separate but also separately un-instrumented. Retrie
 ---
 
 ## 3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways
+
+<span class="badge">intermediate</span>
 
 **Title.** Why exact match fails
 
@@ -134,6 +140,8 @@ Two exact-match implementations exist. `ExactMatchMetric` normalizes lowercase/s
 
 ## 4. Recall@k, and what a low score tells you about your retrieval setup
 
+<span class="badge">advanced</span>
+
 **Title.** Recall@k
 
 **Summary.** Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.
@@ -174,7 +182,9 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 
 ---
 
-## 5. Precision@k = relevant docs in top k / k — how it differs from Recall@k, and why both can be low even when the pipeline "looks" fine
+## 5. How does Precision@k differ from Recall@k?
+
+<span class="badge">intermediate</span>
 
 **Title.** Precision@k
 
@@ -186,7 +196,7 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 - Higher k → recall up, precision usually down.
 - Both can look fine while real quality is poor.
 
-**General.** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant docs that were retrieved. They trade off: raising k raises recall but usually lowers precision. Both can be low if the embedding/chunking is wrong (nothing relevant ranked) or if the corpus lacks the answer. "Looks fine" is exactly why you need numbers — a plausible top-3 can still be mostly irrelevant.
+**General.** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant documents that were retrieved. They trade off: raising k raises recall but usually lowers precision.
 
 ![diagram](assets/diagrams/56c1c00f9a8a4a86115c8e9abaf3120da3b06b08.png)
 
@@ -197,17 +207,16 @@ There is no `Recall@k` implementation. The only recall-looking code is a **class
 
 **Implementation**
 
-Precision@k is **absent**. The only precision present is classification/answer precision: PerStream's "TV (Precision)" = TP/(TP+FP) (how many predicted proactive moments were correct) and sklearn `precision_score` in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.
+Precision@k is **absent**. The only precision present is classification/answer precision: PerStream's “TV (Precision)” = TP/(TP+FP) and sklearn `precision_score` in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362` | get_tv_precision() = tp / total_pred_not_nil |
-| `agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:188` | tv_precision |
-| `agent-core/examples/PerStream/src/eval/test_remember_gate.py:22` | sklearn precision_score |
-| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | rerank(...) re-sorts, no precision measurement |
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60` | compute_batch zips predictions/labels, no relevance-per-rank |
+| `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362` | `get_tv_precision()` = `tp / total_pred_not_nil` |
+| `agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:188` | `tv_precision` |
+| `agent-core/examples/PerStream/src/eval/test_remember_gate.py:22` | sklearn `precision_score` |
+| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | `rerank(...)` re-sorts, no precision measurement |
 
 **Canonical source**
 
@@ -217,7 +226,51 @@ Precision@k is **absent**. The only precision present is classification/answer p
 
 ---
 
-## 6. MRR, and when it matters more than Recall@k
+## 6. Why can precision and recall both look fine while the pipeline is broken?
+
+<span class="badge">intermediate</span>
+
+**Title.** Why precision and recall can both look fine
+
+**Summary.** Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.
+
+**Key points.**
+
+- Wrong embedding/chunking → nothing relevant ranked.
+- Corpus lacks the answer → nothing to retrieve.
+- Plausible output is not quality; measure it.
+
+**General.** Both can be low even when the outputs look plausible: if the embedding or chunking is wrong, nothing relevant is ranked highly; and if the corpus simply lacks the answer, no retriever can find it. A plausible top-3 can still be mostly irrelevant — which is exactly why you need numbers, not vibes.
+
+![diagram](assets/diagrams/00ecc4062fc27e339a3e96893f686699d002877f.png)
+
+**Jiuwen.** The retrieval stack ranks and can re-sort candidates, but never compares the ordering to graded relevance, and the evaluator zips predictions/labels without a relevance-per-rank notion — so the gap stays invisible.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+The retrieval stack produces an ordered candidate list — and a cross-encoder can re-sort it — but never compares that ordering against graded relevance, so there is no precision@k/recall@k to reveal the gap. Evaluation metrics zip predictions/labels without any relevance-per-rank notion.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | `rerank(...)` re-sorts, no precision measurement |
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60` | `compute_batch` zips predictions/labels, no relevance-per-rank |
+
+**Canonical source**
+
+<sub>`source/rag-evaluation-interview-questions_for_engineers.md`</sub>
+
+</details>
+
+---
+
+## 7. MRR, and when it matters more than Recall@k
+
+<span class="badge">intermediate</span>
 
 **Title.** MRR
 
@@ -259,7 +312,9 @@ MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-r
 
 ---
 
-## 7. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
+## 8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
+
+<span class="badge">intermediate</span>
 
 **Title.** NDCG
 
@@ -301,7 +356,9 @@ NDCG is **absent** — no discounted cumulative gain, no gain/discount term, and
 
 ---
 
-## 8. Faithfulness vs. relevance in RAG evaluation
+## 9. Faithfulness vs. relevance in RAG evaluation
+
+<span class="badge">intermediate</span>
 
 **Title.** Faithfulness vs relevance
 
@@ -343,7 +400,9 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 ---
 
-## 9. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
+## 10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
+
+<span class="badge">intermediate</span>
 
 **Title.** Computing faithfulness
 
@@ -386,7 +445,9 @@ There is no retrieval-groundedness, faithfulness, attribution, or context-releva
 
 ---
 
-## 10. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
+## 11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
+
+<span class="badge">intermediate</span>
 
 **Title.** Measuring hallucination rate
 
@@ -428,7 +489,9 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 
 ---
 
-## 11. What is perplexity, and what does a lower score actually tell you
+## 12. What is perplexity, and what does a lower score actually tell you
+
+<span class="badge">foundational</span>
 
 **Title.** Perplexity
 
@@ -471,7 +534,9 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 
 ---
 
-## 12. Known limitations of using an LLM as a judge
+## 13. Known limitations of using an LLM as a judge
+
+<span class="badge">intermediate</span>
 
 **Title.** LLM-as-judge limitations
 
@@ -515,7 +580,9 @@ Four judge implementations exist. `agent_evolving`'s `LLMAsJudgeMetric` is a sin
 
 ---
 
-## 13. How do you evaluate when there's no ground truth answer, only a query and a corpus
+## 14. How do you evaluate when there's no ground truth answer, only a query and a corpus
+
+<span class="badge">intermediate</span>
 
 **Title.** Evaluating with no ground truth
 
@@ -557,7 +624,9 @@ Synthetic dataset generation is largely not runnable. The advertised `rsi/datase
 
 ---
 
-## 14. How would you build an eval dataset from scratch if you don't have one yet
+## 15. How would you build an eval dataset from scratch if you don't have one yet
+
+<span class="badge">advanced</span>
 
 **Title.** Building an eval dataset
 
@@ -599,7 +668,9 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 
 ---
 
-## 15. How many examples before eval results are statistically meaningful, not just noise
+## 16. How many examples before eval results are statistically meaningful, not just noise
+
+<span class="badge">intermediate</span>
 
 **Title.** How many eval examples
 
@@ -641,7 +712,9 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 ---
 
-## 16. How would you compare two models for a specific task, not just a general leaderboard score
+## 17. How would you compare two models for a specific task, not just a general leaderboard score
+
+<span class="badge">advanced</span>
 
 **Title.** Comparing two models
 
@@ -685,7 +758,9 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 
 ---
 
-## 17. Building a regression test suite to catch a quality drop before it ships
+## 18. Building a regression test suite to catch a quality drop before it ships
+
+<span class="badge">intermediate</span>
 
 **Title.** Regression test suite
 
@@ -728,7 +803,9 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 ---
 
-## 18. Evaluating continuously in production, not just once before launch
+## 19. Evaluating continuously in production, not just once before launch
+
+<span class="badge">intermediate</span>
 
 **Title.** Continuous production eval
 
@@ -776,7 +853,9 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 
 ---
 
-## 19. How do you detect when your retrieval quality has degraded over time
+## 20. How do you detect when your retrieval quality has degraded over time
+
+<span class="badge">intermediate</span>
 
 **Title.** Detecting retrieval degradation
 
@@ -818,7 +897,9 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 
 ---
 
-## 20. High eval scores but users still complaining — what does that gap tell you about your eval set
+## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
+
+<span class="badge">advanced</span>
 
 **Title.** High eval, users still unhappy
 
@@ -861,7 +942,9 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 
 ---
 
-## 21. Tying an eval metric back to a business outcome a stakeholder actually cares about
+## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
+
+<span class="badge">intermediate</span>
 
 **Title.** Tying eval to business outcome
 
@@ -904,7 +987,9 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 
 ---
 
-## 22. "How do you know it's working" tests evaluation depth, not confidence
+## 23. "How do you know it's working" tests evaluation depth, not confidence
+
+<span class="badge">intermediate</span>
 
 **Title.** How do you know it's working: eval depth
 
@@ -944,7 +1029,9 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 ---
 
-## 23. "How do you know it's working" is testing evaluation depth
+## 24. "How do you know it's working" is testing evaluation depth
+
+<span class="badge">intermediate</span>
 
 **Title.** 'How do you know it's working': eval depth
 

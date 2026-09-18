@@ -2,6 +2,8 @@
 
 ## 1. How does an agent break a complex task into smaller subtasks
 
+<span class="badge">intermediate</span>
+
 **Title.** Task decomposition
 
 **Summary.** Either ask the model to emit a plan/todo list up front, or decompose lazily and revise; store it as structured tasks that can be marked in-progress/done.
@@ -44,6 +46,8 @@ Model-driven todo tools, not an algorithmic planner. The model's answer *request
 ---
 
 ## 2. How do you handle a task where the plan needs to change mid-execution based on a tool's result
+
+<span class="badge">intermediate</span>
 
 **Title.** Changing the plan mid-run
 
@@ -89,6 +93,8 @@ Several mechanisms. `TodoModifyTool` supports update/delete/cancel/append/insert
 ---
 
 ## 3. What's the difference between a single-step agent and a multi-step planning agent
+
+<span class="badge">foundational</span>
 
 **Title.** Single-step vs planning agent
 
@@ -141,6 +147,8 @@ Jiuwen keeps the two axes as separate layers. `ReActAgent` is multi-step **react
 
 ## 4. What's the planner-executor pattern, and when do you need it
 
+<span class="badge">foundational</span>
+
 **Title.** Planner-executor pattern
 
 **Summary.** A planner produces the steps; one or more executors carry them out, often with a supervisor re-planning — useful when planning needs a global view and execution is parallel/specialized.
@@ -181,6 +189,8 @@ Three patterns exist. (a) Scheduled-dispatch leader: `TeamScheduler` scans the t
 ---
 
 ## 5. How does a framework track state across multiple steps in an agent's execution
+
+<span class="badge">intermediate</span>
 
 **Title.** State across steps
 
@@ -232,6 +242,8 @@ State lives in three layers that are checkpointed independently. The agent layer
 
 ## 6. How would you pause an agent mid-execution and resume it later with the same state
 
+<span class="badge">advanced</span>
+
 **Title.** Pause and resume an agent
 
 **Summary.** Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.
@@ -277,6 +289,8 @@ Two mechanisms. *Interrupt rails* abort the current tool call by raising `AbortE
 ---
 
 ## 7. How would you add human-in-the-loop approval before a specific step executes
+
+<span class="badge">advanced</span>
 
 **Title.** Human-in-the-loop approval
 
@@ -324,6 +338,8 @@ Tool execution passes through `PermissionInterruptRail` (subclass of `ConfirmInt
 
 ## 8. What's the difference between short-term and long-term memory in an agent
 
+<span class="badge">foundational</span>
+
 **Title.** Short vs long-term memory
 
 **Summary.** Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.
@@ -367,6 +383,8 @@ Short-term is `SessionModelContext` with a bounded message buffer. Long-term is 
 
 ## 9. How do you decide what to store in memory versus what to discard
 
+<span class="badge">intermediate</span>
+
 **Title.** What to store vs discard
 
 **Summary.** Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.
@@ -409,6 +427,8 @@ An LLM classifier decides whether a turn has key information, and extraction run
 ---
 
 ## 10. How do you prevent memory from growing unbounded across a long session
+
+<span class="badge">intermediate</span>
 
 **Title.** Bounding memory growth
 
@@ -456,6 +476,8 @@ A bounded FIFO buffer drops the oldest messages beyond twice the limit. Budget g
 
 ## 11. How would you summarize conversation history without losing important details
 
+<span class="badge">advanced</span>
+
 **Title.** Summarizing history safely
 
 **Summary.** Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.
@@ -498,6 +520,8 @@ Compaction replaces the active segment with a structured summary plus a boundary
 
 ## 12. Planner–executor pattern
 
+<span class="badge">intermediate</span>
+
 **Title.** Planner–executor pattern
 
 **Summary.** A planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response.
@@ -537,6 +561,8 @@ Two paths. `DeepAgent`'s outer task loop runs a full inner ReAct invoke per roun
 
 ## 13. Critic or reflection loop
 
+<span class="badge">intermediate</span>
+
 **Title.** Critic or reflection loop
 
 **Summary.** A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.
@@ -573,6 +599,8 @@ There is no generic draft→critique→revise loop in the single-agent ReAct pat
 ---
 
 ## 14. Memory-augmented agent
+
+<span class="badge">intermediate</span>
 
 **Title.** Memory-augmented agent
 
@@ -611,6 +639,8 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 ---
 
 ## 15. Router pattern
+
+<span class="badge">intermediate</span>
 
 **Title.** Router pattern
 

@@ -31,6 +31,20 @@ body.study-on .qa-reveal {
 body.study-on .qa-answer { display: none; }
 body.study-on .qa-answer.revealed { display: block; }
 
+/* Difficulty / importance badges. */
+.md-typeset .badge {
+  display: inline-block;
+  padding: 1px 8px;
+  margin-right: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--md-primary-fg-color--light, #7c8bd4);
+  color: var(--md-primary-fg-color, #3f51b5);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* Code-anchor tables inside technical detail: smaller and denser. */
 .md-typeset details table {
   font-size: 0.68rem;

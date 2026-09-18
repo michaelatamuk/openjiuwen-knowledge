@@ -87,6 +87,8 @@ body:not(.study) .answer{display:block}
 details{margin:8px 0}summary{cursor:pointer;color:var(--accent);font-weight:600}
 .diagram{text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0}
 .diagram svg{max-width:100%;height:auto}
+.badges{margin:2px 0 6px}
+.badge{display:inline-block;padding:1px 8px;margin-right:4px;border-radius:999px;border:1px solid #b9c0ef;color:var(--accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .tech-t{color:var(--accent);font-weight:700;margin:12px 0 4px;font-size:13px}
 table.anchors{width:100%;border-collapse:collapse;font-size:12px}
 table.anchors td{border-bottom:1px solid var(--line);padding:3px 6px;vertical-align:top}
@@ -112,6 +114,9 @@ def build():
         for q in t["questions"]:
             title = f'<div class="title">{html.escape(q["title"])}</div>' if q.get("title") else ""
             summary = f'<div class="summary">{html.escape(q.get("tldr",""))}</div>' if q.get("tldr") else ""
+            mp = q.get("meta", {}) or {}
+            db = mp.get("difficulty", "")
+            badges = f'<div class="badges"><span class="badge">{html.escape(db)}</span></div>' if db else ""
             concept = "".join(inline_img(d.get("image", "")) for d in (q.get("diagrams") or [q.get("diagram", {})]))
             tech = inline_img(q.get("diagramTechnical", {}).get("image", ""))
             plain = q.get("jiuwenPlain", "")
@@ -135,7 +140,7 @@ def build():
                     + "".join(tparts) + "</details>"
                 )
             parts.append(
-                f'<section class="qa"><h2>{html.escape(q["question"])}</h2>{title}{summary}'
+                f'<section class="qa"><h2>{html.escape(q["question"])}</h2>{badges}{title}{summary}'
                 f'<button class="btn" onclick="this.parentElement.classList.toggle(\'revealed\')">Show / hide answer</button>'
                 f'<div class="answer">{points_html(q.get("points", []))}'
                 f'<div class="section-t">Explanation</div>{md(q.get("explain",""))}'

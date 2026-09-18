@@ -1,30 +1,31 @@
 # LLM foundations
 
-## 1. What's the difference between a token and a word, and why does tokenization affect cost and context limits
+## 1. What's the difference between a token and a word?
+
+<span class="badge">foundational</span>
 
 **Title.** Token vs word
 
-**Summary.** Tokens are sub-word units, and cost and context are counted in tokens — so the same word count can cost very differently across languages and content types.
+**Summary.** A token is the model's atomic unit — usually a sub-word — so one word may be one or several tokens.
 
 **Key points.**
 
-- English averages ~4 chars/token, but code, JSON, and non-English text fragment into many more.
-- Rare or long words and symbols split into several tokens; common words stay one.
-- Context limits and billing are token-based, not word-based.
-- Tokenization is why models miscount letters.
+- A token is the model's atomic input/output unit.
+- One word can be several tokens; rare/long words and code fragment more.
+- Tokenization explains character-level mistakes (miscounting letters).
 
-**General.** A token is the model's atomic unit — typically a sub-word produced by a BPE/unigram vocabulary, so one word may be one or several tokens, and rare/long words and code fragment heavily. Cost and context limits are measured in tokens, not words, so a language or domain that fragments more costs more per word and fills the window faster. Tokenization also explains why models miscount letters and struggle with character-level tasks.
+**General.** A token is the model's atomic unit — typically a sub-word produced by a BPE/unigram vocabulary — so one word may be one or several tokens, and rare/long words and code fragment heavily. This is also why models miscount letters and struggle with character-level tasks.
 
 ![diagram](assets/diagrams/977c7dbe06209c401ced61a869098cc5256bda97.png)
 
-**Jiuwen.** Jiuwen counts tokens, never words. It plugs in a tokenizer that knows a model's encoding, falls back to a common one for unknown models, and finally to a rough character-based estimate if none is available. Those counts set each model's context budget, decide when to compress or offload, and feed cost accounting from the provider's reported token usage.
+**Jiuwen.** Jiuwen counts tokens, never words, via a pluggable TokenCounter: TiktokenCounter maps known model names to tiktoken encodings (with a cl100k_base fallback), and TiktokenModelCounter loads a model-native BPE vocabulary. TokenizerManager downloads the tokenizer artifacts per model/family.
 
 <details markdown="1">
 <summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
 
 **Implementation**
 
-The framework counts **tokens**, never words, via a pluggable `TokenCounter`. `TiktokenCounter` maps known model names to tiktoken encodings, falls back to `cl100k_base` for unknown models (marked `tiktoken_fallback`), and finally to a `len(text)//3` heuristic if tiktoken is unavailable. A separate `TiktokenModelCounter` loads a model-native BPE vocabulary, and `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family. Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKENS`, default 200,000), compression/offload thresholds, and cost via provider-reported `usage_metadata` (`input_tokens`/`output_tokens`/cache/reasoning tokens). Retrieval chunking is also token-based.
+The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `TiktokenCounter` maps known model names to tiktoken encodings (falling back to `cl100k_base` for unknown models), and `TiktokenModelCounter` loads a model-native BPE vocabulary. `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family.
 
 **Code anchors**
 
@@ -33,14 +34,11 @@ The framework counts **tokens**, never words, via a pluggable `TokenCounter`. `T
 | `agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212` | TiktokenCounter; :225 model→encoding map; :287 count() with len(text)//3 fallback |
 | `agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86` | model-native tiktoken BPE |
 | `agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34` | TokenizerSpec; :50 fallback policy chain |
-| `agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60` | resolves/downloads tokenizer artifacts; :124 |
-| `agent-core/openjiuwen/core/context_engine/context/context_utils.py:20` | DEFAULT_CONTEXT_MAX_TOKENS = 200000 |
-| `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | per-round token budget |
-| `agent-core/openjiuwen/core/foundation/llm/schema/message.py:28` | total_tokens usage metadata |
+| `agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60` | resolves/downloads tokenizer artifacts |
 
 **Implementation diagram**
 
-![diagram](assets/diagrams/1e389ab7c89247cff5210d71c1a8b1b50a23bf92.png)
+![diagram](assets/diagrams/a13d66dd98d5d103d992aca1836a82027392e2d4.png)
 
 **Canonical source**
 
@@ -50,7 +48,57 @@ The framework counts **tokens**, never words, via a pluggable `TokenCounter`. `T
 
 ---
 
-## 2. What is the difference between tokens and embeddings?
+## 2. Why does tokenization affect cost and context limits
+
+<span class="badge">intermediate</span>
+
+**Title.** Why tokenization affects cost and context limits
+
+**Summary.** Cost and context are measured in tokens, not words — text that fragments more costs more and fills the window faster.
+
+**Key points.**
+
+- Cost and context are counted in tokens, not words.
+- More fragmentation → more tokens → higher cost, faster window fill.
+- Token counts also drive chunking and compaction thresholds.
+
+**General.** Cost and context limits are measured in tokens, not words, so a language or domain that fragments more costs more per word and fills the window faster. The same token count drives when history must be compacted or tool output offloaded.
+
+![diagram](assets/diagrams/f2598fe76d109c09cdb2c29df55f033d8ee34af0.png)
+
+**Jiuwen.** Token counts drive context limits (DEFAULT_CONTEXT_MAX_TOKENS = 200,000), compression/offload thresholds, and cost via provider-reported usage metadata (input/output/cache/reasoning tokens). Retrieval chunking is also token-based.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKENS`, default 200,000), compression/offload thresholds, and cost via provider-reported `usage_metadata` (`input_tokens`/`output_tokens`/cache/reasoning tokens). Retrieval chunking is also token-based.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/context_engine/context/context_utils.py:20` | DEFAULT_CONTEXT_MAX_TOKENS = 200000 |
+| `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | per-round token budget |
+| `agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:287` | count() drives limits/cost |
+| `agent-core/openjiuwen/core/foundation/llm/schema/message.py:28` | total_tokens usage metadata |
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/c288f596c049a51c85685629bbd5938b9a4b67a4.png)
+
+**Canonical source**
+
+<sub>`source/llm-fundamentals-interview-questions_for_engineers.md`</sub>
+
+</details>
+
+---
+
+## 3. What is the difference between tokens and embeddings?
+
+<span class="badge">foundational</span>
 
 **Title.** Tokens vs embeddings
 
@@ -91,7 +139,9 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ---
 
-## 3. Explain how self-attention works in a transformer
+## 4. Explain how self-attention works in a transformer
+
+<span class="badge">intermediate</span>
 
 **Title.** Self-attention
 
@@ -135,7 +185,9 @@ Not implemented — attention is delegated entirely to provider APIs or to Huggi
 
 ---
 
-## 4. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
+## 5. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
+
+<span class="badge">foundational</span>
 
 **Title.** Positional encoding
 
@@ -179,7 +231,9 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 
 ---
 
-## 5. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
+## 6. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
+
+<span class="badge">foundational</span>
 
 **Title.** Encoder vs decoder
 
@@ -227,7 +281,9 @@ There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder
 
 ---
 
-## 6. What's the difference between a model's context window and its training data cutoff
+## 7. What's the difference between a model's context window and its training data cutoff
+
+<span class="badge">foundational</span>
 
 **Title.** Context window vs cutoff
 
@@ -269,7 +325,9 @@ Model metadata here is operational only: model name, provider, context-window to
 
 ---
 
-## 7. What happens when a conversation exceeds the model's context window
+## 8. What happens when a conversation exceeds the model's context window
+
+<span class="badge">intermediate</span>
 
 **Title.** Exceeding the context window
 
@@ -319,7 +377,9 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 ---
 
-## 8. Why does model performance sometimes degrade with very long context, even when the context fits
+## 9. Why does model performance sometimes degrade with very long context, even when the context fits
+
+<span class="badge">foundational</span>
 
 **Title.** Long-context degradation
 
@@ -368,7 +428,9 @@ There is no explicit "lost-in-the-middle" mitigation; the system instead mechani
 
 ---
 
-## 9. What does temperature actually control, mathematically, in the output distribution
+## 10. What does temperature actually control, mathematically, in the output distribution
+
+<span class="badge">foundational</span>
 
 **Title.** Temperature
 
@@ -413,7 +475,9 @@ Temperature is a **passthrough request parameter** — hosted APIs apply the mat
 
 ---
 
-## 10. What's the difference between top-k sampling and top-p (nucleus) sampling
+## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
+
+<span class="badge">foundational</span>
 
 **Title.** Top-k vs top-p
 
@@ -457,7 +521,9 @@ Top-p (nucleus) is implemented locally; top-k sampling is not. `GenerationConfig
 
 ---
 
-## 11. Why does greedy decoding sometimes produce worse output than sampling-based decoding
+## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
+
+<span class="badge">foundational</span>
 
 **Title.** Greedy vs sampling
 
@@ -500,7 +566,9 @@ Greedy is implemented but not argued. The local sampler returns `argmax` when `t
 
 ---
 
-## 12. Why do LLMs struggle with tasks like counting or basic arithmetic
+## 13. Why do LLMs struggle with tasks like counting or basic arithmetic
+
+<span class="badge">intermediate</span>
 
 **Title.** Counting and arithmetic
 
@@ -543,7 +611,9 @@ The repo frames arithmetic/counting as a tool-augmentation problem. A canonical 
 
 ---
 
-## 13. What is hallucination, and why does it happen even in a well-trained model
+## 14. What is hallucination, and why does it happen even in a well-trained model
+
+<span class="badge">foundational</span>
 
 **Title.** Hallucination
 
@@ -588,7 +658,9 @@ The repo does not model or detect low-level hallucination; it implements downstr
 
 ---
 
-## 14. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
+## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
+
+<span class="badge">foundational</span>
 
 **Title.** Wrong vs uncertain
 
@@ -632,7 +704,9 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 
 ---
 
-## 15. "How does the model know X" is really testing context window understanding
+## 16. "How does the model know X" is really testing context window understanding
+
+<span class="badge">intermediate</span>
 
 **Title.** 'How does the model know X': context window understanding
 

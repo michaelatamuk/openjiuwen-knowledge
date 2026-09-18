@@ -2,6 +2,8 @@
 
 ## 1. What's the difference between a system prompt and a user prompt
 
+<span class="badge">foundational</span>
+
 **Title.** System vs user prompt
 
 **Summary.** The system prompt sets persistent role and rules; the user prompt is the per-turn request. Providers give system content higher priority and may pass it as a separate field.
@@ -50,6 +52,8 @@ The system prompt is a single assembled string from priority-ordered, host-injec
 ---
 
 ## 2. Zero-shot vs. few-shot vs. chain-of-thought, when does each actually improve output
+
+<span class="badge">intermediate</span>
 
 **Title.** Zero-shot, few-shot, CoT
 
@@ -100,6 +104,8 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 
 ## 3. How do you get consistent, parseable output like JSON from an LLM
 
+<span class="badge">intermediate</span>
+
 **Title.** Reliable JSON output
 
 **Summary.** Constrain generation (schema/tool mode), validate, and retry on failure; treat free-text JSON as a last resort.
@@ -149,6 +155,8 @@ The core harness has **no native `response_format`/JSON mode**; structured outpu
 
 ## 4. How does the framework validate a tool call's structured output before executing it
 
+<span class="badge">intermediate</span>
+
 **Title.** Validating tool-call output
 
 **Summary.** Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.
@@ -196,6 +204,8 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 ---
 
 ## 5. How do you version prompts the same way you'd version code
+
+<span class="badge">intermediate</span>
 
 **Title.** Versioning prompts
 
@@ -248,6 +258,8 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 ---
 
 ## 6. Any prompt behavior question is secretly a versioning and testing question
+
+<span class="badge">intermediate</span>
 
 **Title.** Prompt behavior: versioning and testing
 

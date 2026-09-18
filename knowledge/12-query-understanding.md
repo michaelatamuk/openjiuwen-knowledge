@@ -2,6 +2,8 @@
 
 ## 1. What is query rewriting or query expansion, and when does it meaningfully improve retrieval quality
 
+<span class="badge">foundational</span>
+
 **Title.** Query rewriting vs expansion
 
 **Summary.** Rewriting makes a query self-contained (coreference, typos, prior-turn reliance); expansion adds terms/synonyms or a hypothetical answer (HyDE) to bridge vocabulary gaps.
@@ -42,6 +44,8 @@
 ---
 
 ## 2. How would you handle a vague or ambiguous user query before it even reaches retrieval
+
+<span class="badge">advanced</span>
 
 **Title.** Handling vague queries
 
@@ -85,6 +89,8 @@ Ambiguity is not resolved by asking the user pre-retrieval. `QueryRewriter.rewri
 
 ## 3. How would you decompose a complex, multi-part question into smaller retrievable sub-questions
 
+<span class="badge">advanced</span>
+
 **Title.** Decomposing multi-part questions
 
 **Summary.** Split a compound question into independently answerable sub-questions, retrieve for each (often in parallel), then synthesize.
@@ -124,6 +130,8 @@ Decomposition is prompt-level and **sequential** inside `AgenticRetriever`. `_RE
 ---
 
 ## 4. What is multi-hop retrieval, and when does single-pass retrieval fail to answer a question
+
+<span class="badge">foundational</span>
 
 **Title.** Multi-hop retrieval
 
@@ -168,6 +176,8 @@ Two mechanisms. `AgenticRetriever` keeps a `queries` list and loops up to `max_i
 
 ## 5. Handling a question requiring information from multiple documents
 
+<span class="badge">intermediate</span>
+
 **Title.** Multi-document questions
 
 **Summary.** Retrieve a candidate set per sub-query or entity, merge and deduplicate, and let the generator synthesize across them (or add an aggregation step).
@@ -211,6 +221,8 @@ This is the strongest area. `AgenticRetriever` runs up to `max_iter` rounds agai
 ---
 
 ## 6. When to skip RAG and rely on parametric knowledge instead
+
+<span class="badge">intermediate</span>
 
 **Title.** When to skip RAG
 

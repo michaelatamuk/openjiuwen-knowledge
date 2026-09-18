@@ -1,11 +1,12 @@
 # LLM foundations
 
-14 unique questions, deduplicated from the archived docs. Each `##` is one question; identical questions from other docs were merged. Full source files are in `source/`.
-## 1. What's the difference between a token and a word, and why does tokenization affect cost and context limits
+15 unique questions, deduplicated from the archived docs. Each `##` is one question; identical questions from other docs were merged. Full source files are in `source/`.
 
-**General:** A token is the model's atomic unit — typically a sub-word produced by a BPE/unigram vocabulary, so one word may be one or several tokens, and rare/long words and code fragment heavily. Cost and context limits are measured in tokens, not words, so a language or domain that fragments more costs more per word and fills the window faster. Tokenization also explains why models miscount letters and struggle with character-level tasks.
+## 1. What's the difference between a token and a word?
 
-**Jiuwen:** The framework counts **tokens**, never words, via a pluggable `TokenCounter`. `TiktokenCounter` maps known model names to tiktoken encodings, falls back to `cl100k_base` for unknown models (marked `tiktoken_fallback`), and finally to a `len(text)//3` heuristic if tiktoken is unavailable. A separate `TiktokenModelCounter` loads a model-native BPE vocabulary, and `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family. Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKENS`, default 200,000), compression/offload thresholds, and cost via provider-reported `usage_metadata` (`input_tokens`/`output_tokens`/cache/reasoning tokens). Retrieval chunking is also token-based.
+**General:** A token is the model's atomic unit — typically a sub-word produced by a BPE/unigram vocabulary — so one word may be one or several tokens, and rare/long words and code fragment heavily. This is also why models miscount letters and struggle with character-level tasks.
+
+**Jiuwen:** The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `TiktokenCounter` maps known model names to tiktoken encodings (falling back to `cl100k_base` for unknown models), and `TiktokenModelCounter` loads a model-native BPE vocabulary. `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family.
 
 ```mermaid
 flowchart LR
@@ -13,21 +14,37 @@ flowchart LR
     TC --> TK["TiktokenCounter: model→encoding, cl100k fallback, len//3 fallback"]
     TC --> TM["TiktokenModelCounter: model-native BPE"]
     TC --> TOK["TokenizerManager: HF/tiktoken artifacts"]
-    TK --> BUD["context window · compression/offload thresholds"]
-    TK --> COST["usage_metadata → cost (input/output/cache/reasoning tokens)"]
-    TK --> CHUNK["token-based retrieval chunking"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:225</code> model→encoding map; <code>:287</code> <code>count()</code> with <code>len(text)//3</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86</code> — model-native tiktoken BPE<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34</code> — <code>TokenizerSpec</code>; <code>:50</code> fallback policy chain<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60</code> — resolves/downloads tokenizer artifacts; <code>:124</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context_utils.py:20</code> — <code>DEFAULT_CONTEXT_MAX_TOKENS = 200000</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — per-round token budget<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/message.py:28</code> — <code>total_tokens</code> usage metadata</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:225</code> model→encoding map; <code>:287</code> <code>count()</code> with <code>len(text)//3</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86</code> — model-native tiktoken BPE<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34</code> — <code>TokenizerSpec</code>; <code>:50</code> fallback policy chain<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60</code> — resolves/downloads tokenizer artifacts</sub>
 
 </details>
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-fund._</sub>
 
-## 2. What is the difference between tokens and embeddings?
+---
+
+## 2. Why does tokenization affect cost and context limits
+
+**General:** Cost and context limits are measured in tokens, not words, so a language or domain that fragments more costs more per word and fills the window faster. The same token count drives when history must be compacted or tool output offloaded.
+
+**Jiuwen:** Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKENS`, default 200,000), compression/offload thresholds, and cost via provider-reported `usage_metadata` (`input_tokens`/`output_tokens`/cache/reasoning tokens). Retrieval chunking is also token-based.
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context_utils.py:20</code> — <code>DEFAULT_CONTEXT_MAX_TOKENS = 200000</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — per-round token budget<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:287</code> — <code>count()</code> drives limits/cost<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/message.py:28</code> — <code>total_tokens</code> usage metadata</sub>
+
+</details>
+
+<sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-fund._</sub>
+
+---
+
+## 3. What is the difference between tokens and embeddings?
 
 **General:** A token is a unit of text (a sub-word piece) — the input/output alphabet of the model. An embedding is a vector representation of text that encodes meaning, used for similarity search. Tokens are discrete and count against cost/context; embeddings are continuous and live in a vector space. You embed chunks/tokens, but they are different abstractions.
 
@@ -48,7 +65,9 @@ flowchart LR
 
 <sub>_Canonical source: `source/llm-applied-interview-questions_for_engineers.md`; also covered in: llm-applied._</sub>
 
-## 3. Explain how self-attention works in a transformer
+---
+
+## 4. Explain how self-attention works in a transformer
 
 **General:** Each token is projected into three vectors — query, key, value. The query of a token is dot-producted with the keys of all tokens (scaled by `1/√d_k`), softmaxed into attention weights, and used to take a weighted sum of the values. Doing this with multiple heads in parallel and stacking layers lets each token aggregate information from every other token, with the weights computed from content rather than position. The result is a context-dependent representation per token.
 
@@ -75,7 +94,9 @@ flowchart LR
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-fund._</sub>
 
-## 4. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
+---
+
+## 5. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
 
 **General:** Self-attention is permutation-equivariant — without positional information it cannot distinguish token order, so "dog bites man" and "man bites dog" yield the same multiset of token representations, only reordered (not one identical output). Positional encoding injects order information — by adding a position-dependent signal to the token representations (sinusoidal/learned), or by rotating the query and key vectors inside attention (RoPE) — so the attention scores can depend on relative or absolute position. Without it the model cannot know sequence order.
 
@@ -100,7 +121,9 @@ flowchart LR
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 5. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
+---
+
+## 6. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
 
 **General:** Encoder-only models (BERT) read bidirectional context and produce representations — good for classification, embedding, extraction. Decoder-only models (GPT) are autoregressive: they predict the next token attending only leftward, which makes them generators. Encoder-decoder models (T5, original Transformer) encode an input and generate an output, suited to translation/summarization. GPT is decoder-only.
 
@@ -123,7 +146,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-fund._</sub>
 
-## 6. What's the difference between a model's context window and its training data cutoff
+---
+
+## 7. What's the difference between a model's context window and its training data cutoff
 
 **General:** The context window is how many tokens the model can attend to at once (a capacity limit). The training data cutoff is the date after which the model has no knowledge (a temporal limit). A model can have a large window but an old cutoff — it can read a long document you paste but still not know events after its training date. Confusing the two leads to expecting up-to-date answers from a frozen model.
 
@@ -147,7 +172,9 @@ flowchart LR
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 7. What happens when a conversation exceeds the model's context window
+---
+
+## 8. What happens when a conversation exceeds the model's context window
 
 **General:** Either the provider rejects the request, or the framework must shrink the prompt before sending. Robust systems pre-empt it: count tokens, then drop/truncate oldest history, offload large tool outputs, and/or summarize old turns into a compact memory block, always preserving recent turns. The goal is to keep the prompt within budget without losing the information needed for the next step.
 
@@ -175,7 +202,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-applied, llm-fund._</sub>
 
-## 8. Why does model performance sometimes degrade with very long context, even when the context fits
+---
+
+## 9. Why does model performance sometimes degrade with very long context, even when the context fits
 
 **General:** Attention spreads over more tokens, diluting the signal for any one of them, and models are empirically better at using information at the beginning and end of the context than in the middle ("lost in the middle"). Irrelevant long context also introduces distractors and can override instructions. Fitting the window is necessary but not sufficient; relevance and ordering matter too.
 
@@ -200,7 +229,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-applied, llm-fund._</sub>
 
-## 9. What does temperature actually control, mathematically, in the output distribution
+---
+
+## 10. What does temperature actually control, mathematically, in the output distribution
 
 **General:** The model produces logits `z_i` for the next token. Temperature `T` rescales them: `softmax(z_i / T)`. As `T → 0` the distribution collapses toward the argmax (greedy/deterministic); as `T` rises the distribution flattens, increasing diversity and the chance of lower-probability tokens. `T = 1` leaves the model's raw distribution unchanged. It does not change which tokens are possible, only their relative probabilities.
 
@@ -226,7 +257,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, llm-fund._</sub>
 
-## 10. What's the difference between top-k sampling and top-p (nucleus) sampling
+---
+
+## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
 
 **General:** Both truncate the next-token distribution before sampling. Top-k keeps the `k` most probable tokens and renormalizes — a fixed candidate count regardless of how peaked the distribution is. Top-p keeps the smallest set of tokens whose cumulative probability reaches `p` — an adaptive count: few tokens when the model is confident, many when it is flat. Top-p usually adapts better; they are often combined.
 
@@ -251,7 +284,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 11. Why does greedy decoding sometimes produce worse output than sampling-based decoding
+---
+
+## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
 
 **General:** Greedy picks the single highest-probability token each step. That is locally optimal but not globally: it can lock into repetitive, degenerate, or bland sequences, and it cannot recover from one early bad choice. Sampling explores alternatives, which often yields more natural and diverse text; a moderate temperature with top-p is a common default. For tasks with a single correct answer (extraction, classification), greedy/`T=0` is usually preferred.
 
@@ -278,7 +313,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 12. Why do LLMs struggle with tasks like counting or basic arithmetic
+---
+
+## 13. Why do LLMs struggle with tasks like counting or basic arithmetic
 
 **General:** The model operates on tokens, not characters or digits-as-numbers; counting letters requires character-level reasoning that BPE hides, and multi-digit arithmetic requires carrying/positional algorithms that are error-prone to learn implicitly. Models also have no scratchpad guarantee unless asked to show work. The reliable fix is tool use — call a calculator or run code — rather than expecting the forward pass to do exact math.
 
@@ -306,7 +343,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 13. What is hallucination, and why does it happen even in a well-trained model
+---
+
+## 14. What is hallucination, and why does it happen even in a well-trained model
 
 **General:** Hallucination is fluent output that is not grounded in fact or in the provided context. It arises because the objective is next-token likelihood, not truth: the model optimizes plausibility, has no built-in fact database, generalizes patterns that sometimes fabricate specifics, and cannot reliably know the boundary of its own knowledge. Mitigations are grounding (retrieval/citations), verification, constrained formats, and abstention — not a property of the weights you can simply "fix".
 
@@ -333,7 +372,9 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 14. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
+---
+
+## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
 
 **General:** Wrong means the answer is factually incorrect; uncertain means the model's distribution is not confident, which may still yield a correct or incorrect answer. They are independent: a model can be confidently wrong, or rightly unsure. From the surface text alone you generally cannot tell — fluent text carries no calibrated confidence. Token log-probabilities, entropy, or self-consistency/vote checking can approximate uncertainty, but they are imperfect and need calibration; abstention only helps if it correlates with being wrong.
 
@@ -366,7 +407,7 @@ flowchart TD
 
 ---
 
-## 15. "How does the model know X" is really testing context window understanding
+## 16. "How does the model know X" is really testing context window understanding
 
 **General:** why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. The interviewer is checking whether you reason about context *contents*, not model capability. A strong answer includes: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
 

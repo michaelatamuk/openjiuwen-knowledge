@@ -62,7 +62,7 @@
    "Repetition detection + cost ceiling."
   ]
  },
- "05-8": {
+ "05-9": {
   "title": "Infinite tool-calling loop",
   "tldr": "Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.",
   "points": [
@@ -71,7 +71,7 @@
    "No-progress nudge/abort + token/time caps."
   ]
  },
- "05-9": {
+ "05-10": {
   "title": "Retrieve again or answer",
   "tldr": "Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.",
   "points": [
@@ -80,7 +80,7 @@
    "Stop on sufficient/no-next-question or the cap."
   ]
  },
- "05-10": {
+ "05-11": {
   "title": "'The agent is stuck': tests shipped experience",
   "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
   "points": [
@@ -90,7 +90,7 @@
    "Dedup rail + session cost cap."
   ]
  },
- "05-11": {
+ "05-12": {
   "title": "'Stuck in a loop': production experience",
   "tldr": "'The agent is stuck in a loop' is testing production experience.",
   "points": [
@@ -98,6 +98,15 @@
    "Agentic retriever max_iter (2, clamped).",
    "Anomaly rail compact/abort.",
    "Dedup rail; idempotent=False default."
+  ]
+ },
+ "05-8": {
+  "title": "Preventing an infinite retrieval/tool loop",
+  "tldr": "Add repetition detection, tool-call dedup, a max-iteration cap, and a cost ceiling so a confused agent cannot loop forever.",
+  "points": [
+   "Detect repetition and duplicate tool calls.",
+   "Bound the agent loop with max_iterations.",
+   "Set a session cost ceiling."
   ]
  }
 }

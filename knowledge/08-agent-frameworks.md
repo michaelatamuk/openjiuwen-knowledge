@@ -2,6 +2,8 @@
 
 ## 1. What does an agent framework actually give you that raw API calls don't
 
+<span class="badge">foundational</span>
+
 **Title.** What a framework gives you
 
 **Summary.** Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.
@@ -53,6 +55,8 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 
 ## 2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI
 
+<span class="badge">foundational</span>
+
 **Title.** Graph vs role frameworks
 
 **Summary.** Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).
@@ -98,6 +102,8 @@ It contains both archetypes as separate subsystems. The graph side is a genuine 
 ---
 
 ## 3. How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project
+
+<span class="badge">intermediate</span>
 
 **Title.** Choosing a framework
 
@@ -149,6 +155,8 @@ There is no in-repo LangGraph or CrewAI code, so this is architectural reading. 
 
 ## 4. What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer
 
+<span class="badge">advanced</span>
+
 **Title.** Heavier framework vs custom
 
 **Summary.** Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.
@@ -196,6 +204,8 @@ The light path is `core`: `BaseAgent`/`ReActAgent` with `AbilityManager`, option
 ---
 
 ## 5. When does a framework add unnecessary abstraction instead of solving a real problem
+
+<span class="badge">intermediate</span>
 
 **Title.** Unnecessary abstraction
 
@@ -245,6 +255,8 @@ The base layer is deliberately thin and elective. `ReActAgent.invoke` auto-creat
 ---
 
 ## 6. What happens when the framework's abstractions don't match how your actual business logic needs to work
+
+<span class="badge">intermediate</span>
 
 **Title.** When abstractions don't fit
 
@@ -296,6 +308,8 @@ The framework exposes multiple escape hatches. At graph level, implement `Execut
 
 ## 7. How does the framework decide which node or agent runs next
 
+<span class="badge">intermediate</span>
+
 **Title.** Which node runs next
 
 **Summary.** A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.
@@ -344,6 +358,8 @@ Workflow next-node selection is Pregel super-step scheduling: each step `Channel
 
 ## 8. How do you version and roll back an agent's workflow definition, not just its prompts
 
+<span class="badge">intermediate</span>
+
 **Title.** Versioning & rolling back workflows
 
 **Summary.** Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.
@@ -389,6 +405,8 @@ In the core framework this is **essentially absent**: `WorkflowCard` has a free-
 ---
 
 ## 9. How do you evaluate whether a framework will scale with your team, not just your first prototype
+
+<span class="badge">advanced</span>
 
 **Title.** Will a framework scale with your team
 

@@ -33,6 +33,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, llm-fund, rag-eval, rag-1._</sub>
 
+---
+
 ## 2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score
 
 **General:** An end-to-end score tells you "the answer was wrong" but not why. If retrieval missed the document, no generator can fix it; if the document was retrieved but the answer is wrong, the generator (or grounding) is at fault. Stage-level metrics — Recall@k / precision@k / NDCG for retrieval, faithfulness / correctness for generation — let you attribute the failure and fix the right component. End-to-end stays as the final acceptance check.
@@ -58,6 +60,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
+---
+
 ## 3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways
 
 **General:** Exact match requires the output string to equal the reference, so "Paris" vs "The capital is Paris" both fail even when correct. It is brittle to wording, formatting, articles, and ordering. Use it only for tasks with a canonical form (classification labels, IDs, single tokens); otherwise use semantic/normalized metrics (LLM judge, embedding similarity, or task-specific parsers).
@@ -82,6 +86,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
+
+---
 
 ## 4. Recall@k, and what a low score tells you about your retrieval setup
 
@@ -110,11 +116,13 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-retrieval._</sub>
 
-## 5. Precision@k = relevant docs in top k / k — how it differs from Recall@k, and why both can be low even when the pipeline "looks" fine
+---
 
-**General:** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant docs that were retrieved. They trade off: raising k raises recall but usually lowers precision. Both can be low if the embedding/chunking is wrong (nothing relevant ranked) or if the corpus lacks the answer. "Looks fine" is exactly why you need numbers — a plausible top-3 can still be mostly irrelevant.
+## 5. How does Precision@k differ from Recall@k?
 
-**Jiuwen:** Precision@k is **absent**. The only precision present is classification/answer precision: PerStream's "TV (Precision)" = TP/(TP+FP) (how many predicted proactive moments were correct) and sklearn `precision_score` in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.
+**General:** Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant documents that were retrieved. They trade off: raising k raises recall but usually lowers precision.
+
+**Jiuwen:** Precision@k is **absent**. The only precision present is classification/answer precision: PerStream's “TV (Precision)” = TP/(TP+FP) and sklearn `precision_score` in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.
 
 ```mermaid
 flowchart LR
@@ -127,13 +135,41 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362</code> — <code>get_tv_precision()</code> = <code>tp / total_pred_not_nil</code><br>&bull; <code>agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:188</code> — <code>tv_precision</code><br>&bull; <code>agent-core/examples/PerStream/src/eval/test_remember_gate.py:22</code> — sklearn <code>precision_score</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — <code>rerank(...)</code> re-sorts, no precision measurement<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60</code> — <code>compute_batch</code> zips predictions/labels, no relevance-per-rank</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362</code> — `get_tv_precision()` = `tp / total_pred_not_nil`<br>&bull; <code>agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:188</code> — `tv_precision`<br>&bull; <code>agent-core/examples/PerStream/src/eval/test_remember_gate.py:22</code> — sklearn `precision_score`<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — `rerank(...)` re-sorts, no precision measurement</sub>
 
 </details>
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-1, rag-retrieval._</sub>
 
-## 6. MRR, and when it matters more than Recall@k
+---
+
+## 6. Why can precision and recall both look fine while the pipeline is broken?
+
+**General:** Both can be low even when the outputs look plausible: if the embedding or chunking is wrong, nothing relevant is ranked highly; and if the corpus simply lacks the answer, no retriever can find it. A plausible top-3 can still be mostly irrelevant — which is exactly why you need numbers, not vibes.
+
+**Jiuwen:** The retrieval stack produces an ordered candidate list — and a cross-encoder can re-sort it — but never compares that ordering against graded relevance, so there is no precision@k/recall@k to reveal the gap. Evaluation metrics zip predictions/labels without any relevance-per-rank notion.
+
+```mermaid
+flowchart TD
+    A["answer looks plausible"] --> B{"embedding/chunking wrong? → nothing relevant ranked"}
+    A --> C{"corpus lacks the answer? → nothing to retrieve"}
+    B --> Z["precision@k / recall@k absent → gap invisible"]
+    C --> Z
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — `rerank(...)` re-sorts, no precision measurement<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60</code> — `compute_batch` zips predictions/labels, no relevance-per-rank</sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-1, rag-retrieval._</sub>
+
+
+---
+
+## 7. MRR, and when it matters more than Recall@k
 
 **General:** MRR is the mean of `1/rank` of the first relevant result. It matters when the user/system mostly needs the single best hit and the position of the first correct answer is what counts (FAQ lookup, "open the right doc", navigation). Recall@k matters when a set of results is consumed together (context stuffing). MRR ignores everything after the first relevant hit, so it is blind to recall.
 
@@ -156,7 +192,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-retrieval._</sub>
 
-## 7. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
+
+---
+
+## 8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
 
 **General:** NDCG discounts each relevant result by `log2(rank+1)` and normalizes by the ideal (best-possible) ordering, so it rewards putting the most relevant documents at the top and supports graded relevance (not just binary). It matters when ranking quality — not just presence — drives the user experience, and is the standard metric for reranker comparisons. Recall@k treats all positions within k equally; NDCG does not.
 
@@ -180,7 +219,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 8. Faithfulness vs. relevance in RAG evaluation
+
+---
+
+## 9. Faithfulness vs. relevance in RAG evaluation
 
 **General:** Relevance asks whether retrieved passages are on-topic for the query (context precision/recall). Faithfulness/groundedness asks whether the answer's claims are actually supported by the retrieved context (does it hallucinate beyond the evidence). A system can retrieve relevant context and still be unfaithful, or be faithful to irrelevant context. Measuring faithfulness requires giving the judge the context and checking claim support/citations, not just answer-vs-reference correctness.
 
@@ -207,7 +249,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, llm-applied, rag-1, genai, rag-eval._</sub>
 
-## 9. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
+
+---
+
+## 10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
 
 **General:** Faithfulness = supported claims / total claims. Decompose the answer into atomic, verifiable claims; for each, ask an NLI model or LLM judge whether the retrieved source entails it; average. It needs the source context and is claim-level, not answer-level. Low faithfulness with high relevance points at the generator skipping or distorting retrieved evidence.
 
@@ -232,7 +277,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 10. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
+
+---
+
+## 11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
 
 **General:** Extract atomic claims from the answer, then verify each against the retrieved context (LLM-judge or NLI). Hallucination rate = unsupported claims / total claims (or fraction of answers with any unsupported claim). This is stricter than "is the answer correct": it catches answers that are plausible but not grounded, and it requires passing the retrieved context to the checker.
 
@@ -257,7 +305,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 11. What is perplexity, and what does a lower score actually tell you
+
+---
+
+## 12. What is perplexity, and what does a lower score actually tell you
 
 **General:** Perplexity is the exponentiated average negative log-likelihood the model assigns to a token sequence: `exp(-(1/N)·Σ log p(token_i))`. Lower means the model finds the text more predictable — useful for comparing language models on the same data or detecting distribution shift/overfitting. It does not measure factuality, reasoning, instruction-following, or usefulness, and it is only comparable across models that share a tokenizer and data.
 
@@ -284,7 +335,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 12. Known limitations of using an LLM as a judge
+
+---
+
+## 13. Known limitations of using an LLM as a judge
 
 **General:** LLM judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and can be gamed or prompt-injected. They need position-swapping, multiple votes, agreement reporting, human calibration on a golden set, and must distinguish "judge failed" from "answer wrong". A single unvalidated judge score is a weak signal.
 
@@ -314,7 +368,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, rag-eval._</sub>
 
-## 13. How do you evaluate when there's no ground truth answer, only a query and a corpus
+
+---
+
+## 14. How do you evaluate when there's no ground truth answer, only a query and a corpus
 
 **General:** Bootstraps without gold labels: (a) generate synthetic queries from known documents and treat the source document as the gold retrieval target (cheap, works well for retrieval metrics); (b) use an LLM to answer and treat cited passages as relevant (RAGAS-style); (c) judge faithfulness against the retrieved context rather than a reference answer; (d) sample and label by hand a small set to calibrate. The key is that retrieval can be graded with synthetic (query, source-doc) pairs even when answers are unlabeled.
 
@@ -341,7 +398,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 14. How would you build an eval dataset from scratch if you don't have one yet
+
+---
+
+## 15. How would you build an eval dataset from scratch if you don't have one yet
 
 **General:** Mine queries from real logs or user questions, then label relevance by (a) synthetic queries generated from known documents (the document is the gold target), (b) LLM answering and treating cited chunks as relevant, or (c) a small hand-labeled calibration set. Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate. For retrieval you can bootstrap (query, source-doc) pairs with no answer labels at all.
 
@@ -366,7 +426,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 15. How many examples before eval results are statistically meaningful, not just noise
+
+---
+
+## 16. How many examples before eval results are statistically meaningful, not just noise
 
 **General:** It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.
 
@@ -389,7 +452,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 16. How would you compare two models for a specific task, not just a general leaderboard score
+
+---
+
+## 17. How would you compare two models for a specific task, not just a general leaderboard score
 
 **General:** Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.
 
@@ -419,7 +485,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
 
-## 17. Building a regression test suite to catch a quality drop before it ships
+
+---
+
+## 18. Building a regression test suite to catch a quality drop before it ships
 
 **General:** Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.
 
@@ -444,7 +513,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, rag-eval, rag-1._</sub>
 
-## 18. Evaluating continuously in production, not just once before launch
+
+---
+
+## 19. Evaluating continuously in production, not just once before launch
 
 **General:** Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.
 
@@ -468,7 +540,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: ai-agent, rag-eval, rag-system._</sub>
 
-## 19. How do you detect when your retrieval quality has degraded over time
+
+---
+
+## 20. How do you detect when your retrieval quality has degraded over time
 
 **General:** Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.
 
@@ -492,7 +567,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
 
-## 20. High eval scores but users still complaining — what does that gap tell you about your eval set
+
+---
+
+## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
 
 **General:** The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.
 
@@ -515,7 +593,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 21. Tying an eval metric back to a business outcome a stakeholder actually cares about
+
+---
+
+## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
 
 **General:** Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.
 
@@ -537,7 +618,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
 
-## 22. "How do you know it's working" tests evaluation depth, not confidence
+
+---
+
+## 23. "How do you know it's working" tests evaluation depth, not confidence
 
 **General:** "It looked good to me" ends the conversation. They want a fixed eval set, faithfulness scoring on generated claims, and how you'd catch silent degradation after an unflagged prompt change. The real trap is "how would you know if it got *worse*", not "how do you know it works now". A strong answer includes: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
 
@@ -559,7 +643,10 @@ flowchart TD
 
 </details>
 
-## 23. "How do you know it's working" is testing evaluation depth
+
+---
+
+## 24. "How do you know it's working" is testing evaluation depth
 
 **General:** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. A strong answer includes: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
 

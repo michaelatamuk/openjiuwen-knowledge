@@ -2,6 +2,8 @@
 
 ## 1. How does function calling actually work under the hood
 
+<span class="badge">intermediate</span>
+
 **Title.** Function calling under the hood
 
 **Summary.** Tool schemas (name, description, JSON-Schema params) go in the request; the model returns a structured tool_calls list; the host validates args, executes, and feeds results back.
@@ -48,6 +50,8 @@ Cards become JSON Schema through the callable schema extractor, the ability mana
 ---
 
 ## 2. How does a framework register and expose tools to the underlying model
+
+<span class="badge">intermediate</span>
 
 **Title.** Registering tools
 
@@ -101,6 +105,8 @@ Abilities are stored as metadata cards (`ToolCard`/`WorkflowCard`/`AgentCard`/`M
 
 ## 3. How do you handle a tool that a framework doesn't natively support
 
+<span class="badge">intermediate</span>
+
 **Title.** Unsupported tool
 
 **Summary.** Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.
@@ -151,6 +157,8 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 
 ## 4. How do you handle a tool call that fails or returns malformed output
 
+<span class="badge">intermediate</span>
+
 **Title.** Failed or malformed tool call
 
 **Summary.** Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).
@@ -196,6 +204,8 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 ---
 
 ## 5. Designing retry logic that doesn't cause duplicate side effects on a tool call
+
+<span class="badge">intermediate</span>
 
 **Title.** Retry without duplicate effects
 
@@ -245,6 +255,8 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 
 ## 6. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
 
+<span class="badge">advanced</span>
+
 **Title.** Custom per-tool retry policy
 
 **Summary.** Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.
@@ -291,6 +303,8 @@ Retry decisions are centralized in `ToolCallResilienceRail` (priority 70, auto-m
 
 ## 7. Handling concurrent API calls when an agent needs to call multiple tools at once
 
+<span class="badge">intermediate</span>
+
 **Title.** Concurrent tool calls
 
 **Summary.** Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.
@@ -332,6 +346,8 @@ The ReAct loop can emit a `List[ToolCall]` in one turn. `AbilityManager.execute`
 ---
 
 ## 8. How does the framework handle a step that times out or throws an error
+
+<span class="badge">intermediate</span>
 
 **Title.** Step timeout or error
 
@@ -382,6 +398,8 @@ Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout re
 
 ## 9. Controlling cost when an agent can call tools repeatedly
 
+<span class="badge">intermediate</span>
+
 **Title.** Cost with repeated tool calls
 
 **Summary.** Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.
@@ -428,6 +446,8 @@ The product tracks provider-reported session cost and enforces a per-session cap
 ---
 
 ## 10. Agentic tool-calling pattern
+
+<span class="badge">intermediate</span>
 
 **Title.** Agentic tool-calling pattern
 

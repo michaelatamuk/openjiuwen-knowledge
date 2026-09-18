@@ -30,6 +30,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-2, rag-practical, rag-retrieval._</sub>
 
+---
+
 ## 2. When keyword search outperforms semantic search
 
 **General:** Keyword search wins when the query contains exact identifiers, codes, rare names, or domain jargon that the embedding model never learned to map, and when the corpus is small or the terms are highly distinctive. Dense search wins on paraphrase and intent. The strongest approach is a router that picks by query type (or always runs hybrid and fuses).
@@ -58,6 +60,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-2, rag-practical, rag-retrieval._</sub>
 
+---
+
 ## 3. Why a purely semantic system can fail on queries with exact codes, IDs, or names
 
 **General:** Embedding models are trained on natural-language co-occurrence; short opaque tokens (error codes, SKUs, UUIDs, version strings, rare proper nouns) carry little semantic signal and get mapped to near-random neighbors. A semantically "close" but wrong chunk can outrank the exact hit, and because dense results are rarely empty, no lexical fallback fires. The fix is metadata/exact filtering, a sparse leg, or an explicit exact-match boost.
@@ -85,6 +89,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: engineering, rag-practical, rag-retrieval, genai, llm-applied, rag-1._</sub>
 
+---
+
 ## 4. How do you decide between retrieving 5 documents versus 20
 
 **General:** It is a recall-vs-precision/token/latency tradeoff. Retrieve more when the question is multi-part, aggregative, or high-stakes and recall matters; fewer when answers are localized and you want precision and low token cost. The robust pattern is retrieve a larger candidate set (e.g. 20–50), rerank to a small k (3–5), and pass only the reranked top-k to the generator — so you keep recall without paying context cost. Tune k on an eval set; do not hardcode a gut number.
@@ -110,6 +116,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
 
+---
+
 ## 5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system
 
 **General:** Keep the two paths explicit: route structured questions to a text-to-SQL/table-query tool (schema-aware, validable) and unstructured questions to document retrieval, then merge/ground the results. Do not flatten tables into text and hope; and do not let a free-form shell tool be the only SQL path, because it is unverified. An orchestrator or router picks the source(s), and the answer cites which.
@@ -133,6 +141,8 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
+
+---
 
 ## 6. What reranking adds that initial retrieval doesn't already do
 
@@ -162,6 +172,8 @@ flowchart LR
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, rag-retrieval, rag-1._</sub>
 
+---
+
 ## 7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test
 
 **General:** You cannot tell from the order alone. Offline, hold out a labeled set of (query, relevant docs) and compare ranking metrics (NDCG@k, MRR, precision@k) with and without the reranker on the same candidate set. If NDCG does not improve, the reranker is reordering noise. Watch for it merely promoting longer/more generic chunks. A/B is better but needs traffic; offline label-based comparison is the first check.
@@ -188,6 +200,8 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval, rag-retrieval._</sub>
 
+---
+
 ## 8. Would you rerank every query, or only some, and how do you decide
 
 **General:** Rerank only when it improves the top-k enough to justify its latency: for high-stakes or ambiguous queries where first-stage precision is low, and when the candidate count is bounded. Skip it for exact-match lookups, high-volume cheap queries, or when latency dominates. Measure NDCG/precision with and without rerank on a labeled set to decide, and cache.
@@ -211,18 +225,19 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
-## 9. How much latency reranking adds, and deciding if it's worth it
+---
 
-**General:** Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds. Worth it when precision@k matters more than latency, when the candidate count is bounded, and when you can cache.
+## 9. How much latency does reranking add?
 
-**Jiuwen:** `RerankerConfig.timeout` defaults to 10 s, and `StandardReranker` sends **all** candidates in one request with `top_n=len(documents)` (no batching/concurrency), `max_retries=3` with backoff. `ChatReranker` enforces a list of size 1, so it costs one LLM call per candidate (O(N) latency) and is flagged experimental. Reranking is optional (`reranker=None` default), and the product `jiuwenswarm` pins `rerank_enabled: False` in the external memory builder. The only guard is the per-request timeout plus `min_score`; no candidate cap, rerank batch size, or cost accounting.
+**General:** Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds.
+
+**Jiuwen:** `RerankerConfig.timeout` defaults to 10 s, and `StandardReranker` sends **all** candidates in one request with `top_n=len(documents)` (no batching/concurrency), `max_retries=3` with backoff. `ChatReranker` enforces a list of size 1, so it costs one LLM call per candidate (O(N) latency) and is flagged experimental. There is no per-document timing, only the request timeout.
 
 ```mermaid
 flowchart TD
     CAND["N candidates"] --> S{"reranker"}
     S -->|StandardReranker| ONE["one request, top_n=len(documents), timeout=10s, retries=3"]
     S -->|ChatReranker| PER["one LLM call per document → O(N) latency"]
-    S -->|"none (default; product pins off)"| SKIP["no rerank"]
     ONE --> OK["bounded by request timeout (no per-doc timing)"]
     PER --> EXP["experimental, slow"]
 ```
@@ -230,15 +245,41 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:22</code> — <code>timeout</code> default 10 s<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:120</code> — <code>top_n=len(documents)</code> single request; <code>:35</code> <code>max_retries=3</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:113</code> — list-size-1 constraint (per-doc LLM call)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/utils/api_requests.py:55</code> — retry/backoff loop<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160</code> — <code>reranker=None</code> optional<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340</code> — product pins <code>rerank_enabled: False</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:22</code> — `timeout` default 10 s<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:120</code> — `top_n=len(documents)` single request; `:35` `max_retries=3`<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:113</code> — list-size-1 constraint (per-doc LLM call)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/utils/api_requests.py:55</code> — retry/backoff loop</sub>
 
 </details>
 
+<sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
 
+---
+
+## 10. When is reranking worth the latency cost?
+
+**General:** Rerank when precision@k matters more than latency, when the candidate count is bounded, and when results can be cached. Reranking a large, unbounded candidate set is usually not worth it — the latency and cost grow with N while the precision gain does not.
+
+**Jiuwen:** The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy.
+
+```mermaid
+flowchart TD
+    Q{"worth the latency?"} --> P["precision@k dominates? → yes"]
+    Q --> B["candidate set bounded/cacheable? → yes"]
+    Q --> D["reranker optional (None default); product pins off"]
+    D -.->|"no policy"| X["caller decides: no candidate cap / batch / cost accounting"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160</code> — `reranker=None` optional<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340</code> — product pins `rerank_enabled: False`</sub>
+
+</details>
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
 
-## 10. Bi-encoder for retrieval vs. cross-encoder for reranking
+
+---
+
+## 11. Bi-encoder for retrieval vs. cross-encoder for reranking
 
 **General:** A bi-encoder embeds query and document independently (fast, precomputable, indexable) but cannot model their interaction. A cross-encoder feeds query+document together through the model and scores the pair, capturing fine-grained relevance at the cost of one forward pass per candidate — hence two-stage retrieval.
 
@@ -270,7 +311,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-practical, rag-retrieval._</sub>
 
-## 11. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+
+---
+
+## 12. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
 
 **General:** Reduce prompt tokens by retrieving fewer but better chunks (rerank a larger candidate set down to a small k), summarizing long chunks/passages before insertion, and trimming conversation history. Reranking preserves quality while cutting k; summarization trades fidelity for tokens. Both beat blindly lowering k.
 

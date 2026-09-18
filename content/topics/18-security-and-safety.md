@@ -1,33 +1,59 @@
 # Security and safety
 
-## 1. What prompt injection is, and how you'd defend against it
+## 1. What is prompt injection?
 
-**General:** Prompt injection is untrusted input containing instructions that hijack the model (direct user input, or indirect via retrieved/tool content). Defenses: treat content as data not instructions, delimit/label untrusted content, never let it trigger privileged actions without a permission re-check, and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
+**General:** Untrusted input containing instructions that hijack the model. It is **direct** when the user types the malicious instruction, and **indirect** when it arrives inside retrieved documents, tool results, or any content the model reads.
 
-**Jiuwen:** The codebase separates prompt-level from enforced defenses. Prompt-level: `SafetyPromptRail` injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution, the permission engine merges tiered tool policy + file guard + net guard by "strictest" and floors risky shell structures to ASK, and builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths. A pluggable guardrail framework exists for injection detection, and the auto-harness adds an input heuristic that force-finishes on "ignore previous instructions".
+**Jiuwen:** Detection-side support exists but is not wired in: `core/security/guardrail/` provides `PromptInjectionGuardrail` with default regex patterns, and the auto-harness adds an input heuristic that force-finishes on “ignore previous instructions”. The configurable guardrail has **no production registration**, so detection is not active by default.
 
 ```mermaid
 flowchart TD
-    INJ["prompt injection"] --> P["prompt-level: SafetyPromptRail adds safety text (advice)"]
-    INJ --> ENF["enforced: tool policy + file guard + net guard (strictest)"]
-    ENF --> ASK["risky shell structure → ASK floor (tree-sitter AST)"]
-    ENF --> DENY["builtin rules: reverse shell / disk / shutdown / sensitive paths"]
-    INJ --> SH["shell: block backtick / `$()` before execution"]
-    INJ --> G["guardrail framework (injection detect) — no production registration"]
+    I["prompt injection"] --> D["direct: user input"]
+    I --> N["indirect: retrieved docs / tool results"]
+    D --> G["PromptInjectionGuardrail + default patterns"]
+    N --> G
+    G -.->|"no production registration"| X["not enforced by default"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code> — <code>SafetyPromptRail</code>; <code>:38</code> injects safety section; <code>agent-core/openjiuwen/harness/prompts/sections/safety.py:14</code> — static safety text<br>&bull; <code>agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29</code> — substitution regex; <code>:40</code> <code>check_injection</code> blocks<br>&bull; <code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code> — reverse-shell deny; <code>:35</code> disk deny; <code>:99</code> shutdown; <code>:148</code> sensitive paths<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588</code> — tiered policy; <code>:409</code> shell AST floor; <code>:502</code> ASK fallback; <code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82</code> — deterministic parse; <code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code> — merge<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code> — <code>PromptInjectionGuardrail</code>; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:184</code> — default patterns<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119</code> — input heuristic → <code>request_force_finish</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code> — `PromptInjectionGuardrail`<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:184</code> — default patterns<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119</code> — input heuristic → `request_force_finish`</sub>
 
 </details>
 
-**Gap.** The configurable `PromptInjectionGuardrail` has no production registration; `SafetyPromptRail` only adds system-prompt text and never inspects or rewrites user/tool content. Enforcement comes from the shell/permission layer, not from injection detection.
+<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied._</sub>
+
+---
+
+## 2. How do you defend against prompt injection?
+
+**General:** Treat content as data, not instructions; delimit and label untrusted content; never let it trigger privileged actions without a permission re-check; and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.
+
+**Jiuwen:** The codebase separates prompt-level from enforced defenses. Prompt-level: `SafetyPromptRail` injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution; the permission engine merges tool policy + file guard + net guard by “strictest” and floors risky shell structures to ASK; builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths.
+
+```mermaid
+flowchart TD
+    DEF["defenses"] --> P["prompt-level: SafetyPromptRail safety text (advice)"]
+    DEF --> ENF["enforced: tool policy + file guard + net guard (strictest)"]
+    ENF --> ASK["risky shell structure → ASK floor (tree-sitter AST)"]
+    ENF --> DENY["builtin rules: reverse shell / disk / shutdown / sensitive paths"]
+    DEF --> SH["shell: block backtick / `$()` before execution"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code> — `SafetyPromptRail`; `:38` injects safety section; `harness/prompts/sections/safety.py:14` static text<br>&bull; <code>agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29</code> — substitution regex; `:40` `check_injection` blocks<br>&bull; <code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code> — reverse-shell deny; `:35` disk; `:99` shutdown; `:148` sensitive paths<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588</code> — tiered policy; `:409` shell AST floor; `:502` ASK fallback; `shell_ast.py:82` parse; `core.py:272` merge</sub>
+
+</details>
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied._</sub>
 
-## 2. Handling untrusted content from a tool result or retrieved document
+
+---
+
+## 3. Handling untrusted content from a tool result or retrieved document
 
 **General:** Treat tool output and retrieved documents as untrusted data, never as instructions. Delimit and label them as data, strip control/escape sequences, and never let them silently trigger privileged actions without re-checking permissions. Prompt injection via tool output is a real threat because it flows straight into the model context.
 
@@ -52,7 +78,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
 
-## 3. How do you handle a user trying to jailbreak your system's guardrails
+
+---
+
+## 4. How do you handle a user trying to jailbreak your system's guardrails
 
 **General:** Assume the model can be talked around, so enforce outside it: detect and block known jailbreak/injection patterns at input, keep privileged actions behind a permission check that the model cannot bypass, sandbox tools, and log/rate-limit repeated attempts. No single regex is sufficient (paraphrase, encoding, multi-turn role-play evade it), so detection is a signal, not the control.
 
@@ -78,7 +107,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai._</sub>
 
-## 4. How do you make sure a user only retrieves documents they're actually authorized to see
+
+---
+
+## 5. How do you make sure a user only retrieves documents they're actually authorized to see
 
 **General:** Enforce authorization inside retrieval: every chunk carries ACL metadata (owner/group/tenant), and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), never post-hoc. Prefer the strongest isolation you can afford (per-tenant index/collection), use row-level security where available, and audit.
 
@@ -102,7 +134,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
-## 5. How do you prevent an agent from taking a destructive or irreversible action by mistake
+
+---
+
+## 6. How do you prevent an agent from taking a destructive or irreversible action by mistake
 
 **General:** Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations (dry-run, snapshot, sandbox) over hard blocks alone. Fail closed — unknown should mean "ask", not "allow".
 
@@ -138,7 +173,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-agent-interview-questions_for_engineers.md`; also covered in: ai-agent._</sub>
 
-## 6. How do you prevent a model from generating harmful or biased content
+
+---
+
+## 7. How do you prevent a model from generating harmful or biased content
 
 **General:** Layer defenses: a safety instruction in the system prompt, input and output content classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. Because a prompt is advice not a control, real safety needs an enforced output filter. Bias specifically needs measurement (bias probes, disaggregated evals) and mitigation, not just a "be safe" instruction.
 
@@ -163,7 +201,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai._</sub>
 
-## 7. Preventing sensitive data from leaking into a model's context or output logs
+
+---
+
+## 8. Preventing sensitive data from leaking into a model's context or output logs
 
 **General:** Detect and redact secrets before they reach the model or the logs: scrub known patterns (API keys, tokens, PII) from tool results and prompts, redact log fields (don't just drop whole fields), gate egress of secret-like payloads, and keep a path to audit without storing the secret. Detection alone is not redaction.
 
@@ -191,7 +232,10 @@ flowchart LR
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai._</sub>
 
-## 8. Design a multi-tenant RAG system where each customer's data must stay isolated from others
+
+---
+
+## 9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
 
 **General:** Isolation choices, strongest first: a separate index/collection (or DB) per tenant; a tenant partition key with mandatory pre-filtering; or row-level security in a relational store. The key is that the tenant filter is applied inside the vector search and cannot be forgotten by a caller. Also isolate embeddings, caches, and logs per tenant, and audit cross-tenant access.
 
@@ -216,7 +260,10 @@ flowchart TD
 
 <sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
 
-## 9. Security-adjacent questions are disguised as normal engineering questions
+
+---
+
+## 10. Security-adjacent questions are disguised as normal engineering questions
 
 **General:** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
 
@@ -239,7 +286,10 @@ flowchart TD
 
 </details>
 
-## 10. Any question about untrusted input is testing prompt injection awareness
+
+---
+
+## 11. Any question about untrusted input is testing prompt injection awareness
 
 **General:** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
 

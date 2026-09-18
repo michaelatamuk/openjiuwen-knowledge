@@ -2,6 +2,8 @@
 
 ## 1. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
 
+<span class="badge">foundational</span>
+
 **Title.** Supervisor vs peer-to-peer
 
 **Summary.** A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.
@@ -46,6 +48,8 @@ Supervisor teams are built on `core/multi_agent`'s `HierarchicalTeam`, in two im
 ---
 
 ## 2. How does a framework handle communication between multiple agents
+
+<span class="badge">intermediate</span>
 
 **Title.** Multi-agent communication
 
@@ -93,6 +97,8 @@ The `agent_teams` stack uses a persisted mailbox plus an event bus. `TeamMessage
 
 ## 3. How does the framework handle one agent's output becoming another agent's input
 
+<span class="badge">intermediate</span>
+
 **Title.** Agent output as another's input
 
 **Summary.** Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.
@@ -136,6 +142,8 @@ Four paths. **Subagent delegation:** `TaskTool` builds isolated child inputs (`_
 ---
 
 ## 4. How do you prevent multiple agents from producing conflicting or redundant results
+
+<span class="badge">intermediate</span>
 
 **Title.** Conflicting/redundant results
 
@@ -181,6 +189,8 @@ One-active-task-per-member invariant, atomic compare-and-swap claim, reassign in
 ---
 
 ## 5. How do you debug a failure when it's unclear which agent in the chain caused it
+
+<span class="badge">advanced</span>
 
 **Title.** Debugging a multi-agent failure
 
@@ -231,6 +241,8 @@ The framework emits an OpenTelemetry span tree attributing each LLM/tool/agent a
 ---
 
 ## 6. When is a multi-agent system overkill compared to a single well-designed agent
+
+<span class="badge">advanced</span>
 
 **Title.** When multi-agent is overkill
 

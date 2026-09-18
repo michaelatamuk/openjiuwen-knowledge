@@ -69,6 +69,10 @@ def main():
         for i, q in enumerate(t["questions"], 1):
             lines.append(f"## {i}. {q['question']}")
             lines.append("")
+            meta = q.get("meta", {}) or {}
+            diff = meta.get("difficulty", "")
+            if diff:
+                lines += [f'<span class="badge">{diff}</span>', ""]
             if q.get("title"):
                 lines += [f"**Title.** {q['title']}", ""]
             if q.get("tldr"):

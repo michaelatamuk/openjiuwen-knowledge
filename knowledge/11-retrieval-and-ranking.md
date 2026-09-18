@@ -2,6 +2,8 @@
 
 ## 1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion
 
+<span class="badge">intermediate</span>
+
 **Title.** Dense vs sparse + rank fusion
 
 **Summary.** Dense matches meaning but can miss rare exact terms; sparse (BM25) matches literal terms but fails on paraphrase; fuse both with reciprocal rank fusion.
@@ -51,6 +53,8 @@ Dense is `VectorRetriever`; sparse is `SparseRetriever`, which on Milvus is real
 
 ## 2. When keyword search outperforms semantic search
 
+<span class="badge">intermediate</span>
+
 **Title.** When keyword search wins
 
 **Summary.** Keyword wins on exact identifiers, codes, rare names, jargon, and small/distinctive corpora; dense wins on paraphrase and intent. Best is hybrid.
@@ -99,6 +103,8 @@ Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeB
 
 ## 3. Why a purely semantic system can fail on queries with exact codes, IDs, or names
 
+<span class="badge">intermediate</span>
+
 **Title.** Semantic misses exact codes
 
 **Summary.** Opaque tokens (codes, SKUs, UUIDs, rare names) carry little semantic signal, so a semantically close but wrong chunk can outrank the exact hit — and dense results are rarely empty, so no fallback fires.
@@ -144,6 +150,8 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 
 ## 4. How do you decide between retrieving 5 documents versus 20
 
+<span class="badge">intermediate</span>
+
 **Title.** Retrieve 5 vs 20
 
 **Summary.** Higher k raises recall but costs tokens/latency and can dilute; lower k is precise and cheap. Retrieve more then rerank down when you have a reranker.
@@ -185,6 +193,8 @@ The stores *can* filter: Milvus builds `key == value` expressions (string-saniti
 ---
 
 ## 5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system
+
+<span class="badge">advanced</span>
 
 **Title.** SQL + documents retrieval
 
@@ -229,6 +239,8 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 
 ## 6. What reranking adds that initial retrieval doesn't already do
 
+<span class="badge">intermediate</span>
+
 **Title.** What reranking adds
 
 **Summary.** First-stage retrieval optimizes recall with cheap approximate similarity; a cross-encoder reranker scores candidates jointly with the query to reorder the top-k for precision — but only over candidates retrieval already returned.
@@ -272,6 +284,8 @@ The system is document-RAG only. The retrieval package indexes documents (PDF/Of
 
 ## 7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test
 
+<span class="badge">intermediate</span>
+
 **Title.** Is the reranker helping?
 
 **Summary.** You can't tell from order alone; on a labeled set, compare ranking metrics (NDCG/MRR/precision) with and without the reranker on the same candidates.
@@ -314,6 +328,8 @@ There is a real reranker stack (`StandardReranker`, `ChatReranker`, DashScope) a
 
 ## 8. Would you rerank every query, or only some, and how do you decide
 
+<span class="badge">intermediate</span>
+
 **Title.** Rerank every query?
 
 **Summary.** Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.
@@ -355,7 +371,9 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 ---
 
-## 9. How much latency reranking adds, and deciding if it's worth it
+## 9. How much latency does reranking add?
+
+<span class="badge">intermediate</span>
 
 **Title.** Reranking latency
 
@@ -367,9 +385,9 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 - LLM-judge: one call per doc — much slower.
 - Weigh added latency against precision gain.
 
-**General.** Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds. Worth it when precision@k matters more than latency, when the candidate count is bounded, and when you can cache.
+**General.** Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds.
 
-![diagram](assets/diagrams/fa661ce7dd7fc8a792b0fd98c7b4b28bc32e5eb3.png)
+![diagram](assets/diagrams/d11bdd6606b33b28cb56745d131597426cefe527.png)
 
 **Jiuwen.** Jiuwen's reranker sends all candidates in a single request with no batching (default 10s timeout, retries with backoff); the LLM-judge variant handles one document per call, so its cost is linear in candidates and it is marked experimental. Reranking is optional and off by default, so the latency is only incurred when you enable it.
 
@@ -378,18 +396,16 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 **Implementation**
 
-`RerankerConfig.timeout` defaults to 10 s, and `StandardReranker` sends **all** candidates in one request with `top_n=len(documents)` (no batching/concurrency), `max_retries=3` with backoff. `ChatReranker` enforces a list of size 1, so it costs one LLM call per candidate (O(N) latency) and is flagged experimental. Reranking is optional (`reranker=None` default), and the product `jiuwenswarm` pins `rerank_enabled: False` in the external memory builder. The only guard is the per-request timeout plus `min_score`; no candidate cap, rerank batch size, or cost accounting.
+`RerankerConfig.timeout` defaults to 10 s, and `StandardReranker` sends **all** candidates in one request with `top_n=len(documents)` (no batching/concurrency), `max_retries=3` with backoff. `ChatReranker` enforces a list of size 1, so it costs one LLM call per candidate (O(N) latency) and is flagged experimental. There is no per-document timing, only the request timeout.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/store/base_reranker.py:22` | timeout default 10 s |
-| `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:120` | top_n=len(documents) single request; :35 max_retries=3 |
+| `agent-core/openjiuwen/core/foundation/store/base_reranker.py:22` | `timeout` default 10 s |
+| `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:120` | `top_n=len(documents)` single request; `:35` `max_retries=3` |
 | `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:113` | list-size-1 constraint (per-doc LLM call) |
 | `agent-core/openjiuwen/core/retrieval/utils/api_requests.py:55` | retry/backoff loop |
-| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160` | reranker=None optional |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340` | product pins rerank_enabled: False |
 
 **Canonical source**
 
@@ -399,7 +415,51 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 ---
 
-## 10. Bi-encoder for retrieval vs. cross-encoder for reranking
+## 10. When is reranking worth the latency cost?
+
+<span class="badge">advanced</span>
+
+**Title.** When reranking is worth the latency
+
+**Summary.** Rerank when precision@k dominates, the candidate set is bounded, and results are cacheable — not when latency/cost grow with N.
+
+**Key points.**
+
+- Worth it when precision@k matters more than latency.
+- Worth it when the candidate set is bounded/cacheable.
+- Unbounded reranking is usually not worth it.
+
+**General.** Rerank when precision@k matters more than latency, when the candidate count is bounded, and when results can be cached. Reranking a large, unbounded candidate set is usually not worth it — the latency and cost grow with N while the precision gain does not.
+
+![diagram](assets/diagrams/386ad0bec75e71a89ef226dfe1635d690de65380.png)
+
+**Jiuwen.** Reranking is optional (reranker=None) and the product pins rerank_enabled: False. The only guard is a per-request timeout + min_score; there is no candidate cap, batch size, or cost accounting, so whether it is worth it is a caller decision.
+
+<details markdown="1">
+<summary><b>Jiuwen technical detail (classes &amp; functions)</b></summary>
+
+**Implementation**
+
+The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160` | `reranker=None` optional |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340` | product pins `rerank_enabled: False` |
+
+**Canonical source**
+
+<sub>`source/rag-retrieval-interview-questions_for_engineers.md`</sub>
+
+</details>
+
+---
+
+## 11. Bi-encoder for retrieval vs. cross-encoder for reranking
+
+<span class="badge">intermediate</span>
 
 **Title.** Bi-encoder vs cross-encoder
 
@@ -441,7 +501,9 @@ Retrieval is bi-encoder (query and docs embedded independently, compared by vect
 
 ---
 
-## 11. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+## 12. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+
+<span class="badge">intermediate</span>
 
 **Title.** Cutting tokens without losing quality
 

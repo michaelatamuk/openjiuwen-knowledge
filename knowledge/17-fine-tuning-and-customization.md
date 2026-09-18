@@ -2,6 +2,8 @@
 
 ## 1. What's the difference between pretraining and fine-tuning
 
+<span class="badge">foundational</span>
+
 **Title.** Pretraining vs fine-tuning
 
 **Summary.** Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.
@@ -47,6 +49,8 @@ Two distinct things live here. The default "evolution" path does **not** train w
 
 ## 2. What is instruction tuning, and how is it different from base model pretraining
 
+<span class="badge">foundational</span>
+
 **Title.** Instruction tuning
 
 **Summary.** Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.
@@ -86,6 +90,8 @@ Instruction tuning is implemented as **SFT over agent chat trajectories**: messa
 ---
 
 ## 3. What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA
+
+<span class="badge">foundational</span>
 
 **Title.** Full fine-tuning vs LoRA
 
@@ -130,6 +136,8 @@ The repo trains weights, but only via **LoRA/PEFT adapters** — there is no ful
 
 ## 4. When would you fine-tune instead of using a longer, more detailed prompt
 
+<span class="badge">intermediate</span>
+
 **Title.** Fine-tune vs a longer prompt
 
 **Summary.** Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.
@@ -173,6 +181,8 @@ The repo contains conceptual guidance plus two separate mechanisms, not a decisi
 
 ## 5. What's the difference between RAG and fine-tuning, and when would you use each
 
+<span class="badge">foundational</span>
+
 **Title.** RAG vs fine-tuning
 
 **Summary.** RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).
@@ -215,6 +225,8 @@ The repo does not implement a decision rule, but it does encode the rationale. T
 ---
 
 ## 6. What's the risk of fine-tuning on a small, narrow dataset
+
+<span class="badge">foundational</span>
 
 **Title.** Risk of fine-tuning on a narrow dataset
 

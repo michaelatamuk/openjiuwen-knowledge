@@ -36,6 +36,8 @@ code{font-family:monospace;background:#f2f2f2;padding:0 2px}
 .diagram{text-align:center;margin:.6em 0}.diagram img{max-width:100%}
 .cite{font-size:.8em;color:#555}
 h4{font-size:.9em;color:#4c5bd4;margin:.7em 0 .15em}
+.badges{margin:.2em 0 .4em}
+.badge{display:inline-block;padding:0 6px;margin-right:4px;border:1px solid #98a4e0;border-radius:9px;color:#3f51b5;font-size:.62em;font-weight:700;text-transform:uppercase}
 table.anchors{width:100%;border-collapse:collapse;font-size:.8em}
 table.anchors td{border-bottom:1px solid #ddd;padding:2px 4px;vertical-align:top}
 table.anchors td.a{white-space:nowrap}
@@ -68,6 +70,9 @@ def main():
             links.append(epub.Link(fname + "#" + qid, q["question"][:80], qid))
             title = f'<div class="title">{html.escape(q["title"])}</div>' if q.get("title") else ""
             summary = f'<div class="summary">{html.escape(q.get("tldr",""))}</div>' if q.get("tldr") else ""
+            mp = q.get("meta", {}) or {}
+            db = mp.get("difficulty", "")
+            badges = f'<div class="badges"><span class="badge">{html.escape(db)}</span></div>' if db else ""
             pts = ("<ul>" + "".join(f"<li>{html.escape(p)}</li>" for p in q.get("points", [])) + "</ul>") if q.get("points") else ""
             concept = ""
             for c in (q.get("diagrams") or [q.get("diagram", {}) or {}]):
@@ -102,7 +107,7 @@ def main():
                                   + "".join(f'<code>{html.escape(s)}</code> ' for s in sources) + "</div>")
                 tech = "".join(tparts)
             parts.append(
-                f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{title}{summary}{pts}'
+                f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{badges}{title}{summary}{pts}'
                 f'<h3>Explanation</h3>{md(q.get("explain",""))}{concept}'
                 f'<h3>Jiuwen</h3>{md(q.get("jiuwenPlain","")) or md(q.get("mechanism",""))}{tech}'
             )

@@ -45,7 +45,7 @@
    "Both can look fine while real quality is poor."
   ]
  },
- "15-6": {
+ "15-7": {
   "title": "MRR",
   "tldr": "Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.",
   "points": [
@@ -54,7 +54,7 @@
    "Complements recall/NDCG."
   ]
  },
- "15-7": {
+ "15-8": {
   "title": "NDCG",
   "tldr": "Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.",
   "points": [
@@ -63,7 +63,7 @@
    "Supports graded relevance."
   ]
  },
- "15-8": {
+ "15-9": {
   "title": "Faithfulness vs relevance",
   "tldr": "Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.",
   "points": [
@@ -72,7 +72,7 @@
    "Both are needed; they fail differently."
   ]
  },
- "15-9": {
+ "15-10": {
   "title": "Computing faithfulness",
   "tldr": "Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.",
   "points": [
@@ -81,7 +81,7 @@
    "Average → faithfulness score."
   ]
  },
- "15-10": {
+ "15-11": {
   "title": "Measuring hallucination rate",
   "tldr": "Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).",
   "points": [
@@ -90,7 +90,7 @@
    "Rate = unsupported / total claims."
   ]
  },
- "15-11": {
+ "15-12": {
   "title": "Perplexity",
   "tldr": "Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.",
   "points": [
@@ -99,7 +99,7 @@
    "Not a task/quality metric."
   ]
  },
- "15-12": {
+ "15-13": {
   "title": "LLM-as-judge limitations",
   "tldr": "Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.",
   "points": [
@@ -108,7 +108,7 @@
    "Mitigate: swap positions, vote, calibrate with humans."
   ]
  },
- "15-13": {
+ "15-14": {
   "title": "Evaluating with no ground truth",
   "tldr": "Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.",
   "points": [
@@ -117,7 +117,7 @@
    "Pairwise / few-shot judging."
   ]
  },
- "15-14": {
+ "15-15": {
   "title": "Building an eval dataset",
   "tldr": "Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.",
   "points": [
@@ -126,7 +126,7 @@
    "Or LLM answers with citations as gold."
   ]
  },
- "15-15": {
+ "15-16": {
   "title": "How many eval examples",
   "tldr": "Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.",
   "points": [
@@ -135,7 +135,7 @@
    "Report confidence/variance, not a bare mean."
   ]
  },
- "15-16": {
+ "15-17": {
   "title": "Comparing two models",
   "tldr": "Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.",
   "points": [
@@ -144,7 +144,7 @@
    "Compare accuracy + latency + cost."
   ]
  },
- "15-17": {
+ "15-18": {
   "title": "Regression test suite",
   "tldr": "Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.",
   "points": [
@@ -153,7 +153,7 @@
    "Baseline + fail on regression."
   ]
  },
- "15-18": {
+ "15-19": {
   "title": "Continuous production eval",
   "tldr": "Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.",
   "points": [
@@ -162,7 +162,7 @@
    "Watch drift in queries and hit rates."
   ]
  },
- "15-19": {
+ "15-20": {
   "title": "Detecting retrieval degradation",
   "tldr": "Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.",
   "points": [
@@ -171,7 +171,7 @@
    "Slice per query type/language."
   ]
  },
- "15-20": {
+ "15-21": {
   "title": "High eval, users still unhappy",
   "tldr": "The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.",
   "points": [
@@ -180,7 +180,7 @@
    "Metric rewards the wrong thing."
   ]
  },
- "15-21": {
+ "15-22": {
   "title": "Tying eval to business outcome",
   "tldr": "Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.",
   "points": [
@@ -189,7 +189,7 @@
    "Use the offline metric as the fast proxy."
   ]
  },
- "15-22": {
+ "15-23": {
   "title": "How do you know it's working: eval depth",
   "tldr": "'How do you know it's working' tests evaluation depth, not confidence.",
   "points": [
@@ -199,7 +199,7 @@
    "No CI quality gate."
   ]
  },
- "15-23": {
+ "15-24": {
   "title": "'How do you know it's working': eval depth",
   "tldr": "'How do you know it's working' is testing evaluation depth.",
   "points": [
@@ -207,6 +207,15 @@
    "No faithfulness/relevance metric.",
    "No retrieval metric layer.",
    "No CI quality gate."
+  ]
+ },
+ "15-6": {
+  "title": "Why precision and recall can both look fine",
+  "tldr": "Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.",
+  "points": [
+   "Wrong embedding/chunking → nothing relevant ranked.",
+   "Corpus lacks the answer → nothing to retrieve.",
+   "Plausible output is not quality; measure it."
   ]
  }
 }
