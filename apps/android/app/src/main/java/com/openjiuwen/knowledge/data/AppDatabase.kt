@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
         BookmarkEntity::class,
         ReviewLogEntity::class,
     ],
-    version = 14,
+    version = 15,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
