@@ -3,7 +3,7 @@
 Concepts and how the Jiuwen codebase implements them — organized by topic, with offline study formats. Every entry pairs a short framework-agnostic **General** answer with a **Jiuwen** answer describing how this codebase implements it (or explicitly does not), plus a diagram and `file:line` **Anchors**.
 
 **Browse online:** https://michaelatamuk.github.io/openjiuwen-knowledge/
-**Android app:** [download the latest APK](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest) (offline study app; debug-signed)
+**Downloads:** [latest release](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest) — Android APK, EPUB, single-file HTML, Anki deck + CSV, Obsidian vault, site zip.
 
 ## Structure
 
