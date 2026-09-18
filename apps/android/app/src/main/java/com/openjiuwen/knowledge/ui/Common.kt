@@ -117,8 +117,8 @@ fun TypeBadge(type: String) {
         else -> MaterialTheme.colorScheme.outline
     }
     Box(
-        Modifier.background(color.copy(alpha = 0.15f), RoundedCornerShape(999.dp))
-            .padding(horizontal = 10.dp, vertical = 3.dp),
+        Modifier.background(color.copy(alpha = 0.12f), RoundedCornerShape(999.dp))
+            .padding(horizontal = 10.dp, vertical = 2.dp),
     ) {
         Text(type.replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.labelSmall, color = color)
     }

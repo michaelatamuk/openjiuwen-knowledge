@@ -2,7 +2,7 @@
 
 ## 1. What's the difference between pretraining and fine-tuning
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Pretraining vs fine-tuning
 
@@ -49,7 +49,7 @@ Two distinct things live here. The default "evolution" path does **not** train w
 
 ## 2. What is instruction tuning, and how is it different from base model pretraining
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Instruction tuning
 
@@ -91,7 +91,7 @@ Instruction tuning is implemented as **SFT over agent chat trajectories**: messa
 
 ## 3. What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Full fine-tuning vs LoRA
 
@@ -181,7 +181,7 @@ The repo contains conceptual guidance plus two separate mechanisms, not a decisi
 
 ## 5. What's the difference between RAG and fine-tuning, and when would you use each
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** RAG vs fine-tuning
 
@@ -226,7 +226,7 @@ The repo does not implement a decision rule, but it does encode the rationale. T
 
 ## 6. What's the risk of fine-tuning on a small, narrow dataset
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Risk of fine-tuning on a narrow dataset
 

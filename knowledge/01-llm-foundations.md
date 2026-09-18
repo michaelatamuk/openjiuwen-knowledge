@@ -2,7 +2,7 @@
 
 ## 1. What's the difference between a token and a word?
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Token vs word
 
@@ -98,7 +98,7 @@ Token counts drive per-model context limits (`MODEL_DEFAULT_CONTEXT_WINDOW_TOKEN
 
 ## 3. What is the difference between tokens and embeddings?
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Tokens vs embeddings
 
@@ -187,7 +187,7 @@ Not implemented — attention is delegated entirely to provider APIs or to Huggi
 
 ## 5. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Positional encoding
 
@@ -233,7 +233,7 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 
 ## 6. What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Encoder vs decoder
 
@@ -283,7 +283,7 @@ There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder
 
 ## 7. What's the difference between a model's context window and its training data cutoff
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Context window vs cutoff
 
@@ -379,7 +379,7 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 ## 9. Why does model performance sometimes degrade with very long context, even when the context fits
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Long-context degradation
 
@@ -430,7 +430,7 @@ There is no explicit "lost-in-the-middle" mitigation; the system instead mechani
 
 ## 10. What does temperature actually control, mathematically, in the output distribution
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Temperature
 
@@ -477,7 +477,7 @@ Temperature is a **passthrough request parameter** — hosted APIs apply the mat
 
 ## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Top-k vs top-p
 
@@ -523,7 +523,7 @@ Top-p (nucleus) is implemented locally; top-k sampling is not. `GenerationConfig
 
 ## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Greedy vs sampling
 
@@ -613,7 +613,7 @@ The repo frames arithmetic/counting as a tool-augmentation problem. A canonical 
 
 ## 14. What is hallucination, and why does it happen even in a well-trained model
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Hallucination
 
@@ -660,7 +660,7 @@ The repo does not model or detect low-level hallucination; it implements downstr
 
 ## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Wrong vs uncertain
 

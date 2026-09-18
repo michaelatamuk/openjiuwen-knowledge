@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Assign a difficulty label to every entry (foundational / intermediate /
+"""Assign a difficulty label to every entry (basic / intermediate /
 advanced) and write content/classification.json.
 
 Heuristic first pass; see content/classification.md for the rubric. Edit the
@@ -33,11 +33,11 @@ OVERRIDES = {
 
 def difficulty(topic: str, text: str) -> str:
     if topic == "03":            # glossary
-        return "foundational"
+        return "basic"
     if ADVANCED.search(text):
         return "advanced"
     if FOUNDATIONAL.search(text):
-        return "foundational"
+        return "basic"
     return "intermediate"
 
 

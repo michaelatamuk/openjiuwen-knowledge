@@ -491,7 +491,7 @@ Claim extraction and verification are **absent**. There is no atomic-claim decom
 
 ## 12. What is perplexity, and what does a lower score actually tell you
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Perplexity
 

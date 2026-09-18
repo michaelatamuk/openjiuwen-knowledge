@@ -8,26 +8,26 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 | id | difficulty | question |
 |---|---|---|
 | 01-1 | intermediate | What's the difference between a token and a word, and why does tokenization affect cost and context limits |
-| 01-2 | foundational | What is the difference between tokens and embeddings? |
+| 01-2 | basic | What is the difference between tokens and embeddings? |
 | 01-3 | intermediate | Explain how self-attention works in a transformer |
-| 01-4 | foundational | What is positional encoding, and why do transformers need it if attention has no inherent sense of order |
-| 01-5 | foundational | What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit |
-| 01-6 | foundational | What's the difference between a model's context window and its training data cutoff |
+| 01-4 | basic | What is positional encoding, and why do transformers need it if attention has no inherent sense of order |
+| 01-5 | basic | What's the difference between an encoder-only, decoder-only, and encoder-decoder model, and where does GPT fit |
+| 01-6 | basic | What's the difference between a model's context window and its training data cutoff |
 | 01-7 | intermediate | What happens when a conversation exceeds the model's context window |
-| 01-8 | foundational | Why does model performance sometimes degrade with very long context, even when the context fits |
-| 01-9 | foundational | What does temperature actually control, mathematically, in the output distribution |
-| 01-10 | foundational | What's the difference between top-k sampling and top-p (nucleus) sampling |
-| 01-11 | foundational | Why does greedy decoding sometimes produce worse output than sampling-based decoding |
+| 01-8 | basic | Why does model performance sometimes degrade with very long context, even when the context fits |
+| 01-9 | basic | What does temperature actually control, mathematically, in the output distribution |
+| 01-10 | basic | What's the difference between top-k sampling and top-p (nucleus) sampling |
+| 01-11 | basic | Why does greedy decoding sometimes produce worse output than sampling-based decoding |
 | 01-12 | intermediate | Why do LLMs struggle with tasks like counting or basic arithmetic |
-| 01-13 | foundational | What is hallucination, and why does it happen even in a well-trained model |
-| 01-14 | foundational | What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone |
+| 01-13 | basic | What is hallucination, and why does it happen even in a well-trained model |
+| 01-14 | basic | What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone |
 | 01-15 | intermediate | "How does the model know X" is really testing context window understanding |
 
 ## 02 · Model foundations
 
 | id | difficulty | question |
 |---|---|---|
-| 02-1 | foundational | What's the difference between a system prompt and a user prompt |
+| 02-1 | basic | What's the difference between a system prompt and a user prompt |
 | 02-2 | intermediate | Zero-shot vs. few-shot vs. chain-of-thought, when does each actually improve output |
 | 02-3 | intermediate | How do you get consistent, parseable output like JSON from an LLM |
 | 02-4 | intermediate | How does the framework validate a tool call's structured output before executing it |
@@ -38,26 +38,26 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 03-1 | foundational | Token |
-| 03-2 | foundational | Embedding |
-| 03-3 | foundational | Context window |
-| 03-4 | foundational | Temperature |
-| 03-5 | foundational | Top-p (nucleus sampling) |
-| 03-6 | foundational | RAG |
-| 03-7 | foundational | Chunking |
-| 03-8 | foundational | Vector database |
-| 03-9 | foundational | Reranking |
-| 03-10 | foundational | Hallucination |
-| 03-11 | foundational | Fine-tuning |
-| 03-12 | foundational | Prompt engineering |
-| 03-13 | foundational | Few-shot prompting |
-| 03-14 | foundational | Chain-of-thought prompting |
-| 03-15 | foundational | Function calling |
-| 03-16 | foundational | Agent |
-| 03-17 | foundational | Memory |
-| 03-18 | foundational | Latency |
-| 03-19 | foundational | Quantization |
-| 03-20 | foundational | Prompt injection |
+| 03-1 | basic | Token |
+| 03-2 | basic | Embedding |
+| 03-3 | basic | Context window |
+| 03-4 | basic | Temperature |
+| 03-5 | basic | Top-p (nucleus sampling) |
+| 03-6 | basic | RAG |
+| 03-7 | basic | Chunking |
+| 03-8 | basic | Vector database |
+| 03-9 | basic | Reranking |
+| 03-10 | basic | Hallucination |
+| 03-11 | basic | Fine-tuning |
+| 03-12 | basic | Prompt engineering |
+| 03-13 | basic | Few-shot prompting |
+| 03-14 | basic | Chain-of-thought prompting |
+| 03-15 | basic | Function calling |
+| 03-16 | basic | Agent |
+| 03-17 | basic | Memory |
+| 03-18 | basic | Latency |
+| 03-19 | basic | Quantization |
+| 03-20 | basic | Prompt injection |
 
 ## 04 · Model foundations
 
@@ -71,10 +71,10 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 05-1 | foundational | What's the difference between a chatbot and an agent |
-| 05-2 | foundational | What's the difference between a workflow and an agent |
-| 05-3 | foundational | What's the difference between a linear chain and a graph with conditional branches |
-| 05-4 | foundational | What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront |
+| 05-1 | basic | What's the difference between a chatbot and an agent |
+| 05-2 | basic | What's the difference between a workflow and an agent |
+| 05-3 | basic | What's the difference between a linear chain and a graph with conditional branches |
+| 05-4 | basic | What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront |
 | 05-5 | intermediate | How do you set a hard limit on iterations or steps within a framework |
 | 05-6 | intermediate | What decides when an agent stops and returns a final answer instead of calling another tool |
 | 05-7 | intermediate | How do you decide how many retrieval hops are enough, and how do you prevent the system from looping indefinitely |
@@ -104,12 +104,12 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 |---|---|---|
 | 07-1 | intermediate | How does an agent break a complex task into smaller subtasks |
 | 07-2 | intermediate | How do you handle a task where the plan needs to change mid-execution based on a tool's result |
-| 07-3 | foundational | What's the difference between a single-step agent and a multi-step planning agent |
-| 07-4 | foundational | What's the planner-executor pattern, and when do you need it |
+| 07-3 | basic | What's the difference between a single-step agent and a multi-step planning agent |
+| 07-4 | basic | What's the planner-executor pattern, and when do you need it |
 | 07-5 | intermediate | How does a framework track state across multiple steps in an agent's execution |
 | 07-6 | advanced | How would you pause an agent mid-execution and resume it later with the same state |
 | 07-7 | advanced | How would you add human-in-the-loop approval before a specific step executes |
-| 07-8 | foundational | What's the difference between short-term and long-term memory in an agent |
+| 07-8 | basic | What's the difference between short-term and long-term memory in an agent |
 | 07-9 | intermediate | How do you decide what to store in memory versus what to discard |
 | 07-10 | intermediate | How do you prevent memory from growing unbounded across a long session |
 | 07-11 | advanced | How would you summarize conversation history without losing important details |
@@ -122,8 +122,8 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 08-1 | foundational | What does an agent framework actually give you that raw API calls don't |
-| 08-2 | foundational | What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI |
+| 08-1 | basic | What does an agent framework actually give you that raw API calls don't |
+| 08-2 | basic | What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI |
 | 08-3 | intermediate | How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project |
 | 08-4 | advanced | What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer |
 | 08-5 | intermediate | When does a framework add unnecessary abstraction instead of solving a real problem |
@@ -136,7 +136,7 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 09-1 | foundational | What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks |
+| 09-1 | basic | What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks |
 | 09-2 | intermediate | How does a framework handle communication between multiple agents |
 | 09-3 | intermediate | How does the framework handle one agent's output becoming another agent's input |
 | 09-4 | intermediate | How do you prevent multiple agents from producing conflicting or redundant results |
@@ -149,7 +149,7 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 |---|---|---|
 | 10-1 | intermediate | Walking through a RAG pipeline end to end, query to final answer |
 | 10-2 | intermediate | The pipeline: query embedding, vector search, context assembly, prompt construction, generation |
-| 10-3 | foundational | What is Modular RAG, and how is it different from a simple RAG pipeline |
+| 10-3 | basic | What is Modular RAG, and how is it different from a simple RAG pipeline |
 | 10-4 | intermediate | Deciding chunk size, and what breaks at each extreme |
 | 10-5 | intermediate | What happens if your chunks are too small or too large |
 | 10-6 | advanced | Fixed-size vs. semantic chunking, the actual retrieval tradeoff |
@@ -164,7 +164,7 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 | 10-15 | intermediate | RAG vs. pasting retrieved text into a long-context prompt |
 | 10-16 | intermediate | Simple RAG pipeline |
 | 10-17 | intermediate | Modular RAG with reranking |
-| 10-18 | foundational | What is agentic RAG, and how is it different from a standard fixed RAG pipeline |
+| 10-18 | basic | What is agentic RAG, and how is it different from a standard fixed RAG pipeline |
 | 10-19 | advanced | How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost |
 
 ## 11 · RAG
@@ -187,10 +187,10 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 12-1 | foundational | What is query rewriting or query expansion, and when does it meaningfully improve retrieval quality |
+| 12-1 | basic | What is query rewriting or query expansion, and when does it meaningfully improve retrieval quality |
 | 12-2 | advanced | How would you handle a vague or ambiguous user query before it even reaches retrieval |
 | 12-3 | advanced | How would you decompose a complex, multi-part question into smaller retrievable sub-questions |
-| 12-4 | foundational | What is multi-hop retrieval, and when does single-pass retrieval fail to answer a question |
+| 12-4 | basic | What is multi-hop retrieval, and when does single-pass retrieval fail to answer a question |
 | 12-5 | intermediate | Handling a question requiring information from multiple documents |
 | 12-6 | intermediate | When to skip RAG and rely on parametric knowledge instead |
 
@@ -242,7 +242,7 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 | 15-8 | intermediate | Faithfulness vs. relevance in RAG evaluation |
 | 15-9 | intermediate | Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge |
 | 15-10 | intermediate | Measuring hallucination rate: claim extraction from the output, then verification against retrieved context |
-| 15-11 | foundational | What is perplexity, and what does a lower score actually tell you |
+| 15-11 | basic | What is perplexity, and what does a lower score actually tell you |
 | 15-12 | intermediate | Known limitations of using an LLM as a judge |
 | 15-13 | intermediate | How do you evaluate when there's no ground truth answer, only a query and a corpus |
 | 15-14 | advanced | How would you build an eval dataset from scratch if you don't have one yet |
@@ -276,12 +276,12 @@ Difficulty labels from a heuristic first pass. See `content/classification.md` f
 
 | id | difficulty | question |
 |---|---|---|
-| 17-1 | foundational | What's the difference between pretraining and fine-tuning |
-| 17-2 | foundational | What is instruction tuning, and how is it different from base model pretraining |
-| 17-3 | foundational | What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA |
+| 17-1 | basic | What's the difference between pretraining and fine-tuning |
+| 17-2 | basic | What is instruction tuning, and how is it different from base model pretraining |
+| 17-3 | basic | What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA |
 | 17-4 | intermediate | When would you fine-tune instead of using a longer, more detailed prompt |
-| 17-5 | foundational | What's the difference between RAG and fine-tuning, and when would you use each |
-| 17-6 | foundational | What's the risk of fine-tuning on a small, narrow dataset |
+| 17-5 | basic | What's the difference between RAG and fine-tuning, and when would you use each |
+| 17-6 | basic | What's the risk of fine-tuning on a small, narrow dataset |
 
 ## 18 · Safety & security
 

@@ -2,7 +2,7 @@
 
 ## 1. What's the difference between a system prompt and a user prompt
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** System vs user prompt
 

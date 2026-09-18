@@ -23,10 +23,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +50,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -248,32 +253,82 @@ fun ExploreScreen(repo: Repo, onTopic: (String) -> Unit) {
     }
 }
 
-@Composable
-private fun BadgeChip(text: String) {
-    Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(999.dp))
-            .padding(horizontal = 8.dp, vertical = 2.dp))
+private fun difficultyRank(d: String): Int = when (d.lowercase()) {
+    "basic" -> 0
+    "intermediate" -> 1
+    "advanced" -> 2
+    else -> 3
 }
 
 @Composable
-private fun MetaBadges(meta: MetaDto) {
-    if (meta.difficulty.isBlank()) return
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { BadgeChip(meta.difficulty) }
+private fun DifficultyText(difficulty: String) {
+    if (difficulty.isBlank()) return
+    val color = when (difficulty.lowercase()) {
+        "basic" -> Color(0xFF2E7D32)
+        "intermediate" -> Color(0xFFB26A00)
+        "advanced" -> Color(0xFFC62828)
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Text(difficulty.replaceFirstChar { it.uppercase() },
+        style = MaterialTheme.typography.labelSmall, color = color)
+}
+
+@Composable
+private fun MetaLine(type: String, difficulty: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (type.isNotBlank()) TypeBadge(type)
+        DifficultyText(difficulty)
+    }
 }
 
 @Composable
 fun TopicScreen(repo: Repo, topicId: String, onQuestion: (String) -> Unit) {
     val questions by repo.questionsForTopic(topicId).collectAsStateWithLifecycle(emptyList())
+    val topics by repo.topics.collectAsStateWithLifecycle(emptyList())
+    val topic = topics.find { it.id == topicId }
     var filter by remember { mutableStateOf("all") }
-    val filtered = if (filter == "all") questions else questions.filter { repo.meta(it).difficulty == filter }
+    var sort by remember { mutableStateOf("number") }
+    val base = if (filter == "all") questions else questions.filter { repo.meta(it).difficulty == filter }
+    val filtered = when (sort) {
+        "difficulty" -> base.sortedBy { difficultyRank(repo.meta(it).difficulty) }
+        else -> base
+    }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    if (topic != null) {
+                        Text(topic.section, style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        Text(topic.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    } else {
+                        Text(topicId, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    }
+                }
+                var menu by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { menu = true }) {
+                        Icon(Icons.Filled.Sort, contentDescription = "Sort")
+                    }
+                    DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                        listOf("number" to "By number", "difficulty" to "By difficulty").forEach { (k, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                onClick = { sort = k; menu = false },
+                                trailingIcon = if (sort == k) {
+                                    { Icon(Icons.Filled.Check, null) }
+                                } else null,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        item {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("all", "foundational", "intermediate", "advanced").forEach { f ->
+                listOf("all", "basic", "intermediate", "advanced").forEach { f ->
                     FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(f) })
                 }
             }
@@ -284,12 +339,10 @@ fun TopicScreen(repo: Repo, topicId: String, onQuestion: (String) -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("${q.number}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(10.dp))
-                        TypeBadge(q.type)
+                        Text(q.question, modifier = Modifier.weight(1f), maxLines = 3, overflow = TextOverflow.Ellipsis)
                     }
                     Spacer(Modifier.height(6.dp))
-                    Text(q.question, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                    Spacer(Modifier.height(6.dp))
-                    MetaBadges(repo.meta(q))
+                    MetaLine(q.type, repo.meta(q).difficulty)
                 }
             }
         }
@@ -317,24 +370,29 @@ fun QuestionScreen(repo: Repo, questionId: String) {
     val techDiagram = remember(item) { repo.diagramTechnical(item) }
     val meta = remember(item) { repo.meta(item) }
     val prov = remember(item) { repo.provenance(item) }
+    val topics by repo.topics.collectAsStateWithLifecycle(emptyList())
+    val topic = topics.find { it.id == item.topicId }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(item.topicId, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.width(10.dp))
-            TypeBadge(item.type)
-            Spacer(Modifier.weight(1f))
+            Column(Modifier.weight(1f)) {
+                if (topic != null) {
+                    Text(topic.section, style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text(topic.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                } else {
+                    Text(item.topicId, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+            }
             IconButton(onClick = { scope.launch { repo.toggleBookmark(questionId, isBookmarked) } }) {
                 Icon(if (isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder, "Bookmark")
             }
         }
         Spacer(Modifier.height(6.dp))
-        MetaBadges(meta)
+        Text("${item.number}. ${item.question}",
+            style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(6.dp))
-        if (item.title.isNotBlank())
-            Text(item.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary)
-        Text(item.question, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+        MetaLine(item.type, meta.difficulty)
         if (item.tldr.isNotBlank()) {
             Spacer(Modifier.height(8.dp))
             Text(item.tldr, style = MaterialTheme.typography.bodyMedium)

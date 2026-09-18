@@ -2,7 +2,7 @@
 
 ## 1. What's the difference between a chatbot and an agent
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Chatbot vs agent
 
@@ -49,7 +49,7 @@ There is no separate `Chatbot` class; the distinction is structural. A single mo
 
 ## 2. What's the difference between a workflow and an agent
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Workflow vs agent
 
@@ -96,7 +96,7 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 
 ## 3. What's the difference between a linear chain and a graph with conditional branches
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Linear chain vs conditional graph
 
@@ -147,7 +147,7 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 
 ## 4. What's the ReAct pattern, and why interleave reasoning with actions instead of planning everything upfront
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** ReAct pattern
 

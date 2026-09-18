@@ -94,7 +94,7 @@ Several mechanisms. `TodoModifyTool` supports update/delete/cancel/append/insert
 
 ## 3. What's the difference between a single-step agent and a multi-step planning agent
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Single-step vs planning agent
 
@@ -147,7 +147,7 @@ Jiuwen keeps the two axes as separate layers. `ReActAgent` is multi-step **react
 
 ## 4. What's the planner-executor pattern, and when do you need it
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Planner-executor pattern
 
@@ -338,7 +338,7 @@ Tool execution passes through `PermissionInterruptRail` (subclass of `ConfirmInt
 
 ## 8. What's the difference between short-term and long-term memory in an agent
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Short vs long-term memory
 

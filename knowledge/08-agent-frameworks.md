@@ -2,7 +2,7 @@
 
 ## 1. What does an agent framework actually give you that raw API calls don't
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** What a framework gives you
 
@@ -55,7 +55,7 @@ The reusable pieces are concrete classes, not a monolith. `Session` owns state, 
 
 ## 2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Graph vs role frameworks
 

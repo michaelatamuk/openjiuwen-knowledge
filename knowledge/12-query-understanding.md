@@ -2,7 +2,7 @@
 
 ## 1. What is query rewriting or query expansion, and when does it meaningfully improve retrieval quality
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Query rewriting vs expansion
 
@@ -131,7 +131,7 @@ Decomposition is prompt-level and **sequential** inside `AgenticRetriever`. `_RE
 
 ## 4. What is multi-hop retrieval, and when does single-pass retrieval fail to answer a question
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Multi-hop retrieval
 

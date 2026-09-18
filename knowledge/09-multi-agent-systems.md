@@ -2,7 +2,7 @@
 
 ## 1. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Supervisor vs peer-to-peer
 

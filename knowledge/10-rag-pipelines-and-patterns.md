@@ -94,7 +94,7 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 
 ## 3. What is Modular RAG, and how is it different from a simple RAG pipeline
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Modular RAG
 
@@ -774,7 +774,7 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 ## 18. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Agentic RAG
 

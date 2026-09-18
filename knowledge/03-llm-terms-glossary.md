@@ -2,7 +2,7 @@
 
 ## 1. Token
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Token
 
@@ -39,7 +39,7 @@ Counts tokens, never words, via a `TokenCounter`. `TiktokenCounter` maps model n
 
 ## 2. Embedding
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Embedding
 
@@ -76,7 +76,7 @@ An `Embedding` ABC defines `embed_query`/`embed_documents`/`dimension`; provider
 
 ## 3. Context window
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Context window
 
@@ -113,7 +113,7 @@ The context engine budgets the window (`effective_context_budget` = strictest of
 
 ## 4. Temperature
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Temperature
 
@@ -150,7 +150,7 @@ A passthrough request param; the local HF/vLLM path implements `softmax(logits/T
 
 ## 5. Top-p (nucleus sampling)
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Top-p (nucleus sampling)
 
@@ -187,7 +187,7 @@ Top-p is implemented locally (`top_p` default `1.0`); **top-k sampling is absent
 
 ## 6. RAG
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** RAG (retrieval-augmented generation)
 
@@ -226,7 +226,7 @@ Ingestion (`parse_files` → `chunk_documents` → `build_index`) plus query-tim
 
 ## 7. Chunking
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Chunking
 
@@ -263,7 +263,7 @@ Char/token/hybrid chunkers with validation (`chunk_size>0`, `overlap<size`), tok
 
 ## 8. Vector database
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Vector database
 
@@ -300,7 +300,7 @@ Chroma (local, vector-only), Milvus (server, BM25 + hybrid + quantized indexes),
 
 ## 9. Reranking
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Reranking
 
@@ -338,7 +338,7 @@ A `Reranker` ABC with cross-encoder/LLM variants exists, but it is wired only in
 
 ## 10. Hallucination
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Hallucination
 
@@ -376,7 +376,7 @@ No hallucination/attribution detector. Mitigations exist separately: a verificat
 
 ## 11. Fine-tuning
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Fine-tuning
 
@@ -413,7 +413,7 @@ Real SFT + PPO via veRL, exporting versioned **LoRA/PEFT** adapters (no full fin
 
 ## 12. Prompt engineering
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Prompt engineering
 
@@ -450,7 +450,7 @@ System prompts are assembled from priority-ordered `PromptSection`s that rails c
 
 ## 13. Few-shot prompting
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Few-shot prompting
 
@@ -487,7 +487,7 @@ The runtime agent is zero-shot; few-shot example injection exists only in the tu
 
 ## 14. Chain-of-thought prompting
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Chain-of-thought prompting
 
@@ -524,7 +524,7 @@ No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxil
 
 ## 15. Function calling
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Function calling
 
@@ -563,7 +563,7 @@ Cards become JSON Schema via the callable schema extractor, the ability manager 
 
 ## 16. Agent
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Agent
 
@@ -602,7 +602,7 @@ The ReAct loop calls the model, executes tools on `tool_calls`, and returns when
 
 ## 17. Memory
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Memory
 
@@ -639,7 +639,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 
 ## 18. Latency
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Latency
 
@@ -676,7 +676,7 @@ Streaming with per-call `ttft_ms`, parallel tool execution, KV/prefix cache affi
 
 ## 19. Quantization
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Quantization
 
@@ -713,7 +713,7 @@ Model-weight quantization is **not implemented** here — it is a passthrough en
 
 ## 20. Prompt injection
 
-<span class="badge">foundational</span>
+<span class="badge">basic</span>
 
 **Title.** Prompt injection
 
