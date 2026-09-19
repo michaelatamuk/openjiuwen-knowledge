@@ -1,10 +1,11 @@
 {
  "sections": [
   {
-   "title": "The agent",
+   "title": "Agents",
    "topics": [
     "05",
-    "08"
+    "08",
+    "09"
    ]
   },
   {
@@ -15,16 +16,11 @@
    ]
   },
   {
-   "title": "Multiple agents",
-   "topics": [
-    "09"
-   ]
-  },
-  {
    "title": "Making agents reliable",
    "topics": [
     "22",
-    "15"
+    "15",
+    "18"
    ]
   },
   {
@@ -32,12 +28,6 @@
    "topics": [
     "16",
     "24"
-   ]
-  },
-  {
-   "title": "Securing agents",
-   "topics": [
-    "18"
    ]
   },
   {

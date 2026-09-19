@@ -43,27 +43,23 @@ A real entry looks like this:
 
 ### Part I — Building with agents
 
-#### The agent
+#### Agents
 - [Agent fundamentals and the loop](05-agent-fundamentals-and-the-loop.md)
 - [Agent frameworks](08-agent-frameworks.md)
+- [Multi-agent systems](09-multi-agent-systems.md)
 
 #### What the agent uses
 - [Tools and function calling](06-tools-and-function-calling.md)
 - [Planning, memory and state](07-planning-memory-and-state.md)
 
-#### Multiple agents
-- [Multi-agent systems](09-multi-agent-systems.md)
-
 #### Making agents reliable
 - [Agent failure modes](22-agent-failure-patterns.md)
 - [Evaluation](15-evaluation.md)
+- [Security and safety](18-security-and-safety.md)
 
 #### Running agents
 - [Production, cost and scale](16-production-cost-and-scale.md)
 - [Model routing and gateways](24-ai-gateway.md)
-
-#### Securing agents
-- [Security and safety](18-security-and-safety.md)
 
 ### Part II — Under the hood
 
