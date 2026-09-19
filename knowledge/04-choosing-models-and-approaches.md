@@ -29,7 +29,7 @@ The codebase deliberately routes many decisions through deterministic code. The 
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/security/permission_engine/core.py:192` | docstring: LLM not used on the permission path |
+| `agent-core/openjiuwen/harness/security/permission_engine/core.py:193` | docstring: LLM not used on the permission path |
 | `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588` | rule-based tiered policy; agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82 — deterministic parse |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/auto_decision.py:73` | deterministic_guard_route; :116 deterministic_domain_route |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/internal.py:165` | bm25_rank_to_score; jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:1044 FTS BM25 |
@@ -65,7 +65,7 @@ The codebase deliberately routes many decisions through deterministic code. The 
 
 **Implementation**
 
-Model selection here is about availability and endpoint distribution, not task quality. A team can declare a `model_pool` of endpoints or a `ModelRouterConfig`/`IntelliRouterConfig` convenience shape; allocators (`RoundRobin`, `ByModelName`, `Router`, `IntelliRouter`) pick an entry by rotation or an explicit `model_name` hint supplied per agent/task. IntelliRouter is rate-aware only through `tpm`/`rpm` budgets. The `ModelPoolEntry` metadata comment ("weights, affinity hints") is documented but not implemented.
+Model selection here is about availability and endpoint distribution, not task quality. A team can declare a `model_pool` of endpoints or a `ModelRouterConfig`/`IntelliRouterConfig` convenience shape; allocators (`RoundRobinModelAllocator`, `ByModelNameAllocator`, `Router`, `IntelliRouter`) pick an entry by rotation or an explicit `model_name` hint supplied per agent/task. IntelliRouter is rate-aware only through `tpm`/`rpm` budgets. The `ModelPoolEntry` metadata comment ("weights, affinity hints") is documented but not implemented.
 
 **Code anchors**
 
@@ -145,13 +145,13 @@ The relevant knobs are static and named: `top_k` defaults to 5 (no adaptive poli
 
 **Implementation**
 
-The deployment surface exposes these constraints as distinct configuration layers. Latency: `ModelRequestConfig.timeout` per call, agent `max_turns`. Volume/concurrency: `ModelPoolEntry` `tpm`/`rpm` caps, `APIEmbedding` `max_concurrent`. Accuracy tradeoff: `score_threshold` (retrieval), `temperature`, `max_tokens`. Cost: `auto_harness` budget rail (per-session dollar cap). None of these are inferred automatically — they must be set by the operator based on the use-case constraints.
+The deployment surface exposes these constraints as distinct configuration layers. Latency: `ModelClientConfig.timeout` per call, agent `max_turns`. Volume/concurrency: `IntelliRouterDeployment` `tpm`/`rpm` caps, `APIEmbedding` `max_concurrent`. Accuracy tradeoff: `score_threshold` (retrieval), `temperature`, `max_tokens`. Cost: the auto-harness `BudgetRail` (per-session dollar cap). The operator sets them per use case.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:214` | ModelRequestConfig.timeout (latency) |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:102` | ModelClientConfig.timeout (latency) |
 | `agent-core/openjiuwen/agent_teams/models/pool.py:278` | tpm/rpm (volume) |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:47` | score_threshold (accuracy lever) |
 | `agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24` | dollar cap (cost) |
@@ -185,14 +185,14 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 **Implementation**
 
-`agent_evolving/evaluator/` has `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric` — a principled eval framework for quality measurement. `dev_tools/tune/Trainer` supports `early_stop_score` for automated quality gating. Gaps: cost and latency are not recorded *alongside* quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in `usage_cost.py` but not correlated to per-query eval scores.
+`agent_evolving/evaluator/` provides metrics such as `ExactMatchMetric` and `LLMAsJudgeMetric` for quality measurement. `dev_tools/tune/Trainer` supports `early_stop_score` for automated quality gating. Gaps: cost and latency are not recorded *alongside* quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in `usage_cost.py` but not correlated to per-query eval scores.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1` | faithfulness metric |
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | LLM-as-judge (no cost/latency input) |
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12` | ExactMatchMetric |
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:17` | LLMAsJudgeMetric |
 | `agent-core/openjiuwen/dev_tools/tune/trainer/trainer.py:38` | early_stop_score |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | session cost (not per-eval-query) |
 
@@ -225,14 +225,14 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 **Implementation**
 
-The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4**: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). **Layer 5**: `PromptTemplate`, `ContextEngine`, `ToolCard` system, `ReactAgent` loop, framework rails. **Layer 6**: `SecurityRail`, `PromptInjectionGuardrail`, `VerificationRail`, `GuardianRail`. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and `ObservabilityHandler`. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.
+The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4**: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). **Layer 5**: `PromptTemplate`, `ContextEngine`, `ToolCard` system, `ReActAgent` loop, framework rails. **Layer 6**: `SecurityRail`, `PromptInjectionGuardrail`, `VerificationRail`. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and the harness observability rail. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/` | full retrieval pipeline |
-| `agent-core/openjiuwen/harness/prompts/template.py` | ; agent-core/openjiuwen/core/context_engine/; agent-core/openjiuwen/core/foundation/tool/base.py; agent-core/openjiuwen/core/single_agent/agents/react_agent.py |
+| `agent-core/openjiuwen/core/foundation/prompt/template.py` | ; agent-core/openjiuwen/core/context_engine/; agent-core/openjiuwen/core/foundation/tool/base.py; agent-core/openjiuwen/core/single_agent/agents/react_agent.py |
 | `agent-core/openjiuwen/auto_harness/rails/security_rail.py` | ; agent-core/openjiuwen/core/security/guardrail/builtin.py; agent-core/openjiuwen/harness/rails/subagent/verification_rail.py |
 | `agent-core/openjiuwen/harness/observability/rail.py` | ; Milvus + vLLM + provider APIs (external) |
 

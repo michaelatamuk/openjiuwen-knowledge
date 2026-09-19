@@ -35,9 +35,9 @@ The system prompt is a single assembled string from priority-ordered, host-injec
 |---|---|
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1504` | builds one SystemMessage; :883 _admit_user_message() writes a UserMessage |
 | `agent-core/openjiuwen/core/context_engine/context/context.py:574` | get_context_window(system_messages, ...); :718 _get_window_messages() windows independently |
-| `agent-core/openjiuwen/harness/rails/task_planning_rail.py:154` | rail adds/removes a system-prompt section |
-| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:17` | security section injection |
-| `agent-core/openjiuwen/harness/prompts/prompt_attachment_manager.py:591` | user→system re-role per provider |
+| `agent-core/openjiuwen/harness/rails/task_planning_rail.py:163` | rail adds/removes a system-prompt section |
+| `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | security section injection |
+| `agent-core/openjiuwen/harness/prompts/prompt_attachment_manager.py:592` | user→system re-role per provider |
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:379` | lifts system into top-level blocks; :858 params["system"] |
 | `agent-core/openjiuwen/core/foundation/llm/utils/responses_utils.py:142` | system/developer → instructions |
 
@@ -83,7 +83,7 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 | `agent-core/openjiuwen/harness/prompts/sections/identity.py:11` | default identity prompt (zero-shot) |
 | `agent-core/openjiuwen/agent_evolving/utils.py:238` | convert_cases_to_examples() |
 | `agent-core/openjiuwen/dev_tools/tune/optimizer/example_optimizer.py:109` | init_examples() few-shot injection |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:347` | parses reasoning_content; agent-core/openjiuwen/core/foundation/llm/utils/endpoint_profiles.py:33 — DeepSeek empty reasoning_content |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:347` | parses reasoning_content; agent-core/openjiuwen/core/foundation/llm/utils/endpoint_profiles.py:37 — DeepSeek empty reasoning_content |
 | `agent-core/openjiuwen/core/workflow/components/llm/questioner_comp.py:68` | explicit CoT instruction |
 
 </details>
@@ -114,7 +114,7 @@ The runtime agent is fundamentally zero-shot: the system prompt is assembled fro
 
 **Implementation**
 
-The core harness has **no native `response_format`/JSON mode**; structured output is enforced by giving the model a single-use `structured_output` tool whose `ToolCard.input_params` is the caller's JSON Schema, so the provider's tool-use layer constrains arguments. On success the arguments are captured on the tool instance and a finish rail ends the round; on failure the error tool-result is returned for self-correction, and the workflow engine retries then validates the captured object with pydantic `model_validate` or `jsonschema.validate`. For text-based JSON (compression summaries), `JsonOutputParser` strips a ```` ```json ```` fence when present and `json.loads` the payload, returning `None` on decode failure rather than raising.
+Provider-level constrained decoding (`response_format`/`json_schema`) is not used; structured output is enforced by giving the model a single-use `structured_output` tool whose `ToolCard.input_params` is the caller's JSON Schema, so the provider's tool-use layer constrains arguments. On success the arguments are captured on the tool instance and a finish rail ends the round; on failure the error tool-result is returned for self-correction, and the workflow engine retries then validates the captured object with pydantic `model_validate` or `jsonschema.validate`. For text-based JSON (compression summaries), `JsonOutputParser` strips a ```` ```json ```` fence when present and `json.loads` the payload, returning `None` on decode failure rather than raising.
 
 **Implementation diagram**
 
@@ -159,7 +159,7 @@ The core harness has **no native `response_format`/JSON mode**; structured outpu
 
 **Implementation**
 
-Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPromptBuilder.add_section`/`build`), extended by `harness.prompts.builder` with a `PromptMode` filter, and JiuwenSwarm supplies a static priority registry. Sections carry only name/priority/category — no version, hash, or ID. Diagnostics exist (`PromptReport`) but are not versioning. Prompt optimization overwrites the operator's `system_prompt`/`user_prompt` in place; the only persistence is `EvolveCheckpoint.version` storing `operators_state` for resume. Real versioning/rollback exists only at the RSI harness-package level (content-addressed `installation_id`, `list_versions`, `rollback` with hash re-validation) and config migration.
+Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPromptBuilder.add_section`/`build`), extended by `harness.prompts.builder` with a `PromptMode` filter, and JiuwenSwarm supplies a static priority registry. Sections carry name/priority/category/carrier/content — no version, hash, or ID. Diagnostics exist (`PromptReport`) but are not versioning. Prompt optimization overwrites the operator's `system_prompt`/`user_prompt` in place; the only persistence is `EvolveCheckpoint.version` storing `operators_state` for resume. Real versioning/rollback exists only at the RSI harness-package level (content-addressed `installation_id`, `list_versions`, `rollback` with hash re-validation) and config migration.
 
 **Implementation diagram**
 
@@ -198,7 +198,7 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 - Diagnostics ≠ versioning.
 - Rollback only at harness-package level.
 
-**Concept.** This claim holds in practice: prompt behaviour changes should be versioned and regression-tested, so "what prompt should I use" resolves into "how do I version and test prompts". treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
+**Concept.** This claim holds in practice: prompt behaviour changes should be versioned and regression-tested, so "what prompt should I use" resolves into "how do I version and test prompts". Treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
 
 ![diagram](assets/diagrams/0e90139d948e0c1355b7b08dec4d5441730d7ecb.png)
 

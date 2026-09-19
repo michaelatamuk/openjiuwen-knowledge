@@ -4,7 +4,7 @@
 
 **Definition:** Before proposing an architecture, extract the four constraints that determine every significant tradeoff: **latency budget** — real-time (≤200ms) or async?; **query volume** — requests per second, peak versus average; **accuracy floor** — is a wrong answer a minor inconvenience or a safety/legal risk?; and **cost envelope** — internal tooling or a consumer product at scale? These four drive every meaningful decision: a tight latency budget rules out reranking or large-model calls in the critical path, a high accuracy floor rules out smaller models, and high volume rules out expensive retrievers.
 
-**Jiuwen:** Latency is set via `ModelRequestConfig.timeout`; volume via `ModelPoolEntry` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the `auto_harness` `budget_rail` dollar cap. None are inferred automatically.
+**Jiuwen:** Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeployment` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the auto-harness `BudgetRail` dollar cap. The operator sets them per use case.
 
 ---
 
@@ -36,7 +36,7 @@
 
 **Definition:** Define a representative eval set, run every candidate on it, and record quality score, latency, and cost per query. Plot the cost–accuracy and latency–accuracy curves, find the knee (the point of diminishing returns), and pick the option that meets the requirement with the minimum overhead — not the highest-accuracy option.
 
-**Jiuwen:** `agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
+**Jiuwen:** `agent_evolving/evaluator/` provides metrics such as `ExactMatchMetric` and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.
 
 ---
 

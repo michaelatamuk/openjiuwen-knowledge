@@ -24,7 +24,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:145</code> — <code>train()</code> loop; <code>:356</code> <code>op.set_parameter(target, value)</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/optimizer/llm_call/instruction_optimizer.py:30</code> — prompt rewrite via textual gradients<br>&bull; <code>agent-core/openjiuwen/rsi/__init__.py:2</code> — recursive self-improvement over harness/prompt/code<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:146</code> — <code>update_actor</code> / <code>:145</code> <code>update_critic</code> (real PPO)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:211</code> — async SFT producing a LoRA<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438</code> — <code>export_lora(...)</code>; <code>:489</code> <code>_convert_fsdp_to_peft(...)</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:51</code> — versioned adapter store</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:145</code> — <code>train()</code> loop; <code>:359</code> <code>op.set_parameter(target, value)</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/optimizer/llm_call/instruction_optimizer.py:30</code> — prompt rewrite via textual gradients<br>&bull; <code>agent-core/openjiuwen/rsi/__init__.py:2</code> — recursive self-improvement over harness/prompt/code<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147</code> — <code>update_actor</code> / <code>:145</code> <code>update_critic</code> (real PPO)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:211</code> — async SFT producing a LoRA<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438</code> — <code>export_lora(...)</code>; <code>:489</code> <code>_convert_fsdp_to_peft(...)</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:51</code> — versioned adapter store</sub>
 
 </details>
 
@@ -90,7 +90,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — <code>SFTTrainingExecutor</code> (owns SFT + LoRA publish); <code>:328-345</code> lora_rank/alpha/target_modules; <code>:455-482</code> <code>_export_sft_lora_adapter</code>; <code>:577-586</code> <code>_is_publishable_lora_dir</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438-470</code> — <code>export_lora</code>; <code>:543-579</code> PEFT <code>adapter_config.json</code>; <code>:550-552</code> warn+fallback if no LoRA params<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:56-131</code> — versioned publish + atomic <code>latest</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/online_config.py:42-45</code> — PPO overlay <code>lora_rank: 16</code>, <code>lora_alpha: 32</code>, <code>target_modules: all-linear</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:146</code> — <code>update_actor</code> (PPO)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — <code>SFTTrainingExecutor</code> (owns SFT + LoRA publish); <code>:328-345</code> lora_rank/alpha/target_modules; <code>:455-482</code> <code>_export_sft_lora_adapter</code>; <code>:577-586</code> <code>_is_publishable_lora_dir</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438-470</code> — <code>export_lora</code>; <code>:543-579</code> PEFT <code>adapter_config.json</code>; <code>:550-552</code> warn+fallback if no LoRA params<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:56-131</code> — versioned publish + atomic <code>latest</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/online_config.py:42-45</code> — PPO overlay <code>lora_rank: 16</code>, <code>lora_alpha: 32</code>, <code>target_modules: all-linear</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147</code> — <code>update_actor</code> (PPO)</sub>
 
 </details>
 
@@ -196,7 +196,7 @@ flowchart TD
 
 **General:** LoRA (Low-Rank Adaptation) freezes all pre-trained weights and injects two small trainable matrices A and B into each target layer such that the weight update is ΔW = BA (rank r ≪ hidden dim). Only A and B are trained — typically <1% of the full parameter count — so GPU memory and storage requirements drop dramatically. This matters when: you are fine-tuning a large model on a small dataset (LoRA's low rank acts as a regularizer that reduces overfitting), you need multiple task-specific adapters on the same base model (swap adapters without reloading the base), or you have limited GPU VRAM. LoRA does not outperform full fine-tuning when: the task is far from the pre-training distribution (the low rank may not be expressive enough), or when you have abundant high-quality task data and sufficient compute. QLoRA extends LoRA by quantizing the frozen base weights to 4-bit, further reducing VRAM.
 
-**Jiuwen:** `agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. `LoRA rank`, `LoRA alpha`, `LoRA dropout`, and `target_modules` are configuration parameters forwarded to the PEFT adapter. The base model weights are frozen; only the A/B matrices are trained. `agent_evolving/` also supports QLoRA (4-bit quantized base) via the `quantization` config field. The LoRA math itself is delegated entirely to the PEFT library.
+**Jiuwen:** `agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. Rank, alpha, and target modules are forwarded to the PEFT adapter; the base model weights are frozen and only the A/B matrices are trained. The LoRA math itself is delegated to the PEFT library.
 
 ```mermaid
 flowchart TD
@@ -213,7 +213,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:359</code> — LoRA config fields forwarded to PEFT<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/</code> — <code>lora_rank</code>, <code>lora_alpha</code>, <code>lora_dropout</code>, <code>target_modules</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:380</code> — <code>quantization</code> field (QLoRA)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342</code> — <code>lora_rank</code>/<code>lora_alpha</code>/<code>target_modules</code> forwarded to PEFT</sub>
 
 </details>
 
@@ -225,7 +225,7 @@ flowchart TD
 
 **General:** RLHF (Reinforcement Learning from Human Feedback) has three stages: supervised fine-tuning (SFT), reward model training (human preferences → a scalar reward model), and RL optimization (PPO to maximize the reward model's score subject to a KL divergence penalty against the SFT model). It works but is complex: two models in memory during PPO training, reward model can be gamed (reward hacking), requires online sampling. DPO (Direct Preference Optimization) is a mathematical simplification: given a preference dataset of (prompt, chosen, rejected) pairs, DPO directly optimizes the policy to increase the probability of chosen over rejected without needing a separate reward model or RL loop — it reduces to a weighted cross-entropy loss. DPO is simpler, more stable, and requires less compute; RLHF/PPO is more flexible for non-differentiable rewards (binary pass/fail, code execution, tool call success) and allows online improvement. Use DPO when you have a preference dataset and want stability; use PPO when your reward is computed externally (unit test pass rate, API call success).
 
-**Jiuwen:** `agent_rl/` implements both paths via veRL. The online PPO path (`online/backends/ppo/`) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (`online/backends/sft/`) covers the first stage of RLHF.
+**Jiuwen:** `agent_rl/` implements both paths via veRL. The online PPO path (`agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py`) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (`online/backends/sft/`) covers the first stage of RLHF.
 
 ```mermaid
 flowchart TD
@@ -244,7 +244,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/</code> — PPO trainer<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT (stage 1)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/</code> — GRPO config (no value model)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/</code> — no DPO backend present</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19</code> — <code>PPOBatchEngine</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — <code>SFTTrainingExecutor</code> (stage 1)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:43</code> — GRPO config (no value model)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/</code> — no DPO backend present</sub>
 
 </details>
 
@@ -258,7 +258,7 @@ flowchart TD
 
 **General:** Three complementary customization levers, not competitors. **Prompting** (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. **RAG**: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). **Fine-tuning**: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.
 
-**Jiuwen:** All three are implemented. Prompting: `PromptTemplate` + `PromptSection` system in `harness/prompts/`; `RuntimePromptRail` for dynamic injection. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. The framework is designed for iterative layering — agents start with prompting, retrieval is added via `RetrieverConfig`, and fine-tuning (via `agent_rl/`) is run offline to improve on collected trajectories. The three levers are independent and composable.
+**Jiuwen:** All three are implemented. Prompting: `PromptTemplate` (`core/foundation/prompt/template.py`) + `PromptSection` (`core/single_agent/prompts/builder.py`); `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py`) for dynamic prompt state. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. Agents start with prompting, retrieval is added via `RetrievalConfig`, and fine-tuning (via `agent_rl/`) runs offline to improve on collected trajectories. The three levers are independent and composable.
 
 ```mermaid
 flowchart TD
@@ -276,7 +276,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/prompts/template.py:1</code> — <code>PromptTemplate</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1</code> — <code>RuntimePromptRail</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:1</code> — <code>RetrieverConfig</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT path<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/</code> — PPO/GRPO path</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/prompt/template.py:14</code> — <code>PromptTemplate</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39</code> — <code>RuntimePromptRail</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:8</code> — <code>RetrievalConfig</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT path<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19</code> — PPO/GRPO path</sub>
 
 </details>
 

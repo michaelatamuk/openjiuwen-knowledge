@@ -20,7 +20,7 @@
 
 **Implementation**
 
-Latency is set via `ModelRequestConfig.timeout`; volume via `ModelPoolEntry` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the `auto_harness` `budget_rail` dollar cap. None are inferred automatically.
+Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeployment` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the auto-harness `BudgetRail` dollar cap. The operator sets them per use case.
 
 </details>
 
@@ -110,7 +110,7 @@ Latency is set via `ModelRequestConfig.timeout`; volume via `ModelPoolEntry` `tp
 
 **Implementation**
 
-`agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
+`agent_evolving/evaluator/` provides metrics such as `ExactMatchMetric` and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.
 
 </details>
 

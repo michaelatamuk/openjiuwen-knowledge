@@ -29,10 +29,10 @@ Two distinct things live here. The default "evolution" path does **not** train w
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/agent_evolving/trainer/trainer.py:145` | train() loop; :356 op.set_parameter(target, value) |
+| `agent-core/openjiuwen/agent_evolving/trainer/trainer.py:145` | train() loop; :359 op.set_parameter(target, value) |
 | `agent-core/openjiuwen/agent_evolving/optimizer/llm_call/instruction_optimizer.py:30` | prompt rewrite via textual gradients |
 | `agent-core/openjiuwen/rsi/__init__.py:2` | recursive self-improvement over harness/prompt/code |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:146` | update_actor / :145 update_critic (real PPO) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147` | update_actor / :145 update_critic (real PPO) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:211` | async SFT producing a LoRA |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438` | export_lora(...); :489 _convert_fsdp_to_peft(...) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:51` | versioned adapter store |
@@ -110,7 +110,7 @@ The repo trains weights, but only via **LoRA/PEFT adapters** — there is no ful
 | `agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438-470` | export_lora; :543-579 PEFT adapter_config.json; :550-552 warn+fallback if no LoRA params |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:56-131` | versioned publish + atomic latest |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/config/online_config.py:42-45` | PPO overlay lora_rank: 16, lora_alpha: 32, target_modules: all-linear |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:146` | update_actor (PPO) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147` | update_actor (PPO) |
 
 </details>
 
@@ -259,15 +259,13 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 **Implementation**
 
-`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. `LoRA rank`, `LoRA alpha`, `LoRA dropout`, and `target_modules` are configuration parameters forwarded to the PEFT adapter. The base model weights are frozen; only the A/B matrices are trained. `agent_evolving/` also supports QLoRA (4-bit quantized base) via the `quantization` config field. The LoRA math itself is delegated entirely to the PEFT library.
+`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. Rank, alpha, and target modules are forwarded to the PEFT adapter; the base model weights are frozen and only the A/B matrices are trained. The LoRA math itself is delegated to the PEFT library.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:359` | LoRA config fields forwarded to PEFT |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/config/` | lora_rank, lora_alpha, lora_dropout, target_modules |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:380` | quantization field (QLoRA) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342` | lora_rank/lora_alpha/target_modules forwarded to PEFT |
 
 </details>
 
@@ -298,15 +296,15 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 **Implementation**
 
-`agent_rl/` implements both paths via veRL. The online PPO path (`online/backends/ppo/`) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (`online/backends/sft/`) covers the first stage of RLHF.
+`agent_rl/` implements both paths via veRL. The online PPO path (`agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py`) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (`online/backends/sft/`) covers the first stage of RLHF.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/` | PPO trainer |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT (stage 1) |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/config/` | GRPO config (no value model) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19` | PPOBatchEngine |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFTTrainingExecutor (stage 1) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:43` | GRPO config (no value model) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/` | no DPO backend present |
 
 </details>
@@ -337,17 +335,17 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 **Implementation**
 
-All three are implemented. Prompting: `PromptTemplate` + `PromptSection` system in `harness/prompts/`; `RuntimePromptRail` for dynamic injection. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. The framework is designed for iterative layering — agents start with prompting, retrieval is added via `RetrieverConfig`, and fine-tuning (via `agent_rl/`) is run offline to improve on collected trajectories. The three levers are independent and composable.
+All three are implemented. Prompting: `PromptTemplate` (`core/foundation/prompt/template.py`) + `PromptSection` (`core/single_agent/prompts/builder.py`); `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py`) for dynamic prompt state. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. Agents start with prompting, retrieval is added via `RetrievalConfig`, and fine-tuning (via `agent_rl/`) runs offline to improve on collected trajectories. The three levers are independent and composable.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/prompts/template.py:1` | PromptTemplate |
-| `agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1` | RuntimePromptRail |
-| `agent-core/openjiuwen/core/retrieval/common/config.py:1` | RetrieverConfig |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT path |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/` | PPO/GRPO path |
+| `agent-core/openjiuwen/core/foundation/prompt/template.py:14` | PromptTemplate |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39` | RuntimePromptRail |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:8` | RetrievalConfig |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFT path |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19` | PPO/GRPO path |
 
 </details>
 
