@@ -31,6 +31,10 @@ DIAGRAMS_JSON = os.path.join(CONTENT_DIR, "diagrams.json")
 SECTIONS_JSON = os.path.join(CONTENT_DIR, "sections.json")
 CLASSIFICATION_JSON = os.path.join(CONTENT_DIR, "classification.json")
 
+# Entries whose title is a claim (from the pattern docs), not a question.
+CLAIMS = {"01-16", "02-5", "04-3", "05-9", "05-10", "13-9", "13-10",
+          "15-23", "15-24", "16-9", "18-10", "18-11"}
+
 MH = re.compile(r"^##\s*(?:(\d+)\.\s*)?(.+)$")
 DIAGRAM = re.compile(r"```mermaid\r?\n(.*?)```", re.S)
 ANCHORS = re.compile(r"<details>\s*<summary>Anchors</summary>\s*\n\s*<sub>(.*?)</sub>\s*\n\s*</details>", re.S)
@@ -380,6 +384,8 @@ def main():
                    or strip_md_header(body, "Used for"))
             citations = parse_anchors(body)
             qtype = infer_type(q["question"], citations)
+            if f"{prefix}-{qi}" in CLAIMS:
+                qtype = "claim"
             sents = sentences(explain)
             key = f"{prefix}-{qi}"
             ov = authored.get(key, {})

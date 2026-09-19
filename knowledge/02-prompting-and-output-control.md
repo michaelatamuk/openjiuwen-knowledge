@@ -185,7 +185,9 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 
 ## 5. Any prompt behavior question is secretly a versioning and testing question
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** Any prompt behavior question is secretly a versioning and testing question.
 
@@ -196,7 +198,7 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 - Diagnostics ≠ versioning.
 - Rollback only at harness-package level.
 
-**Concept.** treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
+**Concept.** This claim holds in practice: prompt behaviour changes should be versioned and regression-tested, so "what prompt should I use" resolves into "how do I version and test prompts". treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
 
 ![diagram](assets/diagrams/0e90139d948e0c1355b7b08dec4d5441730d7ecb.png)
 

@@ -329,7 +329,9 @@ The system has per-process bounded resources rather than elastic scaling. LLM HT
 
 ## 9. Scaling questions test whether you've thought past the demo
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** Scaling questions test whether you've thought past the demo.
 
@@ -339,7 +341,7 @@ The system has per-process bounded resources rather than elastic scaling. LLM HT
 - Shared HTTP pool + embedding/sub-agent semaphores.
 - Missing: autoscaling, distributed queues.
 
-**Concept.** Most architectures do not survive 10x traffic. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
+**Concept.** This claim holds: scaling questions are answered by naming the bottleneck and the first lever, which shows the system has been run past a demo. Most architectures do not survive 10x traffic. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
 
 ![diagram](assets/diagrams/fe38b5d6bafb6ce33d080699d01b3d45d517bdca.png)
 

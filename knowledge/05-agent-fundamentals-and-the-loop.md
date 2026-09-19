@@ -333,7 +333,9 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ## 9. "The agent is stuck" tests whether you've shipped one, not studied one
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'The agent is stuck' tests whether you've shipped one, not studied one.
 
@@ -344,7 +346,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 - Anomaly rail: identical rounds → compact/abort.
 - Dedup rail + session cost cap.
 
-**Concept.** Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
+**Concept.** This claim is fair: diagnosing a stuck agent requires operational experience with loops, budgets, and retries rather than theory alone — though there is a knowledge question underneath the framing. Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
 ![diagram](assets/diagrams/9697b9de619b0d05f8cba0f45f509f36f6ce3157.png)
 
@@ -373,7 +375,9 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ## 10. "The agent is stuck in a loop" is testing production experience
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'The agent is stuck in a loop' is testing production experience.
 
@@ -384,7 +388,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 - Anomaly rail compact/abort.
 - Dedup rail; idempotent=False default.
 
-**Concept.** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
+**Concept.** This claim is largely true, with a caveat: the framing rewards production experience, but the same question is answerable as knowledge about loop guards and budgets. max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
 
 ![diagram](assets/diagrams/d4fd725ea53f07614ecafbef9e25f235267abd2b.png)
 

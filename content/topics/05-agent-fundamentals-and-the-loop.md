@@ -242,7 +242,7 @@ flowchart TD
 
 ## 9. "The agent is stuck" tests whether you've shipped one, not studied one
 
-**General:** Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
+**General:** This claim is fair: diagnosing a stuck agent requires operational experience with loops, budgets, and retries rather than theory alone — though there is a knowledge question underneath the framing. Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
 **Jiuwen:** Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRetriever.max_iter` (default 2, clamped), `ModelAnomalyDetectionRail` (consecutive identical tool rounds → compact/abort) and `ToolCallDeduplicationRail`. A session cost cap is enforced when the provider reports cost, and `ModelBackupRail` fails over. What is **missing** is a circuit breaker after N consecutive failures and a durable token budget on the retrieval loop.
 
@@ -266,7 +266,7 @@ flowchart TD
 
 ## 10. "The agent is stuck in a loop" is testing production experience
 
-**General:** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
+**General:** This claim is largely true, with a caveat: the framing rewards production experience, but the same question is answerable as knowledge about loop guards and budgets. max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
 
 **Jiuwen:** Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max_iter` (2, clamped), `ModelAnomalyDetectionRail` (identical tool rounds → compact/abort), `ToolCallDeduplicationRail`, and secure-by-default `idempotent=False` (non-idempotent tools never retried). A session cost cap is enforced when the provider reports cost; a per-step token budget in the task loop is wired but off by default.
 

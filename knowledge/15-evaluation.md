@@ -857,7 +857,9 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 
 ## 23. "How do you know it's working" tests evaluation depth, not confidence
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'How do you know it's working' tests evaluation depth, not confidence.
 
@@ -868,7 +870,7 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 - No faithfulness/claim scoring.
 - No CI quality gate.
 
-**Concept.** A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
+**Concept.** This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
 
 ![diagram](assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png)
 
@@ -897,7 +899,9 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 ## 24. "How do you know it's working" is testing evaluation depth
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'How do you know it's working' is testing evaluation depth.
 
@@ -908,7 +912,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 - No retrieval metric layer.
 - No CI quality gate.
 
-**Concept.** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. In practice: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
+**Concept.** This claim holds: it makes the same evaluation-depth point as its companion, under a second heading from another source. faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. In practice: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
 
 ![diagram](assets/diagrams/89f2dff7d52788034ab87f32c69f65269f39ba6d.png)
 

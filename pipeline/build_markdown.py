@@ -82,6 +82,8 @@ def main():
                 badges.append(f'<span class="badge badge-{html.escape(meta["difficulty"].lower())}">{html.escape(meta["difficulty"])}</span>')
             if badges:
                 lines += [" ".join(badges), ""]
+            if q.get("type") == "claim":
+                lines += ["**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.", ""]
             if q.get("tldr"):
                 lines += [f"**TL;DR.** {q['tldr']}", ""]
             if q.get("points"):

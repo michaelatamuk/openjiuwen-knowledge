@@ -373,7 +373,9 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 
 ## 10. Security-adjacent questions are disguised as normal engineering questions
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** Security-adjacent questions are disguised as normal engineering questions.
 
@@ -384,7 +386,7 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 - Prompt safety is advisory.
 - Real control is the shell/permission layer.
 
-**Concept.** Content from a tool result or retrieved document is untrusted input. Treat it as data, never as instructions: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
+**Concept.** This claim holds: ordinary-looking engineering questions about input handling, permissions, or egress are often security probes in disguise. Content from a tool result or retrieved document is untrusted input. Treat it as data, never as instructions: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
 
 ![diagram](assets/diagrams/bd23a2c582f0d84607fa39f87399c2cd80d3fe7e.png)
 
@@ -417,7 +419,9 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 
 ## 11. Any question about untrusted input is testing prompt injection awareness
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** Any question about untrusted input is testing prompt-injection awareness.
 
@@ -428,7 +432,7 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 - Safety rail is advisory.
 - Real control: shell/permission layer.
 
-**Concept.** a tool result or retrieved document can carry hidden instructions. Treat tool output and retrieved content as data, never as commands, and sanitize input before it reaches the prompt: delimit and label untrusted content as data, strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
+**Concept.** This claim is mostly true, with a caveat: untrusted input is primarily a prompt-injection concern, but it also covers authorization and data handling. a tool result or retrieved document can carry hidden instructions. Treat tool output and retrieved content as data, never as commands, and sanitize input before it reaches the prompt: delimit and label untrusted content as data, strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
 
 ![diagram](assets/diagrams/d8e7aec4eea44ece4306dd59b3cfb07cf003a653.png)
 

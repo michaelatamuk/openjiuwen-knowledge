@@ -327,7 +327,9 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 
 ## 9. "Design a RAG system" tests failure mode awareness, not architecture recall
 
-<span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-advanced">advanced</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.
 
@@ -338,7 +340,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 - KB path never reranks.
 - Metadata filters dropped at the retriever.
 
-**Concept.** Drawing embed → retrieve → rerank → generate is the basic shape. When retrieval returns the wrong chunk, the causes are usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
+**Concept.** This claim holds: the value in "design a RAG system" is naming the failure modes and how you detect them, not reciting a reference architecture. Drawing embed → retrieve → rerank → generate is the basic shape. When retrieval returns the wrong chunk, the causes are usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
 
 ![diagram](assets/diagrams/72c5aa00ecbd3b58619ea524d274ca8fe1fef893.png)
 
@@ -366,7 +368,9 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 ## 10. "The model made something up" is testing hallucination handling, not model quality
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'The model made something up' is testing hallucination handling, not model quality.
 
@@ -377,7 +381,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 - No answerability gate/abstention.
 - No faithfulness judge with context.
 
-**Concept.** how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. Treat this as a system design, not a claim about model quality: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
+**Concept.** This claim holds: "the model made something up" is about hallucination handling and mitigation, not about which model is best. how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. Treat this as a system design, not a claim about model quality: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
 
 ![diagram](assets/diagrams/9ee27d6e7e8ccce7160b58e54ce6ef5eeef44b31.png)
 

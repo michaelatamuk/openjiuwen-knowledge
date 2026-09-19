@@ -134,7 +134,7 @@ flowchart TD
 
 ## 5. Any prompt behavior question is secretly a versioning and testing question
 
-**General:** treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
+**General:** This claim holds in practice: prompt behaviour changes should be versioned and regression-tested, so "what prompt should I use" resolves into "how do I version and test prompts". treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
 
 **Jiuwen:** Prompts are assembled from named `PromptSection`s that carry only name/priority/category/carrier (no version/hash); optimization overwrites them in place; `PromptReport` is diagnostics, not versioning. Rollback exists only at the RSI **harness-package** level, and the CI gate has no eval threshold. Logs carry spans but not a prompt-version identifier.
 

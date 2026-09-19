@@ -81,7 +81,9 @@ Model selection here is about availability and endpoint distribution, not task q
 
 ## 3. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
 
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
+<span class="badge badge-type">Claim</span> <span class="badge badge-advanced">advanced</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
 
 **TL;DR.** 'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.
 
@@ -92,7 +94,7 @@ Model selection here is about availability and endpoint distribution, not task q
 - Model allocation is availability-based.
 - Session cost tracked and capped.
 
-**Concept.** RAG vs. fine-tuning, 7B vs. 70B, top-5 vs. top-20 retrieval. "It depends" without naming the constraint (latency budget, cost per query, accuracy floor) is not enough; put a number on it — e.g. "at a 200ms budget, reranking 20 docs is not viable, so cap retrieval at 5." State the constraint, then the decision it forces, then the number. Tie retrieval size to latency/tokens, model size to accuracy floor vs cost, and reranking to the latency it buys in precision.
+**Concept.** This claim holds: the expected answer is a constraint-driven tradeoff with numbers, not a single correct pick. RAG vs. fine-tuning, 7B vs. 70B, top-5 vs. top-20 retrieval. "It depends" without naming the constraint (latency budget, cost per query, accuracy floor) is not enough; put a number on it — e.g. "at a 200ms budget, reranking 20 docs is not viable, so cap retrieval at 5." State the constraint, then the decision it forces, then the number. Tie retrieval size to latency/tokens, model size to accuracy floor vs cost, and reranking to the latency it buys in precision.
 
 ![diagram](assets/diagrams/05e403ee71c2ddfc9e280ece288ce292f189063b.png)
 
