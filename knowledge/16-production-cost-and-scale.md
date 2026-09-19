@@ -339,7 +339,7 @@ The system has per-process bounded resources rather than elastic scaling. LLM HT
 - Shared HTTP pool + embedding/sub-agent semaphores.
 - Missing: autoscaling, distributed queues.
 
-**Concept.** "What happens at 10x traffic" is asked because most architectures don't survive it. If nothing changes in your design when asked, that's the signal they're waiting for. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. A strong answer includes: identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
+**Concept.** Most architectures do not survive 10x traffic. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
 
 ![diagram](assets/diagrams/fe38b5d6bafb6ce33d080699d01b3d45d517bdca.png)
 

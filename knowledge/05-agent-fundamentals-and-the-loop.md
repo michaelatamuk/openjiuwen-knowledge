@@ -344,7 +344,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 - Anomaly rail: identical rounds → compact/abort.
 - Dedup rail + session cost cap.
 
-**Concept.** Infinite tool loops, retries on a flaky API that never terminate, token spend that quietly spikes overnight. Vague answers ("I'd add safeguards") don't land; concrete answers do — `max_iterations=5`, a token budget per session, a circuit breaker after N consecutive tool failures. A strong answer includes: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
+**Concept.** Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
 ![diagram](assets/diagrams/9697b9de619b0d05f8cba0f45f509f36f6ce3157.png)
 
@@ -384,7 +384,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 - Anomaly rail compact/abort.
 - Dedup rail; idempotent=False default.
 
-**Concept.** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. This separates people who have run one from people who have read about one. A strong answer includes: a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
+**Concept.** max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
 
 **In Jiuwen.** Caps are concrete: ReAct max iterations (5, harness 15), agentic-retriever max iterations (2, clamped), an anomaly-detection rail (identical tool rounds trigger compaction or abort), a tool-call dedup rail, and secure-by-default non-idempotent tool handling.
 
@@ -464,6 +464,37 @@ Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max
 **Implementation**
 
 Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `WorkPlanApprovalRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `WorkPlanApprovalRail` is opt-in per agent config.
+
+</details>
+
+---
+
+## 13. When should you use a deterministic workflow instead of an autonomous agent?
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.
+
+**Key points.**
+
+- Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.
+- Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.
+- Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.
+- Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.
+- Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first.
+
+**Concept.** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
+
+![diagram](assets/diagrams/abe0963426d0474a1996974eb0641754eb0e1e57.png)
+
+**In Jiuwen.** The graph path (Pregel-based workflow engine) handles known control flow with static and conditional routers, barriers, and OR-groups. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration. Hybrid: a workflow can delegate a sub-step to an agent sub-task.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
 
 </details>
 

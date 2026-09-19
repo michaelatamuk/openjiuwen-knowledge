@@ -235,7 +235,7 @@ flowchart TD
 
 ## 9. Scaling questions test whether you've thought past the demo
 
-**General:** "What happens at 10x traffic" is asked because most architectures don't survive it. If nothing changes in your design when asked, that's the signal they're waiting for. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. A strong answer includes: identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
+**General:** Most architectures do not survive 10x traffic. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
 
 **Jiuwen:** Bounded resources exist per process: shared httpx pool (`max_connections=100`), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded `asyncio.Queue`s, and parallel tool execution with resource lanes. What is missing is autoscaling, a distributed rate limiter, and any semantic response cache — so the design change at 10x is mostly "add replicas + a global limiter", which the repo does not provide.
 
@@ -465,35 +465,3 @@ flowchart TD
 **Gap.** No automatic fallback-provider routing; an open circuit raises rather than returning a structured degraded response. No retry-with-modified-prompt path for quality failures.
 
 <sub>_Canonical source: `source/real-interview-ai-engineer-4rounds_for_engineers.md`; also covered in: real-interview._</sub>
----
-
-## 17. What is an AI gateway and when do you need one?
-
-**General:** An AI gateway is an infrastructure layer that sits between your application and one or more LLM provider APIs. It centralises concerns that would otherwise be duplicated in every service that calls a model.
-
-What a gateway does: (1) **routing** — send requests to different providers (OpenAI, Anthropic, local vLLM) based on cost, latency, availability, or model capability; (2) **rate limiting and cost enforcement** — per-tenant or per-user token budgets, hard spend caps, and quota management without touching application code; (3) **authentication and key isolation** — API keys never leave the gateway; application services hold only an internal token; (4) **semantic caching** — embed incoming queries and return cached responses for near-duplicate requests, reducing redundant model calls; (5) **safety enforcement** — content filtering and PII redaction applied uniformly at the gateway before the request reaches the model; (6) **observability** — every model call is logged with provider, model, token usage, latency, and cost in one place.
-
-When you need a gateway: multiple services calling LLMs independently (key sprawl, duplicated cost logic), strict per-tenant budgets, multi-provider fallback, or a need for a single audit log of all model calls. Single-service applications with one provider generally do not need a dedicated gateway.
-
-**Jiuwen:** No standalone gateway component. Equivalent functions are distributed across the framework: provider routing via `ModelClientFactory`; cost tracking via `usage_cost.py`; circuit breaking via `CircuitBreakerRail`; content safety via `GuardrailRail`; observability via `ObservabilityHandler`. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
-
-```mermaid
-flowchart TD
-    APP["application service"] --> GW["AI gateway"]
-    GW --> RT["routing: provider A / B / local"]
-    GW --> RL["rate limiting + spend cap"]
-    GW --> AUTH["key isolation"]
-    GW --> SC["semantic caching"]
-    GW --> SF["safety filter / PII"]
-    GW --> OB["unified observability"]
-    RT --> PROV["LLM provider API"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; Equivalent in Jiuwen: `usage_cost.py:101` (cost), `circuit_breaker_rail.py:1` (circuit), `guardrail_rail.py:1` (safety), `observability/event.py:1` (logging)<br>&bull; No gateway component in the codebase; these concerns are per-agent, not cross-service</sub>
-
-</details>
-
-<sub>_Canonical source: `source/ai-gateway-architecture_for_engineers.md`._</sub>

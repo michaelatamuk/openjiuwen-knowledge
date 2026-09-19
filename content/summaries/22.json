@@ -1,0 +1,61 @@
+{
+ "22-1": {
+  "title": "",
+  "tldr": "\"What happens if a tool times out after the action already executed?\" Retrying blindly on a non-idempotent call — a payment, a database write, an email send — can cause duplicate side effects.",
+  "points": [
+   "Separate the call type — reads are idempotent and safe to retry with backoff; writes must track whether they were confirmed or merely attempted.",
+   "Idempotency keys (a unique request ID passed with every write; the server deduplicates) are the standard fix.",
+   "State must persist across retries: the agent needs to know that `payment_id=abc123` was *attempted* before deciding to retry, not just that the last call failed.",
+   "Add a human-escalation path for any irreversible action."
+  ]
+ },
+ "22-2": {
+  "title": "",
+  "tldr": "Agents rarely crash visibly.",
+  "points": [
+   "Hard step cap (`max_iterations`).",
+   "Divergence detection: if the last N tool calls are identical or the model output is structurally the same, abort rather than continue.",
+   "State deduplication: canonicalise `(tool, input_hash)` and reject re-execution of a confirmed call.",
+   "Context compaction on loop: if the agent is stuck, the context likely contains noise that is reinforcing the wrong path — compact it before continuing.",
+   "A final-answer forced output at budget exhaustion."
+  ]
+ },
+ "22-3": {
+  "title": "",
+  "tldr": "A fluent answer is not a correct one, so validation is an architectural stage rather than a review step.",
+  "points": [
+   "For factual claims: extract each claim from the output, verify it against the retrieved source documents (NLI model or LLM-as-judge).",
+   "For structured output: validate against the expected schema before acting (JSON schema, Pydantic model).",
+   "For high-stakes actions: a separate verification step before the result is trusted or acted upon.",
+   "Treat \"the model said X\" as a hypothesis, not a fact."
+  ]
+ },
+ "22-4": {
+  "title": "",
+  "tldr": "Memory is a liability as well as a feature: a wrong assumption stored early can shape every later decision.",
+  "points": [
+   "Scope memory by task/session boundary — assumptions from session A should not contaminate session B.",
+   "Invalidation: when a tool returns contradictory evidence, the previous related memory should be flagged or discarded, not silently co-exist.",
+   "Immutability checkpoints: tag memories with the context that generated them; when that context is superseded, the memory is stale.",
+   "Know when to compact the context window rather than accumulate it."
+  ]
+ },
+ "22-5": {
+  "title": "",
+  "tldr": "If the only artifact is the final transcript, no one can audit why the agent chose one tool or path over another.",
+  "points": [
+   "Structured trace per turn: the model's reasoning text, which tools were called with what inputs, the raw tool outputs, and the rail/guard decisions that shaped the response.",
+   "Each step should have a timestamp and a session/turn identifier so you can reconstruct the exact execution path.",
+   "Sampling strategy for production (full trace on errors, sampled on success).",
+   "A way to replay a specific trace to reproduce a failure."
+  ]
+ },
+ "22-6": {
+  "title": "",
+  "tldr": "\"Stop when done\" is not a termination condition; an agent needs explicit success, budget, and escalation paths.",
+  "points": [
+   "At least three termination paths: (1) success — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, retrieved context cited); (2) budget exhaustion — hard cap on iterations and tokens, with a graceful degraded response rather than silence; (3) human escalation — when the agent has exhausted its budget or detected irresolvable ambiguity, it hands off explicitly rather than looping or hallucinating.",
+   "Confidence threshold as an optional fourth: if the model's own uncertainty estimate is above a threshold, escalate before acting."
+  ]
+ }
+}

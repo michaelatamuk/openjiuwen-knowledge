@@ -607,7 +607,7 @@ Not present in the inference framework. The evaluation harness (`agent_evolving/
 
 **Implementation**
 
-Not a concern in the inference framework. In `agent_rl/`, training hyperparameters (weight decay, dropout, early stopping via epoch limits) are configuration parameters forwarded to veRL. The offline RL trainer has real train/val validation pipeline; the SFT path notably has no held-out validation (see entry 17-6).
+Not a concern in the inference framework. In `agent_rl/`, training hyperparameters (weight decay, dropout, early stopping via epoch limits) are configuration parameters forwarded to veRL. The offline RL trainer has real train/val validation pipeline; the SFT path notably has no held-out validation.
 
 **Code anchors**
 
@@ -637,14 +637,14 @@ Not a concern in the inference framework. In `agent_rl/`, training hyperparamete
 
 ![diagram](assets/diagrams/26a19f829275e81797c0bee3994c172f97bf26cc.png)
 
-**In Jiuwen.** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights via AutoModelForCausalLM.from_pretrained. There is no number-of-heads configuration in the framework. This is distinct from the attention mechanics (entry 01-4); this entry covers the architectural motivation for using multiple heads over a single head.
+**In Jiuwen.** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights via AutoModelForCausalLM.from_pretrained. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation for using multiple heads over a single head.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This is distinct from entry 01-4 (which covers the attention mechanics); this entry covers the architectural motivation.
+Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation rather than the attention mechanics themselves.
 
 **Code anchors**
 

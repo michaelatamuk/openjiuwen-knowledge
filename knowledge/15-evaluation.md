@@ -868,7 +868,7 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 - No faithfulness/claim scoring.
 - No CI quality gate.
 
-**Concept.** "It looked good to me" ends the conversation. They want a fixed eval set, faithfulness scoring on generated claims, and how you'd catch silent degradation after an unflagged prompt change. The real trap is "how would you know if it got *worse*", not "how do you know it works now". A strong answer includes: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
+**Concept.** A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
 
 ![diagram](assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png)
 
@@ -908,7 +908,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 - No retrieval metric layer.
 - No CI quality gate.
 
-**Concept.** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. A strong answer includes: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
+**Concept.** faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. In practice: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
 
 ![diagram](assets/diagrams/89f2dff7d52788034ab87f32c69f65269f39ba6d.png)
 
@@ -969,6 +969,48 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 | `agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py` | mock-based unit fixtures |
 | `agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py` | mock-based agentic test |
 | `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | rewrite (query generation from user input, not eval-set synthesis) |
+
+</details>
+
+---
+
+## 26. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** Assert on structural and behavioral invariants (right tool called, correct exit path, schema valid, within budget) rather than exact output strings — those will always fail on agents.
+
+**Key points.**
+
+- Tool invariants: right tool called, call was schema-valid, no prohibited tools invoked
+- Termination invariants: exited within max_turns via expected path (success/escalation/budget), not exception
+- Schema invariants: structured output matched declared JSON schema; required fields present
+- Safety and cost invariants: no guardrail-blocked content executed; total tokens within budget
+- Jiuwen strategy: mock ModelClientABC to inject controlled responses; test each rail contract independently; use LLM-as-judge for behavioral correctness on eval set
+
+**Concept.** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
+
+![diagram](assets/diagrams/2048f2899f1eab2f98b2027bf12dd654fc72aabf.png)
+
+**In Jiuwen.** ModelClientABC (agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1) is the mockable boundary — inject controlled responses in tests to isolate non-determinism to the model call layer. Rail contract invariants: CircuitBreakerRail (agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1) for termination; structured_output tool (agent-core/openjiuwen/harness/tools/structured_output/tool.py:1) for schema; GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) for safety; usage_cost.py:101 for budget. Behavioral correctness: LLMAsJudge (agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40). Gap: no official test harness; evaluator pipeline is offline, not integrated with pytest.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`VerificationRail` and `agent_evolving/evaluator/` provide LLM-as-judge for correctness. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — trips on failure threshold); `StructuredOutputTool` (schema invariant — validates against caller schema); `GuardrailRail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`ModelClientABC`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1` | ModelClientABC (mockable boundary) |
+| `agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1` | termination invariant contract |
+| `agent-core/openjiuwen/harness/tools/structured_output/tool.py:1` | schema invariant |
+| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | safety invariant |
+| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | cost invariant (session budget) |
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | behavioral correctness via LLM-as-judge |
 
 </details>
 

@@ -1,8 +1,8 @@
 # LLM terms glossary
 
-Based on the reference list *20 LLM Terms That Show Up in Every AI Engineering Interview*. This is a glossary, not a question list: interviewers assume you know these terms and expect you to *apply* them. So each entry has the definition, **where it bites** (the failure or decision it explains), and the concrete mechanism in this codebase.
+A glossary of twenty core LLM terms. Each entry has the definition, **where it bites** (the failure or decision it explains), and the concrete mechanism in this codebase.
 
-The definitions get you through a flashcard; knowing which term applies to a failure you're describing gets you through an interview. See [README](README.md) for the shared conventions (anchor format, repo layers).
+The definition is the starting point; the value is knowing which term applies to a failure you are describing. See [README](README.md) for the shared conventions (anchor format, repo layers).
 
 ---
 
@@ -362,7 +362,7 @@ flowchart TD
 
 ## Why this matters
 
-The definitions get you through a flashcard; knowing which term applies to a failure you're describing gets you through an interview. Each entry above pairs the definition with the failure it explains and the mechanism that handles it.
+Each entry above pairs the definition with the failure it explains and the mechanism that handles it.
 
 | Term | Where it most often bites |
 |---|---|

@@ -83,7 +83,7 @@ def main():
                         concept += f'<div class="diagram"><img src="images/{os.path.basename(p)}"/></div>'
             tech = ""
             plain = q.get("jiuwenPlain", "")
-            tech_text = q.get("mechanism", "") if plain else ""
+            tech_text = q.get("mechanism", "")
             td = q.get("diagramTechnical", {}) or {}
             if tech_text or q.get("citations") or td.get("image"):
                 tparts = ["<h3>Under the hood</h3>"]
@@ -105,7 +105,7 @@ def main():
             parts.append(
                 f'<h2 id="{qid}">{html.escape(q["question"])}</h2>{badges}{title}{summary}{pts}'
                 f'<h3>Concept</h3>{md(q.get("explain",""))}{concept}'
-                f'<h3>In Jiuwen</h3>{md(q.get("jiuwenPlain","")) or md(q.get("mechanism",""))}{tech}'
+                f'{"<h3>In Jiuwen</h3>" + md(plain) if plain else ""}{tech}'
             )
         ch = epub.EpubHtml(title=t["title"], file_name=fname, lang="en")
         ch.content = "".join(parts)

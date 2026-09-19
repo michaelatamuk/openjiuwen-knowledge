@@ -1,0 +1,44 @@
+{
+ "21-1": {
+  "title": "",
+  "tldr": "A workflow is a deterministic, pre-defined sequence of steps; an agent is a dynamic, model-driven loop.",
+  "points": [
+   "Use workflows when the sequence is fixed (extract → transform → classify), costs must be bounded, or the path can be fully tested",
+   "Use agents when the task requires open-ended reasoning, tool selection is context-dependent, or the goal is under-specified",
+   "Many production systems combine both: a deterministic outer workflow calling agent sub-tasks where flexibility is needed"
+  ]
+ },
+ "21-2": {
+  "title": "",
+  "tldr": "Two complementary protocols for extending AI systems: MCP for tools, A2A for agent-to-agent delegation.",
+  "points": [
+   "MCP (Model Context Protocol) — one LLM connects to many tool providers; centralized control, the agent decides which server to call",
+   "A2A (Agent-to-Agent Protocol) — agents coordinate with other agents; decentralized execution, possibly across deployments",
+   "They are complementary: MCP for tools, A2A for delegating to other agents",
+   "Most current frameworks implement MCP; A2A wire-protocol support is still emerging"
+  ]
+ },
+ "21-3": {
+  "title": "",
+  "tldr": "Multi-agent systems fall into four architectural types, and every one needs the same five components.",
+  "points": [
+   "Centralized — a single supervisor assigns tasks and aggregates results; simple to reason about, single point of failure",
+   "Decentralized (peer-to-peer) — agents communicate directly without a central coordinator; more resilient, harder to debug",
+   "Hierarchical — a tree of supervisors: a top-level agent delegates to mid-level agents, which delegate further; scales to complex tasks",
+   "Hybrid — combines patterns, e.g. centralized task assignment with peer-to-peer result sharing",
+   "Five components: agents (capabilities and roles), communication (message schemas), coordination (task assignment), shared memory/state, and environment/tool access"
+  ]
+ },
+ "21-4": {
+  "title": "",
+  "tldr": "Exact output strings cannot be asserted for agents, so tests target invariants: properties that must always hold.",
+  "points": [
+   "Tool invariants — required tools were called, forbidden tools were not, parameters were valid",
+   "Termination invariants — the agent stopped within N steps and did not loop",
+   "Schema invariants — outputs matched the required schema",
+   "Safety invariants — no prohibited content, no budget exceeded",
+   "Cost invariants — token usage stayed within budget",
+   "Complement with LLM-as-judge for behavioral correctness, and inject controlled model responses to test agent logic without live calls"
+  ]
+ }
+}

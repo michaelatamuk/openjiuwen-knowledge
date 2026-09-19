@@ -247,3 +247,44 @@ Supported but not the default: `agent_teams` provides a leader/teammate model wi
 </details>
 
 ---
+
+## 7. What are the four multi-agent architecture types and what components does every MAS need?
+
+<span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Centralized, decentralized, hierarchical, or hybrid — every MAS also needs agents, communication, coordination, shared memory, and environment.
+
+**Key points.**
+
+- Centralized: single manager, all agents report up — simple, debuggable, single point of failure
+- Decentralized: peer-to-peer — resilient, harder to ensure consistency
+- Hierarchical: manager agents oversee sub-agent teams (tree of authority) — handles complexity, adds delegation latency
+- Hybrid: combines patterns; e.g. centralized orchestrator with peer-to-peer specialists beneath
+- 5 components every MAS needs: agents, communication, coordination, shared memory, environment. Jiuwen: hierarchical via SubagentRail; LongTermMemory + EphemeralMemory for shared state; no peer-to-peer pattern
+
+**Concept.** Multi-agent systems (MAS) come in four structural patterns: (1) **Centralized** — all agents report to a single manager/supervisor that assigns tasks and aggregates results. Simple to reason about, single point of failure. (2) **Decentralized** — agents communicate directly with each other (peer-to-peer) with no central coordinator. Resilient but harder to ensure consistency. (3) **Hierarchical** — manager agents oversee sub-agent teams, which may themselves have managers — a tree of authority. Natural for complex decomposition (planner → domain-specialist teams → executors). (4) **Hybrid** — combines patterns; e.g., a centralized orchestrator with peer-to-peer specialist agents underneath. Every MAS needs five components regardless of architecture: **agents** (autonomous entities with specific roles), **communication** (message passing — structured output, shared state, or explicit handoff), **coordination** (how tasks are assigned and conflicts avoided), **shared memory** (knowledge and context accessible across agents), and **environment** (the external world or system agents act on). Choosing an architecture is a tradeoff: centralized is debuggable but bottlenecked; decentralized is resilient but harder to coordinate; hierarchical handles complexity but adds latency through multiple delegation layers.
+
+![diagram](assets/diagrams/20ce5f2672fb4daff22b8234bd65ae8b302aaf86.png)
+
+**In Jiuwen.** Architecture: hierarchical via SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1) and TaskPlanningRail (agent-core/openjiuwen/harness/rails/task_planning_rail.py:1). No peer-to-peer pattern exists. 5 components: agents (SubagentSpec configs), communication (SubagentRequest/SubagentResponse schemas), coordination (TaskPlanningRail task decomposition), shared memory (LongTermMemory at agent-core/openjiuwen/core/memory/long_term_memory.py:69 + EphemeralMemory), environment (external APIs via ToolCard and MCP servers).
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to specialized sub-agents via `SubagentRail`, which itself can call further sub-agents. `TaskPlanningRail` breaks the task and generates a plan before delegation. Shared memory is provided by `LongTermMemory` (cross-session KV store) and `EphemeralMemory` (within-session). Communication is structured via `SubagentRequest`/`SubagentResponse` schemas. There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1` | hierarchical delegation |
+| `agent-core/openjiuwen/harness/rails/task_planning_rail.py:1` | TaskPlanningRail (planner layer) |
+| `agent-core/openjiuwen/core/memory/long_term_memory.py:69` | shared long-term memory |
+| `agent-core/openjiuwen/core/memory/ephemeral_memory.py:1` | within-session shared state |
+| `SubagentRequest` | /SubagentResponse in agent-core/openjiuwen/harness/rails/subagent/ |
+
+</details>
+
+---

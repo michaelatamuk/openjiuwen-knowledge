@@ -64,7 +64,8 @@ python build_vault.py          # Obsidian vault zip
 
 `build_markdown.py` writes the compiled knowledge base to `knowledge/` (committed).
 `build_study.py` copies `knowledge/` into `build/docs`, so `build/` is disposable
-and gitignored.
+and gitignored. The raw documents in `source/` are an archive only — they are
+never copied into the site or any other published artifact.
 
 Helpers: `lint_mermaid.py` (Mermaid syntax check), `diagram_audit.py`
 (concept-vs-Jiuwen report → `build/diagram_audit.csv`), `serve.py` (serve

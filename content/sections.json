@@ -1,51 +1,57 @@
 {
   "sections": [
     {
-      "title": "ML foundations",
+      "title": "Foundations",
       "topics": [
-        "00"
-      ]
-    },
-    {
-      "title": "Model foundations",
-      "topics": [
+        "00",
         "01",
-        "02",
         "03",
-        "04"
+        "19",
+        "20"
       ]
     },
     {
-      "title": "Agents",
+      "title": "Working with models",
+      "topics": [
+        "02",
+        "04",
+        "17",
+        "23"
+      ]
+    },
+    {
+      "title": "RAG systems",
+      "topics": [
+        "10",
+        "11",
+        "12",
+        "14"
+      ]
+    },
+    {
+      "title": "Agent systems",
       "topics": [
         "05",
         "06",
         "07",
         "08",
-        "09"
+        "09",
+        "21"
       ]
     },
     {
-      "title": "RAG",
+      "title": "Evaluation & failure modes",
       "topics": [
-        "10",
-        "11",
-        "12",
         "13",
-        "14"
-      ]
-    },
-    {
-      "title": "Evaluation & production",
-      "topics": [
         "15",
-        "16"
+        "22"
       ]
     },
     {
-      "title": "Model adaptation",
+      "title": "Production & operations",
       "topics": [
-        "17"
+        "16",
+        "24"
       ]
     },
     {

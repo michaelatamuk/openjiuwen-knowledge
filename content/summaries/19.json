@@ -1,0 +1,129 @@
+{
+ "19-1": {
+  "title": "",
+  "tldr": "The Transformer architecture — self-attention replaces RNNs/CNNs for sequence modeling.",
+  "points": [
+   "The Transformer architecture — self-attention replaces RNNs/CNNs for sequence modeling.",
+   "Multi-head attention, positional encoding, and the encoder-decoder structure become the foundation for BERT, GPT, T5, and all subsequent LLMs."
+  ]
+ },
+ "19-2": {
+  "title": "",
+  "tldr": "Masked language modeling (MLM) as a pretraining objective enables bidirectional context.",
+  "points": [
+   "Masked language modeling (MLM) as a pretraining objective enables bidirectional context.",
+   "The pretrain-then-finetune paradigm: one large pretrained model + thin task head + small labeled dataset, replacing per-task training.",
+   "MLM randomly masks 15% of input tokens and trains the model to predict them — forcing bidirectional context unlike GPT's left-to-right objective."
+  ]
+ },
+ "19-3": {
+  "title": "",
+  "tldr": "In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale.",
+  "points": [
+   "In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale.",
+   "At 175B parameters, few-shot performance approaches fine-tuned baselines on many benchmarks.",
+   "Scale enables a model to recognize task patterns from prefix sequences and apply them at inference time."
+  ]
+ },
+ "19-4": {
+  "title": "",
+  "tldr": "Compute-optimal training is ~20 tokens per parameter.",
+  "points": [
+   "Compute-optimal training is ~20 tokens per parameter.",
+   "Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen.",
+   "Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters."
+  ]
+ },
+ "19-5": {
+  "title": "",
+  "tldr": "RLHF pipeline for alignment: SFT on demonstrations → reward model trained on human preferences → PPO to maximize reward.",
+  "points": [
+   "RLHF pipeline for alignment: SFT on demonstrations → reward model trained on human preferences → PPO to maximize reward.",
+   "The paper behind ChatGPT's instruction-following."
+  ]
+ },
+ "19-6": {
+  "title": "",
+  "tldr": "DPO eliminates the separate reward model and RL loop from RLHF.",
+  "points": [
+   "DPO eliminates the separate reward model and RL loop from RLHF.",
+   "Given (prompt, chosen, rejected) preference pairs, DPO directly optimizes the policy via a weighted cross-entropy loss — simpler, more stable, equivalent alignment."
+  ]
+ },
+ "19-7": {
+  "title": "",
+  "tldr": "Freeze all pretrained weights; inject two small trainable matrices A and B at each target layer (ΔW = BA, rank r ≪ hidden dim).",
+  "points": [
+   "Freeze all pretrained weights; inject two small trainable matrices A and B at each target layer (ΔW = BA, rank r ≪ hidden dim).",
+   "<1% trainable parameters; multiple adapters can share one base model."
+  ]
+ },
+ "19-8": {
+  "title": "",
+  "tldr": "Foundational RAG paper.",
+  "points": [
+   "Foundational RAG paper.",
+   "Ground generation in a retrieved knowledge base — combine a dense retriever (DPR) with a seq2seq generator — instead of relying purely on parametric memory."
+  ]
+ },
+ "19-9": {
+  "title": "",
+  "tldr": "Including step-by-step reasoning examples in the prompt (chain-of-thought few-shot) significantly improves performance on multi-step arithmetic, commonsense, and symbolic reasoning tasks.",
+  "points": [
+   "Including step-by-step reasoning examples in the prompt (chain-of-thought few-shot) significantly improves performance on multi-step arithmetic, commonsense, and symbolic reasoning tasks."
+  ]
+ },
+ "19-10": {
+  "title": "",
+  "tldr": "Interleave reasoning traces (Think) with tool calls (Act) and observations in the prompt.",
+  "points": [
+   "Interleave reasoning traces (Think) with tool calls (Act) and observations in the prompt.",
+   "This enables dynamic planning, error correction, and grounded retrieval within an agent loop."
+  ]
+ },
+ "19-11": {
+  "title": "",
+  "tldr": "Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time.",
+  "points": [
+   "Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time.",
+   "Stable supervised objective; enables high-quality image generation.",
+   "Foundation for Stable Diffusion, DALL-E 2."
+  ]
+ },
+ "19-12": {
+  "title": "",
+  "tldr": "Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space.",
+  "points": [
+   "Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space.",
+   "Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG.",
+   "Text and image encoders trained together; cosine similarity between text and image embeddings is semantically meaningful."
+  ]
+ },
+ "19-13": {
+  "title": "",
+  "tldr": "Tiled attention computation that stays in SRAM — never materializes the full NxN attention matrix in HBM.",
+  "points": [
+   "Tiled attention computation that stays in SRAM — never materializes the full NxN attention matrix in HBM.",
+   "O(N) memory, 2–4× faster, enables practical long-context (32k–1M token) training and inference.",
+   "Standard attention is O(N²) in memory."
+  ]
+ },
+ "19-14": {
+  "title": "",
+  "tldr": "Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs.",
+  "points": [
+   "Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs.",
+   "1.6T-parameter model at ~same compute as dense 7B; 4× speedup over T5-XXL.",
+   "MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense."
+  ]
+ },
+ "19-15": {
+  "title": "",
+  "tldr": "Replace most human preference labeling with model self-critique against explicit principles (the \"constitution\").",
+  "points": [
+   "Replace most human preference labeling with model self-critique against explicit principles (the \"constitution\").",
+   "SL-CAI: generate → critique → revise → SFT.",
+   "RL-CAI: model-generated preference pairs → reward model → RLHF."
+  ]
+ }
+}

@@ -196,7 +196,7 @@ Prompts are assembled from named `PromptSection`s ordered by priority (`SystemPr
 - Diagnostics ≠ versioning.
 - Rollback only at harness-package level.
 
-**Concept.** treating prompts like code (not one-off strings), testing prompt changes against a fixed eval set, a rollback plan when a change degrades output, and tracking which prompt version produced which output in logs. A strong answer includes: version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and be able to roll back in one step.
+**Concept.** treat prompts like code, not one-off strings. Version prompts in source control or a prompt store with an immutable ID/hash, run a fixed eval on every change, gate the deploy, log the prompt version with the output, and keep a one-step rollback for changes that degrade output.
 
 ![diagram](assets/diagrams/0e90139d948e0c1355b7b08dec4d5441730d7ecb.png)
 

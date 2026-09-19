@@ -120,8 +120,8 @@ def build():
             concept = "".join(inline_img(d.get("image", "")) for d in (q.get("diagrams") or [q.get("diagram", {})]))
             tech = inline_img(q.get("diagramTechnical", {}).get("image", ""))
             plain = q.get("jiuwenPlain", "")
-            jiu = md(plain) or md(q.get("mechanism", ""))
-            tech_text = q.get("mechanism", "") if plain else ""
+            jiu = md(plain)
+            tech_text = q.get("mechanism", "")
             tparts = []
             if tech_text:
                 tparts.append('<div class="tech-t">Implementation</div>' + md(tech_text))
@@ -141,7 +141,7 @@ def build():
                 f'<div class="answer">{points_html(q.get("points", []))}'
                 f'<div class="section-t">Concept</div>{md(q.get("explain",""))}'
                 f'{concept}'
-                f'<div class="section-t">In Jiuwen</div>{jiu}'
+                f'{("<div class=\'section-t\'>In Jiuwen</div>" + jiu) if jiu else ""}'
                 f'{tech_block}'
                 f'</div></section>'
             )

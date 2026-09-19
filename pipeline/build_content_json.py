@@ -360,7 +360,7 @@ def main():
     if os.path.isfile(CLASSIFICATION_JSON):
         classification = json.load(open(CLASSIFICATION_JSON, encoding="utf-8"))
     files = sorted(f for f in glob.glob(os.path.join(TOPICS, "*.md"))
-                   if re.match(r"^(0[0-9]|1[0-8])-", os.path.basename(f)))
+                   if re.match(r"^(0[0-9]|1[0-9]|2[0-9])-", os.path.basename(f)))
     os.makedirs(os.path.join(OUT, "diagrams"), exist_ok=True)
     today = date.today().isoformat()
     topics, missing, total, rendered, pending = [], 0, 0, 0, 0

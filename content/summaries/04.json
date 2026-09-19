@@ -1,63 +1,63 @@
 {
-  "04-1": {
-    "title": "When to use an LLM vs rules",
-    "tldr": "Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.",
-    "points": [
-      "Rules: enumerable, auditable, reproducible.",
-      "LLM: semantic, ambiguous, open-ended.",
-      "Prefer rules; add the LLM where needed."
-    ]
-  },
-  "04-2": {
-    "title": "Larger vs smaller model",
-    "tldr": "Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.",
-    "points": [
-      "Large for reasoning/ambiguity.",
-      "Small/fast for classification/extraction/routing.",
-      "Measure quality per task; weigh latency/cost."
-    ]
-  },
-  "04-3": {
-    "title": "Compare two approaches: tests tradeoff reasoning",
-    "tldr": "'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.",
-    "points": [
-      "top_k defaults 5, no adaptive policy.",
-      "Reranking absent from the KB path.",
-      "Model allocation is availability-based.",
-      "Session cost tracked and capped."
-    ]
-  },
-  "04-4": {
-    "title": "Ask before you design: four questions to open any system design brief",
-    "tldr": "Extract the four binding constraints before proposing any architecture: latency budget, query volume, accuracy floor, and cost envelope.",
-    "points": [
-      "Latency budget — real-time (≤200ms) or async? Rules out reranking and large-model calls in the critical path",
-      "Query volume — p50/p99 RPS? Rules out expensive retrievers per query at scale",
-      "Accuracy floor — what is the cost of a wrong answer? Rules out small/fast models for high-stakes tasks",
-      "Cost envelope — $/query budget? Forces routing, caching, and smaller models when tight",
-      "Jumping to architecture without asking these signals inexperience; the interviewer is watching whether and what you ask"
-    ]
-  },
-  "04-5": {
-    "title": "How to make a defensible model selection decision with evidence",
-    "tldr": "Define an eval set, run all candidates, record quality + latency + cost, plot the curves, and pick the knee — not the highest-accuracy option.",
-    "points": [
-      "Eval set must be representative of the actual use-case distribution, not cherry-picked examples",
-      "Run every candidate on the same eval set; record quality score, latency, and cost per query",
-      "Plot cost-accuracy and latency-accuracy curves to find the knee: where extra spend buys diminishing quality gain",
-      "Pick the option that meets the requirement with minimum overhead — not the top-accuracy option",
-      "Jiuwen gap: evaluators measure quality only; cost and latency are not correlated to eval scores in the pipeline"
-    ]
-  },
-  "04-6": {
-    "title": "The 7-layer AI system architecture every engineer must know",
-    "tldr": "Data → Model → Inference → Retrieval (RAG) → Orchestration → Safety → Infrastructure. Every production AI product runs all 7 simultaneously; most developers interact only with Layer 5.",
-    "points": [
-      "Layer 1 Data: collection, cleaning, storage (vector DB/object store/data lake), versioning",
-      "Layer 2 Model: base, fine-tuned, embedding, multimodal",
-      "Layer 3 Inference: tokenizer, context window, temperature, KV cache, quantization",
-      "Layer 4 RAG: vector store, retriever, reranker, context injection",
-      "Layers 5-7: orchestration (prompt+memory+tools+agent loop), safety (guardrails+alignment+filter), infrastructure (GPU+LB+API GW+observability). Jiuwen covers Layers 4-6 directly."
-    ]
-  }
+ "04-1": {
+  "title": "When to use an LLM vs rules",
+  "tldr": "Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.",
+  "points": [
+   "Rules: enumerable, auditable, reproducible.",
+   "LLM: semantic, ambiguous, open-ended.",
+   "Prefer rules; add the LLM where needed."
+  ]
+ },
+ "04-2": {
+  "title": "Larger vs smaller model",
+  "tldr": "Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.",
+  "points": [
+   "Large for reasoning/ambiguity.",
+   "Small/fast for classification/extraction/routing.",
+   "Measure quality per task; weigh latency/cost."
+  ]
+ },
+ "04-3": {
+  "title": "Compare two approaches: tests tradeoff reasoning",
+  "tldr": "'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.",
+  "points": [
+   "top_k defaults 5, no adaptive policy.",
+   "Reranking absent from the KB path.",
+   "Model allocation is availability-based.",
+   "Session cost tracked and capped."
+  ]
+ },
+ "04-4": {
+  "title": "Ask before you design: four questions to open any system design brief",
+  "tldr": "Extract the four binding constraints before proposing any architecture: latency budget, query volume, accuracy floor, and cost envelope.",
+  "points": [
+   "Latency budget — real-time (≤200ms) or async? Rules out reranking and large-model calls in the critical path",
+   "Query volume — p50/p99 RPS? Rules out expensive retrievers per query at scale",
+   "Accuracy floor — what is the cost of a wrong answer? Rules out small/fast models for high-stakes tasks",
+   "Cost envelope — $/query budget? Forces routing, caching, and smaller models when tight",
+   "Propose an architecture only after these constraints are known"
+  ]
+ },
+ "04-5": {
+  "title": "How to make a defensible model selection decision with evidence",
+  "tldr": "Define an eval set, run all candidates, record quality + latency + cost, plot the curves, and pick the knee — not the highest-accuracy option.",
+  "points": [
+   "Eval set must be representative of the actual use-case distribution, not cherry-picked examples",
+   "Run every candidate on the same eval set; record quality score, latency, and cost per query",
+   "Plot cost-accuracy and latency-accuracy curves to find the knee: where extra spend buys diminishing quality gain",
+   "Pick the option that meets the requirement with minimum overhead — not the top-accuracy option",
+   "Jiuwen gap: evaluators measure quality only; cost and latency are not correlated to eval scores in the pipeline"
+  ]
+ },
+ "04-6": {
+  "title": "The 7-layer AI system architecture every engineer must know",
+  "tldr": "Data → Model → Inference → Retrieval (RAG) → Orchestration → Safety → Infrastructure. Every production AI product runs all 7 simultaneously; most developers interact only with Layer 5.",
+  "points": [
+   "Layer 1 Data: collection, cleaning, storage (vector DB/object store/data lake), versioning",
+   "Layer 2 Model: base, fine-tuned, embedding, multimodal",
+   "Layer 3 Inference: tokenizer, context window, temperature, KV cache, quantization",
+   "Layer 4 RAG: vector store, retriever, reranker, context injection",
+   "Layers 5-7: orchestration (prompt+memory+tools+agent loop), safety (guardrails+alignment+filter), infrastructure (GPU+LB+API GW+observability). Jiuwen covers Layers 4-6 directly."
+  ]
+ }
 }

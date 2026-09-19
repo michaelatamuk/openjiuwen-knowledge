@@ -627,7 +627,7 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 - Multi-stage compaction.
 - FIFO drop beyond message cap.
 
-**Concept.** why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. The interviewer is checking whether you reason about context *contents*, not model capability. A strong answer includes: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
+**Concept.** why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. Reason about context *contents*, not model capability: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
 
 ![diagram](assets/diagrams/6f8e562afe712788463475e4f6b632d565128a10.png)
 
@@ -649,6 +649,397 @@ The context engine decides what is in the window and how it is trimmed: a strict
 | `agent-core/openjiuwen/core/context_engine/context/message_buffer.py:71` | FIFO drop |
 | `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | offload threshold |
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | compaction |
+
+</details>
+
+---
+
+## 17. What was BERT's key contribution, and why did the pretrain-then-finetune paradigm change everything?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** BERT introduced bidirectional MLM pretraining and made pretrain-then-finetune the standard NLP template.
+
+**Key points.**
+
+- Masked language model (MLM): randomly mask 15% of tokens, train to predict them — forces bidirectional context
+- Unlike GPT's left-to-right autoregressive objective, MLM produces richer contextual representations
+- Pretrain-then-finetune: one large pretrained encoder + thin task head + small labeled dataset = replaces per-task training
+- Template became the foundation of transfer learning for NLP and beyond
+- Jiuwen: BERT-family models appear as frozen embedding encoders and finetuned classifiers (guardrail)
+
+**Concept.** BERT (Devlin et al. 2018) made two contributions. First, the **masked language model (MLM)** pretraining objective: randomly mask 15% of input tokens and train the model to predict them. Unlike GPT's left-to-right objective, MLM forces the model to attend to both left and right context simultaneously — producing richer bidirectional representations. Second, and more broadly important, it demonstrated the **pretrain-then-finetune paradigm** at scale: pretrain one large encoder on unlabeled text, then add a thin task-specific head and finetune on a small labeled dataset. This template — one general pretrained model, many downstream tasks — replaced the prior approach of training a separate model per task and became the foundation of modern transfer learning for NLP and beyond.
+
+![diagram](assets/diagrams/f110f17a4d36fa056e36a4aadc2f95f62994eac0.png)
+
+**In Jiuwen.** BERT-family models appear in two roles: (1) AutoModelForSequenceClassification (agent-core/openjiuwen/core/security/guardrail/backends.py:445) as a finetuned classifier for GuardrailRail; model_type accepts 'bert' (builtin.py:174). (2) SentenceTransformerEmbedding (agent-core/openjiuwen/core/retrieval/embedding/sentence_transformer_embedding.py:1) as frozen pretrained encoder for document embeddings — no finetune path in the KB pipeline. The SFT path in agent_rl/ covers decoder-only generation models only.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+BERT-family models appear in two roles. As encoder-only **classifiers**: `guardrail_rail.py` loads `AutoModelForSequenceClassification` (a finetuned BERT-style model) for harmful-content classification. As **embedding models**: sentence transformers (also BERT-derived) are used frozen for document embedding — pretrained, not finetuned within this codebase. The SFT path in `agent_rl/` is the finetune stage but applies to decoder-only generation models, not BERT encoders.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:445` | AutoModelForSequenceClassification (finetuned BERT-family) |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:174` | model_type accepts "bert" |
+| `agent-core/openjiuwen/core/retrieval/embedding/sentence_transformer_embedding.py:1` | frozen pretrained encoder for embeddings |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | finetune stage (decoder-only models) |
+
+</details>
+
+---
+
+## 18. What is in-context learning, and why was GPT-3 the paper that established it?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** ICL — performing a task from prompt examples without weight update — emerges at scale; GPT-3 established this at 175B.
+
+**Key points.**
+
+- In-context learning (ICL): model performs a task from examples in the prompt with no weight update
+- GPT-3 (175B) showed few-shot accuracy approaching fine-tuned baselines; smaller GPT versions did not
+- Mechanism: diverse pretraining implicitly teaches pattern recognition from prefix sequences
+- Practical implication: prompting became the primary interface for using LLMs, not per-task fine-tuning
+- Jiuwen gap: no retrieval-augmented ICL (no system selects similar few-shot examples per query)
+
+**Concept.** In-context learning (ICL) is the ability of a large language model to perform a new task from examples placed directly in the prompt — **without any weight update**. GPT-3 (Brown et al. 2020, 175B parameters) demonstrated that this capability emerges at scale: smaller GPT versions showed weak few-shot performance, but at 175B, few-shot accuracy on many benchmarks approached fine-tuned baselines. The mechanism: pretraining on diverse text implicitly teaches the model to recognize task patterns from prefix sequences; a few in-context examples "activate" the relevant completion behavior at inference time. The practical implication: prompting became the primary interface for steering LLMs, not per-task fine-tuning — changing how practitioners think about deploying models.
+
+![diagram](assets/diagrams/b31e97e1ff0f40c521e5b8cc2524e9f9af790ee1.png)
+
+**In Jiuwen.** RuntimePromptRail (agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1) and PromptTemplate/PromptSection (agent-core/openjiuwen/harness/prompts/template.py:1) are the ICL interface — few-shot examples and instructions are injected as prompt sections. The SFT path in agent_rl/online/backends/sft/trainer.py:1 bakes improvements into weights (weight-update path, reducing reliance on ICL). No retrieval-augmented ICL: there is no system that selects similar demonstrations by query similarity to include in context.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+At inference time, `PromptTemplate` and `PromptSection` are the ICL interface: few-shot examples and system instructions are injected as prompt sections at runtime by `RuntimePromptRail`. The SFT path in `agent_rl/` does bake improvements into weights (reducing reliance on ICL), but day-to-day agent behavior is primarily shaped by prompt construction. There is no demonstration retrieval (no system that selects the most relevant few-shot examples by similarity to the current query — so-called "retrieval-augmented ICL").
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/prompts/template.py:1` | PromptTemplate / PromptSection |
+| `agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1` | RuntimePromptRail (dynamic injection) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT (weight update path) |
+
+</details>
+
+---
+
+## 19. What did the Chinchilla paper change about how we train large models?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Compute-optimal training is ~20 tokens per parameter; most large models (GPT-3, Gopher) were undertrained.
+
+**Key points.**
+
+- Empirical finding: for a fixed compute budget, scale model size and training tokens roughly equally (~20 tokens/param)
+- GPT-3 (175B, 300B tokens) and Gopher (280B, 300B tokens) were undertrained relative to their size
+- Chinchilla (70B, 1.4T tokens) outperformed Gopher (280B) despite being 4× smaller
+- Takeaway: for fixed compute, prefer a smaller model trained on more data
+- Jiuwen: pretraining is out of scope; Chinchilla-aware decisions (which base model, how much SFT data) are operator-level
+
+**Concept.** Hoffmann et al. 2022 (DeepMind) systematically varied parameter count and training token budget across hundreds of runs to find the **compute-optimal** configuration: for a given FLOPs budget, roughly **20 training tokens per parameter** is optimal. Prior large models (GPT-3 175B trained on ~300B tokens, Gopher 280B on 300B tokens) were **undertrained** — they had too many parameters for the data they saw. Chinchilla (70B parameters, trained on 1.4T tokens) outperformed Gopher (280B) despite being 4× smaller, because the data budget matched the parameter count. Practically: for a fixed compute budget, you should prefer a smaller model trained on more data over a larger model trained on less. This reframed the scaling law debate — data matters as much as parameters.
+
+![diagram](assets/diagrams/0a3f7d250dc4ec48165bcb6494d02c770234bb3e.png)
+
+**In Jiuwen.** Pretraining is out of scope. agent_rl/ handles SFT (stage 1) and RL fine-tuning (stages 2-3) starting from a fixed pre-trained base model (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1 and offline_config.py:1). Chinchilla-aware decisions — which base model to select, how much SFT data to collect relative to model size — are human/operator choices. No compute-optimal token budget calculator or data-to-parameter ratio check exists in the codebase.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Pretraining is outside the framework's scope. The SFT and RL fine-tuning paths in `agent_rl/` use a fixed pre-trained base model. Chinchilla-aware decisions — which base model to select, how much SFT data to collect relative to model size — are human/operator-level choices, not framework policy. There is no compute-optimal token budget calculator or data-to-parameter ratio check.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT uses fixed base model (no pretraining) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:1` | offline RL config (no data-to-parameter ratio policy) |
+
+</details>
+
+---
+
+## 20. What is FlashAttention and why does it matter for building long-context systems?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** FlashAttention tiles attention into SRAM to avoid materializing the NxN matrix, giving O(N) memory and enabling 32k–1M context.
+
+**Key points.**
+
+- Standard attention: O(N²) HBM memory — the full NxN attention matrix is written to GPU memory
+- FlashAttention: tiles computation into SRAM blocks, never writes the full matrix — O(N) memory, 2-4× faster
+- Enables practical long-context training and inference (32k, 128k, 1M tokens)
+- Used by default in modern LLMs and serving frameworks (vLLM, TRT-LLM)
+- Jiuwen manages long context at application level (offloading, compaction); FlashAttention is the serving infrastructure layer
+
+**Concept.** Standard self-attention materializes an N×N attention matrix in GPU high-bandwidth memory (HBM), giving O(N²) memory complexity in sequence length N. FlashAttention (Dao et al. 2022) is **IO-aware**: it tiles the computation into blocks that fit in the faster on-chip SRAM, computing attention without ever writing the full NxN matrix to HBM. Result: **O(N) memory** (the matrix is never materialized), 2–4× faster wall-clock time for typical sequence lengths, and practical training/inference at 32k–1M tokens. Without FlashAttention (or equivalent — xFormers, Flex Attention), training on sequences longer than ~8k tokens was memory-prohibitive. Most modern LLMs and inference servers (vLLM, TRT-LLM) use it by default. For practitioners: FlashAttention is why long-context models exist, and why "does this serving framework support FlashAttention?" is a production question.
+
+![diagram](assets/diagrams/558ff61e704558e8e166dcbf91b07c657316fcfc.png)
+
+**In Jiuwen.** FlashAttention is an infrastructure concern handled by the serving layer: vLLM (agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175) enables it in the backend. Jiuwen manages long context at the application level: tool_result_budget_processor.py:34 offloads tool results >50k tokens; tool_result_window_processor.py keep_last_k=3; full_compact_processor.py:184 compacts at 180k. These application guards are necessary even with FlashAttention because cost per call and lost-in-the-middle effects remain.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+FlashAttention is handled at the infrastructure layer below the framework — by the base model weights and the serving backend (vLLM in `symphony/retrieval/llm/`). Jiuwen manages long context at the **application** level: tool-result offloading (>50k tokens), `keep_last_k` windowing, and LLM-based compaction at 180k tokens. These application-level guards are necessary even with FlashAttention because attention still degrades at very long contexts (lost-in-the-middle, cost per call) regardless of the memory technique.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175` | vLLM-backed serving (FlashAttention enabled by vLLM, not by framework) |
+| `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | 50k offload |
+| `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | 180k compaction |
+
+</details>
+
+---
+
+## 21. What is Mixture of Experts (MoE), and how does Switch Transformers show it scales capacity without proportional compute?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** MoE activates only k of N expert networks per token — scaling total parameters without proportional FLOPs.
+
+**Key points.**
+
+- Dense FFN: every token processed by every parameter → FLOPs ∝ total parameters
+- MoE FFN: N experts + learned router activates k (1–2) per token → FLOPs ≈ k-expert dense, total params = N×k
+- Switch Transformers (k=1): 1.6T-parameter model at ~same FLOPs as dense 7B; 4× speedup over T5-XXL
+- Practitioner implication: a 47B MoE model (e.g. Mixtral 8×7B, ~13B active) has far lower inference FLOPs than a 47B dense model
+- Jiuwen: model architecture is opaque (selected by name/provider string); no MoE-aware routing or expert metadata
+
+**Concept.** In a standard dense Transformer, every token passes through every parameter in every layer. **Mixture of Experts** replaces each feed-forward sublayer with N expert networks plus a learned **router** that activates only k of them (typically k=1 or 2) per token. Total parameter count is N×(expert size), but FLOPs per token stay ~constant because only k experts are active. Switch Transformers (Fedus et al. 2021) simplified routing to k=1 and showed a 1.6T-parameter model can be trained at roughly the same FLOPs as a dense 7B model at the same training step — a 4× speed improvement over T5-XXL. Modern MoE deployments: Mixtral 8×7B (active params ~13B out of 47B total), Gemini 1.0 Ultra, Grok-1. Practitioner implication: a model's **total parameter count overstates its compute cost** for MoE architectures — a 47B MoE is not a 47B dense model in terms of inference FLOPs.
+
+![diagram](assets/diagrams/7887e8bfea084c036bf465f52862305277369853.png)
+
+**In Jiuwen.** Model architecture (dense vs MoE) is fully opaque to the framework. ModelPoolEntry (agent-core/openjiuwen/agent_teams/models/pool.py:38) and allocators (allocator.py:559) handle endpoint distribution by availability (round-robin, by-model-name, IntelliRouter by rate). No MoE-aware routing, expert count metadata, or active-parameter tracking exists. Architecture string is available in the vLLM serving config (symphony/retrieval/search/service/serving.py:35) but is not propagated upward.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The framework selects models by provider/model-name string and does not expose MoE-aware metadata. `ModelPoolEntry` and the allocators are endpoint distribution mechanisms, not expert routers. Whether the underlying model is dense or MoE is opaque to the framework — the only operational implication is that MoE models may have higher memory requirements (all experts must be loaded) despite lower FLOPs.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType (architecture not a config dimension) |
+| `agent-core/openjiuwen/agent_teams/models/pool.py:38` | ModelPoolEntry (endpoint distribution, not expert routing) |
+| `agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:35` | vLLM architectures string (closest to architecture awareness) |
+
+</details>
+
+---
+
+## 22. What is CLIP, and how does it enable multimodal retrieval?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** CLIP trains image and text encoders jointly via contrastive learning, enabling text-to-image and image-to-text retrieval with no task labels.
+
+**Key points.**
+
+- Contrastive pretraining on 400M (image, text) pairs: push matching pairs close, mismatched pairs apart
+- Result: shared embedding space where cosine similarity between text and image embeddings is semantically meaningful
+- Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG
+- Underpins DALL-E 2's text conditioning and Stable Diffusion's text-image alignment
+- Jiuwen gap: text-only embedding pipeline; MultimodalImageRail sends images to generation, not to a shared embedding index
+
+**Concept.** CLIP (Contrastive Language-Image Pretraining, Radford et al. 2021) trains an image encoder and a text encoder **jointly** via contrastive learning on 400M internet (image, text) pairs. The training objective: push the embedding of a matching (image, text) pair close together in a shared vector space, push mismatched pairs apart. The result is a **shared embedding space** where cosine similarity between a text embedding and an image embedding is semantically meaningful — enabling zero-shot image classification, text-to-image retrieval, and image-to-text retrieval without task-specific labeling. CLIP underpins DALL-E 2's text-to-image alignment, Stable Diffusion's text conditioning, and multimodal RAG systems that index images alongside text. For practitioners: CLIP-based retrieval lets you run a text query against an image index (or vice versa) using the same vector search infrastructure as text-only RAG.
+
+![diagram](assets/diagrams/7f83c8b4c3f9b6f0926efa52d86a7bb52fbedf8e.png)
+
+**In Jiuwen.** Embedding pipeline (APIEmbedding, SentenceTransformerEmbedding) is text-only — no image encoder or multimodal embedding path. DocumentChunk has no image-content field. MultimodalImageRail (agent-core/openjiuwen/harness/rails/multimodal_image_rail.py:1) handles image inputs from users but routes them directly to the generation model, not to a shared embedding index. CLIP-based cross-modal retrieval is absent.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The embedding pipeline (`APIEmbedding`, `SentenceTransformerEmbedding`) handles text only — no image encoder, no multimodal embedding path. `DocumentChunk` has no image-content field. CLIP-based retrieval is absent; image-text cross-modal search is not supported. Multimodal input exists in a different dimension: `MultimodalImageRail` handles image inputs from users, but passes them to the generation model directly, not to a shared embedding index.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/embedding/sentence_transformer_embedding.py:1` | text-only encoder |
+| `agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:1` | text-only API embedding |
+| `agent-core/openjiuwen/harness/rails/multimodal_image_rail.py:1` | image input → generation (not retrieval) |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:1` | no image chunk type |
+
+</details>
+
+---
+
+## 23. What is the denoising diffusion mechanism behind Stable Diffusion and DALL-E?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** Train a network to reverse a noise-addition process step by step; run inference from pure noise to generate images.
+
+**Key points.**
+
+- Forward process: add Gaussian noise over T steps until signal is destroyed
+- Reverse process: U-Net trained to predict the noise at each step and subtract it
+- Inference: start from pure noise, run reverse T steps → generated image
+- Latent diffusion (Stable Diffusion): run forward/reverse in VAE-compressed latent space — ~8× compute reduction
+- Practitioner levers: number of steps, guidance scale, and scheduler type all map directly to the reverse diffusion process
+
+**Concept.** Denoising Diffusion Probabilistic Models (DDPM, Ho et al. 2020) define two processes. **Forward**: add Gaussian noise to an image over T steps until the image is pure noise (a known distribution). **Reverse**: train a neural network (U-Net) to denoise one step at a time — predict the noise added at each step and subtract it. At inference: sample pure noise, run the reverse process T times, get a generated image. The insight is that denoising is a stable, well-defined supervised objective. **Latent Diffusion Models** (Stable Diffusion) extend this by running the forward/reverse process in a compressed **latent space** (encoded by a VAE) rather than pixel space — reducing compute by ~8×. DALL-E 2 uses diffusion in the CLIP embedding space. For practitioners: generation quality levers (number of denoising steps, guidance scale, scheduler type) directly map to the reverse diffusion process.
+
+![diagram](assets/diagrams/092a9d72686196a7549a53a01269a10938991651.png)
+
+**In Jiuwen.** No diffusion model integration exists in the framework. Image generation tools (DALL-E, Stable Diffusion API) would be invoked as external tool calls via ToolCard definitions (agent-core/openjiuwen/core/foundation/tool/base.py:90). The SVG avatar system in jiuwenswarm-bee/src/avatar/ uses procedural animation (keyframe interpolation, state machine), not diffusion-based generation.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Jiuwen is a language agent framework with no image generation capability or diffusion model integration. Image generation tools (DALL-E, Stable Diffusion API) would be invoked as external tool calls via `ToolCard` definitions. The SVG avatar system in `jiuwenswarm-bee` uses procedural animation, not diffusion-based generation.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `ToolCard` | call |
+| `jiuwenswarm-bee/src/avatar/` | procedural SVG animation (not diffusion) |
+
+</details>
+
+---
+
+## 24. What is the KV cache and how does it affect inference cost and speed?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** KV cache stores computed key/value tensors for prefix tokens, making each decode step O(1) instead of O(N). Prompt cache hits cost ~10% of normal input token price.
+
+**Key points.**
+
+- Prefill phase processes all input tokens in parallel; decode phase generates one token per step reusing cached K/V
+- Without KV cache: decoding N tokens from prompt P costs O((P+N)²); with it: amortized O(P+N)
+- Prompt caching (Anthropic, OpenAI): stable prefix cached across API calls → ~10% input token cost for cached tokens
+- Strategy: put stable system prompt first, variable query last to maximize cache hits
+- Jiuwen observes cache hits via ProviderUsage.cached_input_tokens but does not control provider-side cache policy
+
+**Concept.** During autoregressive decoding, the transformer computes key (K) and value (V) vectors for every token in every layer. For the input prefix these computations don't change as new tokens are generated — so they can be cached. The **KV cache** stores K and V tensors for all processed tokens so far: on each decode step only the new token's K/V is computed, and the cached values are reused. Without KV cache, generating N tokens from a prompt of P tokens costs O((P+N)²) compute; with it, the decode phase amortizes to O(P+N). **Prompt caching** (Anthropic, OpenAI, Google) extends this across API calls: if your request begins with a cached prefix, you pay ~10% of the normal input token cost for those cached tokens. Practical implication: put your stable system prompt and long context at the *beginning* of the message, and put the variable user query at the *end* — this maximizes cache hits across repeated calls.
+
+![diagram](assets/diagrams/35fb263ae1f7219ea412131c0262cc4634538655.png)
+
+**In Jiuwen.** ProviderUsage (agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14) normalizes cached_input_tokens from provider usage metadata. session_aggregator.py:45 tracks cache hit rates in tokens. The framework cannot control provider-side KV cache policy — it observes whether the provider reported a hit. Prompt-prefix stability is indirectly improved by full_compact_processor.py:184 (compaction at 180k keeps stable prefixes at the top).
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The context engine is cache-aware: `ProviderUsage` (agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14) normalizes `cached_input_tokens` from provider usage metadata, and `session_aggregator.py:45` tracks cache hit rates in tokens. The framework can only observe whether the provider reported a cache hit; it does not control the provider-side KV cache. Indirectly, the context engine's full-compaction and offloading strategy keeps long stable prefixes (system prompt, background context) at the top of the prompt, which improves cache-hit rate on re-queries.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14` | normalizes cached_input_tokens from usage metadata |
+| `agent-core/openjiuwen/core/context_engine/usage/session_aggregator.py:45` | cache hit-rate aggregation (tokens, not dollars) |
+| `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | prefix-preserving compaction (indirectly improves cache locality) |
+
+</details>
+
+---
+
+## 25. What is the difference between a base model and an instruct model?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** A base model predicts text; an instruct model has been through SFT + reward modeling + RLHF/DPO to follow instructions and decline harmful requests.
+
+**Key points.**
+
+- Base model: next-token prediction on massive corpus — no assistant persona, completes in any style seen during training
+- Stage 1 SFT: fine-tune on helpful demonstrations — teaches format and tone
+- Stage 2: reward model trained on human preference rankings
+- Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior
+- Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base
+
+**Concept.** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
+
+![diagram](assets/diagrams/a304b162e1d37615c8b1c48fbc8784eab24df514.png)
+
+**In Jiuwen.** No base/instruct distinction in model config schema: ProviderType + model_name string selects a model (agent-core/openjiuwen/core/foundation/llm/schema/config.py:13). agent_rl/online/backends/sft/trainer.py:1 is the SFT stage that produces an instruct-model-like output from demonstration data — the framework implements the alignment training pipeline but does not tag served models as base vs instruct. GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) provides inference-time safety supplement but does not substitute for RLHF/DPO training.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. The SFT path in `agent_rl/online/backends/sft/trainer.py` is the stage that transforms a base model into an instruct model, but it applies to the model being fine-tuned, not to the model being served. `GuardrailRail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType (no instruct/base flag) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT stage (produces instruct-like model from base) |
+| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | inference-time safety supplement |
+
+</details>
+
+---
+
+## 26. Walk me through what happens in the ~400ms when you call an LLM API
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** API gateway → load balancer → tokenization → model router → prefill/decode (KV cache) → post-processing (safety) → response + billing + logging. Inference is ~95% of total latency.
+
+**Key points.**
+
+- API Gateway: TLS, API key validation, rate limiting (429 if exceeded), billing meter starts
+- Tokenization: text → token IDs; this locks in your input cost
+- Prefill phase: all input tokens processed in parallel (fast); Decode phase: one token per step (this loop is why streaming exists)
+- KV cache avoids recomputing past token K/V tensors; FlashAttention reduces memory pressure
+- Output tokens cost 3-5× more than input tokens; safety classifier runs at post-processing at every major provider
+
+**Concept.** (1) **API Gateway** — TLS termination, API key validation, rate limiting (429 if exceeded), billing meter starts. (2) **Load Balancer** — routes to a GPU cluster; identical requests have different latency because different clusters are selected. (3) **Tokenization** — your text is converted to token IDs ("Hello world" → [15339, 1917]); this is where your cost is locked in for input. (4) **Model Router** (provider-internal) — large requests route to a multi-GPU cluster; small requests to an optimized single GPU. (5) **Inference Engine** — *Prefill phase*: all input tokens processed in parallel (fast). *Decode phase*: one output token generated per step (this loop is why streaming exists). KV cache avoids recomputing past token representations; FlashAttention reduces memory pressure. (6) **Post-Processing** — tokens decoded to text; safety classifier runs (every major provider has this). (7) **Response and Billing** — JSON response returned via load balancer and TLS; output tokens cost 3–5× more than input tokens per provider pricing. (8) **Logging** — every call logged: latency, token count, model, safety flags; feeds abuse detection and capacity planning. **Inference (step 5) accounts for ~95% of total latency.**
+
+![diagram](assets/diagrams/51bec1db8b71d9c7ab007a686441dd2fa9a10d75.png)
+
+**In Jiuwen.** Framework operates from the model-router stage onward. Model clients (agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865) send requests and receive streamed responses. ProviderUsage (provider_usage.py:14) captures input_tokens, output_tokens, and cached_input_tokens from the response usage metadata (step 7). ObservabilityHandler (agent-core/openjiuwen/harness/observability/event.py:1) logs model call events (step 8 equivalent). jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101 is the session billing meter. Steps 1-3 (API gateway, load balancer, tokenization) are the provider's infrastructure — not visible to the framework.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The framework operates from step 4 onward. Model clients (`openai_model_client.py`, `anthropic_model_client.py`) send the request and receive the streamed response; they do not control tokenization, routing, or prefill/decode internally. `ProviderUsage` captures `input_tokens`, `output_tokens`, and `cached_input_tokens` from step 7's usage metadata. `ObservabilityHandler` logs model call events for step 8 equivalents. Steps 1–3 (gateway, load balancer, tokenization) are the provider's infrastructure.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865` | builds and sends request (step 4+) |
+| `agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14` | captures usage metadata from step 7 |
+| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | billing meter equivalent (step 7) |
+| `agent-core/openjiuwen/harness/observability/event.py:1` | observability events (step 8 equivalent) |
 
 </details>
 

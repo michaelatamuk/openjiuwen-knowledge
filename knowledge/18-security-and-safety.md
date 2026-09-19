@@ -384,7 +384,7 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 - Prompt safety is advisory.
 - Real control is the shell/permission layer.
 
-**Concept.** "How do you handle content from a tool result or retrieved document" doesn't sound like security — that's the point. It tests prompt-injection awareness: treating tool output and retrieved content as data, never as instructions. A strong answer includes: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
+**Concept.** Content from a tool result or retrieved document is untrusted input. Treat it as data, never as instructions: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.
 
 ![diagram](assets/diagrams/bd23a2c582f0d84607fa39f87399c2cd80d3fe7e.png)
 
@@ -428,7 +428,7 @@ This is the weakest area. Tool results are returned as plain `ToolMessage` with 
 - Safety rail is advisory.
 - Real control: shell/permission layer.
 
-**Concept.** a tool result or retrieved document carrying hidden instructions; treating tool output and retrieved content as data, never as commands; and input sanitization before content reaches the prompt. It rarely sounds like a security question at first, which is the point. A strong answer includes: delimit and label untrusted content as data, sanitize/strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
+**Concept.** a tool result or retrieved document can carry hidden instructions. Treat tool output and retrieved content as data, never as commands, and sanitize input before it reaches the prompt: delimit and label untrusted content as data, strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.
 
 ![diagram](assets/diagrams/d8e7aec4eea44ece4306dd59b3cfb07cf003a653.png)
 
@@ -454,6 +454,46 @@ Weakest area. Tool results are plain `ToolMessage` with no untrusted-data framin
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail (unregistered) |
 | `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | advisory safety rail |
 | `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor |
+
+</details>
+
+---
+
+## 12. What is Constitutional AI and how does it reduce the human-labeling bottleneck in alignment?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** CAI has the model critique and revise its own outputs against explicit principles, replacing most human preference labeling.
+
+**Key points.**
+
+- SL-CAI: generate response → model critiques against constitution → model revises → use revised responses for SFT
+- RL-CAI: model generates preference pairs (chosen/rejected) scored against principles → reward model → RLHF
+- Far fewer human labels needed than standard RLHF; the constitution is explicit and auditable
+- Easier to update behavior: edit the principle list, not retrain a black-box reward model
+- Jiuwen gap: safety rails are static classifiers (SecurityRail, GuardrailRail); no self-critique loop or constitutional principle file
+
+**Concept.** Constitutional AI (Bai et al. 2022, Anthropic) replaces a large portion of human preference labeling with **model self-critique**. The pipeline has two stages. (1) **SL-CAI**: generate responses, have the model critique each against a list of explicit principles (the "constitution" — rules like "do not assist with illegal activities", "be honest"), then revise based on the critique. Use these revised responses for supervised fine-tuning. (2) **RL-CAI**: use a reward model trained on model-generated preference pairs (not human-labeled pairs) to run RLHF. The result: steering a model toward a set of principles requires far fewer human labels. The "constitution" is an **explicit, auditable list** — easier to update and inspect than a black-box reward model trained on opaque human ratings. Claude's alignment training is based on CAI.
+
+![diagram](assets/diagrams/db8335b38815ab82b3c2de6782971a03785c3455.png)
+
+**In Jiuwen.** Safety enforcement uses static classifiers: SecurityRail (agent-core/openjiuwen/harness/rails/security_rail.py:1) for prompt injection, GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) with AutoModelForSequenceClassification backend (agent-core/openjiuwen/core/security/guardrail/backends.py:1), and GuardianRail (agent-core/openjiuwen/harness/rails/guardian_rail.py:1) for policy filtering. No self-critique loop, no constitutional principle list, no model-generates-then-revises pipeline. To add a principle, an operator must update the classifier weights or the system prompt, not append to a principle document.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Safety enforcement in the framework uses fixed classifiers and guardrails: `SecurityRail` (prompt injection detection), `GuardrailRail` (sequence-classification safety model), and `GuardianRail` (policy-level filtering). These are static — there is no self-critique loop, no constitutional principle list that the model iterates against, and no model-generates-then-revises revision pipeline. Adding a principle requires updating the classifier or system prompt, not appending to a constitution document.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/security_rail.py:1` | SecurityRail (prompt injection, static) |
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:1` | GuardrailBackend (sequence classifier, static) |
+| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | GuardrailRail |
+| `agent-core/openjiuwen/harness/rails/guardian_rail.py:1` | GuardianRail (policy filtering) |
 
 </details>
 

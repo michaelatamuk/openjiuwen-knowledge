@@ -1,6 +1,6 @@
 # ML foundations
 
-Classical machine learning and deep learning fundamentals that underpin everything built on top of LLMs. These questions appear in the early rounds of AI engineer interviews before the transformer-specific material. Jiuwen sits above this layer and delegates all of it to hosted models, the PyTorch ecosystem, or veRL — so the pattern throughout this topic is: strong general answer, delegation in Jiuwen.
+Classical machine learning and deep learning fundamentals that underpin everything built on top of LLMs. Jiuwen sits above this layer and delegates all of it to hosted models, the PyTorch ecosystem, or veRL.
 
 ## 1. What is the difference between AI, Machine Learning, and Deep Learning?
 
@@ -506,7 +506,7 @@ flowchart LR
 
 In LLM fine-tuning: use LoRA/PEFT to reduce trainable parameters; keep fine-tuning steps conservative; monitor validation perplexity.
 
-**Jiuwen:** Not a concern in the inference framework. In `agent_rl/`, training hyperparameters (weight decay, dropout, early stopping via epoch limits) are configuration parameters forwarded to veRL. The offline RL trainer has real train/val validation pipeline; the SFT path notably has no held-out validation (see entry 17-6).
+**Jiuwen:** Not a concern in the inference framework. In `agent_rl/`, training hyperparameters (weight decay, dropout, early stopping via epoch limits) are configuration parameters forwarded to veRL. The offline RL trainer has real train/val validation pipeline; the SFT path notably has no held-out validation.
 
 ```mermaid
 flowchart TD
@@ -534,7 +534,7 @@ flowchart TD
 
 **General:** A single attention head learns one type of relationship simultaneously — for example, syntactic dependency or positional proximity. Multiple heads run in parallel on lower-dimensional projections, each free to specialise on different relationship types: one head may track subject-verb agreement, another coreference, another relative position. Concatenating and projecting the outputs lets the model integrate all those signals. The compute cost is equivalent to one full-dimensional head (because `d_model` splits into `h × d_k` heads), but the representational expressivity is higher. Evidence: ablating individual heads degrades performance on different tasks depending on which head was removed.
 
-**Jiuwen:** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This is distinct from entry 01-4 (which covers the attention mechanics); this entry covers the architectural motivation.
+**Jiuwen:** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation rather than the attention mechanics themselves.
 
 ```mermaid
 flowchart LR

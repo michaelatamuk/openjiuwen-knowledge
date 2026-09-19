@@ -1,0 +1,28 @@
+{
+ "24-1": {
+  "title": "AI gateway architecture",
+  "tldr": "An AI gateway centralises routing, rate-limiting, key isolation, semantic caching, safety enforcement, and observability for all LLM calls across multiple services. Needed when multiple services call LLMs independently, per-tenant budgets are required, or a single audit log is needed.",
+  "points": [
+   "Routing: send requests to different providers based on cost, latency, availability, or model capability.",
+   "Rate limiting and cost enforcement: per-tenant token budgets and hard spend caps without touching application code.",
+   "Key isolation: API keys stay in the gateway; application services hold only internal tokens.",
+   "Semantic caching: embed queries, return cached responses for near-duplicates — reduces redundant model calls.",
+   "Safety enforcement: content filtering and PII redaction applied uniformly before the request reaches the model.",
+   "Observability: every call logged with provider, model, tokens, latency, and cost in one place.",
+   "When needed: multiple services calling LLMs (key sprawl), strict budgets, multi-provider fallback, unified audit log."
+  ]
+ },
+ "24-2": {
+  "title": "",
+  "tldr": "A gateway composes six concerns that appear throughout a production LLM stack.",
+  "points": [
+   "Routing chooses among providers by cost, latency, or availability",
+   "Fallback defines what happens when a model call fails",
+   "Rate limiting and cost caps bound spend per tenant or user",
+   "Semantic caching removes redundant calls for repeated or similar questions",
+   "Load balancing and endpoint health keep healthy endpoints in rotation",
+   "Observability attaches span, trace, and cost metadata to every call",
+   "Safety enforcement rejects or sanitizes requests before they reach the model"
+  ]
+ }
+}

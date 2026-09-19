@@ -3,7 +3,7 @@
 > Every concept answered twice: the general idea, and how the Jiuwen codebase
 > actually implements it.
 
-205 entries · 18 topics in 6 sections · readable as a website, EPUB, Anki deck, or offline Android app.
+Readable as a website, EPUB, Anki deck, or offline Android app.
 
 ## Start here
 
@@ -12,64 +12,79 @@
 - **Download** — [latest release](https://github.com/michaelatamuk/openjiuwen-knowledge/releases/latest): Android app, EPUB, single-file HTML, Anki deck, Obsidian vault
 - **Build it** — see [Building](#building)
 
-## How an entry reads
+## How to read an entry
 
 Each entry is layered so you can stop as soon as you have your answer:
 
-1. **Title, Summary, Key points** — a ten-second pass.
-2. **Explanation** — the framework-agnostic answer, plus a concept diagram.
-3. **Jiuwen** — how this codebase implements it, in plain language (or an explicit "it doesn't").
-4. **Jiuwen technical detail** — the classes, functions, and `file:line` anchors (this part is specific to the Jiuwen codebase).
+1. **Title, TL;DR, Key points** — a ten-second pass.
+2. **Concept** — the framework-agnostic explanation, plus a concept diagram.
+3. **In Jiuwen** — how this codebase implements the mechanism, in plain language.
+4. **Under the hood** — the implementation detail, diagram, and `file:line` anchors.
 
 A real entry looks like this:
 
 > **What's the difference between a system prompt and a user prompt**
 >
-> **Summary.** The system prompt sets persistent role and rules; the user prompt is the per-turn request.
+> **TL;DR.** The system prompt sets persistent role and rules; the user prompt is the per-turn request.
 >
-> **Explanation.** The system prompt sets persistent role, rules, persona, and constraints for the whole conversation; the user prompt is the per-turn request. Providers give the system message higher priority, and some APIs pass it as a separate top-level field.
+> **Key points.**
 >
-> **Jiuwen.** Jiuwen assembles the system prompt as one string from priority-ordered, host-injectable sections; rails can add or remove sections before the model call, and the ReAct agent renders it once as a system message passed separately.
+> - The system prompt carries persistent role, persona, and constraints; the user prompt is the per-turn request.
+> - Providers give the system message higher priority; some APIs pass it as a separate top-level field.
+> - Keep stable rules in the system prompt and per-turn content in the user prompt.
 >
-> **Technical detail.** `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1504` — builds one `SystemMessage`; `anthropic_model_client.py:379` — lifts system into top-level blocks.
+> **Concept.** The system prompt sets persistent role, rules, persona, and constraints for the whole conversation; the user prompt is the per-turn request. Providers give the system message higher priority, and some APIs pass it as a separate top-level field.
+>
+> **In Jiuwen.** Jiuwen assembles the system prompt as one string from priority-ordered, host-injectable sections; rails can add or remove sections before the model call, and the ReAct agent renders it once as a system message passed separately.
+>
+> **Under the hood.** `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1504` — builds one `SystemMessage`; `anthropic_model_client.py:379` — lifts system into top-level blocks.
 
 ## Contents
 
-### Model foundations (44)
-- [LLM foundations](knowledge/01-llm-foundations.md) — 15
-- [Prompting and output control](knowledge/02-prompting-and-output-control.md) — 6
-- [LLM terms glossary](knowledge/03-llm-terms-glossary.md) — 20
-- [Choosing models and approaches](knowledge/04-choosing-models-and-approaches.md) — 3
+### Foundations
+- [ML foundations](knowledge/00-ml-foundations.md)
+- [LLM foundations](knowledge/01-llm-foundations.md)
+- [LLM terms glossary](knowledge/03-llm-terms-glossary.md)
+- [Foundational papers](knowledge/19-foundational-papers.md)
+- [AI system stack](knowledge/20-ai-system-stack.md)
 
-### Agents (51)
-- [Agent fundamentals and the loop](knowledge/05-agent-fundamentals-and-the-loop.md) — 11
-- [Tools and function calling](knowledge/06-tools-and-function-calling.md) — 10
-- [Planning, memory and state](knowledge/07-planning-memory-and-state.md) — 15
-- [Agent frameworks](knowledge/08-agent-frameworks.md) — 9
-- [Multi-agent systems](knowledge/09-multi-agent-systems.md) — 6
+### Working with models
+- [Prompting and output control](knowledge/02-prompting-and-output-control.md)
+- [Choosing models and approaches](knowledge/04-choosing-models-and-approaches.md)
+- [Fine-tuning and customization](knowledge/17-fine-tuning-and-customization.md)
+- [Cost, latency and accuracy tradeoffs](knowledge/23-cost-latency-accuracy.md)
 
-### RAG (60)
-- [RAG pipelines and patterns](knowledge/10-rag-pipelines-and-patterns.md) — 19
-- [Retrieval and ranking](knowledge/11-retrieval-and-ranking.md) — 11
-- [Query understanding](knowledge/12-query-understanding.md) — 6
-- [RAG failure modes and evaluation](knowledge/13-rag-failure-modes-and-evaluation.md) — 11
-- [RAG system design](knowledge/14-rag-system-design.md) — 13
+### RAG systems
+- [RAG pipelines and patterns](knowledge/10-rag-pipelines-and-patterns.md)
+- [Retrieval and ranking](knowledge/11-retrieval-and-ranking.md)
+- [Query understanding](knowledge/12-query-understanding.md)
+- [RAG system design](knowledge/14-rag-system-design.md)
 
-### Evaluation and production (34)
-- [Evaluation](knowledge/15-evaluation.md) — 23
-- [Production, cost and scale](knowledge/16-production-cost-and-scale.md) — 11
+### Agent systems
+- [Agent fundamentals and the loop](knowledge/05-agent-fundamentals-and-the-loop.md)
+- [Tools and function calling](knowledge/06-tools-and-function-calling.md)
+- [Planning, memory and state](knowledge/07-planning-memory-and-state.md)
+- [Agent frameworks](knowledge/08-agent-frameworks.md)
+- [Multi-agent systems](knowledge/09-multi-agent-systems.md)
+- [Agent architectures and protocols](knowledge/21-agent-architectures.md)
 
-### Model adaptation (6)
-- [Fine-tuning and customization](knowledge/17-fine-tuning-and-customization.md) — 6
+### Evaluation and failure modes
+- [RAG failure modes and evaluation](knowledge/13-rag-failure-modes-and-evaluation.md)
+- [Evaluation](knowledge/15-evaluation.md)
+- [Agent failure modes](knowledge/22-agent-failure-patterns.md)
 
-### Safety and security (10)
-- [Security and safety](knowledge/18-security-and-safety.md) — 10
+### Production and operations
+- [Production, cost and scale](knowledge/16-production-cost-and-scale.md)
+- [Model routing and gateways](knowledge/24-ai-gateway.md)
+
+### Safety and security
+- [Security and safety](knowledge/18-security-and-safety.md)
 
 ## Formats
 
 - **Website** — [openjiuwen-knowledge](https://michaelatamuk.github.io/openjiuwen-knowledge/), built with MkDocs Material.
 - **Markdown** — `knowledge/` in this repository, one file per section.
-- **Single-file HTML** — one offline file with search and tap-to-reveal answers.
+- **Single-file HTML** — one offline file with search and expandable detail.
 - **EPUB** — for e-readers.
 - **Anki deck / CSV** — spaced repetition in Anki or AnkiDroid.
 - **Obsidian vault** — linked notes with local search.
@@ -87,10 +102,10 @@ openjiuwen-knowledge/
 │   └── assets/diagrams/    rendered diagrams
 ├── content/                authored source
 │   ├── topics/             the section documents
-│   ├── summaries/          per-section Title / Summary / Key points
+│   ├── summaries/          per-section Title / TL;DR / Key points
 │   ├── jiuwen/             per-section plain-language Jiuwen answers
 │   └── diagrams.json       concept-vs-technical diagram assignments
-├── source/                 the 18 original documents, archived unchanged
+├── source/                 the 26 original documents, archived unchanged
 ├── pipeline/               build and publish scripts, MkDocs config
 ├── apps/android/           the native offline study app
 └── build/                  generated artifacts (gitignored)
@@ -117,17 +132,10 @@ Requires Python 3.11+, Node with `@mermaid-js/mermaid-cli` (diagram rendering is
 cached under `build/`), and the Android SDK plus a JDK for the app. Individual
 stages are documented in `pipeline/README.md`.
 
-## Grounding and provenance
+## Provenance
 
-- **Anchors** are `path:line` into the Jiuwen source. They may drift as the code
-  changes; they were verified to resolve when written, and their contents
-  spot-checked. Where a mechanism is absent, config-gated, or inert, the entry
-  says so rather than implying it works.
+- **Anchors** are `path:line` into the Jiuwen source.
 - **Layers.** "The framework" is `agent-core/openjiuwen` — the thin `core/` SDK
   plus the heavier `harness/`, `agent_teams/`, `extensions/`, and `auto_harness/`
-  layers. The product built on it is `jiuwenswarm/jiuwenswarm/`. Answers say
-  which layer carries a mechanism.
-- **Originals.** The 18 source documents are archived unchanged under `source/`.
-  The sections were assembled from them: near-identical and same-concept material
-  was merged, so each concept appears once, and every entry names its canonical
-  source.
+  layers. The product built on it is `jiuwenswarm/jiuwenswarm/`.
+- **Originals.** The 26 source documents are archived under `source/`.
