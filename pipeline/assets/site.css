@@ -253,3 +253,29 @@
     display: none;
   }
 }
+
+/* Mobile menu: stop the scroll area from re-anchoring / chaining, which makes
+   the scrollbar jump while moving through the tree. */
+@media screen and (max-width: 76.234375em) {
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    overflow-anchor: none;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile menu: make the sidebar scroll area the ONE scroller with an accurate
+   height, so the scrollbar doesn't vanish or snap back at the bottom. */
+@media screen and (max-width: 76.234375em) {
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-anchor: none;
+    overscroll-behavior: contain;
+  }
+  .md-nav--primary {
+    position: static;
+    display: block;
+    height: auto;
+  }
+}
