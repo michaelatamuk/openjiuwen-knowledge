@@ -106,7 +106,7 @@
    "Code: keep function/block whole.",
    "Tables: header + rows together.",
    "Prose: paragraph or sentence split.",
-   "Jiuwen: TextSplitter is character-based with no content-type detection."
+   "Jiuwen: CharChunker/CharSplitter cut at fixed offsets with no content-type detection; HybridChunker keeps table units whole."
   ]
  }
 }

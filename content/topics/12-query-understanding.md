@@ -31,7 +31,7 @@ flowchart TD
 
 **General:** Detect ambiguity and either ask a clarifying question or rewrite to the most likely intent. The cheap path is a rewrite that resolves coreference/ellipsis; the interactive path is a clarification turn when the ambiguity would change the retrieval target. Most production systems rewrite by default and clarify only when confidence is low.
 
-**Jiuwen:** Ambiguity is not resolved by asking the user pre-retrieval. `QueryRewriter.rewrite` returns `intention`, `standalone_query`, `references`, and a `missing` list; when a gap cannot be filled from history it marks the gap with `(…)` in the standalone query and records it in `missing` but still proceeds with a best-effort query. Asking the user is a separate, opt-in mechanism: `AskUserRail`/`AskUserTool` interrupt the tool loop and return the answer as a tool result. None of these is wired automatically into the RAG flow as an ambiguity gate.
+**Jiuwen:** Ambiguity is not resolved by asking the user pre-retrieval. `QueryRewriter.rewrite` returns `intention`, `standalone_query`, `references`, and a `missing` list; when a gap cannot be filled from history it marks the gap with `(…)` in the standalone query and records it in `missing` but still proceeds with a best-effort query. Asking the user is a separate, opt-in mechanism: `AskUserRail` intercepts the `ask_user` tool call (registering the stub `AskUserTool`) and returns the user's answer as the tool result. None of these is wired automatically into the RAG flow as an ambiguity gate.
 
 ```mermaid
 flowchart TD
@@ -43,7 +43,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code> — <code>rewrite()</code>; <code>:277</code> output schema (<code>intention</code>/<code>references</code>/<code>missing</code>/<code>typo</code>)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/prompts/intention_completion_en.md:41</code> — missing-info completion (marks gaps, does not ask)<br>&bull; <code>agent-core/openjiuwen/harness/tools/ask_user.py:11</code> — <code>AskUserTool</code>; <code>agent-core/openjiuwen/harness/rails/interrupt/ask_user_rail.py:63</code> — <code>resolve_interrupt</code><br>&bull; <code>agent-core/openjiuwen/core/controller/schema/intent.py:59</code> — <code>UNKNOWN_TASK</code> clarification prompt; <code>agent-core/openjiuwen/core/controller/modules/intent_recognizer.py:436</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code> — <code>rewrite()</code>; <code>:277</code> output schema (<code>intention</code>/<code>references</code>/<code>missing</code>/<code>typo</code>)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/prompts/intention_completion_en.md:41</code> — missing-info completion (marks gaps, does not ask)<br>&bull; <code>agent-core/openjiuwen/harness/tools/ask_user.py:11</code> — <code>AskUserTool</code>; <code>agent-core/openjiuwen/harness/rails/interrupt/ask_user_rail.py:63</code> — <code>resolve_interrupt</code></sub>
 
 </details>
 
@@ -101,7 +101,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:213</code> — <code>for turn in range(1, max_iter+1)</code>; <code>:237</code> <code>_read</code> triples + <code>batch_extend_memory</code>; <code>:244</code> <code>_rewrite</code> → append<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:100</code> — beam expansion <code>range(max_length-1)</code>; <code>:190</code> endpoint entities <code>{triple[0], triple[-1]}</code>; <code>:402</code> <code>graph_hops = kwargs.get("graph_hops", 2)</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/triple_beam.py:12</code> — <code>TripleBeam</code>; <code>agent-core/openjiuwen/core/retrieval/common/triple_memory.py:31</code> — <code>extend_memory</code> dedup<br>&bull; <code>agent-core/openjiuwen/core/memory/config/graph.py:86</code> — <code>bfs_k</code>/<code>bfs_depth</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:38</code> — fixed single-pass retrieve</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:213</code> — <code>for turn in range(1, max_iter+1)</code>; <code>:237</code> <code>_read</code> triples + <code>batch_extend_memory</code>; <code>:244</code> <code>_rewrite</code> → append<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:100</code> — beam expansion <code>range(max_length-1)</code>; <code>:190</code> endpoint entities <code>{triple[0], triple[-1]}</code>; <code>:402</code> <code>graph_hops = kwargs.get("graph_hops", 2)</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/triple_beam.py:12</code> — <code>TripleBeam</code>; <code>agent-core/openjiuwen/core/retrieval/common/triple_memory.py:31</code> — <code>extend_memory</code> dedup<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:38</code> — fixed single-pass retrieve</sub>
 
 </details>
 

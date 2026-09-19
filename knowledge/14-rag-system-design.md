@@ -64,7 +64,7 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 **Implementation**
 
-The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking supports char/token/hybrid but has no code-aware/function-boundary chunker.
+The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking ships `CharChunker`/`TokenizerChunker` and a `HybridChunker`, but has no code-aware/function-boundary chunker.
 
 **Code anchors**
 
@@ -136,14 +136,14 @@ Supports metadata filtering at the **store** layer (Milvus expr, Chroma `where`,
 
 ![diagram](assets/diagrams/3b9f1857c79d75a702bb45896ac4120181ce24cf.png)
 
-**In Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no sharding, partitioning, replication, or multi-collection fan-out in the repo — those are the backend's job.
+**In Jiuwen.** Scale-out is delegated to the backend: Chroma is a local persistent HNSW store for small and medium scale; Milvus is a server ANN with selectable index types and quantization for large scale; PGVector is relational HNSW. Writes are batched. There is no DB-level sharding, partitioning, or replication in the repo; cross-KB fan-out exists only at the application layer.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no sharding, partitioning, replica, or multi-collection fan-out anywhere.
+Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no DB-level sharding, partitioning, or replica; cross-KB fan-out exists only at the application layer (`retrieve_multi_kb`).
 
 **Code anchors**
 
@@ -151,9 +151,9 @@ Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/med
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` | create_vector_store (Milvus/Chroma/PGVector); agent-core/openjiuwen/core/retrieval/common/config.py:67 — store type enum |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:433` | index type AUTOINDEX/HNSW/IVF/FLAT/SCANN; :346 inverted scalar indexes |
-| `agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282` | MilvusHNSW (M=30, efConstruction=360); :100 IVFFlat defaults; :164 SCANN |
+| `agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282` | MilvusHNSW (M=30, efConstruction=360); :100 Milvus IVF (_BaseIVF, nlist=128/nprobe=8); :164 SCANN |
 | `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:203` | HNSW index; agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37 — pgvector defaults |
-| `agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47` | Chroma HNSW defaults |
+| `agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37` | pgvector ivfflat; agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47 — Chroma HNSW defaults |
 | `agent-core/openjiuwen/core/retrieval/vector_store/base.py:57` | add(..., batch_size=128) |
 
 </details>
@@ -228,7 +228,7 @@ Growth is handled by append-only batched writes into a pre-existing ANN index; e
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:519` | _ensure_loaded lazy load; :144 index_type change guard; :117 get_search_params ef dial; :199 flush after write |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:321` | _ensure_collection no-op if exists; :346 inverted scalar indexes |
-| `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:157` | reflects existing table; :203 index created once |
+| `agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:172` | reflects existing table (_reflect_table); :203 index created once |
 | `agent-core/openjiuwen/core/retrieval/lazy_load.py:143` | lazy_load (module imports) |
 | `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74` | add_documents appends via build_index |
 
@@ -371,7 +371,7 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 **Concept.** You need a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids must be derived from the document id so all chunks of a document can be found and removed atomically. The hard parts are atomicity (a crash between delete and reinsert loses the doc) and eventual consistency in the vector store.
 
-![diagram](assets/diagrams/77b75853fb855035ff58e3db81c0fbb9a8d3257f.png)
+![diagram](assets/diagrams/124a88587ca5afdf3da34b6e0f650af61d8ad26a.png)
 
 **In Jiuwen.** The contract is delete-by-document-id plus rebuild: the Chroma and Milvus indexers do not upsert — they find a document's chunk ids, delete them, then re-chunk, re-embed, and write, flushing Milvus in between. The document id is a first-class scalar-indexed field enabling filter deletes. Postgres is the only store with native upsert, but no indexer wraps it, and a crash between delete and rebuild loses the document.
 
@@ -414,14 +414,14 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 ![diagram](assets/diagrams/45fa9015ca8e3383a1911f1faa6e01f49391da3d.png)
 
-**In Jiuwen.** The retrieval layer has no notion of document time: results carry only text, score, and metadata, parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins; there is no freshness mechanism in RAG, so staleness handling would have to be added.
+**In Jiuwen.** The retrieval layer has no notion of document time: results carry no timestamp field (text, score, metadata, doc id, chunk id), parsers set no timestamp, and ranking is score/rank only — no recency boost or outdated filter. Conflict handling is memory-write-only with newest-wins.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry only text/score/metadata, parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
+The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry no timestamp field (`RetrievalResult` = text/score/metadata/doc_id/chunk_id; `TextChunk` = id_/text/doc_id/metadata/embedding), parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
 
 **Code anchors**
 

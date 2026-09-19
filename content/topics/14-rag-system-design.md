@@ -30,7 +30,7 @@ flowchart LR
 
 **General:** Make re-indexing incremental and event-driven: a stable ID per file/chunk, delete-by-ID on change, append new chunks, and a trigger on commit/CI. Avoid full re-embeds except on model/index changes. Keep chunk boundaries structure-aware (functions/classes) and include file paths/branches as metadata so the assistant can cite and filter.
 
-**Jiuwen:** The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking supports char/token/hybrid but has no code-aware/function-boundary chunker.
+**Jiuwen:** The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking ships `CharChunker`/`TokenizerChunker` and a `HybridChunker`, but has no code-aware/function-boundary chunker.
 
 ```mermaid
 flowchart TD
@@ -81,7 +81,7 @@ flowchart TD
 
 **General:** At small scale, a local in-process index (FAISS/Chroma) is fine. At large scale you need a dedicated vector DB with tuned ANN indexes (HNSW/IVF/quantization), sharding/partitioning, replication, and batch ingestion; you also start caring about memory, index build time, and recall/latency tuning per query. The interface stays the same but the operational envelope changes.
 
-**Jiuwen:** Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no sharding, partitioning, replica, or multi-collection fan-out anywhere.
+**Jiuwen:** Scale-out is delegated to the backend: Chroma = local persistent HNSW (small/medium), Milvus = server ANN with selectable AUTO/HNSW/IVF/SCANN and quantization variants (large), PGVector = pgvector HNSW (relational; the field type also declares `ivfflat`, but no IVFFlat index branch is implemented). Writes are batched (128) and flushed. Milvus BM25 for hybrid is native (`SPARSE_INVERTED_INDEX`) plus a jieba analyzer. The architecture is a single collection per KB (`kb_{kb_id}_chunks`) with one ANN index created once at collection creation. There is no DB-level sharding, partitioning, or replica; cross-KB fan-out exists only at the application layer (`retrieve_multi_kb`).
 
 ```mermaid
 flowchart LR
@@ -97,7 +97,7 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/store.py:16</code> — <code>create_vector_store</code> (Milvus/Chroma/PGVector); <code>agent-core/openjiuwen/core/retrieval/common/config.py:67</code> — store type enum<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:433</code> — index type AUTOINDEX/HNSW/IVF/FLAT/SCANN; <code>:346</code> inverted scalar indexes<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282</code> — <code>MilvusHNSW</code> (M=30, efConstruction=360); <code>:100</code> IVFFlat defaults; <code>:164</code> SCANN<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:203</code> — HNSW index; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37</code> — pgvector defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47</code> — Chroma HNSW defaults<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/base.py:57</code> — <code>add(..., batch_size=128)</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/store.py:16</code> — <code>create_vector_store</code> (Milvus/Chroma/PGVector); <code>agent-core/openjiuwen/core/retrieval/common/config.py:67</code> — store type enum<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:433</code> — index type AUTOINDEX/HNSW/IVF/FLAT/SCANN; <code>:346</code> inverted scalar indexes<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/milvus_fields.py:282</code> — <code>MilvusHNSW</code> (M=30, efConstruction=360); <code>:100</code> Milvus IVF (<code>_BaseIVF</code>, nlist=128/nprobe=8); <code>:164</code> SCANN<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:203</code> — HNSW index; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37</code> — pgvector defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/pg_fields.py:37</code> — pgvector <code>ivfflat</code>; <code>agent-core/openjiuwen/core/foundation/store/vector_fields/chroma_fields.py:47</code> — Chroma HNSW defaults<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/base.py:57</code> — <code>add(..., batch_size=128)</code></sub>
 
 </details>
 
@@ -145,7 +145,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:519</code> — <code>_ensure_loaded</code> lazy load; <code>:144</code> index_type change guard; <code>:117</code> <code>get_search_params</code> ef dial; <code>:199</code> flush after write<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:321</code> — <code>_ensure_collection</code> no-op if exists; <code>:346</code> inverted scalar indexes<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:157</code> — reflects existing table; <code>:203</code> index created once<br>&bull; <code>agent-core/openjiuwen/core/retrieval/lazy_load.py:143</code> — <code>lazy_load</code> (module imports)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74</code> — <code>add_documents</code> appends via <code>build_index</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:519</code> — <code>_ensure_loaded</code> lazy load; <code>:144</code> index_type change guard; <code>:117</code> <code>get_search_params</code> ef dial; <code>:199</code> flush after write<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:321</code> — <code>_ensure_collection</code> no-op if exists; <code>:346</code> inverted scalar indexes<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:172</code> — reflects existing table (<code>_reflect_table</code>); <code>:203</code> index created once<br>&bull; <code>agent-core/openjiuwen/core/retrieval/lazy_load.py:143</code> — <code>lazy_load</code> (module imports)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:74</code> — <code>add_documents</code> appends via <code>build_index</code></sub>
 
 </details>
 
@@ -239,7 +239,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    UP["update_documents(doc_id)"] --> DEL["delete_index(doc_id): filter delete all chunks"]
+    UP["update_documents(documents)"] --> DEL["delete_index(doc_id): filter delete all chunks"]
     DEL --> FL["Milvus flush (consistency) between delete and rebuild"]
     FL --> RE["re-chunk + re-embed + build_index"]
     DEL -.->|"crash here"| LOSS["document lost (no transaction)"]
@@ -261,7 +261,7 @@ flowchart TD
 
 **General:** Attach timestamps/versions to documents, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, and surface recency to the generator. Propagate deletes promptly from the source (event-driven) so the index matches source-of-truth, and reconcile periodically.
 
-**Jiuwen:** The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry only text/score/metadata, parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
+**Jiuwen:** The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextChunk` carry no timestamp field (`RetrievalResult` = text/score/metadata/doc_id/chunk_id; `TextChunk` = id_/text/doc_id/metadata/embedding), parsers populate no timestamp, and ranking is score/rank only (RRF, max-score) — no recency boost or outdated filter. Conflict handling is memory-write-only (`MemUpdateChecker`, newest wins); a freshness/time-decay notion exists only for experience records.
 
 ```mermaid
 flowchart TD

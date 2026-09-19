@@ -55,14 +55,14 @@ Retrieval quality is measured outside the framework: `recall_at_k`, `precision_a
 
 ![diagram](assets/diagrams/fa3c0b58efe93dd6d59304c4a05f3a0c27905417.png)
 
-**In Jiuwen.** There is no tooling to check whether a retrieved chunk contains the answer. The nearest signals are weak: no score threshold by default, only lexical relevance checks, and judges that never see the retrieved context — so they cannot tell a chunk that contains the answer from one that merely looks similar. You would diagnose this manually.
+**In Jiuwen.** The signals for whether a retrieved chunk contains the answer are weak: no score threshold by default, only lexical relevance checks, and the pairwise judge (LLMAsJudgeMetric) never sees the retrieved context, so it cannot tell a chunk that contains the answer from one that merely looks similar. The trace-level AccuracyEvaluator does see tool results but has no faithfulness input.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-The signals for "does the retrieved chunk contain the answer" are weak: `score_threshold` defaults to `None` (so weak chunks pass), relevance checks are lexical (`free_search`), and the judges (`AccuracyEvaluator`, `LLMAsJudgeMetric`) do not receive the retrieved context, so they cannot distinguish "context lacks the answer" from "model ignored it". The `VerificationReviewer`'s `Correctness` dimension checks the output, not the grounding.
+The signals for "does the retrieved chunk contain the answer" are weak: `score_threshold` defaults to `None` (so weak chunks pass), relevance checks are lexical (`free_search`), and `LLMAsJudgeMetric` is pairwise (question/expected/model-answer only), so it cannot distinguish "context lacks the answer" from "model ignored it"; the trace-level `AccuracyEvaluator` does see tool results but receives no dedicated retrieved-context/faithfulness input. The `VerificationReviewer`'s `Correctness` dimension checks the output, not the grounding.
 
 **Code anchors**
 
@@ -70,7 +70,7 @@ The signals for "does the retrieved chunk contain the answer" are weak: `score_t
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/common/config.py:47` | score_threshold defaults None |
 | `agent-core/openjiuwen/harness/tools/web/free_search.py:299` | lexical relevance only |
-| `agent-core/openjiuwen/symphony/evaluation/evaluators.py:438` | AccuracyEvaluator (no context input) |
+| `agent-core/openjiuwen/symphony/evaluation/evaluators.py:438` | AccuracyEvaluator (trace-level; no faithfulness input) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:58` | parses result: true/false, no context/attribution |
 | `agent-core/openjiuwen/agent_teams/verification/reviewer.py:43` | Correctness dimension on the output |
 
@@ -340,7 +340,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 - KB path never reranks.
 - Metadata filters dropped at the retriever.
 
-**Concept.** This claim holds: the value in "design a RAG system" is naming the failure modes and how you detect them, not reciting a reference architecture. Drawing embed → retrieve → rerank → generate is the basic shape. When retrieval returns the wrong chunk, the causes are usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Point at the stage that fails, not the pipeline as a whole. "Wrong chunk" is usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Name the check for each (read the chunk, score threshold, hybrid fallback).
+**Concept.** This claim holds: the value in "design a RAG system" is naming the failure modes and how you detect them, not reciting a reference architecture. Drawing embed → retrieve → rerank → generate is the basic shape. When retrieval returns the wrong chunk, the causes are usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Point at the stage that fails, not the pipeline as a whole. Name the check for each (read the chunk, score threshold, hybrid fallback).
 
 ![diagram](assets/diagrams/72c5aa00ecbd3b58619ea524d274ca8fe1fef893.png)
 
@@ -423,16 +423,16 @@ Grounding is a separate, non-blocking layer: a verification agent (read-only evi
 
 **Concept.** Output validation should be an explicit, typed stage between generation and delivery: (1) syntactic validation — does the output match the declared schema or format (JSON schema, regex, structured output type)? (2) semantic validation — is the content grounded in the retrieved context (faithfulness check)? (3) policy validation — does the output pass safety/guardrail rules? Each stage has a clear pass/fail contract: fail syntactic → retry with repair prompt; fail semantic → abstain or flag; fail policy → redact or block. Logging the failure mode at each stage is what makes the system debuggable.
 
-![diagram](assets/diagrams/d26a7948507451e42636a34ad6602e9979070d4e.png)
+![diagram](assets/diagrams/472d0ed7af4add42f3d3c5d35699527730ed8503.png)
 
-**In Jiuwen.** Syntactic: SchemaUtils.validate_with_schema (agent-core/openjiuwen/core/common/utils/schema_utils.py:115) on tool results; structured_output tool enforces a caller-supplied schema. Semantic: VerificationRail (agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92) PASS/FAIL/PARTIAL; FaithfulnessEvaluator in agent_evolving/eval/. Policy: SecurityRail + GuardrailRail. These are independent rails, not a unified pipeline stage — there is no shared output-validation stage or failure-mode log distinguishing syntactic vs semantic vs policy failures.
+**In Jiuwen.** Syntactic: SchemaUtils.validate_with_schema (agent-core/openjiuwen/core/common/utils/schema_utils.py:115) on tool results; structured_output tool enforces a caller-supplied schema. Semantic: VerificationRail (agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92) PASS/FAIL/PARTIAL. Policy: SecurityRail (prompt injection detection) + PromptInjectionGuardrail (sequence-classification). These are independent rails, not a unified pipeline stage — there is no shared output-validation stage or per-response failure-mode log.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-The framework has components for each stage but they are not wired into a single linear validation pipeline. Syntactic: `SchemaUtils.validate_with_schema` on tool results; `structured_output` tool enforces a caller-supplied JSON Schema. Semantic: `VerificationRail` (read-only evidence, PASS/FAIL/PARTIAL); `FaithfulnessEvaluator` in `agent_evolving/eval/`. Policy: `SecurityRail` (prompt injection detection), `PromptInjectionGuardrail` (sequence-classification model). But these operate as independent rails — there is no shared output-validation stage that all responses must pass before leaving the agent, and there is no pipeline-level failure-mode log distinguishing syntactic vs semantic vs policy failures.
+The framework has components for each stage but they are not wired into a single linear validation pipeline. Syntactic: `SchemaUtils.validate_with_schema` on tool results; `structured_output` tool enforces a caller-supplied JSON Schema. Semantic: `VerificationRail` (read-only evidence, PASS/FAIL/PARTIAL). Policy: `SecurityRail` (prompt injection detection) and `PromptInjectionGuardrail` (sequence-classification model). But these operate as independent rails — there is no shared output-validation stage that all responses must pass before leaving the agent, and there is no pipeline-level failure-mode log distinguishing syntactic vs semantic vs policy failures.
 
 **Code anchors**
 
@@ -440,9 +440,8 @@ The framework has components for each stage but they are not wired into a single
 |---|---|
 | `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema (syntactic) |
 | `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92` | VerificationRail (semantic) |
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1` | FaithfulnessEvaluator |
-| `agent-core/openjiuwen/auto_harness/rails/security_rail.py:1` | SecurityRail (policy) |
-| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | GuardrailRail (policy) |
+| `agent-core/openjiuwen/auto_harness/rails/security_rail.py:48` | SecurityRail (policy) |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail (policy) |
 
 </details>
 

@@ -36,7 +36,7 @@ flowchart LR
 
 **General:** Keyword search wins when the query contains exact identifiers, codes, rare names, or domain jargon that the embedding model never learned to map, and when the corpus is small or the terms are highly distinctive. Dense search wins on paraphrase and intent. The strongest approach is a router that picks by query type (or always runs hybrid and fuses).
 
-**Jiuwen:** Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeBase.retrieve` picks the retriever and mode from `config.index_type` (`vector` → `VectorRetriever`, `bm25` → `SparseRetriever`, else hybrid). `AgenticRetriever` derives its default mode from the underlying retriever's `index_type`, and `GraphRetriever` validates against `_allowed_modes`. The only dynamic keyword behavior is a degenerate fallback: if dense returns zero results, `VectorRetriever`/`HybridRetriever` re-run `sparse_search`. `QueryRewriter` produces an `intention` field but never uses it to switch modes.
+**Jiuwen:** Routing is static and config-driven, not query-content-driven: `SimpleKnowledgeBase.retrieve` picks the retriever and mode from `config.index_type` (`vector` → `VectorRetriever`, `bm25` → `SparseRetriever`, else hybrid). `AgenticRetriever` derives its default mode from the underlying retriever's `index_type`, and `GraphRetriever` validates against `_allowed_modes`. The only dynamic keyword behavior is a degenerate fallback: if dense returns zero results, `VectorRetriever` (and `HybridRetriever` only in its `mode="vector"` branch) re-runs `sparse_search`. `QueryRewriter` produces an `intention` field but never uses it to switch modes.
 
 ```mermaid
 flowchart TD
@@ -122,7 +122,7 @@ flowchart TD
 
 **General:** Keep the two paths explicit: route structured questions to a text-to-SQL/table-query tool (schema-aware, validable) and unstructured questions to document retrieval, then merge/ground the results. Do not flatten tables into text and hope; and do not let a free-form shell tool be the only SQL path, because it is unverified. An orchestrator or router picks the source(s), and the answer cites which.
 
-**Jiuwen:** The system is document-RAG only. The retrieval package indexes documents (PDF/Office/images/…) into vector/graph stores; `KnowledgeRetrievalComponent` fans a query to one or more KBs. `core/sys_operation` exposes only `fs()`, `shell()`, and `code()` — no database operation — and there is no text-to-SQL, schema introspection, table retrieval, or DB query tool. SQLite appears only as internal persistence/coordination (locks, session/observability stores), and even spreadsheets are flattened into text row/column documents.
+**Jiuwen:** Retrieval is document-RAG only: parsers emit `TextChunk`s into vector/graph stores and `KnowledgeRetrievalComponent` fans queries to one or more KBs. Structured access is limited to the generic `bash`/`code` escape hatch (`SysOperation.fs()/shell()/code()`); spreadsheets are ingested as row/column text documents rather than queried as tables. SQLite is used only for local lock/session persistence.
 
 ```mermaid
 flowchart TD
@@ -136,7 +136,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/sys_operation/sys_operation.py:204</code> — <code>SysOperation</code> exposes only <code>fs</code>/<code>code</code>/<code>shell</code>; <code>:139</code> card proxies limited to fs/shell/code<br>&bull; <code>agent-core/openjiuwen/harness/tools/__init__.py:42</code> — only Bash/PowerShell shell escape hatch; no DB tool<br>&bull; <code>agent-core/openjiuwen/harness/tools/code.py:43</code> — <code>CodeTool.invoke</code> (generic code, not SQL-aware)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:131</code> — spreadsheets flattened to text documents<br>&bull; <code>agent-core/openjiuwen/core/sys_operation/local/_rw_lock_manager.py:23</code> — SQLite used only as a lock DB</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/sys_operation/sys_operation.py:204</code> — <code>SysOperation</code> exposes only <code>fs</code>/<code>code</code>/<code>shell</code>; <code>:139</code> card proxies limited to fs/shell/code<br>&bull; <code>agent-core/openjiuwen/harness/tools/__init__.py:42</code> — only Bash/PowerShell shell escape hatch; no DB tool<br>&bull; <code>agent-core/openjiuwen/harness/tools/code.py:34</code> — <code>CodeTool.invoke</code> (generic code, not SQL-aware)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:131</code> — spreadsheets flattened to text documents<br>&bull; <code>agent-core/openjiuwen/core/sys_operation/local/_async_read_write_lock.py:6</code> — SQLite used only as a lock DB</sub>
 
 </details>
 
@@ -192,7 +192,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/store/showcase_milvus_graph_store.py:51</code> — <code>_log_score_comparison</code>; <code>:217</code> reranker on; <code>:240</code> reranker off<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:58</code> — <code>rerank()</code> returns <code>relevance_score</code> per doc<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — <code>_combined_rerank</code>/<code>rerank</code> sorts in place<br>&bull; <code>agent-core/examples/retrieval/showcase_reranker.py:23</code> — standalone reranker demo (no baseline)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/examples/store/showcase_milvus_graph_store.py:51</code> — <code>_log_score_comparison</code>; <code>:217</code> reranker on; <code>:240</code> reranker off<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:58</code> — <code>rerank()</code> returns <code>relevance_score</code> per doc<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — <code>rerank</code> sorts in place (<code>_combined_rerank</code> at <code>:467</code>)<br>&bull; <code>agent-core/examples/retrieval/showcase_reranker.py:23</code> — standalone reranker demo (no baseline)</sub>
 
 </details>
 
@@ -270,7 +270,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:160</code> — `reranker=None` optional<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340</code> — product pins `rerank_enabled: False`</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:167</code> — `reranker=None` optional<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340</code> — product pins `rerank_enabled: False`</sub>
 
 </details>
 
@@ -317,7 +317,7 @@ flowchart TD
 
 **General:** Uniform character or token splitting destroys the structure of tables and code. Apply content-aware chunking: detect content type (prose, Markdown table, fenced code block), then apply per-type rules — keep fenced code blocks whole (or split at the function boundary for long files), keep table rows together with their header row, and split prose at paragraph or sentence boundaries. Attach metadata to each chunk (content_type, source_section) so downstream filtering can distinguish them. For large tables or code files that exceed your chunk budget, summarize or use a structured query path (text-to-SQL, AST grep) instead of embedding the raw content.
 
-**Jiuwen:** `TextSplitter` (the default chunker) is a character-based splitter with no content-type detection — it splits at fixed character offsets regardless of whether the offset falls inside a code block, table row, or sentence. No Markdown table parser, no code-block boundary detector, and no per-type chunking policy exist in the indexing pipeline. Metadata fields in `DocumentChunk` (source, doc_id, extra) can be populated manually but are not populated by the chunker from structure. The structured query path (text-to-SQL) is separate from the chunking/embedding pipeline and is not wired as a fallback for table-heavy content.
+**Jiuwen:** The default is `CharChunker` → `CharSplitter`, which cuts at fixed character offsets with no content-type detection — an offset can fall inside a code block, table row, or sentence. `HybridChunker` is the one structural guard: it keeps parser-emitted table units (`metadata.source_type in ("row","column")`) whole and delegates the rest. Chunkers propagate `Document` metadata and add `chunk_index`/`total_chunks`/`chunk_id`, but no chunker derives content type from structure, there is no Markdown-header/code-fence-aware splitter, and there is no structured-query fallback for table-heavy content.
 
 ```mermaid
 flowchart TD
@@ -327,17 +327,17 @@ flowchart TD
     DET --> CD["code → keep function/block whole"]
     PR & TB & CD --> META["tag chunk: content_type, section"]
     META --> IDX["index with metadata filters"]
-    JIW["Jiuwen"] --> CHAR["TextSplitter: character split (no type detection)"]
+    JIW["Jiuwen"] --> CHAR["CharChunker/CharSplitter: fixed offsets (no type detection)"]
     JIW -.->|"absent"| AWARE["content-aware chunking"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56</code> — character chunker, fixed offset splits<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/</code> — chunker package (no Markdown/code-aware variant)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/schema.py:1</code> — <code>DocumentChunk</code> metadata fields</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:34</code> — <code>CharSplitter</code>, fixed offset splits (<code>:56</code> slicing loop)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/char_chunker.py:12</code> — <code>CharChunker</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19</code> — <code>HybridChunker</code> keeps row/column units whole; <code>:76</code> writes <code>chunk_index</code>/<code>total_chunks</code>/<code>chunk_id</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/document.py:30</code> — <code>TextChunk</code> (<code>id_</code>, <code>text</code>, <code>doc_id</code>, <code>metadata</code>, <code>embedding</code>)</sub>
 
 </details>
 
-**Gap.** No content-aware chunking for tables or code blocks; `TextSplitter` can split mid-row or mid-function. No structured-content fallback path wired into the ingest pipeline.
+**Gap.** No prose content-type detection or code-fence awareness; `CharSplitter` can split mid-row or mid-function, and table units stay whole only when a parser emits them as row/column documents. No structured-content fallback path wired into the ingest pipeline.
 
 <sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure, rag-retrieval._</sub>

@@ -222,7 +222,7 @@ The code guards the mechanics but not the quality: construction rejects `chunk_s
 
 **Implementation**
 
-True fixed-size is `CharChunker` (raw character windows via `CharSplitter`). Token-based `TokenizerChunker` is actually sentence-boundary-aware: `SentenceSplitter` uses `pysbd` to segment and packs whole sentences up to a token budget, sub-splitting overly long sentences. `HybridChunker` is a structural guard, not a semantic splitter — it keeps `source_type in ("row","column")` units whole and delegates the rest. There is no embedding-similarity breakpoint chunker and no recursive delimiter hierarchy; `splitter_config` is normalized but never forwarded to `SentenceSplitter` (an inert stub).
+True fixed-size is `CharChunker` (raw character windows via `CharSplitter`). Token-based `TokenizerChunker` is actually sentence-boundary-aware: `SentenceSplitter` uses `pysbd` to segment and packs whole sentences up to a token budget, sub-splitting overly long sentences. `HybridChunker` is a structural guard, not a semantic splitter — it keeps `source_type in ("row","column")` units whole and delegates the rest. There is no embedding-similarity breakpoint chunker and no recursive delimiter hierarchy; `splitter_config` is accepted and normalized but not passed to `SentenceSplitter`.
 
 **Code anchors**
 
@@ -271,7 +271,7 @@ Overlap is a first-class `chunk_overlap` integer (default 50) enforced on both p
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:39` | chunk_overlap: int = 50; :69 overlap >= chunk_size raises; :106 overlap not carried into metadata |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:41` | overlap clamped to [0, size-1]; :54 step = chunk_size - chunk_overlap; :56 slicing loop; :110 token path default chunk_size // 5 |
-| `agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:215` | _flush re-injects trailing sentences ≤ overlap; :186 long-segment window step |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:201` | _flush re-injects trailing sentences ≤ overlap; :186 long-segment window step |
 
 </details>
 
@@ -307,7 +307,7 @@ Structure is preserved at parse time, not chunk time. Excel emits one `Document`
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:32` | _rows_to_documents; :69 source_type: "row"; :96 source_type: "column" |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:32` | _rows_to_documents; :75 source_type: "row"; :102 source_type: "column" |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/word_parser.py:23` | _table_to_markdown; :37 _paragraph_to_markdown (Heading N → N+1 hashes) |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19` | keeps row/column units as one chunk |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/parser/html_file_parser.py:78` | _get_text_from_soup flattens |
@@ -347,10 +347,10 @@ Protection is inconsistent by chunker. `SentenceSplitter` builds chunks from who
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:119` | long-sentence sub-split; :142 _sentences_with_spans; :210 _flush overlap |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:119` | long-sentence sub-split; :142 _sentences_with_spans; :201 _flush overlap |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19` | keep row/column units whole |
 | `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56` | CharSplitter fixed offsets |
-| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_preprocessor.py:53` | WhitespaceNormalizer |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_preprocessor.py:33` | WhitespaceNormalizer |
 | `agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:118` | head/tail truncation; agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:1088 — _build_head_tail_truncated_text |
 
 </details>
@@ -760,7 +760,7 @@ Caps exist (`AgenticRetriever.max_iter` default 2 clamped, `graph_hops`/`max_len
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74` | ToolLoopCompactConfig (default off); :386 compact-or-bailout |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:25/109/157` | cacheable whitelist + per-turn cache + repeat warning |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations=5 |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/context_headroom_rail.py:97` | 60%/80% token-window directives |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/context_headroom_rail.py:64` | 60%/80% token-window directives |
 
 </details>
 
