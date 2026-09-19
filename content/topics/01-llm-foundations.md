@@ -208,7 +208,7 @@ flowchart TD
 
 **General:** Attention spreads over more tokens, diluting the signal for any one of them, and models are empirically better at using information at the beginning and end of the context than in the middle ("lost in the middle"). Irrelevant long context also introduces distractors and can override instructions. Fitting the window is necessary but not sufficient; relevance and ordering matter too.
 
-**Jiuwen:** There is no explicit "lost-in-the-middle" mitigation; the system instead mechanically keeps the window small and biases toward recency. Compressors protect a newest-message tail (`keep_recent_messages`, `messages_to_keep`, `keep_last_round`), offloaders keep only the newest K results, and truncation helpers preserve head + tail (one also keeps a middle slice) rather than only a prefix. When enabled, `CompressionRecallConfig` archives replaced messages in overlapping token chunks and a two-stage BM25 retriever can re-surface relevant archived chunks by query — the closest thing to relevance-based long-context handling.
+**Jiuwen:** The system keeps the window small and biases toward recency, and it preserves the middle when trimming: Compressors protect a newest-message tail (`keep_recent_messages`, `messages_to_keep`, `keep_last_round`), offloaders keep only the newest K results, and truncation helpers preserve head + tail (one also keeps a middle slice) rather than only a prefix. When enabled, `CompressionRecallConfig` archives replaced messages in overlapping token chunks and a two-stage BM25 retriever can re-surface relevant archived chunks by query — the closest thing to relevance-based long-context handling.
 
 ```mermaid
 flowchart TD
@@ -217,7 +217,7 @@ flowchart TD
     BIG --> KEEP["offloaders keep last-K tool results"]
     TRUNC --> SMALL["smaller, recency-weighted prompt"]
     SMALL --> BM25["optional: BM25 re-retrieval of archived chunks by query"]
-    BIG -.->|"absent"| X["no lost-in-the-middle awareness / no importance reordering"]
+    BIG -.->|"partial"| X["middle-preserving truncation + compression-recall; no importance reordering"]
 ```
 
 <details>
@@ -411,7 +411,7 @@ flowchart TD
 
 **General:** This claim is largely true: the useful thing to assess is what is actually inside the context window at generation time, not the model's stored knowledge; the one qualification is that the same question can also probe retrieval when the context is fetched. why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. Reason about context *contents*, not model capability: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
 
-**Jiuwen:** The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. There is no lost-in-the-middle awareness and no entity disambiguation/aliasing.
+**Jiuwen:** The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. Truncation keeps head + middle + tail rather than only a prefix, and compression-recall can re-surface archived chunks; there is no separate importance-reordering step, and entity disambiguation/aliasing is not implemented.
 
 ```mermaid
 flowchart TD
@@ -419,7 +419,7 @@ flowchart TD
     W --> DROP["FIFO drop beyond max_context_message_num"]
     W --> OFF["offload large tool results"]
     W --> COMP["compaction (summary replaces old turns)"]
-    W -.->|"absent"| X["lost-in-the-middle awareness · entity disambiguation"]
+    W -.->|"partial"| X["middle-preserving truncation · compression-recall; no importance reordering · no entity disambiguation"]
 ```
 
 <details>

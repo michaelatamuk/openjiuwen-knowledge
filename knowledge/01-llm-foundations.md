@@ -353,11 +353,11 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 **Implementation**
 
-There is no explicit "lost-in-the-middle" mitigation; the system instead mechanically keeps the window small and biases toward recency. Compressors protect a newest-message tail (`keep_recent_messages`, `messages_to_keep`, `keep_last_round`), offloaders keep only the newest K results, and truncation helpers preserve head + tail (one also keeps a middle slice) rather than only a prefix. When enabled, `CompressionRecallConfig` archives replaced messages in overlapping token chunks and a two-stage BM25 retriever can re-surface relevant archived chunks by query — the closest thing to relevance-based long-context handling.
+The system keeps the window small and biases toward recency, and it preserves the middle when trimming: Compressors protect a newest-message tail (`keep_recent_messages`, `messages_to_keep`, `keep_last_round`), offloaders keep only the newest K results, and truncation helpers preserve head + tail (one also keeps a middle slice) rather than only a prefix. When enabled, `CompressionRecallConfig` archives replaced messages in overlapping token chunks and a two-stage BM25 retriever can re-surface relevant archived chunks by query — the closest thing to relevance-based long-context handling.
 
 **Implementation diagram**
 
-![diagram](assets/diagrams/f2814a4283a4122d4ca23e3a80e483b215eacfb3.png)
+![diagram](assets/diagrams/51caf88e359ebd8c7d37c6ef61898bb7e503024c.png)
 
 **Code anchors**
 
@@ -631,7 +631,7 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 
 **Concept.** This claim is largely true: the useful thing to assess is what is actually inside the context window at generation time, not the model's stored knowledge; the one qualification is that the same question can also probe retrieval when the context is fetched. why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. Reason about context *contents*, not model capability: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
 
-![diagram](assets/diagrams/6f8e562afe712788463475e4f6b632d565128a10.png)
+![diagram](assets/diagrams/d46f63808b7f39d0c0dd83d9fe29c2ed7939543c.png)
 
 **In Jiuwen.** The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond the max context message count, all biased toward the newest turns.
 
@@ -640,7 +640,7 @@ The repo collects token **logprobs** but does not expose an uncertainty/abstenti
 
 **Implementation**
 
-The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. There is no lost-in-the-middle awareness and no entity disambiguation/aliasing.
+The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. Truncation keeps head + middle + tail rather than only a prefix, and compression-recall can re-surface archived chunks; there is no separate importance-reordering step, and entity disambiguation/aliasing is not implemented.
 
 **Code anchors**
 
