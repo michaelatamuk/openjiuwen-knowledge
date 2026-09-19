@@ -19,7 +19,9 @@ theme:
   features:
     - navigation.top
     - navigation.tracking
-    - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
     - search.highlight
     - search.suggest
     - content.code.copy
