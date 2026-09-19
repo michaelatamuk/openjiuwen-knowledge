@@ -24,7 +24,7 @@
 
 **Implementation**
 
-None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG, no ranked-list metric interface (`Metric.compute(prediction, label)` is pairwise), and no gold-relevance set. The only recall/precision present is *classification* metrics in the PerStream example and sklearn gate tests. The reranker's only before/after evidence is a demo score-delta script with no labels.
+Retrieval quality is measured outside the framework: `recall_at_k`, `precision_at_k`, MRR, and NDCG are not computed, the `Metric.compute(prediction, label)` interface is pairwise rather than ranked-list, and there is no gold-relevance set. The recall/precision that do exist are *classification* metrics in the PerStream example and sklearn gate tests; the reranker's only before/after evidence is a demo score-delta script with no labels.
 
 **Code anchors**
 
@@ -62,7 +62,7 @@ None of these metrics exist. There is no `recall_at_k`/`precision_at_k`/MRR/NDCG
 
 **Implementation**
 
-There is no tooling for "does the retrieved chunk contain the answer". The closest signals: `score_threshold` defaults to `None` (so weak chunks pass), relevance checks are lexical (`free_search`), and the judges (`AccuracyEvaluator`, `LLMAsJudgeMetric`) do not receive the retrieved context, so they cannot distinguish "context lacks the answer" from "model ignored it". The `VerificationReviewer`'s `Correctness` dimension checks the output, not the grounding.
+The signals for "does the retrieved chunk contain the answer" are weak: `score_threshold` defaults to `None` (so weak chunks pass), relevance checks are lexical (`free_search`), and the judges (`AccuracyEvaluator`, `LLMAsJudgeMetric`) do not receive the retrieved context, so they cannot distinguish "context lacks the answer" from "model ignored it". The `VerificationReviewer`'s `Correctness` dimension checks the output, not the grounding.
 
 **Code anchors**
 

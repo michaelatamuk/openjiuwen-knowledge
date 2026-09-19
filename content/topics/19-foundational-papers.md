@@ -70,7 +70,7 @@
 
 **Definition:** Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time. Stable supervised objective; enables high-quality image generation. Foundation for Stable Diffusion, DALL-E 2. Inference: start from pure noise, run reverse T steps → generated image. Latent Diffusion Models (Stable Diffusion) compress to a VAE latent space for ~8× compute reduction. Quality levers: steps, guidance scale, scheduler.
 
-**Jiuwen:** No diffusion integration; image generation tools appear as external `ToolCard` calls.
+**Jiuwen:** Image generation is handled by external tools (`ToolCard` calls); diffusion is not part of the framework.
 
 ---
 

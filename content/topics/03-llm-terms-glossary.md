@@ -160,7 +160,7 @@ flowchart LR
 
 **Where it bites:** it is a property of next-token objective, not a bug you patch; it is mitigated by grounding (retrieval/citations), verification, and abstention — none of which are free.
 
-**Jiuwen:** No hallucination/attribution detector. Mitigations exist separately: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer `Correctness` dimension, and the RSI evidence-citation rubric — none receives the retrieved context as a faithfulness check.
+**Jiuwen:** Hallucination is handled through mitigations rather than one detector: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer `Correctness` dimension, and the RSI evidence-citation rubric. None receives the retrieved context as a faithfulness check.
 
 <details>
 <summary>Anchors</summary>
@@ -224,7 +224,7 @@ flowchart LR
 
 **Where it bites:** helps multi-step reasoning/arithmetic (its benefit grows with model scale; unreliable on small models); largely subsumed by native reasoning models, and it adds tokens.
 
-**Jiuwen:** No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxiliary prompts (workflow `questioner_comp`) and implicitly in compaction. Reasoning-model output (`reasoning_content`) is parsed and preserved.
+**Jiuwen:** Explicit CoT appears in auxiliary prompts (workflow `questioner_comp`) and implicitly in compaction, rather than as one global instruction in the DeepAgent prompt. Reasoning-model output (`reasoning_content`) is parsed and preserved.
 
 <details>
 <summary>Anchors</summary>

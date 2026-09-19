@@ -339,7 +339,7 @@ A `Reranker` ABC with cross-encoder/LLM variants exists, but it is wired only in
 
 **Implementation**
 
-No hallucination/attribution detector. Mitigations exist separately: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer `Correctness` dimension, and the RSI evidence-citation rubric — none receives the retrieved context as a faithfulness check.
+Hallucination is handled through mitigations rather than one detector: a verification agent (read-only evidence, PASS/FAIL/PARTIAL), a reviewer `Correctness` dimension, and the RSI evidence-citation rubric. None receives the retrieved context as a faithfulness check.
 
 **Code anchors**
 
@@ -480,7 +480,7 @@ The runtime agent is zero-shot; few-shot example injection exists only in the tu
 
 **Implementation**
 
-No global CoT instruction in the DeepAgent prompt; explicit CoT appears in auxiliary prompts (workflow `questioner_comp`) and implicitly in compaction. Reasoning-model output (`reasoning_content`) is parsed and preserved.
+Explicit CoT appears in auxiliary prompts (workflow `questioner_comp`) and implicitly in compaction, rather than as one global instruction in the DeepAgent prompt. Reasoning-model output (`reasoning_content`) is parsed and preserved.
 
 **Code anchors**
 

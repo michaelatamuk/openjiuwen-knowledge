@@ -198,7 +198,7 @@ Pretraining out of scope; Chinchilla-aware base model selection is an operator-l
 
 **Implementation**
 
-No diffusion integration; image generation tools appear as external `ToolCard` calls.
+Image generation is handled by external tools (`ToolCard` calls); diffusion is not part of the framework.
 
 </details>
 
