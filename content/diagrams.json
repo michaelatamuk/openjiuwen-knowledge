@@ -195,5 +195,41 @@
  "01-10": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    LONG[\"long context that fits the window\"] --> DIL[\"attention diluted across more tokens\"]\n    LONG --> MID[\"middle of context used poorly (lost in the middle)\"]\n    LONG --> DIS[\"distractors can override instructions\"]\n    DIL --> HARM[\"worse answers even though it fits\"]\n    MID --> HARM\n    DIS --> HARM\n    HARM --> FIX[\"retrieve less · rerank · put key info at the ends\"]"
+ },
+ "21-1": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    LOOP([\"agent loop: model → tools → answer\"]) --> A[\"outer task loop\"]\n    LOOP --> B[\"safety & injection filtering\"]\n    LOOP --> C[\"permissions & sensitive data\"]\n    LOOP --> D[\"resilience: retries & loop detection\"]\n    LOOP --> E[\"memory & context\"]\n    LOOP --> F[\"observability & cost\"]\n    LOOP --> G[\"capability composition\"]"
+ },
+ "21-2": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    A([\"invoke\"]) --> B[\"before invoke\"] --> C[\"before task iteration\"] --> D[\"before model call\"] --> E[\"model call\"] --> F[\"after model call\"] --> G[\"before tool call\"] --> H[\"tool call\"] --> I[\"after tool call\"] --> J[\"after task iteration\"] --> K[\"after invoke\"]\n    D -.->|\"repeats per tool round\"| D"
+ },
+ "21-3": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    X[\"a cross-cutting concern\"] --> P[\"prompt: advises only\"]\n    X --> T[\"tool: capability, no policy\"]\n    X --> H[\"lifecycle hook: intercepts · blocks · meters · traces\"]"
+ },
+ "21-4": {
+  "technical": "__existing__",
+  "concept": "flowchart LR\n    CLS[\"lifecycle-hook class\"] --> REG[\"register once (name in catalog)\"]\n    REG --> CAT[\"registry\"]\n    SPEC[\"spec: ordered (name, params) list\"] --> RES[\"resolve + instantiate\"]\n    CAT --> RES\n    RES --> PIPE[\"agent pipeline\"]"
+ },
+ "21-5": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    G([\"long-horizon goal\"]) --> OUT{{\"outer task loop\"}}\n    OUT --> EP[\"inner episode (one invocation)\"]\n    EP --> C{\"goal complete?\"}\n    C -->|no| OUT\n    C -->|yes| D([\"done\"])"
+ },
+ "21-6": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    FX[\"deterministic model + tool fixtures\"] --> AG[\"agent with the hook under test\"]\n    AG --> H1[\"happy path → before/after hooks\"]\n    AG --> H2[\"exception path → on-exception hooks\"]\n    AG --> H3[\"composition → state visible across priorities\"]"
+ },
+ "21-7": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    OUTER[\"outer domain: invoke + task-iteration events\"] --> BR{\"bridge?\"}\n    BR -->|yes| INNER[\"inner domain: model-call + tool-call events\"]\n    BR -->|no| KEEP[\"stays on the outer harness\"]"
+ },
+ "21-8": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    DISC[\"new capability discovered at runtime\"] --> RES[\"resolve new hooks + tools\"]\n    RES --> BIND[\"bind into the live pipeline at its priority\"]\n    BIND --> LIVE[\"agent keeps running with the new capability\"]"
+ },
+ "21-9": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    RUN[\"agent run produces a trajectory\"] --> CAP[\"capture reusable patterns\"]\n    CAP --> GATE{\"quality + approval gate\"}\n    GATE -->|pass| STORE[\"persist as a reusable skill\"]\n    GATE -->|fail| DROP[\"discard\"]\n    STORE --> NEXT[\"future runs start with it\"]"
  }
 }
