@@ -240,12 +240,8 @@ fun ExploreScreen(repo: Repo, onTopic: (String) -> Unit) {
             }
             items(items, key = { it.id }) { t ->
                 Card(Modifier.fillMaxWidth().clickable { onTopic(t.id) }) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(t.id, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(14.dp))
-                        Text(t.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    }
+                    Text(t.title, style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp))
                 }
             }
         }
@@ -301,8 +297,6 @@ fun TopicScreen(repo: Repo, topicId: String, onQuestion: (String) -> Unit) {
                         Text(topic.section, style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         Text(topic.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    } else {
-                        Text(topicId, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
                 }
                 var menu by remember { mutableStateOf(false) }
@@ -376,8 +370,6 @@ fun QuestionScreen(repo: Repo, questionId: String) {
                     Text(topic.section, style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     Text(topic.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                } else {
-                    Text(item.topicId, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             }
             IconButton(onClick = { scope.launch { repo.toggleBookmark(questionId, isBookmarked) } }) {
@@ -472,9 +464,6 @@ fun SearchScreen(repo: Repo, onQuestion: (String) -> Unit) {
                 Card(Modifier.fillMaxWidth().clickable { onQuestion(q.id) }) {
                     Column(Modifier.padding(14.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(q.topicId, style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary)
-                            Spacer(Modifier.width(8.dp))
                             TypeBadge(q.type)
                         }
                         Text(q.question, maxLines = 2, overflow = TextOverflow.Ellipsis)
