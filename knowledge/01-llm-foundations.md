@@ -245,7 +245,46 @@ Architecture type is selected by model/provider choice rather than a config flag
 
 ---
 
-## 7. What's the difference between a model's context window and its training data cutoff
+## 7. What is the difference between a base model and an instruct model?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** A base model predicts text; an instruct model has been through SFT + reward modeling + RLHF/DPO to follow instructions and decline harmful requests.
+
+**Key points.**
+
+- Base model: next-token prediction on massive corpus — no assistant persona, completes in any style seen during training
+- Stage 1 SFT: fine-tune on helpful demonstrations — teaches format and tone
+- Stage 2: reward model trained on human preference rankings
+- Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior
+- Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base
+
+**Concept.** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
+
+![diagram](assets/diagrams/a304b162e1d37615c8b1c48fbc8784eab24df514.png)
+
+**In Jiuwen.** No base/instruct distinction in model config schema: ProviderType + model_name string selects a model (agent-core/openjiuwen/core/foundation/llm/schema/config.py:13). agent_rl/online/backends/sft/trainer.py:1 is the SFT stage that produces an instruct-model-like output from demonstration data — the framework implements the alignment training pipeline but does not tag served models as base vs instruct. GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) provides inference-time safety supplement but does not substitute for RLHF/DPO training.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. Jiuwen does not perform base→instruct alignment; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than a full alignment pipeline. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType (no instruct/base flag) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFT stage (produces instruct-like model from base) |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | inference-time safety supplement |
+
+</details>
+
+---
+
+## 8. What's the difference between a model's context window and its training data cutoff
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
@@ -283,7 +322,7 @@ Model metadata here is operational only: model name, provider, context-window to
 
 ---
 
-## 8. What happens when a conversation exceeds the model's context window
+## 9. What happens when a conversation exceeds the model's context window
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -329,7 +368,7 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 ---
 
-## 9. Why does model performance sometimes degrade with very long context, even when the context fits
+## 10. Why does model performance sometimes degrade with very long context, even when the context fits
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
@@ -374,247 +413,7 @@ The system keeps the window small and biases toward recency, and it preserves th
 
 ---
 
-## 10. What does temperature actually control, mathematically, in the output distribution
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.
-
-**Key points.**
-
-- softmax(z/T); T = 1 leaves the model's raw distribution unchanged.
-- T → 0 collapses toward argmax; T > 1 flattens.
-- Only relative probabilities change; the token set stays the same.
-- Use T = 0 for extraction/classification, higher for creative work.
-
-**Concept.** The model produces logits `z_i` for the next token. Temperature `T` rescales them: `softmax(z_i / T)`. As `T → 0` the distribution collapses toward the argmax (greedy/deterministic); as `T` rises the distribution flattens, increasing diversity and the chance of lower-probability tokens. `T = 1` leaves the model's raw distribution unchanged. It does not change which tokens are possible, only their relative probabilities.
-
-![diagram](assets/diagrams/238a8fbf8d947a1b60de1ecd58b9486c817044f8.png)
-
-**In Jiuwen.** Temperature is mostly passed through to the provider, which does the math, and is also implemented for local models. At the client layer it defaults to unset and is added only when you specify it, and your request-level value overrides the config. Hosted quirks are handled: some OpenAI-style endpoints keep only one of temperature/top-p, and Anthropic routes sampling differently. Locally it divides logits by temperature and falls back to greedy at zero, with a default of 0.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Temperature is a **passthrough request parameter** — hosted APIs apply the math — with a local implementation on the HF/vLLM path. At the core client layer `temperature`/`top_p` default to `None` and are added only when set; request-level args override `ModelRequestConfig`. OpenAI-compatible calls targeting `openai.com` keep only one of temperature/top_p (temperature wins, top_p dropped); Anthropic routes sampling through `extra_body` and drops `top_p` when temperature is explicitly set. The local sampler divides logits by temperature and softmaxes, with `T <= 0` falling back to argmax. The local `GenerationConfig` default is `temperature=0.0`.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:210` | temperature: Optional[float] = None |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:556` | final_temperature = ...; added only when not None |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:944` | drops top_p when temperature present (openai.com) |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:929` | temperature via extra_body; drops top_p if both set |
-| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:516` | scores = next_token_logits / max(1e-6, temperature) |
-| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:60` | GenerationConfig.temperature: float = 0.0 |
-
-</details>
-
----
-
-## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).
-
-**Key points.**
-
-- Top-k: fixed candidate count regardless of confidence.
-- Top-p: adaptive — few tokens when peaked, many when flat.
-- Often combined; top-p usually adapts better.
-
-**Concept.** Both truncate the next-token distribution before sampling. Top-k keeps the `k` most probable tokens and renormalizes — a fixed candidate count regardless of how peaked the distribution is. Top-p keeps the smallest set of tokens whose cumulative probability reaches `p` — an adaptive count: few tokens when the model is confident, many when it is flat. Top-p usually adapts better; they are often combined.
-
-![diagram](assets/diagrams/f9bc8addc668c21bac4ea20da1df5e21002fcc4c.png)
-
-**In Jiuwen.** Jiuwen samples locally with top-p (nucleus): it keeps the smallest token set reaching the target cumulative probability, renormalizes, and samples. There is no top-k field for generation; hosted models receive top-p (Anthropic also accepts top-k if passed). Elsewhere the codebase reuses 'top-k' for retrieval counts, unrelated to sampling.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Local generation samples with top-p (nucleus): `GenerationConfig` exposes `top_p` (default `1.0`), and top-k is not a local sampling field. The local sampler sorts scores, masks tokens beyond the cumulative `top_p`, re-softmaxes, and multinomial-samples; `top_p == 1.0` samples the full distribution. Hosted providers receive `top_p` in the normal body; Anthropic additionally forwards `top_k` via `extra_body` if present. Note three unrelated `top_k` meanings in the codebase that are **not** LLM sampling: retrieval result count, trie-constraint allowed outputs, and logit-selection candidate scoring.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:61` | GenerationConfig.top_p: float = 1.0; no top_k sampling field |
-| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:517` | nucleus top_p truncation; :534 full-distribution softmax when top_p ∉ (0,1) |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:561` | top_p resolved/passed |
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:936` | top_p via extra_body; :940 top_k forwarded if present |
-| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:213` | top_p: Optional[float] = None (no top_k) |
-| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:40` | TrieConstraint.top_k (allowed outputs, not sampling) |
-
-</details>
-
----
-
-## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.
-
-**Key points.**
-
-- Greedy = argmax each step; it cannot recover from one bad choice.
-- Sampling adds diversity and naturalness.
-- Extraction/classification → greedy; open-ended → sampling.
-
-**Concept.** Greedy picks the single highest-probability token each step. That is locally optimal but not globally: it can lock into repetitive, degenerate, or bland sequences, and it cannot recover from one early bad choice. Sampling explores alternatives, which often yields more natural and diverse text; a moderate temperature with top-p is a common default. For tasks with a single correct answer (extraction, classification), greedy/`T=0` is usually preferred.
-
-![diagram](assets/diagrams/33f8b320625039d9d0a2256ed21f710048e21155.png)
-
-**In Jiuwen.** Greedy decoding is what you get at temperature zero: the local sampler returns the single highest-probability token and disables sampling. Because the local default temperature is 0, greedy is the default. Many internal call sites deliberately use temperature 0 for deterministic extraction/classification and switch to sampling when temperature is above zero. Tellingly, the code treats this purely as a determinism switch — there is no reasoning anywhere about why greedy can produce worse text.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Greedy is implemented but not argued. The local sampler returns `argmax` when `temperature <= 0.0`, and the generate path sets `do_sample=False` in that branch; since `GenerationConfig` defaults to `temperature=0.0`, the local default is greedy. Many framework call sites deliberately pass `temperature=0.0` for deterministic extraction/classification, while sampling is enabled (`do_sample=True`, temperature/top_p/seed) when temperature > 0. There is **no** comment, doc, or code discussion explaining why greedy can be worse than sampling — the choice is treated purely as a determinism knob.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:514` | if temperature <= 0.0: return int(torch.argmax(...)) |
-| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:335` | do_sample=True when temperature > 0; :344 do_sample=False |
-| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:60` | default temperature = 0.0 ⇒ local default greedy |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/verl_executor.py:185` | remax_input.meta_info["do_sample"] = False (REMAX baseline, not an exploit path) |
-| `agent-core/openjiuwen/core/retrieval/indexing/processor/extractor/triple_extractor.py:31` | constructor default temperature=0.0 |
-
-</details>
-
----
-
-## 13. Why do LLMs struggle with tasks like counting or basic arithmetic
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.
-
-**Key points.**
-
-- BPE hides characters, so letter counting fails.
-- Multi-digit arithmetic requires carrying, which is not learned reliably.
-- Fix it with tool use (calculator/code), not a bigger prompt.
-
-**Concept.** The model operates on tokens, not characters or digits-as-numbers; counting letters requires character-level reasoning that BPE hides, and multi-digit arithmetic requires carrying/positional algorithms that are error-prone to learn implicitly. Models also have no scratchpad guarantee unless asked to show work. The reliable fix is tool use — call a calculator or run code — rather than expecting the forward pass to do exact math.
-
-![diagram](assets/diagrams/fa2f043411cb44dc038eefd095058ef5a272ee54.png)
-
-**In Jiuwen.** Jiuwen treats math as a tool problem. A canonical example teaches an agent to call a calculator tool (arithmetic via a safe evaluator, algebra via a symbolic library), and the prompt walks it through the steps. More generally, agents can run code in a sandbox to do math and logic. The repo's evaluation code even encodes the rule that 'textual arithmetic is never accepted as execution' — results must come from real execution.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The repo frames arithmetic/counting as a tool-augmentation problem. A canonical example trains a DeepAgent to call a `calculator` tool that evaluates arithmetic via `simpleeval` and solves/simplifies algebra/equations via `sympy`; the system prompt explicitly instructs tool use step by step. More generally, an `execute_code` sandbox operation (JiuwenBox/YuanRong/AIO providers plus a local provider) lets agents run code for math/logic. The RSI evidence analyzer encodes the principle "textual arithmetic is never accepted as execution" — verification must come from actual code execution.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/examples/rl_calculator/tools.py:11-14` | @tool(name="calculator"); :15-85 simple_eval + sympy |
-| `agent-core/examples/rl_calculator/prompts.py:7-16` | "Use the calculator tool … step by step" |
-| `agent-core/openjiuwen/core/sys_operation/code.py:16-49` | execute_code sys-operation |
-| `agent-core/openjiuwen/extensions/sys_operation/sandbox/providers/jiuwenbox.py:2927` | sandbox execute_code |
-| `agent-core/openjiuwen/rsi/harness_rsi/evaluation_result_analyzer/evidence_investigation.py:200` | "textual arithmetic is never accepted as execution" |
-
-</details>
-
----
-
-## 14. What is hallucination, and why does it happen even in a well-trained model
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.
-
-**Key points.**
-
-- Objective is plausibility, not factuality; there is no built-in fact store.
-- Generalized patterns fabricate specifics confidently.
-- Mitigations: retrieval/citations, verification, constrained formats, abstention.
-- It is a property of the objective, not a bug you patch in the weights.
-
-**Concept.** Hallucination is fluent output that is not grounded in fact or in the provided context. It arises because the objective is next-token likelihood, not truth: the model optimizes plausibility, has no built-in fact database, generalizes patterns that sometimes fabricate specifics, and cannot reliably know the boundary of its own knowledge. Mitigations are grounding (retrieval/citations), verification, constrained formats, and abstention — not a property of the weights you can simply "fix".
-
-![diagram](assets/diagrams/cf8077ba07e835de38a33a0c3a9216ecbf129b0a.png)
-
-**In Jiuwen.** Hallucination is addressed by mitigations rather than in-model detection: retrieval infrastructure to supply evidence; a verification agent limited to read-only/command tools that must show real command output and give a PASS/FAIL/PARTIAL verdict; an LLM reviewer scoring correctness and completeness; anomaly detection for degenerate repetition/loops (not false claims); and security guardrails. Claim-to-source attribution is not part of this stack.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The repo does not model or detect low-level hallucination; it implements downstream mitigations: (1) retrieval-augmentation infrastructure to supply evidence; (2) a dedicated **verification agent** restricted to read-only/command tools that must show verbatim command output with a PASS/FAIL/PARTIAL verdict; (3) an LLM quality reviewer scoring CORRECTNESS/COMPLETENESS; (4) model-anomaly rails that catch degenerate repetition/loops (not false claims); and (5) security guardrails/sanitization for injection and secret leakage. There is no claim-to-source attribution checker.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110-117` | repeated stream output / timeouts / tool-call loops (degeneracy, not factual errors) |
-| `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92-108` | VerificationRail tool allowlist; :165-196 blocks disallowed tools, requires evidence |
-| `agent-core/openjiuwen/agent_teams/verification/reviewer.py:127` | VerificationReviewer (LLM reviewer, correctness/completeness) |
-| `agent-core/openjiuwen/core/security/guardrail/backends.py:39-80` | guardrail detection backends; agent-core/openjiuwen/core/security/guardrail/context.py:115-202 confidence thresholds → risk levels |
-| `agent-core/openjiuwen/harness/tools/web/paid_search.py:221-222` | extracts citation URLs (no claim linkage) |
-| `agent-core/openjiuwen/agent_evolving/tools/skill.py:284` | "then cite only the refs you actually read" |
-
-</details>
-
----
-
-## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.
-
-**Key points.**
-
-- Wrong = factually incorrect; uncertain = low confidence in the distribution.
-- Fluent text carries no calibrated confidence.
-- Approximations — logprobs, entropy, self-consistency — are all imperfect.
-- Abstention only helps if it correlates with being wrong.
-
-**Concept.** Wrong means the answer is factually incorrect; uncertain means the model's distribution is not confident, which may still yield a correct or incorrect answer. They are independent: a model can be confidently wrong, or rightly unsure. From the surface text alone you generally cannot tell — fluent text carries no calibrated confidence. Token log-probabilities, entropy, or self-consistency/vote checking can approximate uncertainty, but they are imperfect and need calibration; abstention only helps if it correlates with being wrong.
-
-![diagram](assets/diagrams/07a4334b0eeb57efb62c0bcde2d414d2b06c738a.png)
-
-**In Jiuwen.** Jiuwen captures token log-probabilities for RL training and uses them in one place — a reranker that reads the 'yes'/'no' logprobs for a binary relevance call. They are not turned into an uncertainty or 'I do not know' signal for normal answers; retrieval has its own abstain token (about returning a document, not answer uncertainty), and there is no calibrated confidence threshold at which the agent abstains.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The repo collects token **logprobs** but does not expose an uncertainty/abstention signal on ordinary agent answers. `ReactAgent` can request `logprobs`/`top_logprobs`, captured into canonical RL trajectory spans and validated (must be ≤ 0) for RL training. `ChatReranker` uses them for one specific binary decision: it exponentiates the top-logprobs of "yes"/"no" and normalizes to a relevance probability. The retrieval subsystem has an explicit abstain token ("0"), but that is retrieval-selection abstention, not output uncertainty. There is no confidence threshold at which an agent says "I don't know," and no calibration.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:83-107` | exp(logprob) yes/no → normalized confidence; :134-141 logprobs=True, top_logprobs=5, yes/no logit bias |
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:294-303` | llm_logprobs/llm_top_logprobs; :1622-1624 passes to model call |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:404-427` | parses per-token logprobs, rejects > 0 |
-| `agent-core/openjiuwen/agent_evolving/trajectory/schema.py:36-47` | RL_LOGPROBS; agent-core/openjiuwen/agent_evolving/trajectory/spans.py:849-873 — read_rl_fields |
-| `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305-315` | is_abstain from output token "0" (retrieval only) |
-
-</details>
-
----
-
-## 16. "How does the model know X" is really testing context window understanding
+## 11. "How does the model know X" is really testing context window understanding
 
 <span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -656,40 +455,241 @@ The context engine decides what is in the window and how it is trimmed: a strict
 
 ---
 
-## 17. What is the difference between a base model and an instruct model?
+## 12. What does temperature actually control, mathematically, in the output distribution
 
-<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
-**TL;DR.** A base model predicts text; an instruct model has been through SFT + reward modeling + RLHF/DPO to follow instructions and decline harmful requests.
+**TL;DR.** Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.
 
 **Key points.**
 
-- Base model: next-token prediction on massive corpus — no assistant persona, completes in any style seen during training
-- Stage 1 SFT: fine-tune on helpful demonstrations — teaches format and tone
-- Stage 2: reward model trained on human preference rankings
-- Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior
-- Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base
+- softmax(z/T); T = 1 leaves the model's raw distribution unchanged.
+- T → 0 collapses toward argmax; T > 1 flattens.
+- Only relative probabilities change; the token set stays the same.
+- Use T = 0 for extraction/classification, higher for creative work.
 
-**Concept.** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
+**Concept.** The model produces logits `z_i` for the next token. Temperature `T` rescales them: `softmax(z_i / T)`. As `T → 0` the distribution collapses toward the argmax (greedy/deterministic); as `T` rises the distribution flattens, increasing diversity and the chance of lower-probability tokens. `T = 1` leaves the model's raw distribution unchanged. It does not change which tokens are possible, only their relative probabilities.
 
-![diagram](assets/diagrams/a304b162e1d37615c8b1c48fbc8784eab24df514.png)
+![diagram](assets/diagrams/238a8fbf8d947a1b60de1ecd58b9486c817044f8.png)
 
-**In Jiuwen.** No base/instruct distinction in model config schema: ProviderType + model_name string selects a model (agent-core/openjiuwen/core/foundation/llm/schema/config.py:13). agent_rl/online/backends/sft/trainer.py:1 is the SFT stage that produces an instruct-model-like output from demonstration data — the framework implements the alignment training pipeline but does not tag served models as base vs instruct. GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) provides inference-time safety supplement but does not substitute for RLHF/DPO training.
+**In Jiuwen.** Temperature is mostly passed through to the provider, which does the math, and is also implemented for local models. At the client layer it defaults to unset and is added only when you specify it, and your request-level value overrides the config. Hosted quirks are handled: some OpenAI-style endpoints keep only one of temperature/top-p, and Anthropic routes sampling differently. Locally it divides logits by temperature and falls back to greedy at zero, with a default of 0.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. Jiuwen does not perform base→instruct alignment; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than a full alignment pipeline. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+Temperature is a **passthrough request parameter** — hosted APIs apply the math — with a local implementation on the HF/vLLM path. At the core client layer `temperature`/`top_p` default to `None` and are added only when set; request-level args override `ModelRequestConfig`. OpenAI-compatible calls targeting `openai.com` keep only one of temperature/top_p (temperature wins, top_p dropped); Anthropic routes sampling through `extra_body` and drops `top_p` when temperature is explicitly set. The local sampler divides logits by temperature and softmaxes, with `T <= 0` falling back to argmax. The local `GenerationConfig` default is `temperature=0.0`.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType (no instruct/base flag) |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFT stage (produces instruct-like model from base) |
-| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | inference-time safety supplement |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:210` | temperature: Optional[float] = None |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:556` | final_temperature = ...; added only when not None |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:944` | drops top_p when temperature present (openai.com) |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:929` | temperature via extra_body; drops top_p if both set |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:516` | scores = next_token_logits / max(1e-6, temperature) |
+| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:60` | GenerationConfig.temperature: float = 0.0 |
+
+</details>
+
+---
+
+## 13. What's the difference between top-k sampling and top-p (nucleus) sampling
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).
+
+**Key points.**
+
+- Top-k: fixed candidate count regardless of confidence.
+- Top-p: adaptive — few tokens when peaked, many when flat.
+- Often combined; top-p usually adapts better.
+
+**Concept.** Both truncate the next-token distribution before sampling. Top-k keeps the `k` most probable tokens and renormalizes — a fixed candidate count regardless of how peaked the distribution is. Top-p keeps the smallest set of tokens whose cumulative probability reaches `p` — an adaptive count: few tokens when the model is confident, many when it is flat. Top-p usually adapts better; they are often combined.
+
+![diagram](assets/diagrams/f9bc8addc668c21bac4ea20da1df5e21002fcc4c.png)
+
+**In Jiuwen.** Jiuwen samples locally with top-p (nucleus): it keeps the smallest token set reaching the target cumulative probability, renormalizes, and samples. There is no top-k field for generation; hosted models receive top-p (Anthropic also accepts top-k if passed). Elsewhere the codebase reuses 'top-k' for retrieval counts, unrelated to sampling.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Local generation samples with top-p (nucleus): `GenerationConfig` exposes `top_p` (default `1.0`), and top-k is not a local sampling field. The local sampler sorts scores, masks tokens beyond the cumulative `top_p`, re-softmaxes, and multinomial-samples; `top_p == 1.0` samples the full distribution. Hosted providers receive `top_p` in the normal body; Anthropic additionally forwards `top_k` via `extra_body` if present. Note three unrelated `top_k` meanings in the codebase that are **not** LLM sampling: retrieval result count, trie-constraint allowed outputs, and logit-selection candidate scoring.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:61` | GenerationConfig.top_p: float = 1.0; no top_k sampling field |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:517` | nucleus top_p truncation; :534 full-distribution softmax when top_p ∉ (0,1) |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:561` | top_p resolved/passed |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:936` | top_p via extra_body; :940 top_k forwarded if present |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:213` | top_p: Optional[float] = None (no top_k) |
+| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:40` | TrieConstraint.top_k (allowed outputs, not sampling) |
+
+</details>
+
+---
+
+## 14. Why does greedy decoding sometimes produce worse output than sampling-based decoding
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.
+
+**Key points.**
+
+- Greedy = argmax each step; it cannot recover from one bad choice.
+- Sampling adds diversity and naturalness.
+- Extraction/classification → greedy; open-ended → sampling.
+
+**Concept.** Greedy picks the single highest-probability token each step. That is locally optimal but not globally: it can lock into repetitive, degenerate, or bland sequences, and it cannot recover from one early bad choice. Sampling explores alternatives, which often yields more natural and diverse text; a moderate temperature with top-p is a common default. For tasks with a single correct answer (extraction, classification), greedy/`T=0` is usually preferred.
+
+![diagram](assets/diagrams/33f8b320625039d9d0a2256ed21f710048e21155.png)
+
+**In Jiuwen.** Greedy decoding is what you get at temperature zero: the local sampler returns the single highest-probability token and disables sampling. Because the local default temperature is 0, greedy is the default. Many internal call sites deliberately use temperature 0 for deterministic extraction/classification and switch to sampling when temperature is above zero. Tellingly, the code treats this purely as a determinism switch — there is no reasoning anywhere about why greedy can produce worse text.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Greedy is implemented but not argued. The local sampler returns `argmax` when `temperature <= 0.0`, and the generate path sets `do_sample=False` in that branch; since `GenerationConfig` defaults to `temperature=0.0`, the local default is greedy. Many framework call sites deliberately pass `temperature=0.0` for deterministic extraction/classification, while sampling is enabled (`do_sample=True`, temperature/top_p/seed) when temperature > 0. There is **no** comment, doc, or code discussion explaining why greedy can be worse than sampling — the choice is treated purely as a determinism knob.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:514` | if temperature <= 0.0: return int(torch.argmax(...)) |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:335` | do_sample=True when temperature > 0; :344 do_sample=False |
+| `agent-core/openjiuwen/symphony/retrieval/llm/base/types.py:60` | default temperature = 0.0 ⇒ local default greedy |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/verl_executor.py:185` | remax_input.meta_info["do_sample"] = False (REMAX baseline, not an exploit path) |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/extractor/triple_extractor.py:31` | constructor default temperature=0.0 |
+
+</details>
+
+---
+
+## 15. Why do LLMs struggle with tasks like counting or basic arithmetic
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.
+
+**Key points.**
+
+- BPE hides characters, so letter counting fails.
+- Multi-digit arithmetic requires carrying, which is not learned reliably.
+- Fix it with tool use (calculator/code), not a bigger prompt.
+
+**Concept.** The model operates on tokens, not characters or digits-as-numbers; counting letters requires character-level reasoning that BPE hides, and multi-digit arithmetic requires carrying/positional algorithms that are error-prone to learn implicitly. Models also have no scratchpad guarantee unless asked to show work. The reliable fix is tool use — call a calculator or run code — rather than expecting the forward pass to do exact math.
+
+![diagram](assets/diagrams/fa2f043411cb44dc038eefd095058ef5a272ee54.png)
+
+**In Jiuwen.** Jiuwen treats math as a tool problem. A canonical example teaches an agent to call a calculator tool (arithmetic via a safe evaluator, algebra via a symbolic library), and the prompt walks it through the steps. More generally, agents can run code in a sandbox to do math and logic. The repo's evaluation code even encodes the rule that 'textual arithmetic is never accepted as execution' — results must come from real execution.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The repo frames arithmetic/counting as a tool-augmentation problem. A canonical example trains a DeepAgent to call a `calculator` tool that evaluates arithmetic via `simpleeval` and solves/simplifies algebra/equations via `sympy`; the system prompt explicitly instructs tool use step by step. More generally, an `execute_code` sandbox operation (JiuwenBox/YuanRong/AIO providers plus a local provider) lets agents run code for math/logic. The RSI evidence analyzer encodes the principle "textual arithmetic is never accepted as execution" — verification must come from actual code execution.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/examples/rl_calculator/tools.py:11-14` | @tool(name="calculator"); :15-85 simple_eval + sympy |
+| `agent-core/examples/rl_calculator/prompts.py:7-16` | "Use the calculator tool … step by step" |
+| `agent-core/openjiuwen/core/sys_operation/code.py:16-49` | execute_code sys-operation |
+| `agent-core/openjiuwen/extensions/sys_operation/sandbox/providers/jiuwenbox.py:2927` | sandbox execute_code |
+| `agent-core/openjiuwen/rsi/harness_rsi/evaluation_result_analyzer/evidence_investigation.py:200` | "textual arithmetic is never accepted as execution" |
+
+</details>
+
+---
+
+## 16. What is hallucination, and why does it happen even in a well-trained model
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.
+
+**Key points.**
+
+- Objective is plausibility, not factuality; there is no built-in fact store.
+- Generalized patterns fabricate specifics confidently.
+- Mitigations: retrieval/citations, verification, constrained formats, abstention.
+- It is a property of the objective, not a bug you patch in the weights.
+
+**Concept.** Hallucination is fluent output that is not grounded in fact or in the provided context. It arises because the objective is next-token likelihood, not truth: the model optimizes plausibility, has no built-in fact database, generalizes patterns that sometimes fabricate specifics, and cannot reliably know the boundary of its own knowledge. Mitigations are grounding (retrieval/citations), verification, constrained formats, and abstention — not a property of the weights you can simply "fix".
+
+![diagram](assets/diagrams/cf8077ba07e835de38a33a0c3a9216ecbf129b0a.png)
+
+**In Jiuwen.** Hallucination is addressed by mitigations rather than in-model detection: retrieval infrastructure to supply evidence; a verification agent limited to read-only/command tools that must show real command output and give a PASS/FAIL/PARTIAL verdict; an LLM reviewer scoring correctness and completeness; anomaly detection for degenerate repetition/loops (not false claims); and security guardrails. Claim-to-source attribution is not part of this stack.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The repo does not model or detect low-level hallucination; it implements downstream mitigations: (1) retrieval-augmentation infrastructure to supply evidence; (2) a dedicated **verification agent** restricted to read-only/command tools that must show verbatim command output with a PASS/FAIL/PARTIAL verdict; (3) an LLM quality reviewer scoring CORRECTNESS/COMPLETENESS; (4) model-anomaly rails that catch degenerate repetition/loops (not false claims); and (5) security guardrails/sanitization for injection and secret leakage. There is no claim-to-source attribution checker.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110-117` | repeated stream output / timeouts / tool-call loops (degeneracy, not factual errors) |
+| `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92-108` | VerificationRail tool allowlist; :165-196 blocks disallowed tools, requires evidence |
+| `agent-core/openjiuwen/agent_teams/verification/reviewer.py:127` | VerificationReviewer (LLM reviewer, correctness/completeness) |
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:39-80` | guardrail detection backends; agent-core/openjiuwen/core/security/guardrail/context.py:115-202 confidence thresholds → risk levels |
+| `agent-core/openjiuwen/harness/tools/web/paid_search.py:221-222` | extracts citation URLs (no claim linkage) |
+| `agent-core/openjiuwen/agent_evolving/tools/skill.py:284` | "then cite only the refs you actually read" |
+
+</details>
+
+---
+
+## 17. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
+
+**TL;DR.** They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.
+
+**Key points.**
+
+- Wrong = factually incorrect; uncertain = low confidence in the distribution.
+- Fluent text carries no calibrated confidence.
+- Approximations — logprobs, entropy, self-consistency — are all imperfect.
+- Abstention only helps if it correlates with being wrong.
+
+**Concept.** Wrong means the answer is factually incorrect; uncertain means the model's distribution is not confident, which may still yield a correct or incorrect answer. They are independent: a model can be confidently wrong, or rightly unsure. From the surface text alone you generally cannot tell — fluent text carries no calibrated confidence. Token log-probabilities, entropy, or self-consistency/vote checking can approximate uncertainty, but they are imperfect and need calibration; abstention only helps if it correlates with being wrong.
+
+![diagram](assets/diagrams/07a4334b0eeb57efb62c0bcde2d414d2b06c738a.png)
+
+**In Jiuwen.** Jiuwen captures token log-probabilities for RL training and uses them in one place — a reranker that reads the 'yes'/'no' logprobs for a binary relevance call. They are not turned into an uncertainty or 'I do not know' signal for normal answers; retrieval has its own abstain token (about returning a document, not answer uncertainty), and there is no calibrated confidence threshold at which the agent abstains.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The repo collects token **logprobs** but does not expose an uncertainty/abstention signal on ordinary agent answers. `ReactAgent` can request `logprobs`/`top_logprobs`, captured into canonical RL trajectory spans and validated (must be ≤ 0) for RL training. `ChatReranker` uses them for one specific binary decision: it exponentiates the top-logprobs of "yes"/"no" and normalizes to a relevance probability. The retrieval subsystem has an explicit abstain token ("0"), but that is retrieval-selection abstention, not output uncertainty. There is no confidence threshold at which an agent says "I don't know," and no calibration.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:83-107` | exp(logprob) yes/no → normalized confidence; :134-141 logprobs=True, top_logprobs=5, yes/no logit bias |
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:294-303` | llm_logprobs/llm_top_logprobs; :1622-1624 passes to model call |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:404-427` | parses per-token logprobs, rejects > 0 |
+| `agent-core/openjiuwen/agent_evolving/trajectory/schema.py:36-47` | RL_LOGPROBS; agent-core/openjiuwen/agent_evolving/trajectory/spans.py:849-873 — read_rl_fields |
+| `agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305-315` | is_abstain from output token "0" (retrieval only) |
 
 </details>
 

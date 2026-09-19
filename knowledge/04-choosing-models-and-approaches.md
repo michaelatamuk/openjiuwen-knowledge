@@ -79,7 +79,38 @@ Model selection here is about availability and endpoint distribution, not task q
 
 ---
 
-## 3. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
+## 3. Justifying model size
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Match model capability to task difficulty rather than defaulting to the largest model.
+
+**Key points.**
+
+- Large models suit reasoning and ambiguity
+- Small fast models suit classification, extraction, routing, formatting
+- A leaderboard score is a prior, not a per-task decision
+
+**Concept.** Match capability to task difficulty. Large models suit reasoning and ambiguity; small, fast models suit classification, extraction, routing, and formatting. A leaderboard score is a prior, not a per-task decision — using a large model everywhere is a cost and latency decision, not a safe default.
+
+---
+
+## 4. When the "best" model is the wrong choice
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** "Best" is relative to a constraint, not an absolute quality score.
+
+**Key points.**
+
+- A model too slow or too expensive to ship is not the right choice
+- Justify against the constraint it satisfies or violates
+
+**Concept.** Define "best" relative to a constraint, not as an absolute quality score. A model that is too slow or too expensive to ship at scale is not the right choice regardless of its accuracy; the justification is the constraint it satisfies or violates.
+
+---
+
+## 5. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
 
 <span class="badge badge-type">Claim</span> <span class="badge badge-advanced">advanced</span>
 
@@ -120,7 +151,23 @@ The relevant knobs are static and named: `top_k` defaults to 5 (no adaptive poli
 
 ---
 
-## 4. You're given a vague AI system design brief with no stated constraints — what do you ask first?
+## 6. Retrieval depth versus speed
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** Retrieval depth versus speed is a use-case decision, not a universal rule.
+
+**Key points.**
+
+- Medical assistant: retrieve more and rerank, leaning accuracy
+- Chat autocomplete: small top-k, no reranker, leaning speed
+- Name the latency number or accuracy floor that forces the choice
+
+**Concept.** The choice between retrieving more documents and retrieving faster is tied to the use case, not to a universal rule; 20 documents for accuracy versus 5 for speed has no universally correct answer. A medical assistant leans accuracy (retrieve more, rerank); a chat autocomplete leans speed (small top-k, no reranker). Name the latency number or accuracy floor that forces the decision.
+
+---
+
+## 7. You're given a vague AI system design brief with no stated constraints — what do you ask first?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -160,7 +207,33 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 ---
 
-## 5. How do you make a defensible model selection decision — what does the evaluation actually look like?
+## 8. Gathering constraints before designing
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Extract the four binding constraints — latency budget, query volume, accuracy floor, and cost envelope — before proposing any architecture.
+
+**Key points.**
+
+- A tight latency budget rules out reranking or large-model calls in the critical path
+- A high accuracy floor rules out smaller models
+- High query volume rules out expensive retrievers
+- In Jiuwen these are manual levers: timeout, tpm/rpm, score_threshold, budget cap
+
+**Concept.** Before proposing an architecture, extract the four constraints that determine every significant tradeoff: **latency budget** — real-time (≤200ms) or async?; **query volume** — requests per second, peak versus average; **accuracy floor** — is a wrong answer a minor inconvenience or a safety/legal risk?; and **cost envelope** — internal tooling or a consumer product at scale? These four drive every meaningful decision: a tight latency budget rules out reranking or large-model calls in the critical path, a high accuracy floor rules out smaller models, and high volume rules out expensive retrievers.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeployment` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the auto-harness `BudgetRail` dollar cap. The operator sets them per use case.
+
+</details>
+
+---
+
+## 9. How do you make a defensible model selection decision — what does the evaluation actually look like?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -200,7 +273,33 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 ---
 
-## 6. What are the architectural layers of a modern AI product?
+## 10. Measuring the tradeoff empirically
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** Operationalize the tradeoff: eval set, per-candidate quality/latency/cost, curves, and the knee.
+
+**Key points.**
+
+- Define a representative eval set and run every candidate on it
+- Record quality score, latency, and cost per query
+- Plot cost-accuracy and latency-accuracy curves and find the knee
+- Pick the option meeting the requirement with minimum overhead
+
+**Concept.** Define a representative eval set, run every candidate on it, and record quality score, latency, and cost per query. Plot the cost–accuracy and latency–accuracy curves, find the knee (the point of diminishing returns), and pick the option that meets the requirement with the minimum overhead — not the highest-accuracy option.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`agent_evolving/evaluator/` provides metrics such as `ExactMatchMetric` and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.
+
+</details>
+
+---
+
+## 11. What are the architectural layers of a modern AI product?
 
 <span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -240,49 +339,7 @@ The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4*
 
 ---
 
-## 7. Gathering constraints before designing
-
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Extract the four binding constraints — latency budget, query volume, accuracy floor, and cost envelope — before proposing any architecture.
-
-**Key points.**
-
-- A tight latency budget rules out reranking or large-model calls in the critical path
-- A high accuracy floor rules out smaller models
-- High query volume rules out expensive retrievers
-- In Jiuwen these are manual levers: timeout, tpm/rpm, score_threshold, budget cap
-
-**Concept.** Before proposing an architecture, extract the four constraints that determine every significant tradeoff: **latency budget** — real-time (≤200ms) or async?; **query volume** — requests per second, peak versus average; **accuracy floor** — is a wrong answer a minor inconvenience or a safety/legal risk?; and **cost envelope** — internal tooling or a consumer product at scale? These four drive every meaningful decision: a tight latency budget rules out reranking or large-model calls in the critical path, a high accuracy floor rules out smaller models, and high volume rules out expensive retrievers.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeployment` `tpm`/`rpm`; accuracy via `score_threshold`; cost via the auto-harness `BudgetRail` dollar cap. The operator sets them per use case.
-
-</details>
-
----
-
-## 8. Justifying model size
-
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Match model capability to task difficulty rather than defaulting to the largest model.
-
-**Key points.**
-
-- Large models suit reasoning and ambiguity
-- Small fast models suit classification, extraction, routing, formatting
-- A leaderboard score is a prior, not a per-task decision
-
-**Concept.** Match capability to task difficulty. Large models suit reasoning and ambiguity; small, fast models suit classification, extraction, routing, and formatting. A leaderboard score is a prior, not a per-task decision — using a large model everywhere is a cost and latency decision, not a safe default.
-
----
-
-## 9. Planning for 10x traffic
+## 12. Planning for 10x traffic
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -298,23 +355,7 @@ Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeploym
 
 ---
 
-## 10. Retrieval depth versus speed
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Retrieval depth versus speed is a use-case decision, not a universal rule.
-
-**Key points.**
-
-- Medical assistant: retrieve more and rerank, leaning accuracy
-- Chat autocomplete: small top-k, no reranker, leaning speed
-- Name the latency number or accuracy floor that forces the choice
-
-**Concept.** The choice between retrieving more documents and retrieving faster is tied to the use case, not to a universal rule; 20 documents for accuracy versus 5 for speed has no universally correct answer. A medical assistant leans accuracy (retrieve more, rerank); a chat autocomplete leans speed (small top-k, no reranker). Name the latency number or accuracy floor that forces the decision.
-
----
-
-## 11. What to cut first under a budget constraint
+## 13. What to cut first under a budget constraint
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -327,46 +368,5 @@ Latency is set via `ModelClientConfig.timeout`; volume via `IntelliRouterDeploym
 - Know which components degrade gracefully versus break the system
 
 **Concept.** Know which components cost the most and which degrade gracefully versus break the system. Embedding is one-time; generation scales with traffic — so cut generation first: route simple queries to a smaller model, lower top-k, add semantic caching. Safety and guardrail layers are the last thing to cut, because they prevent unsafe output.
-
----
-
-## 12. Measuring the tradeoff empirically
-
-<span class="badge badge-type">Concept</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Operationalize the tradeoff: eval set, per-candidate quality/latency/cost, curves, and the knee.
-
-**Key points.**
-
-- Define a representative eval set and run every candidate on it
-- Record quality score, latency, and cost per query
-- Plot cost-accuracy and latency-accuracy curves and find the knee
-- Pick the option meeting the requirement with minimum overhead
-
-**Concept.** Define a representative eval set, run every candidate on it, and record quality score, latency, and cost per query. Plot the cost–accuracy and latency–accuracy curves, find the knee (the point of diminishing returns), and pick the option that meets the requirement with the minimum overhead — not the highest-accuracy option.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`agent_evolving/evaluator/` provides metrics such as `ExactMatchMetric` and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.
-
-</details>
-
----
-
-## 13. When the "best" model is the wrong choice
-
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** "Best" is relative to a constraint, not an absolute quality score.
-
-**Key points.**
-
-- A model too slow or too expensive to ship is not the right choice
-- Justify against the constraint it satisfies or violates
-
-**Concept.** Define "best" relative to a constraint, not as an absolute quality score. A model that is too slow or too expensive to ship at scale is not the right choice regardless of its accuracy; the justification is the constraint it satisfies or violates.
 
 ---

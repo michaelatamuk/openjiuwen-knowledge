@@ -18,6 +18,23 @@
   ]
  },
  "04-3": {
+  "title": "",
+  "tldr": "Match model capability to task difficulty rather than defaulting to the largest model.",
+  "points": [
+   "Large models suit reasoning and ambiguity",
+   "Small fast models suit classification, extraction, routing, formatting",
+   "A leaderboard score is a prior, not a per-task decision"
+  ]
+ },
+ "04-4": {
+  "title": "",
+  "tldr": "\"Best\" is relative to a constraint, not an absolute quality score.",
+  "points": [
+   "A model too slow or too expensive to ship is not the right choice",
+   "Justify against the constraint it satisfies or violates"
+  ]
+ },
+ "04-5": {
   "title": "Compare two approaches: tests tradeoff reasoning",
   "tldr": "'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.",
   "points": [
@@ -27,7 +44,16 @@
    "Session cost tracked and capped."
   ]
  },
- "04-4": {
+ "04-6": {
+  "title": "",
+  "tldr": "Retrieval depth versus speed is a use-case decision, not a universal rule.",
+  "points": [
+   "Medical assistant: retrieve more and rerank, leaning accuracy",
+   "Chat autocomplete: small top-k, no reranker, leaning speed",
+   "Name the latency number or accuracy floor that forces the choice"
+  ]
+ },
+ "04-7": {
   "title": "Ask before you design: four questions to open any system design brief",
   "tldr": "Extract the four binding constraints before proposing any architecture: latency budget, query volume, accuracy floor, and cost envelope.",
   "points": [
@@ -38,7 +64,17 @@
    "Propose an architecture only after these constraints are known"
   ]
  },
- "04-5": {
+ "04-8": {
+  "title": "",
+  "tldr": "Extract the four binding constraints — latency budget, query volume, accuracy floor, and cost envelope — before proposing any architecture.",
+  "points": [
+   "A tight latency budget rules out reranking or large-model calls in the critical path",
+   "A high accuracy floor rules out smaller models",
+   "High query volume rules out expensive retrievers",
+   "In Jiuwen these are manual levers: timeout, tpm/rpm, score_threshold, budget cap"
+  ]
+ },
+ "04-9": {
   "title": "How to make a defensible model selection decision with evidence",
   "tldr": "Define an eval set, run all candidates, record quality + latency + cost, plot the curves, and pick the knee — not the highest-accuracy option.",
   "points": [
@@ -49,7 +85,17 @@
    "Jiuwen gap: evaluators measure quality only; cost and latency are not correlated to eval scores in the pipeline"
   ]
  },
- "04-6": {
+ "04-10": {
+  "title": "",
+  "tldr": "Operationalize the tradeoff: eval set, per-candidate quality/latency/cost, curves, and the knee.",
+  "points": [
+   "Define a representative eval set and run every candidate on it",
+   "Record quality score, latency, and cost per query",
+   "Plot cost-accuracy and latency-accuracy curves and find the knee",
+   "Pick the option meeting the requirement with minimum overhead"
+  ]
+ },
+ "04-11": {
   "title": "The 7-layer AI system architecture every engineer must know",
   "tldr": "Data → Model → Inference → Retrieval (RAG) → Orchestration → Safety → Infrastructure. Every production AI product runs all 7 simultaneously; most developers interact only with Layer 5.",
   "points": [
@@ -60,26 +106,7 @@
    "Layers 5-7: orchestration (prompt+memory+tools+agent loop), safety (guardrails+alignment+filter), infrastructure (GPU+LB+API GW+observability). Jiuwen covers Layers 4-6 directly."
   ]
  },
- "04-7": {
-  "title": "",
-  "tldr": "Extract the four binding constraints — latency budget, query volume, accuracy floor, and cost envelope — before proposing any architecture.",
-  "points": [
-   "A tight latency budget rules out reranking or large-model calls in the critical path",
-   "A high accuracy floor rules out smaller models",
-   "High query volume rules out expensive retrievers",
-   "In Jiuwen these are manual levers: timeout, tpm/rpm, score_threshold, budget cap"
-  ]
- },
- "04-8": {
-  "title": "",
-  "tldr": "Match model capability to task difficulty rather than defaulting to the largest model.",
-  "points": [
-   "Large models suit reasoning and ambiguity",
-   "Small fast models suit classification, extraction, routing, formatting",
-   "A leaderboard score is a prior, not a per-task decision"
-  ]
- },
- "04-9": {
+ "04-12": {
   "title": "",
   "tldr": "Scale decisions are made before the demo: identify the bottleneck and the first scaling lever for each stage.",
   "points": [
@@ -88,40 +115,13 @@
    "Each stage has a different first scaling lever"
   ]
  },
- "04-10": {
-  "title": "",
-  "tldr": "Retrieval depth versus speed is a use-case decision, not a universal rule.",
-  "points": [
-   "Medical assistant: retrieve more and rerank, leaning accuracy",
-   "Chat autocomplete: small top-k, no reranker, leaning speed",
-   "Name the latency number or accuracy floor that forces the choice"
-  ]
- },
- "04-11": {
+ "04-13": {
   "title": "",
   "tldr": "Embedding is one-time; generation scales with traffic, so cut generation first.",
   "points": [
    "Route simple queries to a smaller model, lower top-k, add semantic caching",
    "Safety and guardrail layers are the last to cut",
    "Know which components degrade gracefully versus break the system"
-  ]
- },
- "04-12": {
-  "title": "",
-  "tldr": "Operationalize the tradeoff: eval set, per-candidate quality/latency/cost, curves, and the knee.",
-  "points": [
-   "Define a representative eval set and run every candidate on it",
-   "Record quality score, latency, and cost per query",
-   "Plot cost-accuracy and latency-accuracy curves and find the knee",
-   "Pick the option meeting the requirement with minimum overhead"
-  ]
- },
- "04-13": {
-  "title": "",
-  "tldr": "\"Best\" is relative to a constraint, not an absolute quality score.",
-  "points": [
-   "A model too slow or too expensive to ship is not the right choice",
-   "Justify against the constraint it satisfies or violates"
   ]
  }
 }

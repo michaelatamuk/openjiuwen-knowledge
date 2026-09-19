@@ -148,7 +148,36 @@ flowchart TD
 
 ---
 
-## 7. What's the difference between a model's context window and its training data cutoff
+## 7. What is the difference between a base model and an instruct model?
+
+**General:** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
+
+**Jiuwen:** The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. Jiuwen does not perform base→instruct alignment; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than a full alignment pipeline. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+
+```mermaid
+flowchart TD
+    BASE["base model (pretraining: next-token prediction)"] --> SFT_S["Stage 1: SFT on helpful demonstrations"]
+    SFT_S --> RM["Stage 2: reward model (human preference rankings)"]
+    RM --> RLHF_S["Stage 3: RLHF / DPO — optimize policy toward reward model"]
+    RLHF_S --> INST["instruct / chat model"]
+    INST --> PROD["follows instructions, declines harmful requests, consistent persona"]
+    JIW["Jiuwen"] --> SFT_J["agent_rl/sft/trainer.py (stage 1 pipeline)"]
+    JIW --> GR_J["GuardrailRail + SecurityRail (inference-time supplement, not substitute)"]
+    JIW -.->|"absent"| DIST["base vs instruct distinction in model config"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — inference-time safety supplement</sub>
+
+</details>
+
+<sub>_Canonical source: `source/ai-system-full-stack_for_engineers.md`; also covered in: ai-system-full-stack._</sub>
+
+---
+
+## 8. What's the difference between a model's context window and its training data cutoff
 
 **General:** The context window is how many tokens the model can attend to at once (a capacity limit). The training data cutoff is the date after which the model has no knowledge (a temporal limit). A model can have a large window but an old cutoff — it can read a long document you paste but still not know events after its training date. Confusing the two leads to expecting up-to-date answers from a frozen model.
 
@@ -174,7 +203,7 @@ flowchart LR
 
 ---
 
-## 8. What happens when a conversation exceeds the model's context window
+## 9. What happens when a conversation exceeds the model's context window
 
 **General:** Either the provider rejects the request, or the framework must shrink the prompt before sending. Robust systems pre-empt it: count tokens, then drop/truncate oldest history, offload large tool outputs, and/or summarize old turns into a compact memory block, always preserving recent turns. The goal is to keep the prompt within budget without losing the information needed for the next step.
 
@@ -204,7 +233,7 @@ flowchart TD
 
 ---
 
-## 9. Why does model performance sometimes degrade with very long context, even when the context fits
+## 10. Why does model performance sometimes degrade with very long context, even when the context fits
 
 **General:** Attention spreads over more tokens, diluting the signal for any one of them, and models are empirically better at using information at the beginning and end of the context than in the middle ("lost in the middle"). Irrelevant long context also introduces distractors and can override instructions. Fitting the window is necessary but not sufficient; relevance and ordering matter too.
 
@@ -231,7 +260,32 @@ flowchart TD
 
 ---
 
-## 10. What does temperature actually control, mathematically, in the output distribution
+## 11. "How does the model know X" is really testing context window understanding
+
+**General:** This claim is largely true: the useful thing to assess is what is actually inside the context window at generation time, not the model's stored knowledge; the one qualification is that the same question can also probe retrieval when the context is fetched. why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. Reason about context *contents*, not model capability: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
+
+**Jiuwen:** The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. Truncation keeps head + middle + tail rather than only a prefix, and compression-recall can re-surface archived chunks; there is no separate importance-reordering step, and entity disambiguation/aliasing is not implemented.
+
+```mermaid
+flowchart TD
+    Q["why did the model forget / confuse X?"] --> W["what's in the window at generation time?"]
+    W --> DROP["FIFO drop beyond max_context_message_num"]
+    W --> OFF["offload large tool results"]
+    W --> COMP["compaction (summary replaces old turns)"]
+    W -.->|"partial"| X["middle-preserving truncation · compression-recall; no importance reordering · no entity disambiguation"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context_utils.py:20/404</code> — window resolution<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:37</code> — <code>effective_context_budget</code> (strictest)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:71</code> — FIFO drop<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — offload threshold<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — compaction</sub>
+
+</details>
+
+
+---
+
+## 12. What does temperature actually control, mathematically, in the output distribution
 
 **General:** The model produces logits `z_i` for the next token. Temperature `T` rescales them: `softmax(z_i / T)`. As `T → 0` the distribution collapses toward the argmax (greedy/deterministic); as `T` rises the distribution flattens, increasing diversity and the chance of lower-probability tokens. `T = 1` leaves the model's raw distribution unchanged. It does not change which tokens are possible, only their relative probabilities.
 
@@ -259,7 +313,7 @@ flowchart TD
 
 ---
 
-## 11. What's the difference between top-k sampling and top-p (nucleus) sampling
+## 13. What's the difference between top-k sampling and top-p (nucleus) sampling
 
 **General:** Both truncate the next-token distribution before sampling. Top-k keeps the `k` most probable tokens and renormalizes — a fixed candidate count regardless of how peaked the distribution is. Top-p keeps the smallest set of tokens whose cumulative probability reaches `p` — an adaptive count: few tokens when the model is confident, many when it is flat. Top-p usually adapts better; they are often combined.
 
@@ -286,7 +340,7 @@ flowchart TD
 
 ---
 
-## 12. Why does greedy decoding sometimes produce worse output than sampling-based decoding
+## 14. Why does greedy decoding sometimes produce worse output than sampling-based decoding
 
 **General:** Greedy picks the single highest-probability token each step. That is locally optimal but not globally: it can lock into repetitive, degenerate, or bland sequences, and it cannot recover from one early bad choice. Sampling explores alternatives, which often yields more natural and diverse text; a moderate temperature with top-p is a common default. For tasks with a single correct answer (extraction, classification), greedy/`T=0` is usually preferred.
 
@@ -315,7 +369,7 @@ flowchart TD
 
 ---
 
-## 13. Why do LLMs struggle with tasks like counting or basic arithmetic
+## 15. Why do LLMs struggle with tasks like counting or basic arithmetic
 
 **General:** The model operates on tokens, not characters or digits-as-numbers; counting letters requires character-level reasoning that BPE hides, and multi-digit arithmetic requires carrying/positional algorithms that are error-prone to learn implicitly. Models also have no scratchpad guarantee unless asked to show work. The reliable fix is tool use — call a calculator or run code — rather than expecting the forward pass to do exact math.
 
@@ -345,7 +399,7 @@ flowchart TD
 
 ---
 
-## 14. What is hallucination, and why does it happen even in a well-trained model
+## 16. What is hallucination, and why does it happen even in a well-trained model
 
 **General:** Hallucination is fluent output that is not grounded in fact or in the provided context. It arises because the objective is next-token likelihood, not truth: the model optimizes plausibility, has no built-in fact database, generalizes patterns that sometimes fabricate specifics, and cannot reliably know the boundary of its own knowledge. Mitigations are grounding (retrieval/citations), verification, constrained formats, and abstention — not a property of the weights you can simply "fix".
 
@@ -374,7 +428,7 @@ flowchart TD
 
 ---
 
-## 15. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
+## 17. What's the difference between the model being "wrong" and the model being "uncertain," and can you tell the difference from the output alone
 
 **General:** Wrong means the answer is factually incorrect; uncertain means the model's distribution is not confident, which may still yield a correct or incorrect answer. They are independent: a model can be confidently wrong, or rightly unsure. From the surface text alone you generally cannot tell — fluent text carries no calibrated confidence. Token log-probabilities, entropy, or self-consistency/vote checking can approximate uncertainty, but they are imperfect and need calibration; abstention only helps if it correlates with being wrong.
 
@@ -404,60 +458,6 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
-
----
-
-## 16. "How does the model know X" is really testing context window understanding
-
-**General:** This claim is largely true: the useful thing to assess is what is actually inside the context window at generation time, not the model's stored knowledge; the one qualification is that the same question can also probe retrieval when the context is fetched. why the model forgot something earlier, why it mixed up two similar entities, why longer context degrades output — all trace back to what is actually inside the context window at generation time and how attention weights it. Reason about context *contents*, not model capability: name what is in the window (system prompt, retained turns, retrieved chunks, tool results) and what got dropped/compacted/offloaded; explain positional/attention dilution (lost in the middle); and for entity mix-ups, point at missing entity disambiguation or too-similar surface forms.
-
-**Jiuwen:** The context engine decides what is in the window and how it is trimmed: a strictest-bound budget, offload of large tool results, multi-stage compaction, and a FIFO drop beyond `max_context_message_num`, all biased toward the newest turns. Truncation keeps head + middle + tail rather than only a prefix, and compression-recall can re-surface archived chunks; there is no separate importance-reordering step, and entity disambiguation/aliasing is not implemented.
-
-```mermaid
-flowchart TD
-    Q["why did the model forget / confuse X?"] --> W["what's in the window at generation time?"]
-    W --> DROP["FIFO drop beyond max_context_message_num"]
-    W --> OFF["offload large tool results"]
-    W --> COMP["compaction (summary replaces old turns)"]
-    W -.->|"partial"| X["middle-preserving truncation · compression-recall; no importance reordering · no entity disambiguation"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context_utils.py:20/404</code> — window resolution<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:37</code> — <code>effective_context_budget</code> (strictest)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:71</code> — FIFO drop<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — offload threshold<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — compaction</sub>
-
-</details>
-
-
----
-
-## 17. What is the difference between a base model and an instruct model?
-
-**General:** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
-
-**Jiuwen:** The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. Jiuwen does not perform base→instruct alignment; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than a full alignment pipeline. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
-
-```mermaid
-flowchart TD
-    BASE["base model (pretraining: next-token prediction)"] --> SFT_S["Stage 1: SFT on helpful demonstrations"]
-    SFT_S --> RM["Stage 2: reward model (human preference rankings)"]
-    RM --> RLHF_S["Stage 3: RLHF / DPO — optimize policy toward reward model"]
-    RLHF_S --> INST["instruct / chat model"]
-    INST --> PROD["follows instructions, declines harmful requests, consistent persona"]
-    JIW["Jiuwen"] --> SFT_J["agent_rl/sft/trainer.py (stage 1 pipeline)"]
-    JIW --> GR_J["GuardrailRail + SecurityRail (inference-time supplement, not substitute)"]
-    JIW -.->|"absent"| DIST["base vs instruct distinction in model config"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — inference-time safety supplement</sub>
-
-</details>
-
-<sub>_Canonical source: `source/ai-system-full-stack_for_engineers.md`; also covered in: ai-system-full-stack._</sub>
 
 ---
 

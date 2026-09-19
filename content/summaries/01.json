@@ -56,6 +56,17 @@
   ]
  },
  "01-7": {
+  "title": "Base model vs instruct model: what the alignment training stages do",
+  "tldr": "A base model predicts text; an instruct model has been through SFT + reward modeling + RLHF/DPO to follow instructions and decline harmful requests.",
+  "points": [
+   "Base model: next-token prediction on massive corpus — no assistant persona, completes in any style seen during training",
+   "Stage 1 SFT: fine-tune on helpful demonstrations — teaches format and tone",
+   "Stage 2: reward model trained on human preference rankings",
+   "Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior",
+   "Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base"
+  ]
+ },
+ "01-8": {
   "title": "Context window vs cutoff",
   "tldr": "The context window is a per-call capacity limit; the training cutoff is a knowledge-date limit. A big window does not make the model current.",
   "points": [
@@ -64,7 +75,7 @@
    "Fitting a document does not mean the model knows post-cutoff facts."
   ]
  },
- "01-8": {
+ "01-9": {
   "title": "Exceeding the context window",
   "tldr": "Either the provider rejects the request or you must shrink the prompt first — drop old turns, offload big tool outputs, or summarize.",
   "points": [
@@ -74,7 +85,7 @@
    "Otherwise the call is rejected or silently truncated."
   ]
  },
- "01-9": {
+ "01-10": {
   "title": "Long-context degradation",
   "tldr": "Attention spreads thinner over more tokens and models use the middle poorly ('lost in the middle'), so a bigger context is not automatically better.",
   "points": [
@@ -84,64 +95,7 @@
    "Mitigate with retrieval, reranking, and ordering."
   ]
  },
- "01-10": {
-  "title": "Temperature",
-  "tldr": "Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.",
-  "points": [
-   "softmax(z/T); T = 1 leaves the model's raw distribution unchanged.",
-   "T → 0 collapses toward argmax; T > 1 flattens.",
-   "Only relative probabilities change; the token set stays the same.",
-   "Use T = 0 for extraction/classification, higher for creative work."
-  ]
- },
  "01-11": {
-  "title": "Top-k vs top-p",
-  "tldr": "Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).",
-  "points": [
-   "Top-k: fixed candidate count regardless of confidence.",
-   "Top-p: adaptive — few tokens when peaked, many when flat.",
-   "Often combined; top-p usually adapts better."
-  ]
- },
- "01-12": {
-  "title": "Greedy vs sampling",
-  "tldr": "Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.",
-  "points": [
-   "Greedy = argmax each step; it cannot recover from one bad choice.",
-   "Sampling adds diversity and naturalness.",
-   "Extraction/classification → greedy; open-ended → sampling."
-  ]
- },
- "01-13": {
-  "title": "Counting and arithmetic",
-  "tldr": "Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.",
-  "points": [
-   "BPE hides characters, so letter counting fails.",
-   "Multi-digit arithmetic requires carrying, which is not learned reliably.",
-   "Fix it with tool use (calculator/code), not a bigger prompt."
-  ]
- },
- "01-14": {
-  "title": "Hallucination",
-  "tldr": "Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.",
-  "points": [
-   "Objective is plausibility, not factuality; there is no built-in fact store.",
-   "Generalized patterns fabricate specifics confidently.",
-   "Mitigations: retrieval/citations, verification, constrained formats, abstention.",
-   "It is a property of the objective, not a bug you patch in the weights."
-  ]
- },
- "01-15": {
-  "title": "Wrong vs uncertain",
-  "tldr": "They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.",
-  "points": [
-   "Wrong = factually incorrect; uncertain = low confidence in the distribution.",
-   "Fluent text carries no calibrated confidence.",
-   "Approximations — logprobs, entropy, self-consistency — are all imperfect.",
-   "Abstention only helps if it correlates with being wrong."
-  ]
- },
- "01-16": {
   "title": "'How does the model know X': context window understanding",
   "tldr": "'How does the model know X' is really testing context-window understanding.",
   "points": [
@@ -151,15 +105,61 @@
    "FIFO drop beyond message cap."
   ]
  },
- "01-17": {
-  "title": "Base model vs instruct model: what the alignment training stages do",
-  "tldr": "A base model predicts text; an instruct model has been through SFT + reward modeling + RLHF/DPO to follow instructions and decline harmful requests.",
+ "01-12": {
+  "title": "Temperature",
+  "tldr": "Temperature rescales logits before softmax: near 0 is greedy and deterministic; higher flattens the distribution for diversity. It never changes which tokens are possible.",
   "points": [
-   "Base model: next-token prediction on massive corpus — no assistant persona, completes in any style seen during training",
-   "Stage 1 SFT: fine-tune on helpful demonstrations — teaches format and tone",
-   "Stage 2: reward model trained on human preference rankings",
-   "Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior",
-   "Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base"
+   "softmax(z/T); T = 1 leaves the model's raw distribution unchanged.",
+   "T → 0 collapses toward argmax; T > 1 flattens.",
+   "Only relative probabilities change; the token set stays the same.",
+   "Use T = 0 for extraction/classification, higher for creative work."
+  ]
+ },
+ "01-13": {
+  "title": "Top-k vs top-p",
+  "tldr": "Both truncate the distribution before sampling: top-k keeps a fixed k tokens; top-p keeps the smallest set reaching cumulative probability p (adaptive).",
+  "points": [
+   "Top-k: fixed candidate count regardless of confidence.",
+   "Top-p: adaptive — few tokens when peaked, many when flat.",
+   "Often combined; top-p usually adapts better."
+  ]
+ },
+ "01-14": {
+  "title": "Greedy vs sampling",
+  "tldr": "Greedy is locally optimal but can lock into repetitive or bland text; sampling explores alternatives for more natural output. Use greedy when there's one right answer.",
+  "points": [
+   "Greedy = argmax each step; it cannot recover from one bad choice.",
+   "Sampling adds diversity and naturalness.",
+   "Extraction/classification → greedy; open-ended → sampling."
+  ]
+ },
+ "01-15": {
+  "title": "Counting and arithmetic",
+  "tldr": "Models see tokens, not characters or digits, and never learn a carry algorithm — so exact math is unreliable and should be delegated to a tool.",
+  "points": [
+   "BPE hides characters, so letter counting fails.",
+   "Multi-digit arithmetic requires carrying, which is not learned reliably.",
+   "Fix it with tool use (calculator/code), not a bigger prompt."
+  ]
+ },
+ "01-16": {
+  "title": "Hallucination",
+  "tldr": "Hallucination is fluent but unsupported output, caused by optimizing next-token likelihood rather than truth. Mitigate with grounding, verification, and abstention.",
+  "points": [
+   "Objective is plausibility, not factuality; there is no built-in fact store.",
+   "Generalized patterns fabricate specifics confidently.",
+   "Mitigations: retrieval/citations, verification, constrained formats, abstention.",
+   "It is a property of the objective, not a bug you patch in the weights."
+  ]
+ },
+ "01-17": {
+  "title": "Wrong vs uncertain",
+  "tldr": "They are independent axes: a model can be confidently wrong or rightly unsure, and surface text does not reveal calibration.",
+  "points": [
+   "Wrong = factually incorrect; uncertain = low confidence in the distribution.",
+   "Fluent text carries no calibrated confidence.",
+   "Approximations — logprobs, entropy, self-consistency — are all imperfect.",
+   "Abstention only helps if it correlates with being wrong."
   ]
  },
  "01-18": {

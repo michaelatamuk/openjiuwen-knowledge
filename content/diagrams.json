@@ -189,11 +189,11 @@
   "technical": "__existing__",
   "concept": "flowchart LR\n    IN[\"input text\"] --> ENC[\"encoder (bidirectional)\"]\n    ENC --> UND[\"understanding: classify · embed · extract\"]\n    PRE[\"prompt\"] --> DEC[\"decoder (autoregressive)\"]\n    DEC --> GEN[\"generation: next token\"]\n    ENC --> ED[\"encoder-decoder: input → output (translate · summarize)\"]"
  },
- "01-8": {
+ "01-9": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    IN[\"conversation exceeds the context window\"] --> PRE{\"shrink before sending\"}\n    PRE --> DROP[\"drop oldest turns, keep recent\"]\n    PRE --> OFF[\"offload large tool outputs\"]\n    PRE --> SUM[\"summarize old turns into memory\"]\n    DROP --> SEND[\"send smaller prompt\"]\n    OFF --> SEND\n    SUM --> SEND\n    SEND -->|still too long| ERR[\"provider rejects → force compaction & retry\"]"
  },
- "01-9": {
+ "01-10": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    LONG[\"long context that fits the window\"] --> DIL[\"attention diluted across more tokens\"]\n    LONG --> MID[\"middle of context used poorly (lost in the middle)\"]\n    LONG --> DIS[\"distractors can override instructions\"]\n    DIL --> HARM[\"worse answers even though it fits\"]\n    MID --> HARM\n    DIS --> HARM\n    HARM --> FIX[\"retrieve less · rerank · put key info at the ends\"]"
  }

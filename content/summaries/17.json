@@ -27,34 +27,6 @@
   ]
  },
  "17-4": {
-  "title": "Fine-tune vs a longer prompt",
-  "tldr": "Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.",
-  "points": [
-   "Hard-to-specify behavior (style/schema).",
-   "Compress a long few-shot prompt into weights.",
-   "Many labeled examples exist."
-  ]
- },
- "17-5": {
-  "title": "RAG vs fine-tuning",
-  "tldr": "RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).",
-  "points": [
-   "RAG: knowledge at query time, fresh/auditable.",
-   "Fine-tuning: behavior/style baked into weights.",
-   "Often combine them."
-  ]
- },
- "17-6": {
-  "title": "Risk of fine-tuning on a narrow dataset",
-  "tldr": "Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.",
-  "points": [
-   "Overfitting to the sample.",
-   "Catastrophic forgetting.",
-   "Brittleness to new inputs.",
-   "Amplified bias / format lock-in."
-  ]
- },
- "17-7": {
   "title": "LoRA: what it does and when it wins",
   "tldr": "LoRA freezes all pre-trained weights and trains only two small matrices (rank r) per layer, cutting trainable parameters to <1% — best for small data, adapter swapping, and limited VRAM.",
   "points": [
@@ -64,7 +36,45 @@
    "Jiuwen: agent_rl/ uses PEFT LoRA via veRL; delegates math entirely to PEFT."
   ]
  },
+ "17-5": {
+  "title": "Fine-tune vs a longer prompt",
+  "tldr": "Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.",
+  "points": [
+   "Hard-to-specify behavior (style/schema).",
+   "Compress a long few-shot prompt into weights.",
+   "Many labeled examples exist."
+  ]
+ },
+ "17-6": {
+  "title": "RAG vs fine-tuning",
+  "tldr": "RAG supplies knowledge at query time (cheap to update, auditable, handles fresh facts, costs tokens, can't change behavior). Fine-tuning changes behavior/style (bakes it in, needs data and a retrain to update).",
+  "points": [
+   "RAG: knowledge at query time, fresh/auditable.",
+   "Fine-tuning: behavior/style baked into weights.",
+   "Often combine them."
+  ]
+ },
+ "17-7": {
+  "title": "Fine-tuning vs prompting vs RAG",
+  "tldr": "Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.",
+  "points": [
+   "Prompting: format/persona/instructions — zero cost, instantly reversible.",
+   "RAG: dynamic/private/large corpora — updatable without retraining.",
+   "Fine-tuning: new skills/behaviors — training cost, highest latency gain.",
+   "Jiuwen: all three are implemented and composable."
+  ]
+ },
  "17-8": {
+  "title": "Risk of fine-tuning on a narrow dataset",
+  "tldr": "Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.",
+  "points": [
+   "Overfitting to the sample.",
+   "Catastrophic forgetting.",
+   "Brittleness to new inputs.",
+   "Amplified bias / format lock-in."
+  ]
+ },
+ "17-9": {
   "title": "RLHF vs DPO",
   "tldr": "RLHF needs a separate reward model + PPO; DPO skips both and directly maximizes chosen-over-rejected via weighted cross-entropy — simpler and more stable, but less flexible for non-differentiable rewards.",
   "points": [
@@ -73,16 +83,6 @@
    "Use RLHF/PPO when reward is external (code pass rate, tool success).",
    "Use DPO when you have a preference dataset and want stability.",
    "Jiuwen: PPO/GRPO only; no DPO track."
-  ]
- },
- "17-9": {
-  "title": "Fine-tuning vs prompting vs RAG",
-  "tldr": "Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.",
-  "points": [
-   "Prompting: format/persona/instructions — zero cost, instantly reversible.",
-   "RAG: dynamic/private/large corpora — updatable without retraining.",
-   "Fine-tuning: new skills/behaviors — training cost, highest latency gain.",
-   "Jiuwen: all three are implemented and composable."
   ]
  }
 }

@@ -116,7 +116,43 @@ The repo trains weights, but only via **LoRA/PEFT adapters** — there is no ful
 
 ---
 
-## 4. When would you fine-tune instead of using a longer, more detailed prompt
+## 4. What does LoRA actually do, and when does it outperform full fine-tuning?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** LoRA freezes all pre-trained weights and trains only two small matrices (rank r) per layer, cutting trainable parameters to <1% — best for small data, adapter swapping, and limited VRAM.
+
+**Key points.**
+
+- ΔW = B·A where rank r ≪ hidden dim; only A, B trained.
+- Wins: small data (low rank regularizes), multiple adapters, low VRAM.
+- QLoRA: 4-bit frozen base + LoRA adapters — even lower VRAM.
+- Jiuwen: agent_rl/ uses PEFT LoRA via veRL; delegates math entirely to PEFT.
+
+**Concept.** LoRA (Low-Rank Adaptation) freezes all pre-trained weights and injects two small trainable matrices A and B into each target layer such that the weight update is ΔW = BA (rank r ≪ hidden dim). Only A and B are trained — typically <1% of the full parameter count — so GPU memory and storage requirements drop dramatically. This matters when: you are fine-tuning a large model on a small dataset (LoRA's low rank acts as a regularizer that reduces overfitting), you need multiple task-specific adapters on the same base model (swap adapters without reloading the base), or you have limited GPU VRAM. LoRA does not outperform full fine-tuning when: the task is far from the pre-training distribution (the low rank may not be expressive enough), or when you have abundant high-quality task data and sufficient compute. QLoRA extends LoRA by quantizing the frozen base weights to 4-bit, further reducing VRAM.
+
+![diagram](assets/diagrams/ccdf5dd63f8b8a1a2338643d0c0a3c2d30146eb5.png)
+
+**In Jiuwen.** agent_rl/ uses PEFT LoRA via veRL for SFT and PPO/GRPO. lora_rank, lora_alpha, and target_modules are forwarded to the PEFT adapter (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342). Base model weights are frozen; only the A/B matrices are trained. LoRA math is delegated to the PEFT library.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. Rank, alpha, and target modules are forwarded to the PEFT adapter; the base model weights are frozen and only the A/B matrices are trained. The LoRA math itself is delegated to the PEFT library.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342` | lora_rank/lora_alpha/target_modules forwarded to PEFT |
+
+</details>
+
+---
+
+## 5. When would you fine-tune instead of using a longer, more detailed prompt
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -155,7 +191,7 @@ The repo contains conceptual guidance plus two separate mechanisms, not a decisi
 
 ---
 
-## 5. What's the difference between RAG and fine-tuning, and when would you use each
+## 6. What's the difference between RAG and fine-tuning, and when would you use each
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
@@ -194,7 +230,47 @@ The repo does not implement a decision rule, but it does encode the rationale. T
 
 ---
 
-## 6. What's the risk of fine-tuning on a small, narrow dataset
+## 7. Fine-tuning vs prompting vs RAG: when does each win?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.
+
+**Key points.**
+
+- Prompting: format/persona/instructions — zero cost, instantly reversible.
+- RAG: dynamic/private/large corpora — updatable without retraining.
+- Fine-tuning: new skills/behaviors — training cost, highest latency gain.
+- Jiuwen: all three are implemented and composable.
+
+**Concept.** Three complementary customization levers, not competitors. **Prompting** (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. **RAG**: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). **Fine-tuning**: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.
+
+![diagram](assets/diagrams/80870c55071007554d5358baa9187379660ed74a.png)
+
+**In Jiuwen.** All three levers are implemented. Prompting: PromptTemplate (core/foundation/prompt/template.py) + PromptSection (core/single_agent/prompts/builder.py); RuntimePromptRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py) for dynamic prompt state. RAG: full retrieval pipeline via RetrievalConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+All three are implemented. Prompting: `PromptTemplate` (`core/foundation/prompt/template.py`) + `PromptSection` (`core/single_agent/prompts/builder.py`); `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py`) for dynamic prompt state. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. Agents start with prompting, retrieval is added via `RetrievalConfig`, and fine-tuning (via `agent_rl/`) runs offline to improve on collected trajectories. The three levers are independent and composable.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/prompt/template.py:14` | PromptTemplate |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39` | RuntimePromptRail |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:8` | RetrievalConfig |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFT path |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19` | PPO/GRPO path |
+
+</details>
+
+---
+
+## 8. What's the risk of fine-tuning on a small, narrow dataset
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
@@ -235,43 +311,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 ---
 
-## 7. What does LoRA actually do, and when does it outperform full fine-tuning?
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** LoRA freezes all pre-trained weights and trains only two small matrices (rank r) per layer, cutting trainable parameters to <1% — best for small data, adapter swapping, and limited VRAM.
-
-**Key points.**
-
-- ΔW = B·A where rank r ≪ hidden dim; only A, B trained.
-- Wins: small data (low rank regularizes), multiple adapters, low VRAM.
-- QLoRA: 4-bit frozen base + LoRA adapters — even lower VRAM.
-- Jiuwen: agent_rl/ uses PEFT LoRA via veRL; delegates math entirely to PEFT.
-
-**Concept.** LoRA (Low-Rank Adaptation) freezes all pre-trained weights and injects two small trainable matrices A and B into each target layer such that the weight update is ΔW = BA (rank r ≪ hidden dim). Only A and B are trained — typically <1% of the full parameter count — so GPU memory and storage requirements drop dramatically. This matters when: you are fine-tuning a large model on a small dataset (LoRA's low rank acts as a regularizer that reduces overfitting), you need multiple task-specific adapters on the same base model (swap adapters without reloading the base), or you have limited GPU VRAM. LoRA does not outperform full fine-tuning when: the task is far from the pre-training distribution (the low rank may not be expressive enough), or when you have abundant high-quality task data and sufficient compute. QLoRA extends LoRA by quantizing the frozen base weights to 4-bit, further reducing VRAM.
-
-![diagram](assets/diagrams/ccdf5dd63f8b8a1a2338643d0c0a3c2d30146eb5.png)
-
-**In Jiuwen.** agent_rl/ uses PEFT LoRA via veRL for SFT and PPO/GRPO. lora_rank, lora_alpha, and target_modules are forwarded to the PEFT adapter (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342). Base model weights are frozen; only the A/B matrices are trained. LoRA math is delegated to the PEFT library.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. Rank, alpha, and target modules are forwarded to the PEFT adapter; the base model weights are frozen and only the A/B matrices are trained. The LoRA math itself is delegated to the PEFT library.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342` | lora_rank/lora_alpha/target_modules forwarded to PEFT |
-
-</details>
-
----
-
-## 8. RLHF vs DPO: what changes and when do you use each?
+## 9. RLHF vs DPO: what changes and when do you use each?
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
 
@@ -306,46 +346,6 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFTTrainingExecutor (stage 1) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:43` | GRPO config (no value model) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/` | no DPO backend present |
-
-</details>
-
----
-
-## 9. Fine-tuning vs prompting vs RAG: when does each win?
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.
-
-**Key points.**
-
-- Prompting: format/persona/instructions — zero cost, instantly reversible.
-- RAG: dynamic/private/large corpora — updatable without retraining.
-- Fine-tuning: new skills/behaviors — training cost, highest latency gain.
-- Jiuwen: all three are implemented and composable.
-
-**Concept.** Three complementary customization levers, not competitors. **Prompting** (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. **RAG**: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). **Fine-tuning**: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.
-
-![diagram](assets/diagrams/80870c55071007554d5358baa9187379660ed74a.png)
-
-**In Jiuwen.** All three levers are implemented. Prompting: PromptTemplate (core/foundation/prompt/template.py) + PromptSection (core/single_agent/prompts/builder.py); RuntimePromptRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py) for dynamic prompt state. RAG: full retrieval pipeline via RetrievalConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-All three are implemented. Prompting: `PromptTemplate` (`core/foundation/prompt/template.py`) + `PromptSection` (`core/single_agent/prompts/builder.py`); `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py`) for dynamic prompt state. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. Agents start with prompting, retrieval is added via `RetrievalConfig`, and fine-tuning (via `agent_rl/`) runs offline to improve on collected trajectories. The three levers are independent and composable.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/foundation/prompt/template.py:14` | PromptTemplate |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39` | RuntimePromptRail |
-| `agent-core/openjiuwen/core/retrieval/common/config.py:8` | RetrievalConfig |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44` | SFT path |
-| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19` | PPO/GRPO path |
 
 </details>
 
