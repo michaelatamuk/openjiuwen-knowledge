@@ -16,15 +16,7 @@
 
 ---
 
-## 3. Base model versus instruct model
-
-**Definition:** A base model is the raw pretrained checkpoint — next-token prediction on web-scale data, no instruction following. An instruct (or chat) model is the same weights after the alignment pipeline: supervised fine-tuning (SFT) on demonstration data, reward model training, and RLHF or DPO to match human preferences. The practical difference: a base model will continue text; an instruct model will follow instructions, decline harmful requests, and produce structured responses.
-
-**Jiuwen:** Jiuwen does not run the base→instruct alignment pipeline; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than full alignment. `PromptInjectionGuardrail` (`core/security/guardrail/builtin.py:60`) provides an inference-time safety supplement. Served models are selected by `ProviderType` + `model_name`; the config schema does not tag base vs instruct.
-
----
-
-## 4. LLM API call lifecycle
+## 3. LLM API call lifecycle
 
 **Definition:** What happens between calling `client.chat()` and receiving the first token, step by step, and which of those steps the provider owns versus the caller.
 

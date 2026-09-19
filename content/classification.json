@@ -174,8 +174,6 @@
  "19-9": "basic",
  "20-1": "advanced",
  "20-2": "intermediate",
- "20-3": "basic",
- "20-4": "intermediate",
  "23-1": "intermediate",
  "23-2": "intermediate",
  "23-3": "intermediate",
@@ -288,5 +286,6 @@
  "22-4": "advanced",
  "22-5": "intermediate",
  "22-6": "intermediate",
- "22-7": "advanced"
+ "22-7": "advanced",
+ "20-3": "intermediate"
 }

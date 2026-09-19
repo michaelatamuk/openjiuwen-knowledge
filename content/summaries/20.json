@@ -26,15 +26,6 @@
  },
  "20-3": {
   "title": "",
-  "tldr": "A base model is the raw pretrained checkpoint; an instruct model is the same weights after the alignment pipeline.",
-  "points": [
-   "Alignment pipeline: pretrain → SFT on demonstrations → reward model → RL fine-tuning (RLHF or DPO)",
-   "A base model continues text; an instruct model follows instructions and produces structured responses",
-   "A guardrail layer at inference time supplements but does not substitute for alignment training"
-  ]
- },
- "20-4": {
-  "title": "",
   "tldr": "The path from calling `client.chat()` to the first token: nine steps, of which the later ones are the provider's infrastructure.",
   "points": [
    "SDK constructs a JSON payload",

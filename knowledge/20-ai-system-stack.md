@@ -57,32 +57,7 @@ Layer 4: `core/retrieval/retriever/` (vector, hybrid, graph, agentic). Layer 5: 
 
 ---
 
-## 3. Base model versus instruct model
-
-<span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
-
-**TL;DR.** A base model is the raw pretrained checkpoint; an instruct model is the same weights after the alignment pipeline.
-
-**Key points.**
-
-- Alignment pipeline: pretrain → SFT on demonstrations → reward model → RL fine-tuning (RLHF or DPO)
-- A base model continues text; an instruct model follows instructions and produces structured responses
-- A guardrail layer at inference time supplements but does not substitute for alignment training
-
-**Concept.** A base model is the raw pretrained checkpoint — next-token prediction on web-scale data, no instruction following. An instruct (or chat) model is the same weights after the alignment pipeline: supervised fine-tuning (SFT) on demonstration data, reward model training, and RLHF or DPO to match human preferences. The practical difference: a base model will continue text; an instruct model will follow instructions, decline harmful requests, and produce structured responses.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Jiuwen does not run the base→instruct alignment pipeline; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than full alignment. `PromptInjectionGuardrail` (`core/security/guardrail/builtin.py:60`) provides an inference-time safety supplement. Served models are selected by `ProviderType` + `model_name`; the config schema does not tag base vs instruct.
-
-</details>
-
----
-
-## 4. LLM API call lifecycle
+## 3. LLM API call lifecycle
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
