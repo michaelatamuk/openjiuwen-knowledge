@@ -42,36 +42,41 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Foundations:
-      - ML foundations: 00-ml-foundations.md
-      - LLM foundations: 01-llm-foundations.md
-      - LLM terms glossary: 03-llm-terms-glossary.md
-      - Foundational papers: 19-foundational-papers.md
-      - AI system stack: 20-ai-system-stack.md
-  - Working with models:
-      - Prompting & output: 02-prompting-and-output-control.md
-      - Choosing models & approaches: 04-choosing-models-and-approaches.md
-      - Fine-tuning & customization: 17-fine-tuning-and-customization.md
-      - Cost, latency & accuracy tradeoffs: 23-cost-latency-accuracy.md
-  - RAG systems:
-      - RAG pipelines & patterns: 10-rag-pipelines-and-patterns.md
-      - Retrieval & ranking: 11-retrieval-and-ranking.md
-      - Query understanding: 12-query-understanding.md
-      - RAG system design: 14-rag-system-design.md
-  - Agent systems:
-      - Agent fundamentals & the loop: 05-agent-fundamentals-and-the-loop.md
-      - Tools & function calling: 06-tools-and-function-calling.md
-      - Planning, memory & state: 07-planning-memory-and-state.md
-      - Agent frameworks: 08-agent-frameworks.md
-      - Multi-agent systems: 09-multi-agent-systems.md
-      - Agent architectures & protocols: 21-agent-architectures.md
-  - Evaluation & failure modes:
-      - RAG failure modes & evaluation: 13-rag-failure-modes-and-evaluation.md
-      - Evaluation: 15-evaluation.md
-      - Agent failure modes: 22-agent-failure-patterns.md
-  - Production & operations:
-      - Production, cost & scale: 16-production-cost-and-scale.md
-      - Model routing & gateways: 24-ai-gateway.md
-  - Safety & security:
-      - Security & safety: 18-security-and-safety.md
+  - Building with agents:
+      - The agent:
+          - Agent fundamentals & the loop: 05-agent-fundamentals-and-the-loop.md
+          - Agent architectures & protocols: 21-agent-architectures.md
+      - What the agent uses:
+          - Tools & function calling: 06-tools-and-function-calling.md
+          - Planning, memory & state: 07-planning-memory-and-state.md
+      - Composing agents:
+          - Agent frameworks: 08-agent-frameworks.md
+          - Multi-agent systems: 09-multi-agent-systems.md
+      - Making agents reliable:
+          - Agent failure modes: 22-agent-failure-patterns.md
+          - Evaluation: 15-evaluation.md
+      - Running agents:
+          - Production, cost & scale: 16-production-cost-and-scale.md
+          - Model routing & gateways: 24-ai-gateway.md
+      - Securing agents:
+          - Security & safety: 18-security-and-safety.md
+  - Under the hood:
+      - The model:
+          - LLM foundations: 01-llm-foundations.md
+          - AI system stack: 20-ai-system-stack.md
+          - Foundational papers: 19-foundational-papers.md
+      - Working with the model:
+          - Prompting & output control: 02-prompting-and-output-control.md
+          - Choosing models & approaches: 04-choosing-models-and-approaches.md
+          - Fine-tuning & customization: 17-fine-tuning-and-customization.md
+          - Cost, latency & accuracy tradeoffs: 23-cost-latency-accuracy.md
+      - Retrieval internals:
+          - RAG pipelines & patterns: 10-rag-pipelines-and-patterns.md
+          - Retrieval & ranking: 11-retrieval-and-ranking.md
+          - Query understanding: 12-query-understanding.md
+          - RAG system design: 14-rag-system-design.md
+          - RAG failure modes & evaluation: 13-rag-failure-modes-and-evaluation.md
+      - Background:
+          - ML foundations: 00-ml-foundations.md
+          - LLM terms glossary: 03-llm-terms-glossary.md
 

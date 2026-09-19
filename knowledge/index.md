@@ -41,44 +41,54 @@ A real entry looks like this:
 
 ## Contents
 
-### Foundations
-- [ML foundations](00-ml-foundations.md)
-- [LLM foundations](01-llm-foundations.md)
-- [LLM terms glossary](03-llm-terms-glossary.md)
-- [Foundational papers](19-foundational-papers.md)
-- [AI system stack](20-ai-system-stack.md)
+### Part I — Building with agents
 
-### Working with models
+#### The agent
+- [Agent fundamentals and the loop](05-agent-fundamentals-and-the-loop.md)
+- [Agent architectures and protocols](21-agent-architectures.md)
+
+#### What the agent uses
+- [Tools and function calling](06-tools-and-function-calling.md)
+- [Planning, memory and state](07-planning-memory-and-state.md)
+
+#### Composing agents
+- [Agent frameworks](08-agent-frameworks.md)
+- [Multi-agent systems](09-multi-agent-systems.md)
+
+#### Making agents reliable
+- [Agent failure modes](22-agent-failure-patterns.md)
+- [Evaluation](15-evaluation.md)
+
+#### Running agents
+- [Production, cost and scale](16-production-cost-and-scale.md)
+- [Model routing and gateways](24-ai-gateway.md)
+
+#### Securing agents
+- [Security and safety](18-security-and-safety.md)
+
+### Part II — Under the hood
+
+#### The model
+- [LLM foundations](01-llm-foundations.md)
+- [AI system stack](20-ai-system-stack.md)
+- [Foundational papers](19-foundational-papers.md)
+
+#### Working with the model
 - [Prompting and output control](02-prompting-and-output-control.md)
 - [Choosing models and approaches](04-choosing-models-and-approaches.md)
 - [Fine-tuning and customization](17-fine-tuning-and-customization.md)
 - [Cost, latency and accuracy tradeoffs](23-cost-latency-accuracy.md)
 
-### RAG systems
+#### Retrieval internals
 - [RAG pipelines and patterns](10-rag-pipelines-and-patterns.md)
 - [Retrieval and ranking](11-retrieval-and-ranking.md)
 - [Query understanding](12-query-understanding.md)
 - [RAG system design](14-rag-system-design.md)
-
-### Agent systems
-- [Agent fundamentals and the loop](05-agent-fundamentals-and-the-loop.md)
-- [Tools and function calling](06-tools-and-function-calling.md)
-- [Planning, memory and state](07-planning-memory-and-state.md)
-- [Agent frameworks](08-agent-frameworks.md)
-- [Multi-agent systems](09-multi-agent-systems.md)
-- [Agent architectures and protocols](21-agent-architectures.md)
-
-### Evaluation and failure modes
 - [RAG failure modes and evaluation](13-rag-failure-modes-and-evaluation.md)
-- [Evaluation](15-evaluation.md)
-- [Agent failure modes](22-agent-failure-patterns.md)
 
-### Production and operations
-- [Production, cost and scale](16-production-cost-and-scale.md)
-- [Model routing and gateways](24-ai-gateway.md)
-
-### Safety and security
-- [Security and safety](18-security-and-safety.md)
+#### Background
+- [ML foundations](00-ml-foundations.md)
+- [LLM terms glossary](03-llm-terms-glossary.md)
 
 ## Formats
 
