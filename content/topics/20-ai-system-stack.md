@@ -1,4 +1,4 @@
-# Serving and infrastructure
+# Model serving
 
 ## 1. The 7-layer AI application stack
 

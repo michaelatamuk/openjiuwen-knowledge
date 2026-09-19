@@ -63,7 +63,7 @@ nav:
       - The model:
           - How LLMs work: 01-llm-foundations.md
           - Foundational papers: 19-foundational-papers.md
-          - Serving & infrastructure: 20-ai-system-stack.md
+          - Model serving: 20-ai-system-stack.md
       - Working with the model:
           - Prompting & output control: 02-prompting-and-output-control.md
           - Choosing models & tradeoffs: 04-choosing-models-and-approaches.md

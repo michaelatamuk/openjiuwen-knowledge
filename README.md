@@ -70,7 +70,7 @@ A real entry looks like this:
 #### The model
 - [How LLMs work](knowledge/01-llm-foundations.md)
 - [Foundational papers](knowledge/19-foundational-papers.md)
-- [Serving and infrastructure](knowledge/20-ai-system-stack.md)
+- [Model serving](knowledge/20-ai-system-stack.md)
 
 #### Working with the model
 - [Prompting and output control](knowledge/02-prompting-and-output-control.md)
