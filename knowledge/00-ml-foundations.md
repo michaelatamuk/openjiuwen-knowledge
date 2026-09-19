@@ -224,7 +224,7 @@ Not hand-coded. Vector similarity queries go through the vector store (Milvus, C
 
 ![diagram](assets/diagrams/7c1de214ecf234f5e929aeda60bb4a39ba01d172.png)
 
-**In Jiuwen.** The evaluation module in agent_evolving/eval/ computes precision, recall, and F1 for retrieval-level evaluation. The framework delegates the computation to standard library helpers rather than implementing the confusion-matrix arithmetic directly. For generation evaluation, FaithfulnessEvaluator and AnswerRelevanceEvaluator produce scores rather than classification metrics. The only true classifier in the framework is AutoModelForSequenceClassification in the guardrail layer, evaluated externally.
+**In Jiuwen.** The evaluation module under agent_evolving/evaluator/ provides classification-style metrics such as ExactMatchMetric, and delegates the arithmetic to standard library helpers. Generation evaluation uses LLM-as-judge scoring (LLMAsJudgeMetric). The only true classifier is AutoModelForSequenceClassification in the guardrail layer.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -522,7 +522,7 @@ The framework is built entirely on transfer learning. Model clients call pre-tra
 
 ![diagram](assets/diagrams/dbe1fe35ad9d41d289610d5ee61f1d6982afd051.png)
 
-**In Jiuwen.** The evaluation harness in agent_evolving/eval/ computes precision, recall, and F1 for retrieval-level evaluation. Generation evaluation uses LLM-as-judge and NLI-model scores rather than classification metrics — FaithfulnessEvaluator, AnswerRelevanceEvaluator. The one true classifier is AutoModelForSequenceClassification in the security/guardrail layer, evaluated externally. ROC-AUC, PR-AUC, and calibration are not implemented in the framework.
+**In Jiuwen.** The evaluation harness under agent_evolving/evaluator/ provides ExactMatchMetric and LLMAsJudgeMetric (LLM-as-judge) rather than classification metrics. The one true classifier is AutoModelForSequenceClassification in the security/guardrail layer. ROC-AUC, PR-AUC, and calibration are not part of the framework.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
