@@ -92,7 +92,6 @@
   "concept": "flowchart TD\n    FW[\"framework choice\"] --> TEAM{\"fits the team + change rate?\"}\n    TEAM -->|small team, few devs| LIGHT[\"lighter, less magic\"]\n    TEAM -->|large team, many features| STRUCT[\"more structure / abstraction\"]\n    LIGHT --> OK[\"scales with the team\"]\n    STRUCT --> OK"
  },
  "03-20": {
-  "technical": "__existing__",
   "concept": "flowchart TD\n    INJ[\"prompt injection\"] --> WHY[\"untrusted content carries instructions\"]\n    WHY --> RISK[\"model may act on them\"]\n    RISK --> DEF[\"treat as data + enforce controls outside the model\"]"
  },
  "05-4": {

@@ -100,36 +100,7 @@ flowchart TD
 
 ---
 
-## 4. What does LoRA actually do, and when does it outperform full fine-tuning?
-
-**General:** LoRA (Low-Rank Adaptation) freezes all pre-trained weights and injects two small trainable matrices A and B into each target layer such that the weight update is ΔW = BA (rank r ≪ hidden dim). Only A and B are trained — typically <1% of the full parameter count — so GPU memory and storage requirements drop dramatically. This matters when: you are fine-tuning a large model on a small dataset (LoRA's low rank acts as a regularizer that reduces overfitting), you need multiple task-specific adapters on the same base model (swap adapters without reloading the base), or you have limited GPU VRAM. LoRA does not outperform full fine-tuning when: the task is far from the pre-training distribution (the low rank may not be expressive enough), or when you have abundant high-quality task data and sufficient compute. QLoRA extends LoRA by quantizing the frozen base weights to 4-bit, further reducing VRAM.
-
-**Jiuwen:** `agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. Rank, alpha, and target modules are forwarded to the PEFT adapter; the base model weights are frozen and only the A/B matrices are trained. The LoRA math itself is delegated to the PEFT library.
-
-```mermaid
-flowchart TD
-    W["pre-trained weight W (frozen)"] --> ADD["W + ΔW at inference"]
-    ΔW["ΔW = B·A (rank r ≪ d)"] --> ADD
-    A["A: d × r (trainable)"] --> ΔW
-    B["B: r × d (trainable)"] --> ΔW
-    LORA["LoRA benefits"] --> MEM["< 1% trainable params → low VRAM"]
-    LORA --> REG["low rank → implicit regularization (good for small data)"]
-    LORA --> SWAP["adapter swapping: multiple tasks, one base model"]
-    QLORA["QLoRA"] --> QUANT["4-bit frozen base → even lower VRAM"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342</code> — <code>lora_rank</code>/<code>lora_alpha</code>/<code>target_modules</code> forwarded to PEFT</sub>
-
-</details>
-
-<sub>_Canonical source: `source/ai-engineer-levelled-interview-questions_for_engineers.md`; also covered in: ai-engineer-levelled._</sub>
-
----
-
-## 5. When would you fine-tune instead of using a longer, more detailed prompt
+## 4. When would you fine-tune instead of using a longer, more detailed prompt
 
 **General:** Fine-tune when the behavior is hard to specify in words (style, tone, domain jargon, strict output schema), when you need to compress a long few-shot prompt into the weights for latency/cost, when you have many labeled examples of the desired behavior, or when the task is high-volume and a smaller tuned model is cheaper. Prefer prompting when the task is general, examples are few, the requirement changes often, or you need to iterate quickly — prompt changes ship in seconds, fine-tunes in hours/days.
 
@@ -161,36 +132,7 @@ flowchart TD
 
 ---
 
-## 6. What's the difference between RAG and fine-tuning, and when would you use each
-
-**General:** RAG supplies knowledge at query time by retrieving relevant passages and putting them in the prompt — it is cheap to update, auditable, and handles fresh or long-tail facts, but it costs tokens per call and cannot change the model's behavior/style. Fine-tuning changes the weights to teach behavior, format, tone, or a reasoning pattern, and can compress a long prompt into the model, but it is expensive, slow to iterate, can't cite, and won't reliably store volatile facts. Use RAG for knowledge, fine-tuning for behavior; often both. Reaching for fine-tuning to "add knowledge" is usually the wrong tool because updating the weights to change a fact is costly and unverifiable.
-
-**Jiuwen:** The repo does not implement a decision rule, but it does encode the rationale. The self-optimizing-agent design argues against fine-tuning on bad cases because implementation cost is high and the fix cycle is tied to the model's fine-tuning version (slow intervention), so the default is automatic prompt/instruction-and-example optimization (`InstructionOptimizer`/`JointOptimizer`). Retrieval (`core/retrieval`) and self-evolution (`agent_evolving`) are separate, composable capabilities, and `dev_tools` positions prompt tuning as offline/dev-time iteration with "solidified" configs in production. Weight tuning exists as an optional heavier path (`agent_rl`, LoRA/SFT).
-
-```mermaid
-flowchart TD
-    Q{"need knowledge or behavior?"} --> K["volatile/long-tail knowledge → RAG (retrieve at query time)"]
-    Q --> B["behavior/format/tone → fine-tune (LoRA/SFT)"]
-    K --> R["core/retrieval: index + retrieve + prompt"]
-    B --> P["default alternatives: prompt/instruction optimization (dev_tools/tune)"]
-    B --> W["optional: agent_rl weight tuning"]
-    Q -.->|"no explicit RAG-vs-tune decision doc"| X["selection criteria not encoded"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/dev_tools/tune/optimizer/instruction_optimizer.py:173</code> — prompt rewrite via textual gradients<br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:241</code> — candidate prompt updates, keep best<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — alternate weight-training (SFT/LoRA) path<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code> — retrieval path (knowledge at query time)<br>&bull; <code>agent-core/openjiuwen/dev_tools/tune/optimizer/example_optimizer.py:109</code> — few-shot/example optimization</sub>
-
-</details>
-
-**Gap.** No document or comment compares RAG vs. fine-tuning or gives selection criteria; the only stated contrast is fine-tuning vs. *prompt* tuning (one paragraph).
-
-<sub>_Canonical source: `source/genai-interview-questions_for_engineers.md`; also covered in: genai, llm-applied, rag-1, rag-practical._</sub>
-
----
-
-## 7. Fine-tuning vs prompting vs RAG: when does each win?
+## 5. Fine-tuning vs prompting vs RAG: when does each win?
 
 **General:** Three complementary customization levers, not competitors. **Prompting** (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. **RAG**: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). **Fine-tuning**: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.
 
@@ -218,7 +160,7 @@ flowchart TD
 
 <sub>_Canonical source: `source/ai-engineer-levelled-interview-questions_for_engineers.md`; also covered in: ai-engineer-levelled._</sub>
 
-## 8. What's the risk of fine-tuning on a small, narrow dataset
+## 6. What's the risk of fine-tuning on a small, narrow dataset
 
 **General:** Small/narrow data risks overfitting (memorizing the sample rather than generalizing), catastrophic forgetting of general ability, brittleness to slightly different inputs, and amplified bias/format lock-in from the narrow distribution. Mitigations: held-out validation with early stopping, regularization (weight decay, LoRA's low rank), data augmentation/diversity, and evaluating on a broader set than you trained on. The smaller the data, the more you should prefer PEFT and prompt engineering over full fine-tuning.
 
@@ -249,7 +191,7 @@ flowchart TD
 
 ---
 
-## 9. RLHF vs DPO: what changes and when do you use each?
+## 7. RLHF vs DPO: what changes and when do you use each?
 
 **General:** RLHF (Reinforcement Learning from Human Feedback) has three stages: supervised fine-tuning (SFT), reward model training (human preferences → a scalar reward model), and RL optimization (PPO to maximize the reward model's score subject to a KL divergence penalty against the SFT model). It works but is complex: two models in memory during PPO training, reward model can be gamed (reward hacking), requires online sampling. DPO (Direct Preference Optimization) is a mathematical simplification: given a preference dataset of (prompt, chosen, rejected) pairs, DPO directly optimizes the policy to increase the probability of chosen over rejected without needing a separate reward model or RL loop — it reduces to a weighted cross-entropy loss. DPO is simpler, more stable, and requires less compute; RLHF/PPO is more flexible for non-differentiable rewards (binary pass/fail, code execution, tool call success) and allows online improvement. Use DPO when you have a preference dataset and want stability; use PPO when your reward is computed externally (unit test pass rate, API call success).
 

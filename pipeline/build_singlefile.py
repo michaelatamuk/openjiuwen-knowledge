@@ -135,13 +135,14 @@ def build():
                     "<details><summary>Under the hood</summary>"
                     + "".join(tparts) + "</details>"
                 )
+            in_jiuwen = ('<div class="section-t">In Jiuwen</div>' + jiu) if jiu else ""
             parts.append(
                 f'<section class="qa"><h2>{html.escape(q["question"])}</h2>{badges}{title}{summary}'
                 f'<button class="btn" onclick="this.parentElement.classList.toggle(\'revealed\')">Show / hide answer</button>'
                 f'<div class="answer">{points_html(q.get("points", []))}'
                 f'<div class="section-t">Concept</div>{md(q.get("explain",""))}'
                 f'{concept}'
-                f'{("<div class=\'section-t\'>In Jiuwen</div>" + jiu) if jiu else ""}'
+                f'{in_jiuwen}'
                 f'{tech_block}'
                 f'</div></section>'
             )

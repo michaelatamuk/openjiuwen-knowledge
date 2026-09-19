@@ -159,7 +159,7 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 |---|---|
 | `agent-core/openjiuwen/core/security/guardrail/backends.py:184` | default injection patterns; :127 RuleBasedPromptInjectionBackend |
 | `agent-core/openjiuwen/auto_harness/rails/security_rail.py:28` | _SUSPICIOUS_PATTERNS; :129 scan + request_force_finish; agent-core/openjiuwen/auto_harness/agents/factory.py:178 — production registration path |
-| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; bash/_security.py:71 destructive-command warnings |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; agent-core/openjiuwen/harness/tools/shell/bash/_security.py:71 destructive-command warnings |
 | `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor; :502 ASK fallback; :694 interpreter-sink ASK |
 | `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell DENY; :99 shutdown; :148 sensitive paths |
 | `agent-core/openjiuwen/harness/security/permission_engine/core.py:246` | strictest merge; agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57 PermissionInterruptRail |
