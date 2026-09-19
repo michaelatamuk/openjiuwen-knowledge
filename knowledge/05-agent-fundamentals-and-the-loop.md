@@ -409,3 +409,62 @@ Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max
 </details>
 
 ---
+
+## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Cap iterations to stop infinite loops, but also detect meaningless cycling: track tool-call fingerprints and output-text similarity to catch repetitive steps early.
+
+**Key points.**
+
+- ToolCallDeduplicationRail suppresses repeated identical calls within a session.
+- ModelAnomalyDetectionRail detects repeated outputs (off by default).
+- Gap: no output-text similarity comparison across turns to catch paraphrase loops.
+
+**Concept.** A hard iteration cap (`max_iterations`) prevents runaway loops by time but does not detect that the agent is *stuck repeating itself*. Divergence detection is a complementary mechanism: (1) hash `(tool_name, canonicalised_args)` on each turn and compare against prior turns — if the same call recurs, the agent is spinning; (2) compare model output text similarity across consecutive turns — if the reasoning text is structurally identical, the agent is not making progress; (3) on detection, trigger a compaction step (rewrite history to remove the reinforcing noise) before continuing, rather than simply aborting. The goal is to detect the loop early and repair the context, not just stop at a budget limit.
+
+![diagram](assets/diagrams/a2f28c1d97be76f28914e8cd647a73ae1f87f26c.png)
+
+**In Jiuwen.** ToolCallDeduplicationRail (agent-core/openjiuwen/harness/rails/subagent/tool_call_deduplication_rail.py) suppresses repeated identical tool calls within a session. ModelAnomalyDetectionRail exists for output-pattern anomalies but is off by default. No output-text similarity comparison across turns exists — paraphrase loops that change argument wording pass the dedup rail.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`ToolCallDeduplicationRail` hashes `(tool, args)` per turn and emits warnings on repeat. `ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and can trigger compact-then-abort (`ToolLoopCompactConfig`), but this config is **off by default** — loops generate warnings but do not abort without explicit configuration. There is no output-text-similarity divergence check (only tool-call-level detection). Compaction on loop is available via `FullCompactProcessor` but is not automatically triggered by the dedup rail.
+
+</details>
+
+---
+
+## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** An agent needs named success, budget-exceeded, and escalation exit paths — not just 'stop when done' — so every run terminates predictably and failures degrade gracefully.
+
+**Key points.**
+
+- Success: structured_output or answer action fires.
+- Budget: turn/token cap, CircuitBreakerRail.
+- Escalation: AskUserRail for human input.
+- Gap: no graceful degraded response from any path — budget exhaustion raises rather than returns a partial result.
+
+**Concept.** "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) **success** — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) **budget exhaustion** — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) **human escalation** — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.
+
+![diagram](assets/diagrams/5d7d7de9d7ae0e51ff73960109494a798e8c4d0c.png)
+
+**In Jiuwen.** Success path: model emits a structured_output tool call or the ReactAgent's answer branch (react_agent.py:2793). Budget paths: turn cap (max_turns), CircuitBreakerRail trip on consecutive failures. Escalation: AskUserRail pauses and surfaces the question. Gap: no path returns a graceful degraded partial result — budget exhaustion raises an exception that propagates to the caller.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `WorkPlanApprovalRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `WorkPlanApprovalRail` is opt-in per agent config.
+
+</details>
+
+---

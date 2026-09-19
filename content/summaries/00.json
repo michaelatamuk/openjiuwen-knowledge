@@ -1,0 +1,182 @@
+{
+  "00-1": {
+    "title": "AI vs ML vs Deep Learning",
+    "tldr": "AI is the broadest umbrella; ML is the subset that learns from data; Deep Learning is the sub-subset using multi-layer neural nets.",
+    "points": [
+      "AI: any technique making a machine exhibit intelligent behaviour.",
+      "ML: learns patterns from data rather than hand-coded rules.",
+      "DL: ML with many-layer neural nets enabling end-to-end representation learning.",
+      "Jiuwen sits at the DL layer and above — it calls LLMs, builds agentic loops, provides retrieval."
+    ]
+  },
+  "00-2": {
+    "title": "Supervised vs unsupervised vs RL",
+    "tldr": "Supervised uses labelled pairs to learn a mapping; unsupervised discovers structure without labels; RL maximises cumulative reward via trial and error.",
+    "points": [
+      "Supervised: labelled (x, y) pairs → learn f(x)→y.",
+      "Unsupervised: no labels → clusters, embeddings, density.",
+      "RL: reward signal → policy that maximises return.",
+      "LLM training combines all three: self-supervised pretraining, SFT, RLHF."
+    ]
+  },
+  "00-3": {
+    "title": "Bias-variance tradeoff",
+    "tldr": "Generalisation error = bias² (underfitting) + variance (overfitting) + irreducible noise; the tradeoff is between model complexity and stability.",
+    "points": [
+      "High bias: model too simple, misses patterns.",
+      "High variance: model too complex, fits noise.",
+      "Reducing bias (more complexity) tends to increase variance.",
+      "Double descent: very large models can re-enter low-variance regime with enough data."
+    ]
+  },
+  "00-4": {
+    "title": "Parameter vs hyperparameter",
+    "tldr": "Parameters are learned weights updated by gradient descent; hyperparameters are engineer-set configuration choices not changed by training.",
+    "points": [
+      "Parameters: W, b, attention matrices — set by gradient descent.",
+      "Training hyperparams: LR, batch size, epochs, dropout, LoRA rank.",
+      "Inference hyperparams: temperature, top-p, max_tokens — not weights.",
+      "Jiuwen: ModelRequestConfig for inference; agent_rl/ config for training."
+    ]
+  },
+  "00-5": {
+    "title": "Gradient descent",
+    "tldr": "Iterative optimisation that moves parameters in the direction of steepest loss decrease by subtracting learning_rate × gradient at each step.",
+    "points": [
+      "Step: compute loss, compute gradient, subtract lr × grad.",
+      "SGD uses mini-batches — noisy but cheap per step.",
+      "Variants: momentum, Adam (adaptive per-parameter LR).",
+      "Jiuwen: delegated to veRL/PyTorch optimizer in agent_rl/."
+    ]
+  },
+  "00-6": {
+    "title": "Cosine similarity (implementation)",
+    "tldr": "dot(A,B) / (|A| × |B|) — measures directional similarity, length-independent, range [-1,1].",
+    "points": [
+      "Dot product divided by product of magnitudes.",
+      "Length-independent: normalising to unit length reduces it to a dot product.",
+      "Edge cases: zero vectors, dimension mismatch.",
+      "Jiuwen: metric_type in IndexConfig, delegated to vector store."
+    ]
+  },
+  "00-7": {
+    "title": "Precision, recall, F1 from confusion matrix",
+    "tldr": "Precision = TP/(TP+FP); Recall = TP/(TP+FN); F1 = harmonic mean of the two — each measures a different cost of classification error.",
+    "points": [
+      "Precision: of predicted positives, how many are actually positive.",
+      "Recall: of all actual positives, how many were caught.",
+      "F1: harmonic mean; penalises imbalance between precision and recall.",
+      "Multi-class: per-class TP/FP/FN, then macro/micro average."
+    ]
+  },
+  "00-8": {
+    "title": "K-nearest neighbors (implementation)",
+    "tldr": "Lazy learner: store all training points, predict by majority vote of the k nearest examples by distance.",
+    "points": [
+      "No training cost, all cost at inference (O(n·d) per query).",
+      "Sensitive to feature scale — normalise first.",
+      "ANN indexes (HNSW, IVF) approximate KNN at scale.",
+      "Jiuwen retrieval is effectively ANN over embedding space."
+    ]
+  },
+  "00-9": {
+    "title": "Forward pass and backpropagation",
+    "tldr": "Forward pass computes the prediction and loss; backpropagation applies the chain rule backwards to compute gradients for every weight.",
+    "points": [
+      "Forward: input → layers → loss.",
+      "Backward: chain rule ∂L/∂w = ∂L/∂output × ∂output/∂w.",
+      "PyTorch autograd records graph forward, traverses backward.",
+      "Jiuwen: delegated to veRL/PyTorch in agent_rl/."
+    ]
+  },
+  "00-10": {
+    "title": "Vanishing and exploding gradients",
+    "tldr": "Products of many Jacobians shrink (vanishing) or grow (exploding) exponentially; fixed by ReLU, residual connections, layer norm, and gradient clipping.",
+    "points": [
+      "Vanishing: eigenvalue < 1 → early weights stop learning.",
+      "Exploding: eigenvalue > 1 → NaN weights.",
+      "Fixes: ReLU, residuals, layer norm, He init (vanishing); gradient clipping (exploding).",
+      "Transformers largely avoid both via residual + layer norm at every block."
+    ]
+  },
+  "00-11": {
+    "title": "Batch norm vs layer norm",
+    "tldr": "Batch norm normalises over the batch dimension (good for CNNs); layer norm normalises over the feature dimension (standard in Transformers and LLMs).",
+    "points": [
+      "BatchNorm: over batch dim; needs large batches; good for CNNs.",
+      "LayerNorm: over feature dim; independent of batch size; standard in Transformers.",
+      "Small batch or variable-length sequence? Always LayerNorm.",
+      "Jiuwen: delegated to model architecture via AutoModelForCausalLM."
+    ]
+  },
+  "00-12": {
+    "title": "Dropout",
+    "tldr": "Randomly zeroes activations with probability p during training, forcing distributed representations and acting as an ensemble of 2^n thinned networks.",
+    "points": [
+      "Each neuron zeroed with probability p; inference scales by 1/(1-p).",
+      "Prevents co-adaptation between neurons.",
+      "Applied to attention weights, FFN, and embeddings in Transformers.",
+      "LoRA dropout is a key regularisation knob for PEFT fine-tuning."
+    ]
+  },
+  "00-13": {
+    "title": "CNNs vs RNNs",
+    "tldr": "CNNs use shared spatial filters (images, 1D signals); RNNs maintain a sequential hidden state (time series, variable-length text before Transformers).",
+    "points": [
+      "CNN: translation-invariant, shared weights, efficient for grids.",
+      "RNN/LSTM: sequential hidden state, order-aware, bottleneck on long sequences.",
+      "Transformers replaced RNNs for text; CNNs dominate for images.",
+      "Jiuwen: transformer-only at the model layer."
+    ]
+  },
+  "00-14": {
+    "title": "Transfer learning",
+    "tldr": "Use a model trained on one task as the starting point for another — either freezing weights (feature extraction) or continuing to train them (fine-tuning).",
+    "points": [
+      "Feature extraction: freeze pre-trained weights, train new head.",
+      "Fine-tuning: continue training all or some pre-trained weights.",
+      "Every use of a foundation model is transfer learning.",
+      "Jiuwen: model clients = feature extraction; agent_rl/ = fine-tuning."
+    ]
+  },
+  "00-15": {
+    "title": "Classification evaluation beyond accuracy",
+    "tldr": "Accuracy is misleading on imbalanced data; use precision/recall/F1, confusion matrix, ROC-AUC, PR-AUC, and log loss for a complete picture.",
+    "points": [
+      "Precision/Recall/F1: cost-weighted classification quality.",
+      "Confusion matrix: reveals per-class error patterns.",
+      "ROC-AUC: ranking quality, threshold-independent.",
+      "PR-AUC: better than ROC-AUC for severely imbalanced data."
+    ]
+  },
+  "00-16": {
+    "title": "Cross-validation",
+    "tldr": "k-fold CV splits data into k folds and rotates the held-out set, producing a low-variance generalisation estimate that uses every sample.",
+    "points": [
+      "Train on k-1 folds, evaluate on the held-out fold, repeat k times.",
+      "Average of k scores is more reliable than a single split.",
+      "Essential for honest hyperparameter tuning.",
+      "Jiuwen: not implemented; evaluation uses a fixed held-out set."
+    ]
+  },
+  "00-17": {
+    "title": "Overfitting and prevention",
+    "tldr": "Overfitting: training loss falls but validation loss rises as the model memorises noise; prevent with more data, regularisation, early stopping, or reduced capacity.",
+    "points": [
+      "Signal: train loss ↓, val loss ↑.",
+      "Prevent: more data, L2/dropout regularisation, early stopping.",
+      "For LLMs: LoRA reduces trainable parameters; monitor validation perplexity.",
+      "Jiuwen SFT path has no held-out validation by default."
+    ]
+  },
+  "00-18": {
+    "title": "Why multi-head attention",
+    "tldr": "Multiple heads run in parallel on lower-dimensional projections, each free to specialise on different relationship types simultaneously, with no extra compute cost.",
+    "points": [
+      "Single head: one relationship type at a time.",
+      "Multi-head: each head specialises (syntax, coreference, position, etc.).",
+      "Same compute cost: d_model splits into h × d_k per head.",
+      "Jiuwen: fully delegated to provider API / AutoModelForCausalLM."
+    ]
+  }
+}

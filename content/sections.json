@@ -1,6 +1,12 @@
 {
   "sections": [
     {
+      "title": "ML foundations",
+      "topics": [
+        "00"
+      ]
+    },
+    {
       "title": "Model foundations",
       "topics": [
         "01",

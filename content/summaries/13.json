@@ -92,5 +92,15 @@
    "No answerability gate/abstention.",
    "No faithfulness judge with context."
   ]
+ },
+ "13-11": {
+  "title": "Output validation as a pipeline stage",
+  "tldr": "Validation must be three explicit stages with typed pass/fail contracts: syntactic (schema), semantic (faithfulness), policy (safety) — not ad hoc checks.",
+  "points": [
+   "Syntactic: schema/format → retry with repair prompt on fail.",
+   "Semantic: faithfulness/grounding → abstain or flag on fail.",
+   "Policy: safety/guardrail → redact or block on fail.",
+   "Jiuwen: independent rails, no unified stage with shared failure-mode log."
+  ]
  }
 }

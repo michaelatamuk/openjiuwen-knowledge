@@ -53,5 +53,36 @@
    "Brittleness to new inputs.",
    "Amplified bias / format lock-in."
   ]
+ },
+ "17-7": {
+  "title": "LoRA: what it does and when it wins",
+  "tldr": "LoRA freezes all pre-trained weights and trains only two small matrices (rank r) per layer, cutting trainable parameters to <1% — best for small data, adapter swapping, and limited VRAM.",
+  "points": [
+   "ΔW = B·A where rank r ≪ hidden dim; only A, B trained.",
+   "Wins: small data (low rank regularizes), multiple adapters, low VRAM.",
+   "QLoRA: 4-bit frozen base + LoRA adapters — even lower VRAM.",
+   "Jiuwen: agent_rl/ uses PEFT LoRA via veRL; delegates math entirely to PEFT."
+  ]
+ },
+ "17-8": {
+  "title": "RLHF vs DPO",
+  "tldr": "RLHF needs a separate reward model + PPO; DPO skips both and directly maximizes chosen-over-rejected via weighted cross-entropy — simpler and more stable, but less flexible for non-differentiable rewards.",
+  "points": [
+   "RLHF: SFT → reward model → PPO (3 stages, 2 models in memory).",
+   "DPO: (prompt, chosen, rejected) → weighted CE (no reward model, no RL loop).",
+   "Use RLHF/PPO when reward is external (code pass rate, tool success).",
+   "Use DPO when you have a preference dataset and want stability.",
+   "Jiuwen: PPO/GRPO only; no DPO track."
+  ]
+ },
+ "17-9": {
+  "title": "Fine-tuning vs prompting vs RAG",
+  "tldr": "Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.",
+  "points": [
+   "Prompting: format/persona/instructions — zero cost, instantly reversible.",
+   "RAG: dynamic/private/large corpora — updatable without retraining.",
+   "Fine-tuning: new skills/behaviors — training cost, highest latency gain.",
+   "Jiuwen: all three are implemented and composable."
+  ]
  }
 }

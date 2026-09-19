@@ -1,86 +1,97 @@
 {
- "08-1": {
-  "title": "What a framework gives you",
-  "tldr": "Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.",
-  "points": [
-   "Session/state across turns.",
-   "Context trimming/compression.",
-   "Tool registry + control loop.",
-   "Streaming, tracing, guardrails."
-  ]
- },
- "08-2": {
-  "title": "Graph vs role frameworks",
-  "tldr": "Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).",
-  "points": [
-   "Graph: explicit nodes/edges, deterministic routing.",
-   "Role: agents with roles that collaborate.",
-   "Trade control for flexibility."
-  ]
- },
- "08-3": {
-  "title": "Choosing a framework",
-  "tldr": "Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.",
-  "points": [
-   "Explicit graph + durable state → LangGraph.",
-   "Role/team collaboration → CrewAI.",
-   "Managed agent SDK for hosted agents.",
-   "Match the framework to the control shape."
-  ]
- },
- "08-4": {
-  "title": "Heavier framework vs custom",
-  "tldr": "Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.",
-  "points": [
-   "Heavy: batteries included, more config/learning.",
-   "Light: transparent, you build plumbing.",
-   "Choose by team size, rate of change, control needs."
-  ]
- },
- "08-5": {
-  "title": "Unnecessary abstraction",
-  "tldr": "The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.",
-  "points": [
-   "Single model call doesn't need a framework.",
-   "Forcing business logic into nodes/agents is a smell.",
-   "A straight line disguised as a graph."
-  ]
- },
- "08-6": {
-  "title": "When abstractions don't fit",
-  "tldr": "Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.",
-  "points": [
-   "Implement the base interface directly.",
-   "Call the primitive (model/tool) without the wrapper.",
-   "Override hooks or replace a component."
-  ]
- },
- "08-7": {
-  "title": "Which node runs next",
-  "tldr": "A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.",
-  "points": [
-   "Ready = input channels satisfied.",
-   "Run ready nodes concurrently.",
-   "Route outputs; repeat until quiescent."
-  ]
- },
- "08-8": {
-  "title": "Versioning & rolling back workflows",
-  "tldr": "Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.",
-  "points": [
-   "Version the whole definition, not just prompts.",
-   "Immutable versions + content hash.",
-   "Activate/list/rollback atomically."
-  ]
- },
- "08-9": {
-  "title": "Will a framework scale with your team",
-  "tldr": "Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.",
-  "points": [
-   "Declarative registration and plugins.",
-   "Stable extension contracts.",
-   "Provider/config abstraction.",
-   "Schema'd config + docs."
-  ]
- }
+  "08-1": {
+    "title": "What a framework gives you",
+    "tldr": "Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.",
+    "points": [
+      "Session/state across turns.",
+      "Context trimming/compression.",
+      "Tool registry + control loop.",
+      "Streaming, tracing, guardrails."
+    ]
+  },
+  "08-2": {
+    "title": "Graph vs role frameworks",
+    "tldr": "Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).",
+    "points": [
+      "Graph: explicit nodes/edges, deterministic routing.",
+      "Role: agents with roles that collaborate.",
+      "Trade control for flexibility."
+    ]
+  },
+  "08-3": {
+    "title": "Choosing a framework",
+    "tldr": "Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.",
+    "points": [
+      "Explicit graph + durable state → LangGraph.",
+      "Role/team collaboration → CrewAI.",
+      "Managed agent SDK for hosted agents.",
+      "Match the framework to the control shape."
+    ]
+  },
+  "08-4": {
+    "title": "Heavier framework vs custom",
+    "tldr": "Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.",
+    "points": [
+      "Heavy: batteries included, more config/learning.",
+      "Light: transparent, you build plumbing.",
+      "Choose by team size, rate of change, control needs."
+    ]
+  },
+  "08-5": {
+    "title": "Unnecessary abstraction",
+    "tldr": "The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.",
+    "points": [
+      "Single model call doesn't need a framework.",
+      "Forcing business logic into nodes/agents is a smell.",
+      "A straight line disguised as a graph."
+    ]
+  },
+  "08-6": {
+    "title": "When abstractions don't fit",
+    "tldr": "Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.",
+    "points": [
+      "Implement the base interface directly.",
+      "Call the primitive (model/tool) without the wrapper.",
+      "Override hooks or replace a component."
+    ]
+  },
+  "08-7": {
+    "title": "Which node runs next",
+    "tldr": "A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.",
+    "points": [
+      "Ready = input channels satisfied.",
+      "Run ready nodes concurrently.",
+      "Route outputs; repeat until quiescent."
+    ]
+  },
+  "08-8": {
+    "title": "Versioning & rolling back workflows",
+    "tldr": "Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.",
+    "points": [
+      "Version the whole definition, not just prompts.",
+      "Immutable versions + content hash.",
+      "Activate/list/rollback atomically."
+    ]
+  },
+  "08-9": {
+    "title": "Will a framework scale with your team",
+    "tldr": "Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.",
+    "points": [
+      "Declarative registration and plugins.",
+      "Stable extension contracts.",
+      "Provider/config abstraction.",
+      "Schema'd config + docs."
+    ]
+  },
+  "08-10": {
+    "title": "MCP vs A2A: tool access protocol vs agent coordination protocol",
+    "tldr": "MCP = one LLM + many tools (centralized control); A2A = agents talk to agents (decentralized execution). Use both together in production: MCP within agents, A2A between them.",
+    "points": [
+      "MCP (Model Context Protocol): standardized interface for a single LLM to access external tools — databases, browsers, APIs, code. One brain, centralized tool access.",
+      "A2A (Agent-to-Agent Protocol): communication protocol for multi-agent systems — each agent has own tools/memory/reasoning; orchestrator delegates, never touches tools directly",
+      "Key difference: MCP = model in control; A2A = agents in control",
+      "Use MCP for single-agent assistants with broad tool access; add A2A when specialized agents need to run concurrently",
+      "Jiuwen: MCP via McpServerConfig; A2A-style delegation via SubagentRail (internal, not A2A wire protocol)"
+    ]
+  }
 }

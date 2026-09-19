@@ -79,3 +79,96 @@ flowchart LR
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code> — <code>top_k: int = 5</code> static<br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code> — no reranker in KB retrieve<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code> — <code>build_model_allocator</code> (availability strategies, not cost/accuracy)<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — enforced session cost cap</sub>
 
 </details>
+
+
+---
+
+## 4. You're given a vague AI system design brief with no stated constraints — what do you ask first?
+
+**General:** Before proposing any architecture, extract the four constraints that determine every significant tradeoff: (1) **latency budget** — is this real-time (≤200ms) or async? (2) **query volume** — requests per second, peak vs average; (3) **accuracy floor** — is a wrong answer a minor inconvenience or a safety/legal risk? (4) **cost envelope** — is this internal tooling or a consumer product at scale? These four drive every meaningful decision: latency budget rules out reranking or large-model calls in the critical path; accuracy floor rules out smaller models; volume rules out expensive retrievers. Jumping to architecture without asking reads as inexperience — the interviewer is watching whether you ask, and what you ask.
+
+**Jiuwen:** The deployment surface exposes these constraints as distinct configuration layers. Latency: `ModelRequestConfig.timeout` per call, agent `max_turns`. Volume/concurrency: `ModelPoolEntry` `tpm`/`rpm` caps, `APIEmbedding` `max_concurrent`. Accuracy tradeoff: `score_threshold` (retrieval), `temperature`, `max_tokens`. Cost: `auto_harness` budget rail (per-session dollar cap). None of these are inferred automatically — they must be set by the operator based on the use-case constraints.
+
+```mermaid
+flowchart TD
+    BRIEF["vague brief"] --> Q1["latency budget: real-time or async?"]
+    BRIEF --> Q2["query volume: p50/p99 RPS?"]
+    BRIEF --> Q3["accuracy floor: wrong answer cost?"]
+    BRIEF --> Q4["cost envelope: $/query budget?"]
+    Q1 -->|"≤200ms"| NODROP["rules out: reranking, large model in critical path"]
+    Q3 -->|"high stakes"| NODROP2["rules out: small/fast model, no verification"]
+    Q2 -->|"high volume"| NODROP3["rules out: expensive retriever per query"]
+    Q4 -->|"tight"| NODROP4["forces: routing, caching, smaller model"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:214</code> — <code>ModelRequestConfig.timeout</code> (latency)<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/pool.py:278</code> — <code>tpm</code>/<code>rpm</code> (volume)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:47</code> — <code>score_threshold</code> (accuracy lever)<br>&bull; <code>agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24</code> — dollar cap (cost)</sub>
+
+</details>
+
+<sub>_Canonical source: `source/cost-latency-accuracy-tradeoffs_for_engineers.md`; also covered in: tradeoffs._</sub>
+
+---
+
+## 5. How do you make a defensible model selection decision — what does the evaluation actually look like?
+
+**General:** "There's a tradeoff" is not an answer — it is the beginning of one. A defensible selection looks like: (1) define a representative eval set covering the actual use-case distribution (not cherry-picked examples); (2) run every candidate model (or configuration) on the same eval set; (3) record accuracy/quality score AND latency AND cost per query; (4) plot the cost-accuracy and latency-accuracy curves; (5) identify the **knee of the curve** — the point where additional cost or latency buys diminishing quality gain; (6) choose the option that meets the requirement with the least overhead, not the option with the highest absolute accuracy. Critically: the choice is a decision that follows from the requirement, not from intuition or a leaderboard.
+
+**Jiuwen:** `agent_evolving/evaluator/` has `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudge` — a principled eval framework for quality measurement. `dev_tools/tune/Trainer` supports `early_stop_score` for automated quality gating. Gaps: cost and latency are not recorded *alongside* quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in `usage_cost.py` but not correlated to per-query eval scores.
+
+```mermaid
+flowchart TD
+    REQ["requirement (latency / cost / accuracy floor)"] --> EVAL["eval set: representative, not cherry-picked"]
+    EVAL --> RUN["run all candidates on same set"]
+    RUN --> RECORD["record: quality + latency + cost per query"]
+    RECORD --> CURVE["plot cost-accuracy + latency-accuracy curves"]
+    CURVE --> KNEE["find knee: diminishing returns point"]
+    KNEE --> PICK["pick: meets requirement, minimum overhead"]
+    JIW["Jiuwen"] --> EV["evaluator/: FaithfulnessEvaluator, CorrectnessEvaluator, LLMAsJudge"]
+    EV -.->|"absent"| GAP["no cost/latency correlation to eval scores"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1</code> — faithfulness metric<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — LLM-as-judge (no cost/latency input)<br>&bull; <code>agent-core/openjiuwen/dev_tools/tune/trainer/trainer.py:38</code> — <code>early_stop_score</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — session cost (not per-eval-query)</sub>
+
+</details>
+
+**Gap.** Eval pipeline measures quality only — cost and latency are not correlated with quality scores, so the cost-accuracy curve must be assembled externally by the operator.
+
+<sub>_Canonical source: `source/cost-latency-accuracy-tradeoffs_for_engineers.md`; also covered in: tradeoffs._</sub>
+
+---
+
+## 6. What are the architectural layers of a modern AI product?
+
+**General:** A production AI system has seven functional layers, each independently scalable and debuggable: **(1) Data Layer** — raw collection, cleaning/deduplication/filtering, storage (vector DB, object store, data lake), and versioning (what data trained which model). **(2) Model Layer** — base model (raw language prediction), fine-tuned model (task-specific behavior), embedding model (text→vectors), multimodal model (text+image+audio). **(3) Inference Layer** — tokenizer, context window management, temperature/sampling controls, KV cache (reuse past token computations), quantization (reduce weight precision for speed/memory). **(4) Retrieval Layer** — vector store, retriever, reranker, context injection. **(5) Orchestration Layer** — prompt template, conversation memory, tools/function calling, agent loop (plan → act → observe → repeat), orchestration framework. **(6) Safety Layer** — guardrails, alignment (RLHF/CAI), content filter, hallucination detection. **(7) Infrastructure Layer** — GPU cluster (inference compute), load balancer, API gateway (auth/rate limiting/billing), observability (logs, latency, token counts, traces). Every production AI product runs all 7 layers simultaneously. Most developers interact only with Layer 5. The practical test: if something breaks, can you identify which layer it's in?
+
+**Jiuwen:** The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4**: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). **Layer 5**: `PromptTemplate`, `ContextEngine`, `ToolCard` system, `ReactAgent` loop, framework rails. **Layer 6**: `SecurityRail`, `GuardrailRail`, `VerificationRail`, `GuardianRail`. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and `ObservabilityHandler`. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.
+
+```mermaid
+flowchart TB
+    L1["Layer 1 — Data: collection · pipeline · storage · versioning"]
+    L2["Layer 2 — Model: base · fine-tuned · embedding · multimodal"]
+    L3["Layer 3 — Inference: tokenizer · context window · KV cache · quantization"]
+    L4["Layer 4 — Retrieval (RAG): vector store · retriever · reranker · injection"]
+    L5["Layer 5 — Orchestration: prompt · memory · tools · agent loop · framework"]
+    L6["Layer 6 — Safety: guardrails · alignment · content filter · hallucination detection"]
+    L7["Layer 7 — Infrastructure: GPU · load balancer · API gateway · observability"]
+    L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7
+    JIW["Jiuwen covers"] --- L4
+    JIW --- L5
+    JIW --- L6
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; Layer 4: <code>agent-core/openjiuwen/core/retrieval/</code> — full retrieval pipeline<br>&bull; Layer 5: <code>agent-core/openjiuwen/harness/prompts/template.py</code>; <code>agent-core/openjiuwen/core/context_engine/</code>; <code>agent-core/openjiuwen/core/foundation/tool/base.py</code>; <code>agent-core/openjiuwen/core/agentic/react_agent.py</code><br>&bull; Layer 6: <code>agent-core/openjiuwen/harness/rails/security_rail.py</code>; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py</code>; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py</code><br>&bull; Layer 7: <code>agent-core/openjiuwen/harness/observability/event.py</code>; Milvus + vLLM + provider APIs (external)</sub>
+
+</details>
+
+<sub>_Canonical source: `source/ai-system-full-stack_for_engineers.md`; also covered in: ai-system-full-stack._</sub>

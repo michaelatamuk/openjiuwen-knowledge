@@ -460,3 +460,34 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code> — <code>SessionModelContext</code>; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11</code> — <code>ContextMessageBuffer</code><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:183/805</code> — product hybrid index<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — <code>memory_search</code>; <code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code> — when to call</sub>
 
 </details>
+
+
+---
+
+## 15. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+
+**General:** Memory contamination happens when wrong or hallucinated facts are written to long-term memory and then retrieved into future turns, compounding errors. Prevention: write to memory only from verified/confirmed outputs (not raw model scratchpads); tag memory entries with provenance (source, confidence, timestamp); implement targeted invalidation — delete or overwrite specific wrong entries by key rather than wiping all memory; use versioning so you can roll back. Detection: run a periodic audit query that cross-checks stored facts against the authoritative source.
+
+**Jiuwen:** `LongTermMemory` stores typed entries (`MemoryEntry`) with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
+
+```mermaid
+flowchart TD
+    A["agent writes memory (memory_write)"] --> E["MemoryEntry (no confidence gate)"]
+    E --> LTM["LongTermMemory store"]
+    WRONG["wrong fact stored"] --> CONT["contamination: retrieved into future turns"]
+    FIX["fix options"] --> UPD["memory_update(id, ...) — targeted overwrite"]
+    FIX --> DEL["memory_delete_by_category — broad wipe"]
+    FIX -.->|"absent"| VER["versioning / provenance chain"]
+    FIX -.->|"absent"| AUD["periodic audit cross-check"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code> and entry schema<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — <code>memory_write</code>/<code>memory_update</code>/<code>memory_delete_by_category</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/memory_forbidden_rail.py:1</code> — memory suppression gate<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code> — when/what to write</sub>
+
+</details>
+
+**Gap.** No confidence gate before memory write, no versioning or provenance tracking, no audit loop, and no automatic invalidation on conflict detection.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>

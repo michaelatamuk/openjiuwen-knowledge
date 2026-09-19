@@ -264,3 +264,38 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> allowlist<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:43</code> — <code>Correctness</code> dimension<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:47</code> — <code>score_threshold</code> default <code>None</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:83</code> — dense-empty → sparse fallback<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — no context input</sub>
 
 </details>
+
+
+---
+
+## 11. How do you treat output validation as a pipeline stage, not an afterthought?
+
+**General:** Output validation should be an explicit, typed stage between generation and delivery: (1) syntactic validation — does the output match the declared schema or format (JSON schema, regex, structured output type)? (2) semantic validation — is the content grounded in the retrieved context (faithfulness check)? (3) policy validation — does the output pass safety/guardrail rules? Each stage has a clear pass/fail contract: fail syntactic → retry with repair prompt; fail semantic → abstain or flag; fail policy → redact or block. Logging the failure mode at each stage is what makes the system debuggable.
+
+**Jiuwen:** The framework has components for each stage but they are not wired into a single linear validation pipeline. Syntactic: `SchemaUtils.validate_with_schema` on tool results; `structured_output` tool enforces a caller-supplied JSON Schema. Semantic: `VerificationRail` (read-only evidence, PASS/FAIL/PARTIAL); `FaithfulnessEvaluator` in `agent_evolving/eval/`. Policy: `SecurityRail` (prompt injection detection), `GuardrailRail` (sequence-classification model). But these operate as independent rails — there is no shared output-validation stage that all responses must pass before leaving the agent, and there is no pipeline-level failure-mode log distinguishing syntactic vs semantic vs policy failures.
+
+```mermaid
+flowchart TD
+    GEN["generation output"] --> SYN["syntactic: schema / format check"]
+    SYN -->|"fail"| REP["retry with repair prompt"]
+    SYN -->|"pass"| SEM["semantic: faithfulness / grounding check"]
+    SEM -->|"fail"| ABS["abstain or flag"]
+    SEM -->|"pass"| POL["policy: safety / guardrail"]
+    POL -->|"fail"| BLK["redact or block"]
+    POL -->|"pass"| OUT["deliver output"]
+    JIW["Jiuwen"] --> IND["independent rails (no unified stage + failure log)"]
+    IND --> SR["SchemaUtils (syntactic)"]
+    IND --> VR["VerificationRail (semantic — optional)"]
+    IND --> GR["SecurityRail + GuardrailRail (policy)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema</code> (syntactic)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> (semantic)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1</code> — <code>FaithfulnessEvaluator</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (policy)<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — <code>GuardrailRail</code> (policy)</sub>
+
+</details>
+
+**Gap.** No unified output-validation pipeline with a shared failure-mode log; rails are independently enabled/disabled and do not feed a per-response validation record distinguishing syntactic vs semantic vs policy failures.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>

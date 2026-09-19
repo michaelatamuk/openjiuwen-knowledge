@@ -28,6 +28,7 @@ DIST = os.path.join(BUILD, "dist")
 ASSETS = os.path.join(HERE, "assets")
 CONFIG = os.path.join(HERE, "mkdocs.yml")
 MD_DIR = os.path.join(ROOT, "knowledge")
+SOURCE_DIR = os.path.join(ROOT, "source")
 
 
 def prep():
@@ -40,7 +41,14 @@ def prep():
     os.makedirs(os.path.join(DOCS, "assets"), exist_ok=True)
     for a in glob.glob(os.path.join(ASSETS, "site.*")):
         shutil.copyfile(a, os.path.join(DOCS, "assets", os.path.basename(a)))
-    print("prepared docs from", MD_DIR)
+    # copy source reference docs to docs/reference/
+    ref_dst = os.path.join(DOCS, "reference")
+    os.makedirs(ref_dst, exist_ok=True)
+    n_ref = 0
+    for src in glob.glob(os.path.join(SOURCE_DIR, "*.md")):
+        shutil.copyfile(src, os.path.join(ref_dst, os.path.basename(src)))
+        n_ref += 1
+    print(f"prepared docs from {MD_DIR} + {n_ref} reference docs from {SOURCE_DIR}")
 
 
 def find_python():

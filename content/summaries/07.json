@@ -124,5 +124,14 @@
    "Long-term = persisted store.",
    "Retrieval brings memory back."
   ]
+ },
+ "07-15": {
+  "title": "Memory contamination and targeted invalidation",
+  "tldr": "Wrong facts written to memory compound across sessions; prevent via write gating, and fix via targeted overwrite — not full wipes.",
+  "points": [
+   "Prevention: write only from verified outputs; tag with provenance.",
+   "Fix: memory_update(id) for targeted overwrite; memory_delete_by_category for broad wipe.",
+   "Gap: no confidence gate before write, no versioning, no audit loop."
+  ]
  }
 }

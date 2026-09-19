@@ -434,3 +434,41 @@ Retrieval is bi-encoder (query and docs embedded independently, compared by vect
 </details>
 
 ---
+
+## 12. How do you chunk documents that mix prose, tables, and code?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Prose, tables, and code need separate chunking rules: keep code blocks whole, keep table rows with their header, split prose at paragraph/sentence boundaries.
+
+**Key points.**
+
+- Code: keep function/block whole.
+- Tables: header + rows together.
+- Prose: paragraph or sentence split.
+- Jiuwen: TextSplitter is character-based with no content-type detection.
+
+**Concept.** Uniform character or token splitting destroys the structure of tables and code. Apply content-aware chunking: detect content type (prose, Markdown table, fenced code block), then apply per-type rules — keep fenced code blocks whole (or split at the function boundary for long files), keep table rows together with their header row, and split prose at paragraph or sentence boundaries. Attach metadata to each chunk (content_type, source_section) so downstream filtering can distinguish them. For large tables or code files that exceed your chunk budget, summarize or use a structured query path (text-to-SQL, AST grep) instead of embedding the raw content.
+
+![diagram](assets/diagrams/d4e76bc0da7e921a2486e47feed9c66c82a326b7.png)
+
+**In Jiuwen.** TextSplitter (agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56) is a character-based chunker with no content-type detection — it splits at fixed offsets regardless of code block or table boundaries. DocumentChunk metadata fields (source, doc_id, extra) can be populated manually but are not populated from structure by the chunker. No Markdown table parser, no code-block boundary detector, no per-type chunking policy exists in the indexing pipeline.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`TextSplitter` (the default chunker) is a character-based splitter with no content-type detection — it splits at fixed character offsets regardless of whether the offset falls inside a code block, table row, or sentence. No Markdown table parser, no code-block boundary detector, and no per-type chunking policy exist in the indexing pipeline. Metadata fields in `DocumentChunk` (source, doc_id, extra) can be populated manually but are not populated by the chunker from structure. The structured query path (text-to-SQL) is separate from the chunking/embedding pipeline and is not wired as a fallback for table-heavy content.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56` | character chunker, fixed offset splits |
+| `agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/` | chunker package (no Markdown/code-aware variant) |
+| `agent-core/openjiuwen/core/retrieval/common/schema.py:1` | DocumentChunk metadata fields |
+
+</details>
+
+---

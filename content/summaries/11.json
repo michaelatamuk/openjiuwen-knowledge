@@ -98,5 +98,15 @@
    "Cross-encoder: joint scoring, higher precision, per-pair cost.",
    "Use bi-encoder to retrieve, cross-encoder to rerank."
   ]
+ },
+ "11-12": {
+  "title": "Chunking mixed content",
+  "tldr": "Prose, tables, and code need separate chunking rules: keep code blocks whole, keep table rows with their header, split prose at paragraph/sentence boundaries.",
+  "points": [
+   "Code: keep function/block whole.",
+   "Tables: header + rows together.",
+   "Prose: paragraph or sentence split.",
+   "Jiuwen: TextSplitter is character-based with no content-type detection."
+  ]
  }
 }

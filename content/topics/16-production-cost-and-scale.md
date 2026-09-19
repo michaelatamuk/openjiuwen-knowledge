@@ -368,3 +368,132 @@ flowchart TD
 </details>
 
 <sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
+
+
+---
+
+## 14. What does structured agent tracing look like, and why does print-debugging fail at scale?
+
+**General:** Print/log statements produce unstructured text: you can't query "all tool calls in session X", can't aggregate latency by tool, and can't correlate a wrong answer back to which retrieval chunk was in context. Structured tracing means emitting a typed event for every meaningful action — model call started/completed, tool called/returned, retrieval executed, decision made — with a shared trace/span ID so events from the same agent run can be grouped. Each event carries: timestamp, latency, token counts, tool name + arguments, retrieval score, model response. This enables offline debugging (replay a trace), production monitoring (alert on p99 latency), and eval (attach ground truth to a trace for scoring). The minimum viable schema: `trace_id`, `span_id`, `event_type`, `payload`, `duration_ms`.
+
+**Jiuwen:** `ObservabilityEvent` (in `harness/observability/`) is the framework's structured event type; `ObservabilityHandler` receives events and can forward to a backend. `ReactAgent` emits events at major loop points (model call, tool call, final answer). Token counts are available via `ModelResponse.usage`. The `TraceManager` / `TraceHandler` provide span-level tracing with parent-child span linking. However, retrieval events (which chunks were returned, their scores) are not automatically emitted as observability events — they appear only in tool result text, not as structured spans, so cross-run retrieval analytics require manual instrumentation.
+
+```mermaid
+flowchart TD
+    PRINT["print debugging"] -.->|"unqueryable, no correlation"| BAD["fails at scale"]
+    STRUCT["structured tracing"] --> EV["typed event per action"]
+    EV --> MC["model call (tokens, latency)"]
+    EV --> TC["tool call (name, args, result)"]
+    EV --> RET["retrieval (chunks, scores)"]
+    EV --> DEC["decision (plan step, branch)"]
+    EV --> TID["shared trace_id + span_id for grouping"]
+    JIW["Jiuwen"] --> OBS["ObservabilityEvent + ObservabilityHandler"]
+    JIW --> TM["TraceManager / TraceHandler (span linking)"]
+    JIW -.->|"absent"| RETEV["retrieval events as structured spans"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/observability/event.py:1</code> — <code>ObservabilityEvent</code> schema<br>&bull; <code>agent-core/openjiuwen/harness/observability/handler.py:1</code> — <code>ObservabilityHandler</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code> — event emission points<br>&bull; <code>agent-core/openjiuwen/harness/trace/trace_manager.py:1</code> — <code>TraceManager</code> span tracking<br>&bull; <code>agent-core/openjiuwen/core/model/response.py:1</code> — <code>ModelResponse.usage</code> token counts</sub>
+
+</details>
+
+**Gap.** Retrieval events (chunk ids, scores, query) are not emitted as structured observability spans; they appear only in the tool result text, making cross-run retrieval analysis require custom instrumentation.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>
+
+---
+
+## 15. How do you route between multiple model providers — and when do you switch dynamically?
+
+**General:** Multi-provider routing has two modes: static (choose provider at config time based on cost, capability, or data residency) and dynamic (route at request time based on load, availability, or task type). Dynamic routing patterns: (1) primary/fallback — always try provider A, fall back to B on error or timeout; (2) capability routing — send code tasks to a coding-optimized model, chat tasks to a general model; (3) cost routing — send cheap queries to a small cheap model, expensive reasoning to a large model (classifier decides). Key considerations: response format compatibility across providers (different tool-call schemas), token counting per-provider, and observable routing decisions (which provider was actually used).
+
+**Jiuwen:** `ModelClientFactory` (or the `model_config` field on each agent) selects a provider at agent construction time. A `ModelConfig` references a named provider (OpenAI, Anthropic, DashScope, Ollama, etc.) and a model ID. There is no built-in runtime routing layer: no primary/fallback chain, no capability classifier, and no cost-based dispatch. Multi-provider setups are achieved by configuring different agents with different `ModelConfig`s (e.g., a fast model for intent classification, a powerful model for reasoning), but the routing logic is in the application layer, not the framework. Circuit-breaker behavior is provided by `CircuitBreakerRail` (trip on consecutive failures, open for a cooldown), which is the closest analogue to a fallback.
+
+```mermaid
+flowchart TD
+    REQ["incoming request"] --> ROUTE{"routing mode"}
+    ROUTE -->|"static"| CONF["provider from ModelConfig (set at construction)"]
+    ROUTE -->|"dynamic"| DYN["runtime router"]
+    DYN --> PF["primary/fallback (CircuitBreakerRail)"]
+    DYN --> CAP["capability (task-type classifier → agent selection)"]
+    DYN --> COST["cost routing (cheap model for simple, expensive for complex)"]
+    CONF --> PROV["provider client (OpenAI / Anthropic / DashScope / Ollama)"]
+    DYN -.->|"absent in framework"| X["no built-in capability or cost router"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/model/client/factory.py:1</code> — <code>ModelClientFactory</code><br>&bull; <code>agent-core/openjiuwen/core/model/config.py:1</code> — <code>ModelConfig</code> (provider + model_id)<br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> failure trip + cooldown<br>&bull; <code>agent-core/openjiuwen/core/model/client/</code> — per-provider client implementations</sub>
+
+</details>
+
+**Gap.** No built-in runtime capability or cost router; multi-provider setups require application-layer orchestration. `CircuitBreakerRail` trips on consecutive errors but does not reroute to an alternate provider.
+
+<sub>_Canonical source: `source/real-interview-ai-engineer-4rounds_for_engineers.md`; also covered in: real-interview._</sub>
+
+---
+
+## 16. What is the correct fallback sequence when a model call fails?
+
+**General:** Model call failures fall into three categories: transient (timeout, rate limit, 5xx), permanent (auth error, unsupported model, input too long), and quality (response parsed but content invalid/refused). The correct fallback sequence: (1) retry with exponential backoff + jitter for transient errors (max 3 attempts); (2) if still failing, route to a fallback provider/model if one is configured; (3) if the fallback also fails or no fallback exists, return a graceful degraded response — "I was unable to complete this request, please try again" — rather than surfacing a raw exception. Do not retry permanent errors (they will not recover). Do not retry quality failures as-is (retry with a modified prompt or abstain).
+
+**Jiuwen:** `CircuitBreakerRail` tracks consecutive failures and opens the circuit after a threshold (preventing further calls during cooldown), then half-opens to probe recovery. Model clients do not implement their own retry; retries are the responsibility of the rail layer or the caller. There is no automatic fallback-provider routing in the framework — if the primary provider is down, the circuit opens and the agent returns an error. `ModelRequestConfig` has a `timeout` field that is forwarded to the provider client. Graceful degraded responses are not emitted by any rail; an open circuit raises an exception that propagates to the caller.
+
+```mermaid
+flowchart TD
+    FAIL["model call fails"] --> CAT{"error type"}
+    CAT -->|"transient (timeout, 5xx, rate limit)"| RETRY["retry + exponential backoff + jitter"]
+    RETRY -->|"still failing"| FBK["fallback provider/model (if configured)"]
+    FBK -->|"also fails"| DEG["graceful degraded response"]
+    CAT -->|"permanent (auth, unsupported)"| DEG
+    CAT -->|"quality (bad output)"| RPMT["retry with modified prompt or abstain"]
+    JIW["Jiuwen"] --> CB["CircuitBreakerRail: trip → cooldown → half-open probe"]
+    CB -.->|"absent"| AUTO["auto-fallback provider routing"]
+    CB -.->|"absent"| GDEG["graceful degraded response on open circuit"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> open/closed/half-open states<br>&bull; <code>agent-core/openjiuwen/core/model/config.py:1</code> — <code>ModelRequestConfig.timeout</code><br>&bull; <code>agent-core/openjiuwen/core/model/client/factory.py:1</code> — single provider per agent (no fallback chain)</sub>
+
+</details>
+
+**Gap.** No automatic fallback-provider routing; an open circuit raises rather than returning a structured degraded response. No retry-with-modified-prompt path for quality failures.
+
+<sub>_Canonical source: `source/real-interview-ai-engineer-4rounds_for_engineers.md`; also covered in: real-interview._</sub>
+---
+
+## 17. What is an AI gateway and when do you need one?
+
+**General:** An AI gateway is an infrastructure layer that sits between your application and one or more LLM provider APIs. It centralises concerns that would otherwise be duplicated in every service that calls a model.
+
+What a gateway does: (1) **routing** — send requests to different providers (OpenAI, Anthropic, local vLLM) based on cost, latency, availability, or model capability; (2) **rate limiting and cost enforcement** — per-tenant or per-user token budgets, hard spend caps, and quota management without touching application code; (3) **authentication and key isolation** — API keys never leave the gateway; application services hold only an internal token; (4) **semantic caching** — embed incoming queries and return cached responses for near-duplicate requests, reducing redundant model calls; (5) **safety enforcement** — content filtering and PII redaction applied uniformly at the gateway before the request reaches the model; (6) **observability** — every model call is logged with provider, model, token usage, latency, and cost in one place.
+
+When you need a gateway: multiple services calling LLMs independently (key sprawl, duplicated cost logic), strict per-tenant budgets, multi-provider fallback, or a need for a single audit log of all model calls. Single-service applications with one provider generally do not need a dedicated gateway.
+
+**Jiuwen:** No standalone gateway component. Equivalent functions are distributed across the framework: provider routing via `ModelClientFactory`; cost tracking via `usage_cost.py`; circuit breaking via `CircuitBreakerRail`; content safety via `GuardrailRail`; observability via `ObservabilityHandler`. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
+
+```mermaid
+flowchart TD
+    APP["application service"] --> GW["AI gateway"]
+    GW --> RT["routing: provider A / B / local"]
+    GW --> RL["rate limiting + spend cap"]
+    GW --> AUTH["key isolation"]
+    GW --> SC["semantic caching"]
+    GW --> SF["safety filter / PII"]
+    GW --> OB["unified observability"]
+    RT --> PROV["LLM provider API"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; Equivalent in Jiuwen: `usage_cost.py:101` (cost), `circuit_breaker_rail.py:1` (circuit), `guardrail_rail.py:1` (safety), `observability/event.py:1` (logging)<br>&bull; No gateway component in the codebase; these concerns are per-agent, not cross-service</sub>
+
+</details>
+
+<sub>_Canonical source: `source/ai-gateway-architecture_for_engineers.md`._</sub>

@@ -234,3 +234,121 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 </details>
 
 ---
+
+## 7. What does LoRA actually do, and when does it outperform full fine-tuning?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** LoRA freezes all pre-trained weights and trains only two small matrices (rank r) per layer, cutting trainable parameters to <1% — best for small data, adapter swapping, and limited VRAM.
+
+**Key points.**
+
+- ΔW = B·A where rank r ≪ hidden dim; only A, B trained.
+- Wins: small data (low rank regularizes), multiple adapters, low VRAM.
+- QLoRA: 4-bit frozen base + LoRA adapters — even lower VRAM.
+- Jiuwen: agent_rl/ uses PEFT LoRA via veRL; delegates math entirely to PEFT.
+
+**Concept.** LoRA (Low-Rank Adaptation) freezes all pre-trained weights and injects two small trainable matrices A and B into each target layer such that the weight update is ΔW = BA (rank r ≪ hidden dim). Only A and B are trained — typically <1% of the full parameter count — so GPU memory and storage requirements drop dramatically. This matters when: you are fine-tuning a large model on a small dataset (LoRA's low rank acts as a regularizer that reduces overfitting), you need multiple task-specific adapters on the same base model (swap adapters without reloading the base), or you have limited GPU VRAM. LoRA does not outperform full fine-tuning when: the task is far from the pre-training distribution (the low rank may not be expressive enough), or when you have abundant high-quality task data and sufficient compute. QLoRA extends LoRA by quantizing the frozen base weights to 4-bit, further reducing VRAM.
+
+![diagram](assets/diagrams/ccdf5dd63f8b8a1a2338643d0c0a3c2d30146eb5.png)
+
+**In Jiuwen.** agent_rl/ uses PEFT LoRA via veRL for SFT and PPO/GRPO. lora_rank, lora_alpha, lora_dropout, target_modules are config parameters forwarded to the PEFT adapter (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:359). Base model weights are frozen; only A/B matrices are trained. QLoRA (4-bit frozen base) is supported via the quantization config field. LoRA math is entirely delegated to the PEFT library.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. `LoRA rank`, `LoRA alpha`, `LoRA dropout`, and `target_modules` are configuration parameters forwarded to the PEFT adapter. The base model weights are frozen; only the A/B matrices are trained. `agent_evolving/` also supports QLoRA (4-bit quantized base) via the `quantization` config field. The framework does not implement LoRA math directly — it delegates entirely to the PEFT library.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:359` | LoRA config fields forwarded to PEFT |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/config/` | lora_rank, lora_alpha, lora_dropout, target_modules |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:380` | quantization field (QLoRA) |
+
+</details>
+
+---
+
+## 8. RLHF vs DPO: what changes and when do you use each?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** RLHF needs a separate reward model + PPO; DPO skips both and directly maximizes chosen-over-rejected via weighted cross-entropy — simpler and more stable, but less flexible for non-differentiable rewards.
+
+**Key points.**
+
+- RLHF: SFT → reward model → PPO (3 stages, 2 models in memory).
+- DPO: (prompt, chosen, rejected) → weighted CE (no reward model, no RL loop).
+- Use RLHF/PPO when reward is external (code pass rate, tool success).
+- Use DPO when you have a preference dataset and want stability.
+- Jiuwen: PPO/GRPO only; no DPO track.
+
+**Concept.** RLHF (Reinforcement Learning from Human Feedback) has three stages: supervised fine-tuning (SFT), reward model training (human preferences → a scalar reward model), and RL optimization (PPO to maximize the reward model's score subject to a KL divergence penalty against the SFT model). It works but is complex: two models in memory during PPO training, reward model can be gamed (reward hacking), requires online sampling. DPO (Direct Preference Optimization) is a mathematical simplification: given a preference dataset of (prompt, chosen, rejected) pairs, DPO directly optimizes the policy to increase the probability of chosen over rejected without needing a separate reward model or RL loop — it reduces to a weighted cross-entropy loss. DPO is simpler, more stable, and requires less compute; RLHF/PPO is more flexible for non-differentiable rewards (binary pass/fail, code execution, tool call success) and allows online improvement. Use DPO when you have a preference dataset and want stability; use PPO when your reward is computed externally (unit test pass rate, API call success).
+
+![diagram](assets/diagrams/92ac41ad87de82ccb4c160167976d795583ae51b.png)
+
+**In Jiuwen.** Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, eliminating the value model from PPO. No DPO backend exists in the codebase — the preference-based alignment track is absent. SFT path (online/backends/sft/) covers stage 1 of RLHF.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`agent_rl/` implements both paths via veRL. The online PPO path (`online/backends/ppo/`) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (`online/backends/sft/`) covers the first stage of RLHF.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/` | PPO trainer |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT (stage 1) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/config/` | GRPO config (no value model) |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/` | no DPO backend present |
+
+</details>
+
+---
+
+## 9. Fine-tuning vs prompting vs RAG: when does each win?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.
+
+**Key points.**
+
+- Prompting: format/persona/instructions — zero cost, instantly reversible.
+- RAG: dynamic/private/large corpora — updatable without retraining.
+- Fine-tuning: new skills/behaviors — training cost, highest latency gain.
+- Jiuwen: all three are implemented and composable.
+
+**Concept.** Three complementary customization levers, not competitors. **Prompting** (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. **RAG**: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). **Fine-tuning**: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.
+
+![diagram](assets/diagrams/80870c55071007554d5358baa9187379660ed74a.png)
+
+**In Jiuwen.** All three levers are implemented. Prompting: PromptTemplate + PromptSection system in harness/prompts/; RuntimePromptRail for dynamic injection. RAG: full retrieval pipeline via RetrieverConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable — agents start with prompting, retrieval is added via RetrieverConfig, and fine-tuning is run offline on collected trajectories.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+All three are implemented. Prompting: `PromptTemplate` + `PromptSection` system in `harness/prompts/`; `RuntimePromptRail` for dynamic injection. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: `agent_rl/` SFT + PPO/GRPO via veRL. The framework is designed for iterative layering — agents start with prompting, retrieval is added via `RetrieverConfig`, and fine-tuning (via `agent_rl/`) is run offline to improve on collected trajectories. The three levers are independent and composable.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/prompts/template.py:1` | PromptTemplate |
+| `agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1` | RuntimePromptRail |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:1` | RetrieverConfig |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT path |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/` | PPO/GRPO path |
+
+</details>
+
+---

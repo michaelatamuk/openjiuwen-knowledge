@@ -276,3 +276,94 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations=5</code>; <code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness 15<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133</code> — <code>max_iter=2</code> clamped<br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90</code> — loop compact/abort<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code> — <code>idempotent</code> default <code>False</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128/145</code> — non-idempotent guard + retry budget<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap</sub>
 
 </details>
+
+<sub>_Canonical source: `source/ai-engineer-interview-patterns_for_engineers.md`; also covered in: ai-agent, ai-technical._</sub>
+
+---
+
+## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+
+**General:** A hard iteration cap (`max_iterations`) prevents runaway loops by time but does not detect that the agent is *stuck repeating itself*. Divergence detection is a complementary mechanism: (1) hash `(tool_name, canonicalised_args)` on each turn and compare against prior turns — if the same call recurs, the agent is spinning; (2) compare model output text similarity across consecutive turns — if the reasoning text is structurally identical, the agent is not making progress; (3) on detection, trigger a compaction step (rewrite history to remove the reinforcing noise) before continuing, rather than simply aborting. The goal is to detect the loop early and repair the context, not just stop at a budget limit.
+
+**Jiuwen:** `ToolCallDeduplicationRail` hashes `(tool, args)` per turn and emits warnings on repeat. `ModelAnomalyDetectionRail` detects consecutive identical tool-call rounds and can trigger compact-then-abort (`ToolLoopCompactConfig`), but this config is **off by default** — loops generate warnings but do not abort without explicit configuration. There is no output-text-similarity divergence check (only tool-call-level detection). Compaction on loop is available via `FullCompactProcessor` but is not automatically triggered by the dedup rail.
+
+```mermaid
+flowchart TD
+    LOOP["agent appears stuck"] --> HASH["ToolCallDeduplicationRail: hash(tool,args) repeat → warn"]
+    LOOP --> ANOM["ModelAnomalyDetectionRail: identical rounds → compact+abort (off by default)"]
+    LOOP -.->|"absent"| TEXT["output-text-similarity divergence check"]
+    LOOP -.->|"absent"| AUTO["auto-compaction triggered by dedup rail"]
+    ANOM -.->|"must configure"| CONF["ToolLoopCompactConfig: must be explicitly enabled"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` — repeat counter + warning<br>&bull; `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74` — `ToolLoopCompactConfig` (default off); `:90` compact+abort<br>&bull; `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py` — compaction; not auto-triggered by dedup</sub>
+
+</details>
+
+**Gap.** `ToolLoopCompactConfig` is off by default — loops warn but do not abort. No output-text-similarity divergence check. Compaction is not automatically triggered on loop detection.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`._</sub>
+
+---
+
+## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+
+**General:** "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) **success** — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) **budget exhaustion** — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) **human escalation** — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.
+
+**Jiuwen:** Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `WorkPlanApprovalRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `WorkPlanApprovalRail` is opt-in per agent config.
+
+```mermaid
+flowchart TD
+    T["termination decision"] --> S["success: final answer emitted (ReactAgent done)"]
+    T --> B["budget: max_iterations (5/15) + session cost cap"]
+    T --> E["escalation: WorkPlanApprovalRail / StructuredAskUserRail (opt-in)"]
+    T --> A["anomaly abort: ModelAnomalyDetectionRail (off by default)"]
+    T -.->|"absent"| D["graceful degraded response at budget exhaustion"]
+    T -.->|"absent"| C["confidence-threshold auto-escalation"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` — `max_iterations: int = Field(default=5)`<br>&bull; `agent-core/openjiuwen/harness/schema/config.py:252` — harness default 15<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py` — structured human escalation<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` — `WorkPlanApprovalRail` (opt-in)</sub>
+
+</details>
+
+**Gap.** Budget exhaustion produces abort, not a graceful degraded response. Confidence-based escalation is absent. Human-in-the-loop rails are opt-in and not in the default profile.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`._</sub>
+
+---
+
+## 13. When should you use a deterministic workflow instead of an autonomous agent?
+
+**General:** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
+
+Choose a workflow when: (1) the task structure is fully known in advance (extract → validate → classify); (2) every execution must follow the same path for compliance or auditability; (3) failure modes must be enumerated and handled explicitly; (4) cost must be bounded (fixed number of model calls). Choose an agent when: (1) the next action depends on the previous result in ways you cannot enumerate; (2) the task requires open-ended tool use across many possible paths; (3) the goal is underspecified and the model must decompose it dynamically.
+
+In practice most production systems are **hybrid**: a deterministic outer workflow that calls agent sub-tasks only where flexibility is genuinely required. Build the workflow path first; add agent autonomy only where the workflow cannot reach.
+
+**Jiuwen:** The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
+
+```mermaid
+flowchart TD
+    TASK["task arrives"] --> Q{"structure known?"}
+    Q -->|yes| WF["workflow: fixed steps, deterministic, bounded cost"]
+    Q -->|no| AG["agent: model chooses tools, variable steps"]
+    WF --> HYB["hybrid: workflow outer shell + agent sub-task where needed"]
+    AG --> HYB
+    WF --> TEST["unit-testable, enumerable failure modes"]
+    AG --> INVAR["invariant-based testing (tool calls, schema, budget)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/agentic/react_agent.py` — agent loop (dynamic)<br>&bull; `agent-core/openjiuwen/core/workflow/` — Pregel graph engine (deterministic)<br>&bull; `agent-core/openjiuwen/harness/rails/task_planning_rail.py` — task decomposition in the agent path</sub>
+
+</details>
+
+<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`._</sub>

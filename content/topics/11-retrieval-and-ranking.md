@@ -309,3 +309,35 @@ flowchart TD
 **Gap.** `ChatReranker` is one document per request. The `language` kwarg from the graph store is silently dropped by `StandardReranker._assemble_params`.
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-practical, rag-retrieval._</sub>
+
+
+---
+
+## 12. How do you chunk documents that mix prose, tables, and code?
+
+**General:** Uniform character or token splitting destroys the structure of tables and code. Apply content-aware chunking: detect content type (prose, Markdown table, fenced code block), then apply per-type rules — keep fenced code blocks whole (or split at the function boundary for long files), keep table rows together with their header row, and split prose at paragraph or sentence boundaries. Attach metadata to each chunk (content_type, source_section) so downstream filtering can distinguish them. For large tables or code files that exceed your chunk budget, summarize or use a structured query path (text-to-SQL, AST grep) instead of embedding the raw content.
+
+**Jiuwen:** `TextSplitter` (the default chunker) is a character-based splitter with no content-type detection — it splits at fixed character offsets regardless of whether the offset falls inside a code block, table row, or sentence. No Markdown table parser, no code-block boundary detector, and no per-type chunking policy exist in the indexing pipeline. Metadata fields in `DocumentChunk` (source, doc_id, extra) can be populated manually but are not populated by the chunker from structure. The structured query path (text-to-SQL) is separate from the chunking/embedding pipeline and is not wired as a fallback for table-heavy content.
+
+```mermaid
+flowchart TD
+    DOC["mixed document: prose + table + code"] --> DET["detect content type"]
+    DET --> PR["prose → paragraph/sentence split"]
+    DET --> TB["table → keep header + rows together"]
+    DET --> CD["code → keep function/block whole"]
+    PR & TB & CD --> META["tag chunk: content_type, section"]
+    META --> IDX["index with metadata filters"]
+    JIW["Jiuwen"] --> CHAR["TextSplitter: character split (no type detection)"]
+    JIW -.->|"absent"| AWARE["content-aware chunking"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56</code> — character chunker, fixed offset splits<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/</code> — chunker package (no Markdown/code-aware variant)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/schema.py:1</code> — <code>DocumentChunk</code> metadata fields</sub>
+
+</details>
+
+**Gap.** No content-aware chunking for tables or code blocks; `TextSplitter` can split mid-row or mid-function. No structured-content fallback path wired into the ingest pipeline.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure, rag-retrieval._</sub>

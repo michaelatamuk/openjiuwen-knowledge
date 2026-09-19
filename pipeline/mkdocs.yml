@@ -42,6 +42,8 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - ML foundations:
+      - ML foundations: 00-ml-foundations.md
   - Model foundations:
       - LLM foundations: 01-llm-foundations.md
       - Prompting & output: 02-prompting-and-output-control.md
@@ -66,3 +68,37 @@ nav:
       - Fine-tuning: 17-fine-tuning-and-customization.md
   - Safety & security:
       - Security & safety: 18-security-and-safety.md
+  - Source reference:
+      - Overview: reference/README.md
+      - Real interview reports:
+          - 4-round AI engineer interview: reference/real-interview-ai-engineer-4rounds_for_engineers.md
+          - Levelled questions (beginner → advanced): reference/ai-engineer-levelled-interview-questions_for_engineers.md
+      - General AI engineering:
+          - Technical questions: reference/ai-engineer-technical-questions_for_engineers.md
+          - GenAI interview questions: reference/genai-interview-questions_for_engineers.md
+          - LinkedIn / community questions: reference/ai-engineer-linkedin-interview-questions_for_engineers.md
+      - Agents:
+          - Agent interview questions: reference/ai-agent-interview-questions_for_engineers.md
+          - Agent framework questions: reference/ai-agent-framework-interview-questions_for_engineers.md
+      - RAG:
+          - RAG Part 1: reference/rag-part1-interview-questions_for_engineers.md
+          - RAG Part 2: reference/rag-part2-interview-questions_for_engineers.md
+          - RAG practical: reference/rag-practical-interview-questions_for_engineers.md
+          - Retrieval deep dive: reference/rag-retrieval-interview-questions_for_engineers.md
+          - RAG evaluation: reference/rag-evaluation-interview-questions_for_engineers.md
+          - RAG system design: reference/rag-system-design-interview-questions_for_engineers.md
+      - LLM:
+          - LLM fundamentals: reference/llm-fundamentals-interview-questions_for_engineers.md
+          - LLM applied: reference/llm-applied-interview-questions_for_engineers.md
+      - Knowledge & patterns:
+          - Interview dynamics patterns: reference/ai-engineer-interview-patterns_for_engineers.md
+          - LLM interview patterns: reference/llm-interview-patterns_for_engineers.md
+          - Agent failure patterns: reference/agent-failure-patterns_for_engineers.md
+          - LLM architecture patterns: reference/llm-architecture-patterns_for_engineers.md
+          - LLM terms glossary: reference/llm-terms-interview-reference_for_engineers.md
+          - Cost, latency & accuracy tradeoffs: reference/cost-latency-accuracy-tradeoffs_for_engineers.md
+          - 15 foundational papers: reference/15-foundational-papers_for_engineers.md
+          - AI system full-stack concepts: reference/ai-system-full-stack_for_engineers.md
+          - Agent design patterns 2026: reference/agent-design-patterns-2026_for_engineers.md
+          - AI gateway architecture: reference/ai-gateway-architecture_for_engineers.md
+          - AI engineer learning path: reference/ai-engineer-learning-path_for_engineers.md

@@ -560,3 +560,36 @@ flowchart TD
 **Gap.** Sufficiency is judged on triples only, not the actual passages; no confidence score; a JSON parse failure returns `None` (silent early stop).
 
 <sub>_Canonical source: `source/rag-part2-interview-questions_for_engineers.md`; also covered in: rag-2._</sub>
+
+
+---
+
+## 21. How does a larger context window change your retrieval strategy — and when does it not help?
+
+**General:** A larger context window lets you stuff more retrieved documents into the prompt, potentially reducing the need for aggressive top-k filtering. But it does not solve retrieval precision: the model still has to attend to the right passage inside a long context, and "lost in the middle" research shows models systematically underweight evidence in the middle of long contexts. More tokens also mean more cost per call and higher latency. Strategy: use retrieval precision (reranking, score thresholds) as the primary filter, and reserve long-context capacity for cases where multiple documents must be read together (multi-hop reasoning, synthesis tasks). Do not trade retrieval quality for window stuffing.
+
+**Jiuwen:** `AgenticRetriever` (iterative multi-hop) and `VectorRetriever` (single-shot) both retrieve into `top_k` (default 5) regardless of the deployed model's context window — window size is not a retrieval config parameter. Long contexts are managed by the context engine: tool-result offloading (>50k tokens), `keep_last_k` windowing, and full compaction at 180k. There is no adaptive top-k that scales with available context budget, and no "lost-in-the-middle" reordering (placing high-relevance chunks at boundaries).
+
+```mermaid
+flowchart TD
+    LW["larger context window"] --> MORE["can fit more docs — raises recall ceiling"]
+    LW --> LITM["'lost in the middle' — mid-context evidence underweighted"]
+    LW --> COST["more tokens → higher cost + latency per call"]
+    LW -.->|"does not solve"| PREC["retrieval precision (still need rerank + threshold)"]
+    STRAT["strategy"] --> PREC_F["prioritize reranking + score filtering"]
+    STRAT --> RES["reserve long window for multi-doc synthesis"]
+    JIW["Jiuwen"] --> FIXED["top_k fixed (default 5), not adaptive to window"]
+    JIW --> CE["context engine caps via offloading + compaction"]
+    JIW -.->|"absent"| REORD["boundary reordering for lost-in-the-middle"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code> — <code>top_k: int = 5</code> (fixed, not window-adaptive)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326</code> — iterative retriever does not scale k<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — 50k offload threshold<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — 180k compaction</sub>
+
+</details>
+
+**Gap.** No adaptive top-k based on available context budget; no lost-in-the-middle mitigation (boundary placement of high-relevance chunks); context management happens at the conversation engine level, not the retrieval configuration level.
+
+<sub>_Canonical source: `source/ai-engineer-levelled-interview-questions_for_engineers.md`; also covered in: ai-engineer-levelled._</sub>

@@ -681,3 +681,36 @@ flowchart TD
 
 
 <sub>_Canonical source: `source/rag-retrieval-interview-questions_for_engineers.md`; also covered in: rag-retrieval._</sub>
+
+
+---
+
+## 26. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+
+**General:** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
+
+**Jiuwen:** `VerificationRail` and `agent_evolving/evaluator/` provide LLM-as-judge for correctness. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — trips on failure threshold); `StructuredOutputTool` (schema invariant — validates against caller schema); `GuardrailRail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`ModelClientABC`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
+
+```mermaid
+flowchart TD
+    INVAR["invariant-based testing"] --> TOOL_I["tool invariants: right tool called, schema valid, no prohibited tools"]
+    INVAR --> TERM_I["termination invariants: exits within max_turns via expected path"]
+    INVAR --> SCHEMA_I["schema invariants: structured output matches declared schema"]
+    INVAR --> SAFE_I["safety invariants: no guardrail-blocked content executed"]
+    INVAR --> COST_I["cost invariants: tokens within budget, latency under SLA"]
+    BEHAV["behavioral correctness"] --> JUDGE["LLM-as-judge on eval set (not regression test)"]
+    JIW_T["Jiuwen test strategy"] --> MOCK["mock ModelClientABC → inject controlled responses"]
+    JIW_T --> RAILS["test rail contracts independently (CircuitBreaker, GuardrailRail, etc.)"]
+    JIW_T -.->|"wrong approach"| EXACT["exact output string assertion"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1</code> — <code>ModelClientABC</code> (mockable boundary)<br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — termination invariant contract<br>&bull; <code>agent-core/openjiuwen/harness/tools/structured_output/tool.py:1</code> — schema invariant<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — safety invariant<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — cost invariant (session budget)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — behavioral correctness via LLM-as-judge</sub>
+
+</details>
+
+**Gap.** No official test harness for invariant-based agent testing ships with the framework; test authors must implement their own ModelClientABC mock and rail-contract assertions. The evaluator pipeline (`agent_evolving/`) is offline, not integrated with a pytest-style test runner.
+
+<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>

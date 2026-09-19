@@ -802,3 +802,41 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 </details>
 
 ---
+
+## 21. How does a larger context window change your retrieval strategy — and when does it not help?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** A larger context window raises the recall ceiling but doesn't replace retrieval precision; 'lost in the middle' degrades mid-context evidence, and more tokens cost more.
+
+**Key points.**
+
+- More tokens → higher recall ceiling, but mid-context evidence is underweighted.
+- Strategy: rerank and threshold first; reserve window for multi-doc synthesis.
+- Jiuwen: top_k fixed at 5, not adaptive; no lost-in-the-middle boundary reordering.
+
+**Concept.** A larger context window lets you stuff more retrieved documents into the prompt, potentially reducing the need for aggressive top-k filtering. But it does not solve retrieval precision: the model still has to attend to the right passage inside a long context, and "lost in the middle" research shows models systematically underweight evidence in the middle of long contexts. More tokens also mean more cost per call and higher latency. Strategy: use retrieval precision (reranking, score thresholds) as the primary filter, and reserve long-context capacity for cases where multiple documents must be read together (multi-hop reasoning, synthesis tasks). Do not trade retrieval quality for window stuffing.
+
+![diagram](assets/diagrams/6d0071af2d36e13a491b5bc16bbf06b3a6b55a78.png)
+
+**In Jiuwen.** top_k is fixed at 5 (agent-core/openjiuwen/core/retrieval/common/config.py:46) and is not adaptive to the deployed model's context window. Long-context management is handled by the context engine (tool_result_budget_processor 50k offload, tool_result_window keep_last_k=3, full_compact_processor 180k compaction), not by retrieval config. No boundary reordering to mitigate lost-in-the-middle effects.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`AgenticRetriever` (iterative multi-hop) and `VectorRetriever` (single-shot) both retrieve into `top_k` (default 5) regardless of the deployed model's context window — window size is not a retrieval config parameter. Long contexts are managed by the context engine: tool-result offloading (>50k tokens), `keep_last_k` windowing, and full compaction at 180k. There is no adaptive top-k that scales with available context budget, and no "lost-in-the-middle" reordering (placing high-relevance chunks at boundaries).
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/retrieval/common/config.py:46` | top_k: int = 5 (fixed, not window-adaptive) |
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326` | iterative retriever does not scale k |
+| `agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34` | 50k offload threshold |
+| `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | 180k compaction |
+
+</details>
+
+---

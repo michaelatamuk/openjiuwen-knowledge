@@ -88,5 +88,14 @@
    "Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.",
    "Return the error to the model so it can self-correct."
   ]
+ },
+ "06-11": {
+  "title": "Tool idempotency and safe retry",
+  "tldr": "Separate tools into idempotent reads (safe to retry) and non-idempotent writes (require idempotency keys and attempted-vs-confirmed tracking).",
+  "points": [
+   "Reads: retry with backoff — same result every time.",
+   "Writes: attach an idempotency key; verify state before retrying.",
+   "Jiuwen: no idempotent flag on ToolCard; ToolCallDeduplicationRail is narrow (same args in session only)."
+  ]
  }
 }

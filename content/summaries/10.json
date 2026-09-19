@@ -182,5 +182,14 @@
    "If not sufficient, produce the next query.",
    "Stop on sufficient/no-next-question or the cap."
   ]
+ },
+ "10-21": {
+  "title": "Context window vs retrieval precision",
+  "tldr": "A larger context window raises the recall ceiling but doesn't replace retrieval precision; 'lost in the middle' degrades mid-context evidence, and more tokens cost more.",
+  "points": [
+   "More tokens → higher recall ceiling, but mid-context evidence is underweighted.",
+   "Strategy: rerank and threshold first; reserve window for multi-doc synthesis.",
+   "Jiuwen: top_k fixed at 5, not adaptive; no lost-in-the-middle boundary reordering."
+  ]
  }
 }

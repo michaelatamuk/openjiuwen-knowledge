@@ -18,6 +18,7 @@ OUT = os.path.join(ROOT, "knowledge")
 CONTENT = os.path.join(ASSETS, "content.json")
 
 FNAME = {
+    "00": "00-ml-foundations",
     "01": "01-llm-foundations", "02": "02-prompting-and-output-control",
     "03": "03-llm-terms-glossary", "04": "04-choosing-models-and-approaches",
     "05": "05-agent-fundamentals-and-the-loop", "06": "06-tools-and-function-calling",

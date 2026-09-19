@@ -403,3 +403,43 @@ Grounding is a separate, non-blocking layer: a verification agent (read-only evi
 </details>
 
 ---
+
+## 11. How do you treat output validation as a pipeline stage, not an afterthought?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Validation must be three explicit stages with typed pass/fail contracts: syntactic (schema), semantic (faithfulness), policy (safety) — not ad hoc checks.
+
+**Key points.**
+
+- Syntactic: schema/format → retry with repair prompt on fail.
+- Semantic: faithfulness/grounding → abstain or flag on fail.
+- Policy: safety/guardrail → redact or block on fail.
+- Jiuwen: independent rails, no unified stage with shared failure-mode log.
+
+**Concept.** Output validation should be an explicit, typed stage between generation and delivery: (1) syntactic validation — does the output match the declared schema or format (JSON schema, regex, structured output type)? (2) semantic validation — is the content grounded in the retrieved context (faithfulness check)? (3) policy validation — does the output pass safety/guardrail rules? Each stage has a clear pass/fail contract: fail syntactic → retry with repair prompt; fail semantic → abstain or flag; fail policy → redact or block. Logging the failure mode at each stage is what makes the system debuggable.
+
+![diagram](assets/diagrams/d26a7948507451e42636a34ad6602e9979070d4e.png)
+
+**In Jiuwen.** Syntactic: SchemaUtils.validate_with_schema (agent-core/openjiuwen/core/common/utils/schema_utils.py:115) on tool results; structured_output tool enforces a caller-supplied schema. Semantic: VerificationRail (agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92) PASS/FAIL/PARTIAL; FaithfulnessEvaluator in agent_evolving/eval/. Policy: SecurityRail + GuardrailRail. These are independent rails, not a unified pipeline stage — there is no shared output-validation stage or failure-mode log distinguishing syntactic vs semantic vs policy failures.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The framework has components for each stage but they are not wired into a single linear validation pipeline. Syntactic: `SchemaUtils.validate_with_schema` on tool results; `structured_output` tool enforces a caller-supplied JSON Schema. Semantic: `VerificationRail` (read-only evidence, PASS/FAIL/PARTIAL); `FaithfulnessEvaluator` in `agent_evolving/eval/`. Policy: `SecurityRail` (prompt injection detection), `GuardrailRail` (sequence-classification model). But these operate as independent rails — there is no shared output-validation stage that all responses must pass before leaving the agent, and there is no pipeline-level failure-mode log distinguishing syntactic vs semantic vs policy failures.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema (syntactic) |
+| `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92` | VerificationRail (semantic) |
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1` | FaithfulnessEvaluator |
+| `agent-core/openjiuwen/harness/rails/security_rail.py:1` | SecurityRail (policy) |
+| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | GuardrailRail (policy) |
+
+</details>
+
+---

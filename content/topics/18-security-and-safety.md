@@ -301,3 +301,37 @@ flowchart TD
 <sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code> — <code>ToolMessage</code> with no wrapper<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code> — no production callers<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code> — <code>PromptInjectionGuardrail</code> (unregistered)<br>&bull; <code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code> — advisory safety rail<br>&bull; <code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409</code> — shell AST ASK floor</sub>
 
 </details>
+
+
+---
+
+## 12. What is Constitutional AI and how does it reduce the human-labeling bottleneck in alignment?
+
+**General:** Constitutional AI (Bai et al. 2022, Anthropic) replaces a large portion of human preference labeling with **model self-critique**. The pipeline has two stages. (1) **SL-CAI**: generate responses, have the model critique each against a list of explicit principles (the "constitution" — rules like "do not assist with illegal activities", "be honest"), then revise based on the critique. Use these revised responses for supervised fine-tuning. (2) **RL-CAI**: use a reward model trained on model-generated preference pairs (not human-labeled pairs) to run RLHF. The result: steering a model toward a set of principles requires far fewer human labels. The "constitution" is an **explicit, auditable list** — easier to update and inspect than a black-box reward model trained on opaque human ratings. Claude's alignment training is based on CAI.
+
+**Jiuwen:** Safety enforcement in the framework uses fixed classifiers and guardrails: `SecurityRail` (prompt injection detection), `GuardrailRail` (sequence-classification safety model), and `GuardianRail` (policy-level filtering). These are static — there is no self-critique loop, no constitutional principle list that the model iterates against, and no model-generates-then-revises revision pipeline. Adding a principle requires updating the classifier or system prompt, not appending to a constitution document.
+
+```mermaid
+flowchart TD
+    CONST["constitution: explicit principle list"] --> CRITIQUE["model critiques its own response against principles"]
+    CRITIQUE --> REVISE["model revises response"]
+    REVISE --> SFT_C["SL-CAI: SFT on revised responses"]
+    REVISE --> RM_C["RL-CAI: reward model on model-generated preference pairs"]
+    RM_C --> RLHF_C["RLHF with model-generated RM (fewer human labels)"]
+    BENEFIT["benefits"] --> AUD["auditable: principles are explicit text, not latent reward weights"]
+    BENEFIT --> SCALE["scales: model generates its own preference data"]
+    JIW["Jiuwen"] --> STATIC["SecurityRail + GuardrailRail + GuardianRail (static classifiers)"]
+    JIW -.->|"absent"| SELF["self-critique / revision loop"]
+    JIW -.->|"absent"| CONSTLIST["constitutional principle list"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (prompt injection, static)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:1</code> — <code>GuardrailBackend</code> (sequence classifier, static)<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — <code>GuardrailRail</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/guardian_rail.py:1</code> — <code>GuardianRail</code> (policy filtering)<br>&bull; Framework has no self-critique, constitution file, or model-generated preference pipeline</sub>
+
+</details>
+
+**Gap.** No self-critique loop, no constitutional principle list, no model-generated preference pipeline. Safety rails are static classifiers that require code or config changes to update — there is no "edit the constitution" interface.
+
+<sub>_Canonical source: `source/15-foundational-papers_for_engineers.md`; also covered in: foundational-papers._</sub>

@@ -565,3 +565,41 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 </details>
 
 ---
+
+## 15. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Wrong facts written to memory compound across sessions; prevent via write gating, and fix via targeted overwrite — not full wipes.
+
+**Key points.**
+
+- Prevention: write only from verified outputs; tag with provenance.
+- Fix: memory_update(id) for targeted overwrite; memory_delete_by_category for broad wipe.
+- Gap: no confidence gate before write, no versioning, no audit loop.
+
+**Concept.** Memory contamination happens when wrong or hallucinated facts are written to long-term memory and then retrieved into future turns, compounding errors. Prevention: write to memory only from verified/confirmed outputs (not raw model scratchpads); tag memory entries with provenance (source, confidence, timestamp); implement targeted invalidation — delete or overwrite specific wrong entries by key rather than wiping all memory; use versioning so you can roll back. Detection: run a periodic audit query that cross-checks stored facts against the authoritative source.
+
+![diagram](assets/diagrams/38a9998c5918ba6813ee7b3218fcb8f9432528b4.png)
+
+**In Jiuwen.** LongTermMemory (agent-core/openjiuwen/core/memory/long_term_memory.py:69) stores MemoryEntry objects with category/source metadata. memory_update(id) allows targeted overwrite of an existing entry; memory_delete_by_category allows broad wipe. No confidence gate before memory_write, no versioning chain, no provenance trail, and no periodic audit query against an authoritative source.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+`LongTermMemory` stores typed entries (`MemoryEntry`) with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/memory/long_term_memory.py:69` | LongTermMemory and entry schema |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167` | memory_write/memory_update/memory_delete_by_category |
+| `agent-core/openjiuwen/harness/rails/subagent/memory_forbidden_rail.py:1` | memory suppression gate |
+| `agent-core/openjiuwen/harness/prompts/sections/memory.py:14` | when/what to write |
+
+</details>
+
+---
