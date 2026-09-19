@@ -2,6 +2,7 @@
  "sections": [
   {
    "title": "Agents",
+   "part": "Building with agents",
    "topics": [
     "05",
     "08",
@@ -10,6 +11,7 @@
   },
   {
    "title": "What the agent uses",
+   "part": "Building with agents",
    "topics": [
     "06",
     "07"
@@ -17,6 +19,7 @@
   },
   {
    "title": "Making agents reliable",
+   "part": "Building with agents",
    "topics": [
     "22",
     "15",
@@ -25,6 +28,7 @@
   },
   {
    "title": "Running agents",
+   "part": "Building with agents",
    "topics": [
     "16",
     "24"
@@ -32,6 +36,7 @@
   },
   {
    "title": "The model",
+   "part": "Under the hood",
    "topics": [
     "01",
     "19",
@@ -40,6 +45,7 @@
   },
   {
    "title": "Working with the model",
+   "part": "Under the hood",
    "topics": [
     "02",
     "04",
@@ -48,6 +54,7 @@
   },
   {
    "title": "Retrieval internals",
+   "part": "Under the hood",
    "topics": [
     "10",
     "11",
@@ -58,6 +65,7 @@
   },
   {
    "title": "Background",
+   "part": "Under the hood",
    "topics": [
     "00",
     "03"

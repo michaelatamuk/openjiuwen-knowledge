@@ -119,3 +119,91 @@
     padding-bottom: 0.15rem;
   }
 }
+
+/* Material hides the top tab bar below the desktop breakpoint and moves the
+   parts into the drawer. Keep the parts visible in the header on phones. */
+@media screen and (max-width: 76.234375em) {
+  .md-header > .md-tabs,
+  .md-container > .md-tabs {
+    display: block;
+  }
+}
+
+/* Mobile: show the ENTIRE tree in the menu (parts -> sections -> topics) as one
+   scrollable list, instead of Material's drill-down overlays where each level
+   replaces the previous and you must go back. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav {
+    position: static;
+    display: block;
+    height: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    grid-template-rows: none;
+    transition: none;
+  }
+  .md-nav--primary .md-nav__title {
+    display: none;
+  }
+  .md-nav--primary .md-nav__toggle {
+    display: none;
+  }
+  .md-nav--primary .md-nav[data-md-level="1"] > .md-nav__list > .md-nav__item > .md-nav__link {
+    padding-left: 1.2rem;
+  }
+  .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item > .md-nav__link {
+    padding-left: 2.4rem;
+    font-size: 0.72rem;
+    opacity: 0.85;
+  }
+}
+
+/* Mobile full-tree menu: don't also pull the current page's table of contents
+   (the question list) into the drawer. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav--secondary {
+    display: none !important;
+  }
+}
+
+/* Mobile full-tree menu: no drill-down chevrons — everything is already shown. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link .md-nav__icon {
+    display: none;
+  }
+}
+
+/* Mobile full-tree menu: parts/sections are just group labels now (the tree is
+   always shown), so don't let them collapse/expand on tap. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+/* Mobile full-tree menu: group labels (parts, sections) should read as captions,
+   not as blue links. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    color: var(--md-default-fg-color--light, #8a8a8a) !important;
+    font-weight: 500;
+  }
+}
+
+/* Mobile full-tree menu: mark the current topic with weight, not a blue link. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__link--active {
+    color: var(--md-default-fg-color, #333) !important;
+    font-weight: 600;
+  }
+}
+
+/* Mobile full-tree menu: the active item's chevron expands the on-page TOC,
+   which we hide here — so drop the chevron too. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__link[for="__toc"] .md-nav__icon {
+    display: none;
+  }
+}
