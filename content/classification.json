@@ -255,8 +255,6 @@
  "01-15": "intermediate",
  "01-16": "basic",
  "01-17": "basic",
- "01-18": "intermediate",
- "01-19": "intermediate",
  "04-1": "intermediate",
  "04-2": "intermediate",
  "04-3": "intermediate",
@@ -278,5 +276,7 @@
  "17-6": "basic",
  "17-7": "intermediate",
  "17-8": "basic",
- "17-9": "advanced"
+ "17-9": "advanced",
+ "20-2": "intermediate",
+ "20-3": "intermediate"
 }
