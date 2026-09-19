@@ -159,7 +159,7 @@ No dedicated jailbreak subsystem; four independent mechanisms. A `RuleBasedPromp
 |---|---|
 | `agent-core/openjiuwen/core/security/guardrail/backends.py:184` | default injection patterns; :127 RuleBasedPromptInjectionBackend |
 | `agent-core/openjiuwen/auto_harness/rails/security_rail.py:28` | _SUSPICIOUS_PATTERNS; :129 scan + request_force_finish; agent-core/openjiuwen/auto_harness/agents/factory.py:178 — production registration path |
-| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; :71 destructive-command warnings |
+| `agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29` | _INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; bash/_security.py:71 destructive-command warnings |
 | `agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409` | shell AST ASK floor; :502 ASK fallback; :694 interpreter-sink ASK |
 | `agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59` | reverse-shell DENY; :99 shutdown; :148 sensitive paths |
 | `agent-core/openjiuwen/harness/security/permission_engine/core.py:246` | strictest merge; agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57 PermissionInterruptRail |
@@ -286,7 +286,7 @@ Two layers. Prompt-level (advisory): `SafetyPromptRail` is production-registered
 | `jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:93` | production import of SecurityRail; :8577 _build_security_rail(); jiuwenswarm/jiuwenswarm/agents/harness/team/team_runtime_inheritance.py:248 — team members create SecurityRail() |
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/guardrail.py:378 — raises AbortError/GuardrailError |
 | `agent-core/openjiuwen/core/security/guardrail/backends.py:445` | LocalModelBackend (AutoModelForSequenceClassification); agent-core/openjiuwen/core/security/guardrail/context.py:207 — QwenGuardParser |
-| `agent-core/openjiuwen/harness/rails/security/base_security_rail.py:58` | SecurityReject/SecurityInterrupt/SecurityAlert |
+| `agent-core/openjiuwen/harness/rails/security/base_security_rail.py:59` | SecurityReject/SecurityInterrupt/SecurityAlert |
 
 </details>
 
@@ -362,7 +362,7 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:196 — kb_{kb_id}_triples |
+| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102` | kb_{kb_id}_chunks; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:197 — kb_{kb_id}_triples |
 | `agent-core/openjiuwen/core/retrieval/common/config.py:75` | VectorStoreConfig(database_name, collection_name, …) |
 | `jiuwenswarm/jiuwenswarm/common/auth/session_store.py:198` | user_id in auth session (not retrieval) |
 | `jiuwenswarm/jiuwenswarm/gateway/app_gateway.py:660` | WS user_id for routing/sandbox (not KB scoping) |
@@ -492,7 +492,7 @@ Safety enforcement uses fixed classifiers and rails rather than a self-critique 
 |---|---|
 | `agent-core/openjiuwen/auto_harness/rails/security_rail.py:48` | SecurityRail (static policy rail) |
 | `agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16` | SafetyPromptRail (static safety text) |
-| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:1 — GuardrailBackend |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:39 — GuardrailBackend |
 
 </details>
 

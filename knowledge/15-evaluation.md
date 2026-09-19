@@ -188,7 +188,7 @@ Precision@k is **absent**. The only precision present is classification/answer p
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362` | `get_tv_precision()` = `tp / total_pred_not_nil` |
-| `agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:188` | `tv_precision` |
+| `agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:189` | `tv_precision` |
 | `agent-core/examples/PerStream/src/eval/test_remember_gate.py:22` | sklearn `precision_score` |
 | `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | `rerank(...)` re-sorts, no precision measurement |
 
@@ -456,7 +456,7 @@ Perplexity is absent as a concept or metric — no `perplexity`/`ppl`/loss-based
 | `agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:847` | cumulative_logprob per completion (not perplexity) |
 | `agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:94-107` | exp(logprob) yes/no |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:408-418` | stores token logprobs for RL |
-| `agent-core/openjiuwen/harness/tools/web/paid_search.py:44` | "Perplexity" is the search vendor, not the metric |
+| `agent-core/openjiuwen/harness/tools/web/paid_search.py:42` | "Perplexity" is the search vendor, not the metric |
 
 </details>
 
@@ -607,7 +607,7 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/symphony/evaluation/suite.py:560` | _confidence(sample_count) heuristic; :362 sample_count attached |
+| `agent-core/openjiuwen/symphony/evaluation/suite.py:560` | _confidence(sample_count) heuristic; :378 sample_count attached |
 | `agent-core/openjiuwen/rsi/harness_rsi/evaluator/metrics_collector.py:34` | total_cases/passed_cases/average_score (no variance/CI) |
 | `agent-core/openjiuwen/symphony/orchestration/config.py:50` | min_successes_verified (threshold, not statistics) |
 | `agent-core/openjiuwen/symphony/retrieval/build/tree/schema.py:232` | structure_sample_size (sampling config) |
@@ -990,7 +990,7 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 **Concept.** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
 
-![diagram](assets/diagrams/e1b0e9abf523ac5f63e9e700efc308ea8c32196a.png)
+![diagram](assets/diagrams/5c11c4e71cc44a08b68c5eb0d0bab6016e52dcbb.png)
 
 **In Jiuwen.** ModelClientABC (agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1) is the mockable boundary — inject controlled responses in tests to isolate non-determinism to the model call layer. Rail contract invariants: CircuitBreakerRail (agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1) for termination; structured_output tool (agent-core/openjiuwen/harness/tools/structured_output/tool.py:1) for schema; GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) for safety; usage_cost.py:101 for budget. Behavioral correctness: LLMAsJudge (agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40). Gap: no official test harness; evaluator pipeline is offline, not integrated with pytest.
 
@@ -999,16 +999,16 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 **Implementation**
 
-`VerificationRail` and `agent_evolving/evaluator/` provide LLM-as-judge for correctness. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — trips on failure threshold); `StructuredOutputTool` (schema invariant — validates against caller schema); `PromptInjectionGuardrail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`BaseModelClient`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
+`agent_evolving/evaluator/` provides LLM-as-judge (`LLMAsJudgeMetric`) for correctness, and the verification agent emits a PASS/FAIL/PARTIAL verdict. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — detects repeated/ping-pong tool calls and aborts); `StructuredOutputTool` (schema invariant — validates against caller schema); `PromptInjectionGuardrail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`BaseModelClient`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:1` | BaseModelClient (mockable boundary) |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | termination invariant contract |
-| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:1` | schema invariant |
-| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | safety invariant |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:45` | BaseModelClient (mockable boundary) |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303` | termination invariant contract |
+| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:46` | schema invariant |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | safety invariant |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | cost invariant (session budget) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | behavioral correctness via LLM-as-judge |
 

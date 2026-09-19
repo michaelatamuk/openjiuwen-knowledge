@@ -29,7 +29,7 @@ Embedding is batched and effectively one-time: `APIEmbedding` chunks texts (`max
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:45` | max_batch_size: int = 8, max_concurrent: int = 50; :167 batch + gather |
+| `agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:45` | max_batch_size: int = 8; :46 max_concurrent: int = 50; :194 batch + gather |
 | `agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:21` | compute_chunk_embeddings at index/update time |
 | `agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14` | normalizes input/cache tokens; agent-core/openjiuwen/core/context_engine/usage/session_aggregator.py:45 — cache hit-rate aggregation |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | add_session_usage; jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:17212 — usage events |
@@ -71,7 +71,7 @@ The product tracks provider-reported session cost and enforces a per-session cap
 |---|---|
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171/196` | session cost cap |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default |
-| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
+| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23` | BudgetLedger |
 | `agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184` | 180k compaction |
 | `agent-core/openjiuwen/agent_teams/models/allocator.py:559` | availability routing (not cost/quality) |
 
@@ -103,7 +103,7 @@ The product tracks provider-reported session cost and enforces a per-session cap
 
 **Implementation**
 
-The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
+Repeated tool calls are bounded at several levels: the ReAct loop's `max_iterations` (default 5, harness 15); `ModelAnomalyDetectionRail`, which detects consecutive identical tool-call rounds and either compacts or bails out; `ToolCallDeduplicationRail`, which suppresses repeated read-only calls; and `ToolCallResilienceRail`, which bounds retries (non-idempotent tools are never retried). Team runs add a `BudgetLedger` token ceiling, and the product tracks provider-reported session cost with a per-session cap (`raise_if_session_cost_limit_exceeded`).
 
 **Implementation diagram**
 
@@ -115,8 +115,8 @@ The product tracks provider-reported session cost and enforces a per-session cap
 |---|---|
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | raise_if_session_cost_limit_exceeded; :196 set_session_cost_limit (requires provider cost) |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15 |
-| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | tool-loop threshold + bailout |
+| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23` | BudgetLedger |
+| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90` | tool-loop threshold + bailout |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts |
 
 </details>
@@ -436,7 +436,7 @@ The closest code mechanisms are CI gates and explicit human activation, not an e
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:168` | load gates; :1153 run + aggregate passed |
+| `agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:173` | load gates; :1153 run + aggregate passed |
 | `agent-core/openjiuwen/auto_harness/stages/activate.py:118` | explicit accept/reject interaction before hot-load |
 | `agent-core/openjiuwen/auto_harness/stages/merge.py:95` | static-check retry (max 3) then fail-fast |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617` | rollback; :682 _assert_rollback_allowed; :694 validate target hash |
@@ -469,7 +469,7 @@ The closest code mechanisms are CI gates and explicit human activation, not an e
 
 **Implementation**
 
-The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, `set_session_cost_limit` sets a ceiling only when provider cost metadata is available, and `raise_if_session_cost_limit_exceeded` raises when over. Core limits repetition via ReAct `max_iterations` (default 5, harness 15), team `BudgetLedger` token ceilings, and `ModelAnomalyDetectionRail`'s tool-loop compaction/bailout. `ToolCallDeduplicationRail` counts repeated read-only calls and warns.
+Repeated tool calls are bounded at several levels: the ReAct loop's `max_iterations` (default 5, harness 15); `ModelAnomalyDetectionRail`, which detects consecutive identical tool-call rounds and either compacts or bails out; `ToolCallDeduplicationRail`, which suppresses repeated read-only calls; and `ToolCallResilienceRail`, which bounds retries (non-idempotent tools are never retried). Team runs add a `BudgetLedger` token ceiling, and the product tracks provider-reported session cost with a per-session cap (`raise_if_session_cost_limit_exceeded`).
 
 **Implementation diagram**
 
@@ -481,8 +481,8 @@ The product tracks provider-reported session cost and enforces a per-session cap
 |---|---|
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | raise_if_session_cost_limit_exceeded; :196 set_session_cost_limit (requires provider cost) |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15 |
-| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:27` | BudgetLedger |
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | tool-loop threshold + bailout |
+| `agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23` | BudgetLedger |
+| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90` | tool-loop threshold + bailout |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts |
 
 </details>
@@ -558,9 +558,9 @@ The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and t
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/observability/rail.py:1` | ObservabilityEvent schema |
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | event emission points |
-| `agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:1` | ModelResponse.usage token counts |
+| `agent-core/openjiuwen/harness/observability/rail.py:355` | AgentObservabilityRail (typed events) |
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1328` | _emit_context_usage (token/usage emission) |
+| `agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:9` | GenerationResponse usage/token counts |
 
 </details>
 
@@ -597,8 +597,8 @@ Routing is configured per agent through `ModelClientConfig` and `ProviderType`, 
 |---|---|
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58` | create_model_client provider dispatch |
 | `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType / ModelClientConfig |
-| `agent-core/openjiuwen/agent_teams/models/pool.py:38` | ModelPoolEntry; agent-core/openjiuwen/agent_teams/models/allocator.py:22 — IntelliRouterAllocator |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | CircuitBreakerRail failure trip + cooldown |
+| `agent-core/openjiuwen/agent_teams/models/pool.py:38` | ModelPoolEntry; agent-core/openjiuwen/agent_teams/models/allocator.py:452 — IntelliRouterAllocator |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303` | CircuitBreakerRail failure trip + cooldown |
 
 </details>
 
@@ -628,15 +628,15 @@ Routing is configured per agent through `ModelClientConfig` and `ProviderType`, 
 
 **Implementation**
 
-`ModelBackupRail` provides failover to a backup model on failure, and `CircuitBreakerRail` tracks consecutive failures, opens the circuit during cooldown, and half-opens to probe recovery. `ModelRequestConfig.timeout` is forwarded to the provider client. There is no structured degraded response emitted by a rail, and no retry-with-modified-prompt path for quality failures.
+`ModelBackupRail` provides failover to a backup model on failure, and `CircuitBreakerRail` tracks consecutive failures, opens the circuit during cooldown, and half-opens to probe recovery. `ModelClientConfig.timeout` is forwarded to the provider client. There is no structured degraded response emitted by a rail, and no retry-with-modified-prompt path for quality failures.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | CircuitBreakerRail open/closed/half-open states |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303` | CircuitBreakerRail open/closed/half-open states |
 | `agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9` | ModelBackupRail failover |
-| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:1` | ModelRequestConfig.timeout |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:102` | ModelClientConfig.timeout |
 
 </details>
 
