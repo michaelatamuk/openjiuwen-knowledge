@@ -78,7 +78,7 @@
 
 **Definition:** Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space. Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG. Text and image encoders trained together; cosine similarity between text and image embeddings is semantically meaningful. Underpins DALL-E 2 and Stable Diffusion text conditioning.
 
-**Jiuwen:** CLIP-based cross-modal retrieval is absent. Jiuwen has provider-based multimodal embeddings (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
+**Jiuwen:** Cross-modal retrieval here uses provider-based multimodal embeddings rather than CLIP. (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
 
 ---
 

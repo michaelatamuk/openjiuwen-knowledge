@@ -71,7 +71,7 @@ flowchart LR
 
 **General:** Each token is projected into three vectors — query, key, value. The query of a token is dot-producted with the keys of all tokens (scaled by `1/√d_k`), softmaxed into attention weights, and used to take a weighted sum of the values. Doing this with multiple heads in parallel and stacking layers lets each token aggregate information from every other token, with the weights computed from content rather than position. The result is a context-dependent representation per token.
 
-**Jiuwen:** Not implemented — attention is delegated entirely to provider APIs or to HuggingFace models loaded by name. There is no Q/K/V projection, scaled dot-product, or multi-head code anywhere; the only `torch.softmax` in the framework is used for token sampling, not attention. The framework's boundary is the model-client/config layer, which serializes request params and sends them to a provider; the local `transformers` client calls `AutoModelForCausalLM` and consumes logits.
+**Jiuwen:** Attention is the served model's job: provider APIs or HuggingFace models loaded by name. The framework's boundary is the model-client/config layer, which serializes request params, sends them to a provider, and (for the local `transformers` client) calls `AutoModelForCausalLM` and consumes the logits. The only `torch.softmax` in the framework is for token sampling, not attention.
 
 ```mermaid
 flowchart LR
@@ -100,7 +100,7 @@ flowchart LR
 
 **General:** Self-attention is permutation-equivariant — without positional information it cannot distinguish token order, so "dog bites man" and "man bites dog" yield the same multiset of token representations, only reordered (not one identical output). Positional encoding injects order information — by adding a position-dependent signal to the token representations (sinusoidal/learned), or by rotating the query and key vectors inside attention (RoPE) — so the attention scores can depend on relative or absolute position. Without it the model cannot know sequence order.
 
-**Jiuwen:** No positional-encoding implementation exists — no sinusoidal, learned, or RoPE code. The only positional-adjacent items are passthrough configuration: `attn_implementation` forwarded to HuggingFace and `rope_scaling_type`/`rope_scaling_factor` forwarded as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches, which is batching metadata rather than an encoding scheme.
+**Jiuwen:** Positional encoding is the served model's job. The framework only passes related engine settings through: `attn_implementation` to HuggingFace, and `rope_scaling_type`/`rope_scaling_factor` as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches — batching metadata, not an encoding scheme.
 
 ```mermaid
 flowchart LR
@@ -127,7 +127,7 @@ flowchart LR
 
 **General:** Encoder-only models (BERT) read bidirectional context and produce representations — good for classification, embedding, extraction. Decoder-only models (GPT) are autoregressive: they predict the next token attending only leftward, which makes them generators. Encoder-decoder models (T5, original Transformer) encode an input and generate an output, suited to translation/summarization. GPT is decoder-only.
 
-**Jiuwen:** There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
+**Jiuwen:** Architecture type is selected by model/provider choice rather than a config flag, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
 
 ```mermaid
 flowchart TD
@@ -576,7 +576,7 @@ flowchart TD
 
 **General:** CLIP (Contrastive Language-Image Pretraining, Radford et al. 2021) trains an image encoder and a text encoder **jointly** via contrastive learning on 400M internet (image, text) pairs. The training objective: push the embedding of a matching (image, text) pair close together in a shared vector space, push mismatched pairs apart. The result is a **shared embedding space** where cosine similarity between a text embedding and an image embedding is semantically meaningful — enabling zero-shot image classification, text-to-image retrieval, and image-to-text retrieval without task-specific labeling. CLIP underpins DALL-E 2's text-to-image alignment, Stable Diffusion's text conditioning, and multimodal RAG systems that index images alongside text. For practitioners: CLIP-based retrieval lets you run a text query against an image index (or vice versa) using the same vector search infrastructure as text-only RAG.
 
-**Jiuwen:** CLIP-based cross-modal retrieval is absent (no CLIP encoder). Jiuwen does have a provider-based multimodal embedding path — `DashscopeEmbedding.embed_multimodal` (`core/retrieval/embedding/dashscope_embedding.py:199`) and `VLLMEmbedding.embed_multimodal` (`core/retrieval/embedding/vllm_embedding.py:32`) embed image+text via `MultimodalDocument` (`core/retrieval/common/document.py:50`) — but it uses provider embedding APIs, not CLIP. `MultimodalImageRail` prepares image attachments for the generation model; it is not an embedding index.
+**Jiuwen:** Cross-modal retrieval here uses provider multimodal embeddings rather than CLIP. Jiuwen does have a provider-based multimodal embedding path — `DashscopeEmbedding.embed_multimodal` (`core/retrieval/embedding/dashscope_embedding.py:199`) and `VLLMEmbedding.embed_multimodal` (`core/retrieval/embedding/vllm_embedding.py:32`) embed image+text via `MultimodalDocument` (`core/retrieval/common/document.py:50`) — but it uses provider embedding APIs, not CLIP. `MultimodalImageRail` prepares image attachments for the generation model; it is not an embedding index.
 
 ```mermaid
 flowchart TD

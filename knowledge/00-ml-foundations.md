@@ -268,7 +268,7 @@ Not hand-coded. Vector similarity queries go through the vector store (Milvus, C
 
 **Implementation**
 
-Not implemented as a classifier. The retrieval layer is effectively approximate KNN over embedding space — `VectorRetriever` performs top-k ANN search via the vector store's index. The concept is directly instantiated by the embedding retrieval pipeline.
+k-NN shows up as vector retrieval rather than a classifier: `VectorRetriever` performs top-k approximate nearest-neighbour search over embedding space via the vector store's index. The embedding retrieval pipeline is the direct instantiation of the concept.
 
 **Code anchors**
 
@@ -305,7 +305,7 @@ Not implemented as a classifier. The retrieval layer is effectively approximate 
 
 **Implementation**
 
-Not implemented in the inference framework. `agent_rl/` calls veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd. There is no hand-written backward pass anywhere.
+Backpropagation is handled by the training stack: `agent_rl/` runs veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd. The framework delegates the backward pass to PyTorch.
 
 **Code anchors**
 
@@ -342,7 +342,7 @@ Not implemented in the inference framework. `agent_rl/` calls veRL's SFT and PPO
 
 **Implementation**
 
-Not implemented in the inference framework. In `agent_rl/`, gradient clipping is a veRL/PyTorch training hyperparameter. The inference framework calls hosted models that handle all of this internally.
+Gradient clipping is a training-side hyperparameter in `agent_rl/` (veRL/PyTorch). At inference, hosted models handle it internally.
 
 **Code anchors**
 
@@ -378,7 +378,7 @@ Not implemented in the inference framework. In `agent_rl/`, gradient clipping is
 
 **Implementation**
 
-Not implemented. The framework calls hosted models that apply these internally. No `BatchNorm` or `LayerNorm` code in the inference layer. `AutoModelForCausalLM` implicitly uses whatever norm the model architecture specifies.
+Batch/layer normalization is part of the served model: hosted models apply it internally, and local `AutoModelForCausalLM` uses whatever norm the architecture specifies. It is a model-layer concern, not a framework one.
 
 **Code anchors**
 
@@ -414,7 +414,7 @@ Not implemented. The framework calls hosted models that apply these internally. 
 
 **Implementation**
 
-Not implemented in the inference layer. In `agent_rl/`, dropout rates are hyperparameters forwarded to veRL/PyTorch. For LoRA fine-tuning, LoRA dropout is a config parameter on the PEFT adapter.
+Dropout is a training-side hyperparameter: in `agent_rl/` it is forwarded to veRL/PyTorch, and for LoRA fine-tuning it is a PEFT adapter config parameter. At inference, the served model applies whatever dropout it was trained with.
 
 **Code anchors**
 
@@ -450,7 +450,7 @@ Not implemented in the inference layer. In `agent_rl/`, dropout rates are hyperp
 
 **Implementation**
 
-Neither CNNs nor RNNs are implemented in the framework. Text processing uses transformer-based LLMs via provider API. Image inputs use a vision encoder (typically a ViT — a transformer over image patches, not a CNN) in multimodal models. No RNN or CNN code in the codebase.
+These architectures live in the served models: text is handled by transformer LLMs via provider APIs, and image inputs by a vision encoder (typically a ViT) in multimodal models. The agent framework itself does not implement CNN or RNN layers.
 
 **Code anchors**
 
@@ -644,7 +644,7 @@ Not a concern in the inference framework. In `agent_rl/`, training hyperparamete
 
 **Implementation**
 
-Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation rather than the attention mechanics themselves.
+Multi-head attention is entirely the served model's job — provider APIs or HuggingFace weights loaded by name. The framework exposes no number-of-heads configuration; this entry covers the architectural motivation rather than the mechanics.
 
 **Code anchors**
 

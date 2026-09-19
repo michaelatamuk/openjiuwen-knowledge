@@ -122,7 +122,7 @@ def gradient_descent(loss_fn, grad_fn, params, lr=0.01, steps=100):
     return params
 ```
 
-**Jiuwen:** Not implemented in the inference framework. `agent_rl/` runs SFT and PPO/GRPO via veRL, which manages its own optimisation loop using PyTorch `Optimizer.step()` internally. There is no hand-written gradient-descent loop in the codebase.
+**Jiuwen:** Gradient descent lives in the training stack: `agent_rl/` runs SFT and PPO/GRPO through veRL, which manages the optimisation loop with PyTorch `Optimizer.step()`. The agent framework delegates optimisation to veRL/PyTorch.
 
 ```mermaid
 flowchart LR
@@ -241,7 +241,7 @@ def knn_predict(train_X, train_y, query, k=3):
     return Counter(neighbors).most_common(1)[0][0]
 ```
 
-**Jiuwen:** Not implemented as a classifier. The retrieval layer is effectively approximate KNN over embedding space — `VectorRetriever` performs top-k ANN search via the vector store's index. The concept is directly instantiated by the embedding retrieval pipeline.
+**Jiuwen:** k-NN shows up as vector retrieval rather than a classifier: `VectorRetriever` performs top-k approximate nearest-neighbour search over embedding space via the vector store's index. The embedding retrieval pipeline is the direct instantiation of the concept.
 
 ```mermaid
 flowchart LR
@@ -267,7 +267,7 @@ flowchart LR
 
 **General:** The forward pass flows inputs through layers, applying learned weights and non-linearities, to produce a prediction and a scalar loss. Backpropagation then applies the chain rule backwards through every layer: `∂L/∂w = ∂L/∂output × ∂output/∂w` for each weight. PyTorch's autograd engine records the computation graph during the forward pass and traverses it in reverse during `.backward()`, accumulating `w.grad`. The optimiser then applies `w -= lr × w.grad`.
 
-**Jiuwen:** Not implemented in the inference framework. `agent_rl/` calls veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd. There is no hand-written backward pass anywhere.
+**Jiuwen:** Backpropagation is handled by the training stack: `agent_rl/` runs veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd. The framework delegates the backward pass to PyTorch.
 
 ```mermaid
 flowchart LR
@@ -300,7 +300,7 @@ Fixes:
 
 Transformers largely avoid both through residual connections and layer norm at every block.
 
-**Jiuwen:** Not implemented in the inference framework. In `agent_rl/`, gradient clipping is a veRL/PyTorch training hyperparameter. The inference framework calls hosted models that handle all of this internally.
+**Jiuwen:** Gradient clipping is a training-side hyperparameter in `agent_rl/` (veRL/PyTorch). At inference, hosted models handle it internally.
 
 ```mermaid
 flowchart TD
@@ -332,7 +332,7 @@ Layer normalisation normalises across the feature dimension — mean and varianc
 
 Rule of thumb: CNNs → batch norm. Transformers, RNNs, LLMs → layer norm. Small batch or variable-length sequence? Always layer norm.
 
-**Jiuwen:** Not implemented. The framework calls hosted models that apply these internally. No `BatchNorm` or `LayerNorm` code in the inference layer. `AutoModelForCausalLM` implicitly uses whatever norm the model architecture specifies.
+**Jiuwen:** Batch/layer normalization is part of the served model: hosted models apply it internally, and local `AutoModelForCausalLM` uses whatever norm the architecture specifies. It is a model-layer concern, not a framework one.
 
 ```mermaid
 flowchart LR
@@ -358,7 +358,7 @@ flowchart LR
 
 **General:** Dropout randomly zeroes each neuron's activation with probability `p` (typically 0.1–0.5) on each forward pass during training. At inference, dropout is disabled and activations are scaled by `1/(1-p)` (inverted dropout). Why it works: by randomly removing neurons, the network cannot co-adapt (learn to rely on specific neurons to compensate for each other's mistakes in a memorisation-specific way) and is forced to learn redundant, distributed representations. The effect is similar to training an ensemble of `2^n` thinned networks and averaging them at inference. In transformers, dropout is applied to attention weights, FFN layers, and embeddings. In LoRA fine-tuning, dropout on the low-rank matrices is a key regularisation knob.
 
-**Jiuwen:** Not implemented in the inference layer. In `agent_rl/`, dropout rates are hyperparameters forwarded to veRL/PyTorch. For LoRA fine-tuning, LoRA dropout is a config parameter on the PEFT adapter.
+**Jiuwen:** Dropout is a training-side hyperparameter: in `agent_rl/` it is forwarded to veRL/PyTorch, and for LoRA fine-tuning it is a PEFT adapter config parameter. At inference, the served model applies whatever dropout it was trained with.
 
 ```mermaid
 flowchart LR
@@ -385,7 +385,7 @@ flowchart LR
 
 **General:** Convolutional Neural Networks (CNNs) apply learned filters spatially using shared weights — translation-invariant and efficient for structured grid data (images, audio spectrograms, 1D signals). Not designed for variable-length sequential dependencies. Recurrent Neural Networks (RNNs, LSTMs, GRUs) process sequences step by step, maintaining a hidden state. Designed for sequential data where order matters and length varies: time series, text (pre-transformer), audio frames. Weakness: the hidden state is a bottleneck for long sequences; vanishing gradients make long-range dependencies hard. Transformers have largely replaced RNNs for text because attention can directly attend to any position. CNNs remain dominant for image tasks.
 
-**Jiuwen:** Neither CNNs nor RNNs are implemented in the framework. Text processing uses transformer-based LLMs via provider API. Image inputs use a vision encoder (typically a ViT — a transformer over image patches, not a CNN) in multimodal models. No RNN or CNN code in the codebase.
+**Jiuwen:** These architectures live in the served models: text is handled by transformer LLMs via provider APIs, and image inputs by a vision encoder (typically a ViT) in multimodal models. The agent framework itself does not implement CNN or RNN layers.
 
 ```mermaid
 flowchart TD
@@ -534,7 +534,7 @@ flowchart TD
 
 **General:** A single attention head learns one type of relationship simultaneously — for example, syntactic dependency or positional proximity. Multiple heads run in parallel on lower-dimensional projections, each free to specialise on different relationship types: one head may track subject-verb agreement, another coreference, another relative position. Concatenating and projecting the outputs lets the model integrate all those signals. The compute cost is equivalent to one full-dimensional head (because `d_model` splits into `h × d_k` heads), but the representational expressivity is higher. Evidence: ablating individual heads degrades performance on different tasks depending on which head was removed.
 
-**Jiuwen:** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation rather than the attention mechanics themselves.
+**Jiuwen:** Multi-head attention is entirely the served model's job — provider APIs or HuggingFace weights loaded by name. The framework exposes no number-of-heads configuration; this entry covers the architectural motivation rather than the mechanics.
 
 ```mermaid
 flowchart LR

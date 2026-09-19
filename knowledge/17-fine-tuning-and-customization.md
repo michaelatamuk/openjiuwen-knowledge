@@ -23,7 +23,7 @@
 
 **Implementation**
 
-Two distinct things live here. The default "evolution" path does **not** train weights: `agent_evolving.Trainer` runs evaluate → LLM-generated update → validate → checkpoint and writes back **operators/parameters** (system/user prompts, configs) via `Operator.set_parameter` using "textual gradients" — prompt optimization, not gradient descent. `rsi/` and `auto_harness` evolve harness code/prompt sections. Separately, the optional `agent_evolving/agent_rl/` subsystem genuinely trains weights with veRL (PPO actor/critic updates, SFT) and exports **LoRA/PEFT adapters**. There is no from-scratch pretraining.
+Two distinct things live here. The default "evolution" path does **not** train weights: `agent_evolving.Trainer` runs evaluate → LLM-generated update → validate → checkpoint and writes back **operators/parameters** (system/user prompts, configs) via `Operator.set_parameter` using "textual gradients" — prompt optimization, not gradient descent. `rsi/` and `auto_harness` evolve harness code/prompt sections. Separately, the optional `agent_evolving/agent_rl/` subsystem genuinely trains weights with veRL (PPO actor/critic updates, SFT) and exports **LoRA/PEFT adapters**. The training subsystems start from an existing base model rather than pretraining from scratch.
 
 **Code anchors**
 
@@ -259,7 +259,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 **Implementation**
 
-`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. `LoRA rank`, `LoRA alpha`, `LoRA dropout`, and `target_modules` are configuration parameters forwarded to the PEFT adapter. The base model weights are frozen; only the A/B matrices are trained. `agent_evolving/` also supports QLoRA (4-bit quantized base) via the `quantization` config field. The framework does not implement LoRA math directly — it delegates entirely to the PEFT library.
+`agent_rl/` uses PEFT LoRA via veRL for SFT and PPO/GRPO. `LoRA rank`, `LoRA alpha`, `LoRA dropout`, and `target_modules` are configuration parameters forwarded to the PEFT adapter. The base model weights are frozen; only the A/B matrices are trained. `agent_evolving/` also supports QLoRA (4-bit quantized base) via the `quantization` config field. The LoRA math itself is delegated entirely to the PEFT library.
 
 **Code anchors**
 

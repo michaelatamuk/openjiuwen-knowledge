@@ -659,7 +659,7 @@ Streaming with per-call `ttft_ms`, parallel tool execution, KV/prefix cache affi
 
 **Implementation**
 
-Model-weight quantization is **not implemented** here — it is a passthrough engine param for local vLLM. Vector-index quantization is first-class for Milvus: SQ8 (~75% memory cut), PQ, PRQ, RABITQ, and SCANN (IVF + product quantization).
+Model-weight quantization is a passthrough engine parameter for local vLLM. Vector-index quantization is first-class for Milvus: SQ8 (~75% memory cut), PQ, PRQ, RABITQ, and SCANN (IVF + product quantization).
 
 **Code anchors**
 

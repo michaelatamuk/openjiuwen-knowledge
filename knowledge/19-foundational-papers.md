@@ -223,7 +223,7 @@ No diffusion integration; image generation tools appear as external `ToolCard` c
 
 **Implementation**
 
-CLIP-based cross-modal retrieval is absent. Jiuwen has provider-based multimodal embeddings (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
+Cross-modal retrieval here uses provider-based multimodal embeddings rather than CLIP. (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
 
 </details>
 

@@ -145,7 +145,7 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 **Implementation**
 
-Not implemented — attention is delegated entirely to provider APIs or to HuggingFace models loaded by name. There is no Q/K/V projection, scaled dot-product, or multi-head code anywhere; the only `torch.softmax` in the framework is used for token sampling, not attention. The framework's boundary is the model-client/config layer, which serializes request params and sends them to a provider; the local `transformers` client calls `AutoModelForCausalLM` and consumes logits.
+Attention is the served model's job: provider APIs or HuggingFace models loaded by name. The framework's boundary is the model-client/config layer, which serializes request params, sends them to a provider, and (for the local `transformers` client) calls `AutoModelForCausalLM` and consumes the logits. The only `torch.softmax` in the framework is for token sampling, not attention.
 
 **Code anchors**
 
@@ -185,7 +185,7 @@ Not implemented — attention is delegated entirely to provider APIs or to Huggi
 
 **Implementation**
 
-No positional-encoding implementation exists — no sinusoidal, learned, or RoPE code. The only positional-adjacent items are passthrough configuration: `attn_implementation` forwarded to HuggingFace and `rope_scaling_type`/`rope_scaling_factor` forwarded as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches, which is batching metadata rather than an encoding scheme.
+Positional encoding is the served model's job. The framework only passes related engine settings through: `attn_implementation` to HuggingFace, and `rope_scaling_type`/`rope_scaling_factor` as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches — batching metadata, not an encoding scheme.
 
 **Code anchors**
 
@@ -224,7 +224,7 @@ No positional-encoding implementation exists — no sinusoidal, learned, or RoPE
 
 **Implementation**
 
-There is no architecture-type configuration, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
+Architecture type is selected by model/provider choice rather than a config flag, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
 
 **Implementation diagram**
 
@@ -876,7 +876,7 @@ The framework selects models by provider/model-name string and does not expose M
 
 **Implementation**
 
-CLIP-based cross-modal retrieval is absent (no CLIP encoder). Jiuwen does have a provider-based multimodal embedding path — `DashscopeEmbedding.embed_multimodal` (`core/retrieval/embedding/dashscope_embedding.py:199`) and `VLLMEmbedding.embed_multimodal` (`core/retrieval/embedding/vllm_embedding.py:32`) embed image+text via `MultimodalDocument` (`core/retrieval/common/document.py:50`) — but it uses provider embedding APIs, not CLIP. `MultimodalImageRail` prepares image attachments for the generation model; it is not an embedding index.
+Cross-modal retrieval here uses provider multimodal embeddings rather than CLIP. Jiuwen does have a provider-based multimodal embedding path — `DashscopeEmbedding.embed_multimodal` (`core/retrieval/embedding/dashscope_embedding.py:199`) and `VLLMEmbedding.embed_multimodal` (`core/retrieval/embedding/vllm_embedding.py:32`) embed image+text via `MultimodalDocument` (`core/retrieval/common/document.py:50`) — but it uses provider embedding APIs, not CLIP. `MultimodalImageRail` prepares image attachments for the generation model; it is not an embedding index.
 
 **Code anchors**
 
