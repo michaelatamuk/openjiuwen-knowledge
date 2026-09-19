@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="10-rag-pipelines-and-patterns.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">RAG pipelines and patterns</span></a>
+<a class="topic-nav__link topic-nav__next" href="12-query-understanding.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Query understanding</span></a>
+</div>
+
 # Retrieval and ranking
 
 ## 1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion

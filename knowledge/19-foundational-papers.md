@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="01-llm-foundations.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">How LLMs work</span></a>
+<a class="topic-nav__link topic-nav__next" href="20-ai-system-stack.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Model serving</span></a>
+</div>
+
 # Foundational papers
 
 ## 1. Attention Is All You Need (Vaswani, 2017)

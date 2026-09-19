@@ -207,3 +207,49 @@
     display: none;
   }
 }
+
+/* Prev / next topic bar at the top of every topic page, so readers know other
+   topics exist without discovering the sidebar/footer. */
+.topic-nav {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin: 0 0 1.2rem;
+}
+.topic-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: 48%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+  border-radius: 0.3rem;
+  text-decoration: none;
+  overflow: hidden;
+}
+.topic-nav__next {
+  text-align: right;
+  margin-left: auto;
+}
+.topic-nav__dir {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-default-fg-color--light, #8a8a8a);
+}
+.topic-nav__name {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color, #333);
+}
+.topic-nav__link--off {
+  visibility: hidden;
+}
+
+/* Prev/next topic bar is for when the sidebar is hidden (phones/tablets). On
+   desktop the sidebar already provides navigation, so hide it there. */
+@media screen and (min-width: 76.25em) {
+  .topic-nav {
+    display: none;
+  }
+}

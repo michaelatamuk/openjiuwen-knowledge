@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="17-fine-tuning-and-customization.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Fine-tuning and customization</span></a>
+<a class="topic-nav__link topic-nav__next" href="11-retrieval-and-ranking.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Retrieval and ranking</span></a>
+</div>
+
 # RAG pipelines and patterns
 
 ## 1. Walking through a RAG pipeline end to end, query to final answer

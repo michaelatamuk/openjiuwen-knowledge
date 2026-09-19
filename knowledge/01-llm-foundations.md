@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<span class="topic-nav__link topic-nav__link--off">← Previous</span>
+<a class="topic-nav__link topic-nav__next" href="19-foundational-papers.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Foundational papers</span></a>
+</div>
+
 # How LLMs work
 
 ## 1. What's the difference between a token and a word?

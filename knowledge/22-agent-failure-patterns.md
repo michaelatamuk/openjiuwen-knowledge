@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="07-planning-memory-and-state.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Planning, memory and state</span></a>
+<a class="topic-nav__link topic-nav__next" href="15-evaluation.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Evaluation</span></a>
+</div>
+
 # Agent failure modes
 
 ## 1. Tool call failures and idempotency

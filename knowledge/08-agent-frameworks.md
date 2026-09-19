@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="05-agent-fundamentals-and-the-loop.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent fundamentals and the loop</span></a>
+<a class="topic-nav__link topic-nav__next" href="09-multi-agent-systems.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Multi-agent systems</span></a>
+</div>
+
 # Agent frameworks
 
 ## 1. What does an agent framework actually give you that raw API calls don't

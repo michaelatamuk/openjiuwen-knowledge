@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="16-production-cost-and-scale.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Production, cost and scale</span></a>
+<span class="topic-nav__link topic-nav__link--off">Next →</span>
+</div>
+
 # Model routing & gateways
 
 ## 1. What is an AI gateway and when do you need one?

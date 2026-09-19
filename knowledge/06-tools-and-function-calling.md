@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="09-multi-agent-systems.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Multi-agent systems</span></a>
+<a class="topic-nav__link topic-nav__next" href="07-planning-memory-and-state.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Planning, memory and state</span></a>
+</div>
+
 # Tools and function calling
 
 ## 1. How does function calling actually work under the hood

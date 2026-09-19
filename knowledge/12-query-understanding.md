@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="11-retrieval-and-ranking.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Retrieval and ranking</span></a>
+<a class="topic-nav__link topic-nav__next" href="14-rag-system-design.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">RAG system design</span></a>
+</div>
+
 # Query understanding
 
 ## 1. What is query rewriting or query expansion, and when does it meaningfully improve retrieval quality

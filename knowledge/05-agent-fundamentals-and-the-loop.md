@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<span class="topic-nav__link topic-nav__link--off">← Previous</span>
+<a class="topic-nav__link topic-nav__next" href="08-agent-frameworks.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent frameworks</span></a>
+</div>
+
 # Agent fundamentals and the loop
 
 ## 1. What's the difference between a chatbot and an agent

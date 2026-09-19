@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="19-foundational-papers.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Foundational papers</span></a>
+<a class="topic-nav__link topic-nav__next" href="02-prompting-and-output-control.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Prompting and output control</span></a>
+</div>
+
 # Model serving
 
 ## 1. The 7-layer AI application stack

@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="06-tools-and-function-calling.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Tools and function calling</span></a>
+<a class="topic-nav__link topic-nav__next" href="22-agent-failure-patterns.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent failure modes</span></a>
+</div>
+
 # Planning, memory and state
 
 ## 1. How does an agent break a complex task into smaller subtasks

@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="00-ml-foundations.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">ML foundations</span></a>
+<span class="topic-nav__link topic-nav__link--off">Next →</span>
+</div>
+
 # LLM terms glossary
 
 ## 1. Token

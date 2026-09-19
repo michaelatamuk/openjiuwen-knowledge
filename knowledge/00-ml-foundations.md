@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="13-rag-failure-modes-and-evaluation.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">RAG failure modes and evaluation</span></a>
+<a class="topic-nav__link topic-nav__next" href="03-llm-terms-glossary.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">LLM terms glossary</span></a>
+</div>
+
 # ML foundations
 
 ## 1. What is the difference between AI, Machine Learning, and Deep Learning?

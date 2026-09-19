@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="02-prompting-and-output-control.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Prompting and output control</span></a>
+<a class="topic-nav__link topic-nav__next" href="17-fine-tuning-and-customization.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Fine-tuning and customization</span></a>
+</div>
+
 # Choosing models and tradeoffs
 
 ## 1. Deciding when a problem actually needs an LLM versus a simpler rule-based system

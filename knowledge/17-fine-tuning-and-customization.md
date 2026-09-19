@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="04-choosing-models-and-approaches.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Choosing models and tradeoffs</span></a>
+<a class="topic-nav__link topic-nav__next" href="10-rag-pipelines-and-patterns.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">RAG pipelines and patterns</span></a>
+</div>
+
 # Fine-tuning and customization
 
 ## 1. What's the difference between pretraining and fine-tuning

@@ -69,8 +69,51 @@ def main():
         shutil.rmtree(OUT)
     os.makedirs(OUT, exist_ok=True)
 
+    # Prev/next runs across the whole Part (its sections in order): the first
+    # topic of a part has no previous, the last has no next. Links point at the
+    # built .html pages (site uses no directory URLs).
+    by_id = {t["id"]: t for t in data["topics"]}
+    part_of, part_list = {}, {}
+    sections_path = os.path.join(ROOT, "content", "sections.json")
+    if os.path.isfile(sections_path):
+        for s in json.load(open(sections_path, encoding="utf-8"))["sections"]:
+            p = s.get("part", "")
+            ids = [i for i in s["topics"] if i in by_id]
+            part_list.setdefault(p, []).extend(ids)
+            for i in ids:
+                part_of[i] = p
+
+    def url_of(tid):
+        tt = by_id.get(tid)
+        return (FNAME.get(tid, f"{tid}-{slug(tt['title'])}") + ".html") if tt else ""
+
+    def title_of(tid):
+        tt = by_id.get(tid)
+        return tt["title"] if tt else ""
+
     for t in data["topics"]:
-        lines = [f"# {t['title']}", ""]
+        lines = []
+        sibs = part_list.get(part_of.get(t["id"], ""), [])
+        idx = sibs.index(t["id"]) if t["id"] in sibs else -1
+        prev_id = sibs[idx - 1] if idx > 0 else None
+        next_id = sibs[idx + 1] if 0 <= idx < len(sibs) - 1 else None
+
+        def navlink(tid, cls, label):
+            if not tid:
+                return f'<span class="topic-nav__link topic-nav__link--off">{label}</span>'
+            return (f'<a class="topic-nav__link {cls}" href="{url_of(tid)}">'
+                    f'<span class="topic-nav__dir">{label}</span>'
+                    f'<span class="topic-nav__name">{html.escape(title_of(tid))}</span></a>')
+
+        lines += [
+            '<div class="topic-nav">',
+            navlink(prev_id, "topic-nav__prev", "\u2190 Previous"),
+            navlink(next_id, "topic-nav__next", "Next \u2192"),
+            "</div>",
+            "",
+            f"# {t['title']}",
+            "",
+        ]
         for i, q in enumerate(t["questions"], 1):
             lines.append(f"## {i}. {q['question']}")
             lines.append("")

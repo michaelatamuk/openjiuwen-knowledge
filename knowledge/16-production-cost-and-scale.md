@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="18-security-and-safety.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Security and safety</span></a>
+<a class="topic-nav__link topic-nav__next" href="24-ai-gateway.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Model routing &amp; gateways</span></a>
+</div>
+
 # Production, cost and scale
 
 ## 1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic

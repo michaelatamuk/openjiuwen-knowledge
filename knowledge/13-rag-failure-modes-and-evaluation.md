@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="14-rag-system-design.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">RAG system design</span></a>
+<a class="topic-nav__link topic-nav__next" href="00-ml-foundations.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">ML foundations</span></a>
+</div>
+
 # RAG failure modes and evaluation
 
 ## 1. How do you measure whether your retrieval step is actually working

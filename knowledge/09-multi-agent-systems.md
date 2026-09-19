@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="08-agent-frameworks.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent frameworks</span></a>
+<a class="topic-nav__link topic-nav__next" href="06-tools-and-function-calling.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Tools and function calling</span></a>
+</div>
+
 # Multi-agent systems
 
 ## 1. What are the four multi-agent architecture types and what components does every MAS need?

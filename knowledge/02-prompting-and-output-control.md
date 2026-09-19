@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="20-ai-system-stack.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Model serving</span></a>
+<a class="topic-nav__link topic-nav__next" href="04-choosing-models-and-approaches.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Choosing models and tradeoffs</span></a>
+</div>
+
 # Prompting and output control
 
 ## 1. What's the difference between a system prompt and a user prompt

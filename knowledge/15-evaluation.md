@@ -1,3 +1,8 @@
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="22-agent-failure-patterns.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent failure modes</span></a>
+<a class="topic-nav__link topic-nav__next" href="18-security-and-safety.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Security and safety</span></a>
+</div>
+
 # Evaluation
 
 ## 1. How do you evaluate an LLM's output beyond "it looks correct"
