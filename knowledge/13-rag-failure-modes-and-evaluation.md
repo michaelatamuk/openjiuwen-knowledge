@@ -161,45 +161,7 @@ The retrieval layer has no notion of document time at all: `RetrievalResult`/`Te
 
 ---
 
-## 5. No relevant documents exist: expected behavior is a confidence-gated "not enough information"
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.
-
-**Key points.**
-
-- Gate on retrieval score or answerability.
-- Abstain or ask a clarifying question.
-- Don't generate from out-of-scope chunks.
-
-**Concept.** When retrieval returns nothing relevant, the system should abstain rather than answer from noise: gate on a retrieval-score threshold or an explicit answerability check, and return "not enough information" (or ask a clarifying question). Without this, the model will still produce a fluent answer from irrelevant context.
-
-![diagram](assets/diagrams/06db4ee27ec51d635b2a5843869b738cbf6d94a3.png)
-
-**In Jiuwen.** There is a score filter, but its default is off, so out-of-scope chunks are normally returned. The agentic retriever's sufficiency check only triggers another query, never a user-facing abstention. A real abstention path exists only in a separate retrieval subsystem, not in the knowledge-base RAG path.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-There is a retrieval score filter but its default is `None`, so out-of-scope chunks are normally returned. `AgenticRetriever` asks an LLM whether facts are `sufficient`, but `sufficient=False` only generates a follow-up query — never a user-facing abstention. A true abstention path exists only in `symphony/retrieval` internal selection (`is_abstain` → empty candidates). Grounding is a separate, non-blocking review layer.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/common/config.py:47` | score_threshold defaults None; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:94 — applied only when supplied |
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326` | _rewrite sufficiency (rewrite, not abstain) |
-| `agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94` | is_abstain → empty candidates; agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305 — is_abstain |
-| `agent-core/openjiuwen/harness/subagents/verification_agent.py:51` | PASS/FAIL/PARTIAL verdict |
-
-</details>
-
----
-
-## 6. Same question, different answers on different days: non-deterministic reranking or embedding drift
+## 5. Same question, different answers on different days: non-deterministic reranking or embedding drift
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -243,7 +205,7 @@ Determinism is partial. `ChatReranker` hard-codes `temperature=0` and `AgenticRe
 
 ---
 
-## 7. Vocabulary mismatch, where the answer exists but uses different wording
+## 6. Vocabulary mismatch, where the answer exists but uses different wording
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -282,7 +244,7 @@ The `QueryRewriter` is the designated mitigation, but it targets **coreference/e
 
 ---
 
-## 8. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
+## 7. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -325,7 +287,7 @@ Failures are mostly contained per stage. Retrievers implement stage-local fallba
 
 ---
 
-## 9. "Design a RAG system" tests failure mode awareness, not architecture recall
+## 8. "Design a RAG system" tests failure mode awareness, not architecture recall
 
 <span class="badge badge-type">Claim</span> <span class="badge badge-advanced">advanced</span>
 
@@ -366,7 +328,7 @@ The failure points are concrete. Dense retrieval falls back to sparse only when 
 
 ---
 
-## 10. "The model made something up" is testing hallucination handling, not model quality
+## 9. "The model made something up" is testing hallucination handling, not model quality
 
 <span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -408,7 +370,7 @@ Grounding is a separate, non-blocking layer: a verification agent (read-only evi
 
 ---
 
-## 11. How do you treat output validation as a pipeline stage, not an afterthought?
+## 10. How do you treat output validation as a pipeline stage, not an afterthought?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

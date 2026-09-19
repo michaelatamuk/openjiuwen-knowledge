@@ -30,7 +30,7 @@ flowchart LR
 
 **General:** Make re-indexing incremental and event-driven: a stable ID per file/chunk, delete-by-ID on change, append new chunks, and a trigger on commit/CI. Avoid full re-embeds except on model/index changes. Keep chunk boundaries structure-aware (functions/classes) and include file paths/branches as metadata so the assistant can cite and filter.
 
-**Jiuwen:** The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking ships `CharChunker`/`TokenizerChunker` and a `HybridChunker`, but has no code-aware/function-boundary chunker.
+**Jiuwen:** Re-indexing is incremental: `build_index` appends new documents into the pre-existing ANN index, so adding files triggers no full re-index. An update to an existing document is delete-by-`doc_id` followed by re-chunk/re-embed/write. `doc_id` is a first-class, scalar-inverted field, and chunking ships `CharChunker`/`TokenizerChunker` plus `HybridChunker`, though with no code-aware/function-boundary chunker.
 
 ```mermaid
 flowchart TD
@@ -178,34 +178,7 @@ flowchart TD
 
 ---
 
-## 8. How do you decide between a hosted vector database and a self-managed one at scale
-
-**General:** Hosted (Pinecone/Zilliz Cloud): less ops, elastic scaling, predictable latency, but cost scales with data/queries and there is vendor lock-in. Self-managed (Milvus/Qdrant/pgvector): control, cost at steady state, data residency, but you own scaling, backups, upgrades, and on-call. Decide by team ops capacity, data sensitivity, query volume, and elasticity needs — not by the library API.
-
-**Jiuwen:** `create_vector_store` dispatches Chroma (local/embedded), Milvus (server, fits hosted or self-managed), and PostgreSQL+pgvector (self-managed relational). The choice is pure config; there is no autoscaling, managed-service integration, or ops tooling in-repo. Chroma local cannot do hybrid, so production hybrid means Milvus or PG.
-
-```mermaid
-flowchart TD
-    D{"hosted vs self-managed"} --> LOCAL["Chroma: local/embedded (prototype, vector-only)"]
-    D --> SRV["Milvus: server (hosted or self-managed), hybrid"]
-    D --> PG["PGVector: self-managed relational"]
-    D -.->|"in-repo"| X["no autoscaling · managed-service integration · ops tooling"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/store.py:16</code> — factory<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129</code> — local; <code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108</code> — server; <code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108</code> — relational<br>&bull; <code>agent-core/openjiuwen/core/retrieval/knowledge_base.py:59</code> — Chroma rejects hybrid<br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:67</code> — <code>StoreType</code></sub>
-
-</details>
-
-
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
-
----
-
-## 9. What happens to the user experience if the vector database is down, what's your fallback
+## 8. What happens to the user experience if the vector database is down, what's your fallback
 
 **General:** Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/BM25 or a replica), or disable retrieval and answer from parametric knowledge with a caveat. Add a circuit breaker, health checks, and timeouts so one dependency cannot hang the request. Replicate the index so a single node is not a SPOF.
 
@@ -231,7 +204,7 @@ flowchart TD
 
 ---
 
-## 10. Handling a document updated or deleted after it's already indexed
+## 9. Handling a document updated or deleted after it's already indexed
 
 **General:** You need a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids must be derived from the document id so all chunks of a document can be found and removed atomically. The hard parts are atomicity (a crash between delete and reinsert loses the doc) and eventual consistency in the vector store.
 
@@ -257,7 +230,7 @@ flowchart TD
 
 ---
 
-## 11. How would you design the system so users never get an answer based on stale, outdated information
+## 10. How would you design the system so users never get an answer based on stale, outdated information
 
 **General:** Attach timestamps/versions to documents, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, and surface recency to the generator. Propagate deletes promptly from the source (event-driven) so the index matches source-of-truth, and reconcile periodically.
 
@@ -281,7 +254,7 @@ flowchart TD
 
 ---
 
-## 12. How do you design for the case where retrieval returns zero relevant documents
+## 11. How do you design for the case where retrieval returns zero relevant documents
 
 **General:** Detect it (score threshold or answerability) and abstain: return "I don't have enough information" or ask a clarifying question, rather than answering from noise. Optionally fall back to a broader retrieval (sparse), a knowledge-graph hop, or parametric knowledge with a caveat. Log zero-result queries — they signal coverage gaps.
 
@@ -309,7 +282,7 @@ flowchart TD
 
 ---
 
-## 13. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
+## 12. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
 
 **General:** Budget roughly: embedding + vector search tens of ms, rerank tens–low-hundreds of ms, generation the rest (and generation dominates when you stream, because TTFT is what the user perceives). To hit 500ms: stream tokens, cache embeddings/results, keep top-k small, rerank only when it pays, route to a fast model, and parallelize independent steps. Measure TTFT, not total.
 

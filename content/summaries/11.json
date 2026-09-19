@@ -64,15 +64,6 @@
   ]
  },
  "11-8": {
-  "title": "Rerank every query?",
-  "tldr": "Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.",
-  "points": [
-   "Rerank when precision matters and candidates are bounded.",
-   "Skip exact-match, high-volume, latency-critical queries.",
-   "Decide per query, not globally."
-  ]
- },
- "11-9": {
   "title": "Reranking latency",
   "tldr": "Latency scales with candidate count and batching: a cross-encoder over ~50–100 candidates adds tens to low-hundreds of ms; an LLM-judge reranker is one call per document (O(N)).",
   "points": [
@@ -81,7 +72,7 @@
    "Weigh added latency against precision gain."
   ]
  },
- "11-10": {
+ "11-9": {
   "title": "When reranking is worth the latency",
   "tldr": "Rerank when precision@k dominates, the candidate set is bounded, and results are cacheable — not when latency/cost grow with N.",
   "points": [
@@ -90,7 +81,7 @@
    "Unbounded reranking is usually not worth it."
   ]
  },
- "11-11": {
+ "11-10": {
   "title": "Bi-encoder vs cross-encoder",
   "tldr": "Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).",
   "points": [
@@ -99,7 +90,7 @@
    "Use bi-encoder to retrieve, cross-encoder to rerank."
   ]
  },
- "11-12": {
+ "11-11": {
   "title": "Chunking mixed content",
   "tldr": "Prose, tables, and code need separate chunking rules: keep code blocks whole, keep table rows with their header, split prose at paragraph/sentence boundaries.",
   "points": [

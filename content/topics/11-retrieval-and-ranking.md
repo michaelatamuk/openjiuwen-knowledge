@@ -202,32 +202,7 @@ flowchart TD
 
 ---
 
-## 8. Would you rerank every query, or only some, and how do you decide
-
-**General:** Rerank only when it improves the top-k enough to justify its latency: for high-stakes or ambiguous queries where first-stage precision is low, and when the candidate count is bounded. Skip it for exact-match lookups, high-volume cheap queries, or when latency dominates. Measure NDCG/precision with and without rerank on a labeled set to decide, and cache.
-
-**Jiuwen:** Reranking is **optional and not part of the default KB path** — the `Reranker` classes exist (`StandardReranker`, `ChatReranker`, `DashscopeReranker`) but only the graph store / graph memory call `rerank`, gated by `config_e.rerank`. So the codebase effectively never reranks default RAG queries; there is no per-query rerank policy and no metric-driven decision (only the demo score-delta script).
-
-```mermaid
-flowchart TD
-    Q["query"] --> D{"rerank?"}
-    D -->|"default KB path"| NO["no rerank (classes unwired)"]
-    D -->|"graph store / memory"| YES["rerank if config_e.rerank"]
-    D -.->|"absent"| X["per-query rerank policy · NDCG-driven decision"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code> — KB retrieve has no reranker<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code> — <code>rerank</code> in graph store<br>&bull; <code>agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:645</code> — <code>config_e.rerank</code> gate<br>&bull; <code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23</code> — <code>StandardReranker</code> (<code>/rerank</code>)<br>&bull; <code>agent-core/examples/store/showcase_milvus_graph_store.py:51</code> — before/after rerank demo (no labels)</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-system-design-interview-questions_for_engineers.md`; also covered in: rag-system._</sub>
-
----
-
-## 9. How much latency does reranking add?
+## 8. How much latency does reranking add?
 
 **General:** Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds.
 
@@ -253,11 +228,11 @@ flowchart TD
 
 ---
 
-## 10. When is reranking worth the latency cost?
+## 9. When is reranking worth the latency cost?
 
 **General:** Rerank when precision@k matters more than latency, when the candidate count is bounded, and when results can be cached. Reranking a large, unbounded candidate set is usually not worth it — the latency and cost grow with N while the precision gain does not.
 
-**Jiuwen:** The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy.
+**Jiuwen:** The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy. There is no per-query rerank policy and no NDCG-driven decision (only the demo score-delta script).
 
 ```mermaid
 flowchart TD
@@ -278,7 +253,7 @@ flowchart TD
 
 ---
 
-## 11. Bi-encoder for retrieval vs. cross-encoder for reranking
+## 10. Bi-encoder for retrieval vs. cross-encoder for reranking
 
 **General:** A bi-encoder embeds query and document independently (fast, precomputable, indexable) but cannot model their interaction. A cross-encoder feeds query+document together through the model and scores the pair, capturing fine-grained relevance at the cost of one forward pass per candidate — hence two-stage retrieval.
 
@@ -313,7 +288,7 @@ flowchart TD
 
 ---
 
-## 12. How do you chunk documents that mix prose, tables, and code?
+## 11. How do you chunk documents that mix prose, tables, and code?
 
 **General:** Uniform character or token splitting destroys the structure of tables and code. Apply content-aware chunking: detect content type (prose, Markdown table, fenced code block), then apply per-type rules — keep fenced code blocks whole (or split at the function boundary for long files), keep table rows together with their header row, and split prose at paragraph or sentence boundaries. Attach metadata to each chunk (content_type, source_section) so downstream filtering can distinguish them. For large tables or code files that exceed your chunk budget, summarize or use a structured query path (text-to-SQL, AST grep) instead of embedding the raw content.
 

@@ -40,47 +40,7 @@ Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_d
 
 ---
 
-## 2. The pipeline: query embedding, vector search, context assembly, prompt construction, generation
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** The same pipeline stage by stage: query embedding → vector search → context assembly → prompt construction → generation.
-
-**Key points.**
-
-- Embed the query with the same model used for the index.
-- Vector search returns top-k candidate chunks.
-- Assemble the hits into a context string and build the prompt.
-- Generate the answer from that context.
-
-**Concept.** Ingest: parse → chunk → embed → index. Query: embed the query → retrieve top-k (dense and/or sparse) → rerank → assemble the retrieved context into the prompt → generate → optionally cite. Each stage is separable; failures and quality drops can occur at any of them.
-
-![diagram](assets/diagrams/05b856b35af57c9c7bb442aa05d35f68f58bba95.png)
-
-**In Jiuwen.** Each stage is a distinct component: the query is embedded, a retriever performs the vector search over the store, the retrieval workflow component concatenates the hits into a context string, and the LLM component formats that context into the prompt and calls the model. The stages are swappable and can be instrumented independently.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_documents` calls `chunker.chunk_documents`, builds an `IndexConfig`, and `Indexer.build_index` computes embeddings via `compute_chunk_embeddings` and writes them to the vector store. Query: `SimpleKnowledgeBase.retrieve` lazily instantiates `VectorRetriever`/`SparseRetriever`/`HybridRetriever` by `index_type`, embeds the query, and calls `vector_store.search`. The production end-to-end wiring is the workflow `KnowledgeRetrievalComponent`, which returns `results`/`context`; a downstream `LLMComponent` formats them into the prompt.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96` | chunk_documents; :110 build_index(...); :182 delegate to retriever |
-| `agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46/73` | embed_documents / embed_multimodal |
-| `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78` | embed_query → vector_store.search |
-| `agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109` | retrieve_multi_kb_with_source(...); :243 joins texts into context |
-| `agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654` | template format feeding {{context}}/{{query}} |
-
-</details>
-
----
-
-## 3. What is Modular RAG, and how is it different from a simple RAG pipeline
+## 2. What is Modular RAG, and how is it different from a simple RAG pipeline
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
@@ -121,7 +81,7 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 
 ---
 
-## 4. Deciding chunk size, and what breaks at each extreme
+## 3. Deciding chunk size, and what breaks at each extreme
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -161,7 +121,7 @@ The building blocks are modular and pluggable: parsers self-register by extensio
 
 ---
 
-## 5. What happens if your chunks are too small or too large
+## 4. What happens if your chunks are too small or too large
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -199,7 +159,7 @@ The code guards the mechanics but not the quality: construction rejects `chunk_s
 
 ---
 
-## 6. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
+## 5. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -240,7 +200,7 @@ True fixed-size is `CharChunker` (raw character windows via `CharSplitter`). Tok
 
 ---
 
-## 7. Overlapping vs. non-overlapping chunks
+## 6. Overlapping vs. non-overlapping chunks
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -277,7 +237,7 @@ Overlap is a first-class `chunk_overlap` integer (default 50) enforced on both p
 
 ---
 
-## 8. Chunking structured content like tables, code, or nested headings without losing structure
+## 7. Chunking structured content like tables, code, or nested headings without losing structure
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -318,7 +278,7 @@ Structure is preserved at parse time, not chunk time. Excel emits one `Document`
 
 ---
 
-## 9. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
+## 8. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -357,7 +317,7 @@ Protection is inconsistent by chunker. `SentenceSplitter` builds chunks from who
 
 ---
 
-## 10. Picking an embedding model, and whether bigger always means better retrieval
+## 9. Picking an embedding model, and whether bigger always means better retrieval
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -401,7 +361,7 @@ An `Embedding` ABC defines `embed_query`, `embed_documents`, and a `dimension` p
 
 ---
 
-## 11. Should queries and documents use the same embedding model
+## 10. Should queries and documents use the same embedding model
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -445,7 +405,7 @@ In the KB pipeline they do: one `embed_model` instance is held on the KB, passed
 
 ---
 
-## 12. Why swapping embedding models forces a full re-embedding of the corpus
+## 11. Why swapping embedding models forces a full re-embedding of the corpus
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -484,7 +444,7 @@ At index time `compute_chunk_embeddings` calls `embed_model.embed_documents` and
 
 ---
 
-## 13. Multilingual documents: multilingual embedding models, translate at query or index time
+## 12. Multilingual documents: multilingual embedding models, translate at query or index time
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -523,7 +483,7 @@ Effectively bilingual zh/en at the processing layer, with no translation. `Sente
 
 ---
 
-## 14. Handling multiple document types and formats in the same system
+## 13. Handling multiple document types and formats in the same system
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -562,7 +522,7 @@ Format dispatch is an extension-keyed plugin registry loaded lazily by `AutoFile
 
 ---
 
-## 15. RAG vs. pasting retrieved text into a long-context prompt
+## 14. RAG vs. pasting retrieved text into a long-context prompt
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -601,7 +561,7 @@ The KB is not budgeted against the model window. `KnowledgeRetrievalExecutable._
 
 ---
 
-## 16. Simple RAG pipeline
+## 15. Simple RAG pipeline
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -639,7 +599,7 @@ Implemented end to end as composable pieces rather than a packaged app: ingest v
 
 ---
 
-## 17. Modular RAG with reranking
+## 16. Modular RAG with reranking
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -678,7 +638,7 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 ---
 
-## 18. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
+## 17. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
@@ -723,7 +683,7 @@ The reranker modules exist (`StandardReranker` cross-encoder, `ChatReranker` LLM
 
 ---
 
-## 19. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
+## 18. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -766,7 +726,7 @@ Caps exist (`AgenticRetriever.max_iter` default 2 clamped, `graph_hops`/`max_len
 
 ---
 
-## 20. How does an agent decide when to retrieve again versus when it has enough context to answer
+## 19. How does an agent decide when to retrieve again versus when it has enough context to answer
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -803,7 +763,7 @@ This is `AgenticRetriever._rewrite`: `_REWRITE_PROMPT` receives the query, the a
 
 ---
 
-## 21. How does a larger context window change your retrieval strategy — and when does it not help?
+## 20. How does a larger context window change your retrieval strategy — and when does it not help?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

@@ -68,15 +68,6 @@
   ]
  },
  "14-8": {
-  "title": "Hosted vs self-managed vector DB",
-  "tldr": "Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.",
-  "points": [
-   "Hosted: less ops, elastic, lock-in, cost scales.",
-   "Self-managed: control, cost, residency, you run it.",
-   "Decide by ops capacity, sensitivity, volume."
-  ]
- },
- "14-9": {
   "title": "Vector DB down: fallback",
   "tldr": "Decide the degradation: fail fast with a clear message, serve cached results, fall back to a secondary index (sparse/replica), or disable retrieval and answer with a caveat — plus a circuit breaker and health checks.",
   "points": [
@@ -86,7 +77,7 @@
    "Add circuit breaker + health checks."
   ]
  },
- "14-10": {
+ "14-9": {
   "title": "Updating/deleting an indexed doc",
   "tldr": "Use a stable document id and a delete-by-id path; updates are delete-then-insert (or upsert). Chunk ids derive from the doc id so all chunks can be removed; the hard parts are atomicity and consistency.",
   "points": [
@@ -96,7 +87,7 @@
    "Atomicity and consistency are the hard parts."
   ]
  },
- "14-11": {
+ "14-10": {
   "title": "Never serving stale information",
   "tldr": "Attach timestamps/versions, prefer recency in ranking (or hard-filter to a freshness window), tombstone superseded versions, surface recency to the generator, and propagate deletes promptly.",
   "points": [
@@ -106,7 +97,7 @@
    "Surface recency to the generator."
   ]
  },
- "14-12": {
+ "14-11": {
   "title": "Zero relevant documents",
   "tldr": "Detect it (score threshold or answerability) and abstain: return 'not enough information' or ask a clarifying question, rather than answering from noise; optionally fall back to sparse or a graph hop.",
   "points": [
@@ -115,7 +106,7 @@
    "Optional fallbacks: sparse, graph hop."
   ]
  },
- "14-13": {
+ "14-12": {
   "title": "Sub-500ms budget",
   "tldr": "Budget: embedding+vector search tens of ms, rerank tens–low-hundreds, generation the rest; stream tokens so TTFT is what the user feels. Cache and parallelize, and skip rerank when latency-bound.",
   "points": [

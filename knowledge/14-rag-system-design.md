@@ -64,7 +64,7 @@ Provides the ingestion pipeline (`parse_files` → `chunk_documents` → `build_
 
 **Implementation**
 
-The contract is delete-by-`doc_id` + rebuild: indexers scan a doc's chunk IDs, delete them, then re-chunk/re-embed/write (Milvus flushes between to defeat eventual consistency); new documents append into the pre-existing ANN index (no full re-index). `doc_id` is a first-class, scalar-inverted field. Chunking ships `CharChunker`/`TokenizerChunker` and a `HybridChunker`, but has no code-aware/function-boundary chunker.
+Re-indexing is incremental: `build_index` appends new documents into the pre-existing ANN index, so adding files triggers no full re-index. An update to an existing document is delete-by-`doc_id` followed by re-chunk/re-embed/write. `doc_id` is a first-class, scalar-inverted field, and chunking ships `CharChunker`/`TokenizerChunker` plus `HybridChunker`, though with no code-aware/function-boundary chunker.
 
 **Code anchors**
 
@@ -279,45 +279,7 @@ Three backends behind one factory: Chroma (local persisted, **vector-only** — 
 
 ---
 
-## 8. How do you decide between a hosted vector database and a self-managed one at scale
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Hosted: less ops, elastic scaling, predictable latency, but cost scales and there's lock-in. Self-managed: control, steady-state cost, data residency, but you own scaling, backups, upgrades, on-call.
-
-**Key points.**
-
-- Hosted: less ops, elastic, lock-in, cost scales.
-- Self-managed: control, cost, residency, you run it.
-- Decide by ops capacity, sensitivity, volume.
-
-**Concept.** Hosted (Pinecone/Zilliz Cloud): less ops, elastic scaling, predictable latency, but cost scales with data/queries and there is vendor lock-in. Self-managed (Milvus/Qdrant/pgvector): control, cost at steady state, data residency, but you own scaling, backups, upgrades, and on-call. Decide by team ops capacity, data sensitivity, query volume, and elasticity needs — not by the library API.
-
-![diagram](assets/diagrams/3fd4013499fb4f4287982fc5915ad97a2f0a3d15.png)
-
-**In Jiuwen.** The factory can create Chroma (local), Milvus (server, which fits hosted or self-managed), and PostgreSQL plus pgvector (self-managed relational). The choice is pure config; the repo provides no autoscaling, managed-service integration, or ops tooling, so the operational side is entirely on you.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`create_vector_store` dispatches Chroma (local/embedded), Milvus (server, fits hosted or self-managed), and PostgreSQL+pgvector (self-managed relational). The choice is pure config; there is no autoscaling, managed-service integration, or ops tooling in-repo. Chroma local cannot do hybrid, so production hybrid means Milvus or PG.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/vector_store/store.py:16` | factory |
-| `agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:129` | local; agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:108 — server; agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:108 — relational |
-| `agent-core/openjiuwen/core/retrieval/knowledge_base.py:59` | Chroma rejects hybrid |
-| `agent-core/openjiuwen/core/retrieval/common/config.py:67` | StoreType |
-
-</details>
-
----
-
-## 9. What happens to the user experience if the vector database is down, what's your fallback
+## 8. What happens to the user experience if the vector database is down, what's your fallback
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -356,7 +318,7 @@ There is **no availability fallback** for a down vector DB. Dense `search()` doe
 
 ---
 
-## 10. Handling a document updated or deleted after it's already indexed
+## 9. Handling a document updated or deleted after it's already indexed
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -397,7 +359,7 @@ The contract is delete-by-`doc_id` + rebuild. Chroma/Milvus indexers do **not** 
 
 ---
 
-## 11. How would you design the system so users never get an answer based on stale, outdated information
+## 10. How would you design the system so users never get an answer based on stale, outdated information
 
 <span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span>
 
@@ -436,7 +398,7 @@ The retrieval layer has **no notion of document time**: `RetrievalResult`/`TextC
 
 ---
 
-## 12. How do you design for the case where retrieval returns zero relevant documents
+## 11. How do you design for the case where retrieval returns zero relevant documents
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -474,7 +436,7 @@ The KB path implements **dense-empty → sparse** fallback, but has **no abstent
 
 ---
 
-## 13. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
+## 12. Your system needs sub-500ms responses, walk me through where you'd spend that budget across retrieval, reranking, and generation
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 

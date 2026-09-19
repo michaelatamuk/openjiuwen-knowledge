@@ -111,33 +111,7 @@ flowchart TD
 
 ---
 
-## 5. No relevant documents exist: expected behavior is a confidence-gated "not enough information"
-
-**General:** When retrieval returns nothing relevant, the system should abstain rather than answer from noise: gate on a retrieval-score threshold or an explicit answerability check, and return "not enough information" (or ask a clarifying question). Without this, the model will still produce a fluent answer from irrelevant context.
-
-**Jiuwen:** There is a retrieval score filter but its default is `None`, so out-of-scope chunks are normally returned. `AgenticRetriever` asks an LLM whether facts are `sufficient`, but `sufficient=False` only generates a follow-up query — never a user-facing abstention. A true abstention path exists only in `symphony/retrieval` internal selection (`is_abstain` → empty candidates). Grounding is a separate, non-blocking review layer.
-
-```mermaid
-flowchart TD
-    Q["query"] --> R["retrieve (score_threshold default None → no filtering)"]
-    R --> S{"facts sufficient?"}
-    S -->|no| NQ["next question → re-retrieve (no abstention)"]
-    S -->|yes| GEN["generate"]
-    R -.->|"absent"| X["confidence-gated 'not enough information' / 'I don't know'"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:47</code> — <code>score_threshold</code> defaults <code>None</code>; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:94</code> — applied only when supplied<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326</code> — <code>_rewrite</code> sufficiency (rewrite, not abstain)<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/search/runtime/engine.py:94</code> — <code>is_abstain</code> → empty candidates; <code>agent-core/openjiuwen/symphony/retrieval/search/runtime/selector.py:305</code> — <code>is_abstain</code><br>&bull; <code>agent-core/openjiuwen/harness/subagents/verification_agent.py:51</code> — PASS/FAIL/PARTIAL verdict</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-1, rag-practical._</sub>
-
----
-
-## 6. Same question, different answers on different days: non-deterministic reranking or embedding drift
+## 5. Same question, different answers on different days: non-deterministic reranking or embedding drift
 
 **General:** Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (the provider updates the embedding model behind the same name, or you change models). Remedies: pin temperature/seed, store a model/version fingerprint with the index, and re-index when the fingerprint changes. Identical inputs should otherwise be reproducible.
 
@@ -163,7 +137,7 @@ flowchart TD
 
 ---
 
-## 7. Vocabulary mismatch, where the answer exists but uses different wording
+## 6. Vocabulary mismatch, where the answer exists but uses different wording
 
 **General:** The document says "myocardial infarction", the user says "heart attack". Mitigations: better embeddings (semantic match), query expansion/synonyms, HyDE (generate a hypothetical answer and retrieve with it), and hybrid search so exact terms still match. Pure dense handles paraphrase but not rare terms; pure sparse handles rare terms but not paraphrase.
 
@@ -190,7 +164,7 @@ flowchart TD
 
 ---
 
-## 8. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
+## 7. Structuring error handling for a pipeline where retrieval, reranking, or generation can each fail independently
 
 **General:** Isolate each stage so one failure degrades rather than aborts: retrieval returns an empty/flagged result, reranking falls back to the pre-rerank order, generation surfaces a structured error. Use typed errors per stage, explicit fallbacks, retries only for transient failures, and a top-level handler that converts failure into a model-readable message instead of a crash.
 
@@ -219,7 +193,7 @@ flowchart TD
 
 ---
 
-## 9. "Design a RAG system" tests failure mode awareness, not architecture recall
+## 8. "Design a RAG system" tests failure mode awareness, not architecture recall
 
 **General:** This claim holds: the value in "design a RAG system" is naming the failure modes and how you detect them, not reciting a reference architecture. Drawing embed → retrieve → rerank → generate is the basic shape. When retrieval returns the wrong chunk, the causes are usually retrieval-side: chunk boundaries cut the answer, the embedding mismatches the domain, the query wording differs from the corpus, exact IDs need sparse search, or metadata filters were dropped. Point at the stage that fails, not the pipeline as a whole. Name the check for each (read the chunk, score threshold, hybrid fallback).
 
@@ -243,7 +217,7 @@ flowchart TD
 
 ---
 
-## 10. "The model made something up" is testing hallucination handling, not model quality
+## 9. "The model made something up" is testing hallucination handling, not model quality
 
 **General:** This claim holds: "the model made something up" is about hallucination handling and mitigation, not about which model is best. how you ground and verify output — grounding in retrieved context, citations tied to sources, confidence thresholds before generating, and defined fallback when retrieval is empty or irrelevant. Treat this as a system design, not a claim about model quality: pass the retrieved context to the generator, require citations, gate on an answerability/score threshold before generating, and define the empty/irrelevant fallback (abstain or ask). Measure faithfulness against the context, not just correctness against a reference.
 
@@ -268,7 +242,7 @@ flowchart TD
 
 ---
 
-## 11. How do you treat output validation as a pipeline stage, not an afterthought?
+## 10. How do you treat output validation as a pipeline stage, not an afterthought?
 
 **General:** Output validation should be an explicit, typed stage between generation and delivery: (1) syntactic validation — does the output match the declared schema or format (JSON schema, regex, structured output type)? (2) semantic validation — is the content grounded in the retrieved context (faithfulness check)? (3) policy validation — does the output pass safety/guardrail rules? Each stage has a clear pass/fail contract: fail syntactic → retry with repair prompt; fail semantic → abstain or flag; fail policy → redact or block. Logging the failure mode at each stage is what makes the system debuggable.
 

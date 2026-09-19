@@ -10,16 +10,6 @@
   ]
  },
  "10-2": {
-  "title": "Pipeline stages",
-  "tldr": "The same pipeline stage by stage: query embedding → vector search → context assembly → prompt construction → generation.",
-  "points": [
-   "Embed the query with the same model used for the index.",
-   "Vector search returns top-k candidate chunks.",
-   "Assemble the hits into a context string and build the prompt.",
-   "Generate the answer from that context."
-  ]
- },
- "10-3": {
   "title": "Modular RAG",
   "tldr": "Simple RAG is a fixed chain; Modular RAG decomposes it into swappable modules (indexing, retrieval, fusion, reranking, query rewriting, generation) that can be routed and scheduled.",
   "points": [
@@ -28,7 +18,7 @@
    "Lets you add rewriting, reranking, or iteration per query."
   ]
  },
- "10-4": {
+ "10-3": {
   "title": "Choosing chunk size",
   "tldr": "Too small loses context and splits answers; too large dilutes the embedding. Start at a few hundred tokens with modest overlap.",
   "points": [
@@ -37,7 +27,7 @@
    "Start ~a few hundred tokens with small overlap; tune by measuring."
   ]
  },
- "10-5": {
+ "10-4": {
   "title": "Chunks too small or too large",
   "tldr": "Too small: the answer splits and the answer-bearing chunk can be missed. Too large: the embedding blends topics, precision drops, and prompt cost rises.",
   "points": [
@@ -46,7 +36,7 @@
    "The code guards mechanics (invalid values, limits), not retrieval quality."
   ]
  },
- "10-6": {
+ "10-5": {
   "title": "Fixed-size vs semantic chunking",
   "tldr": "Fixed-size is cheap and deterministic but cuts mid-sentence; structure/sentence-aware chunking keeps chunks coherent at the cost of variable size and extra processing.",
   "points": [
@@ -55,7 +45,7 @@
    "Best: sentence/structure-aware with a cap, not raw character windows."
   ]
  },
- "10-7": {
+ "10-6": {
   "title": "Chunk overlap",
   "tldr": "A small overlap preserves meaning across a boundary; too much duplicates content, inflates the index, and returns near-identical hits.",
   "points": [
@@ -64,7 +54,7 @@
    "Non-overlapping is cheaper but risks losing the boundary fact."
   ]
  },
- "10-8": {
+ "10-7": {
   "title": "Chunking tables, code, headings",
   "tldr": "Capture structure at parse time and carry it as metadata — keep tables intact (row/column), preserve code boundaries, and split on headings.",
   "points": [
@@ -74,7 +64,7 @@
    "Headings: use them as split boundaries."
   ]
  },
- "10-9": {
+ "10-8": {
   "title": "Answer cut across chunks",
   "tldr": "If the answer spans a boundary, the retrieved chunk holds only half of it. Fix with overlap, sentence/structure-aware splitting, and neighbor expansion at serve time.",
   "points": [
@@ -83,7 +73,7 @@
    "At serve time, expand a hit with its neighbors."
   ]
  },
- "10-10": {
+ "10-9": {
   "title": "Choosing an embedding model",
   "tldr": "Bigger isn't automatically better: fit to domain and language, use the right query/passage prefixes, pick an affordable dimension, and weigh latency/cost.",
   "points": [
@@ -93,7 +83,7 @@
    "Evaluate recall on your data, not a leaderboard."
   ]
  },
- "10-11": {
+ "10-10": {
   "title": "Same embedding model for query & docs",
   "tldr": "Yes — both sides must use the same model, and asymmetric models need the correct role prefix on each side, or the vectors aren't comparable.",
   "points": [
@@ -102,7 +92,7 @@
    "Mixing models or dropping prefixes degrades retrieval."
   ]
  },
- "10-12": {
+ "10-11": {
   "title": "Re-embedding after model swap",
   "tldr": "Stored vectors belong to one model; a new model — even at the same dimension — is a different space, so every chunk must be re-embedded and the index rebuilt.",
   "points": [
@@ -111,7 +101,7 @@
    "Re-embed the whole corpus and rebuild the index."
   ]
  },
- "10-13": {
+ "10-12": {
   "title": "Multilingual retrieval",
   "tldr": "Use a multilingual/alignment embedding so queries and docs share one space; otherwise translate at index or query time and store language metadata.",
   "points": [
@@ -120,7 +110,7 @@
    "Store language metadata to route and evaluate per language."
   ]
  },
- "10-14": {
+ "10-13": {
   "title": "Multiple document formats",
   "tldr": "Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by type, preserving format-specific structure as metadata.",
   "points": [
@@ -129,7 +119,7 @@
    "Keep format-specific structure as metadata."
   ]
  },
- "10-15": {
+ "10-14": {
   "title": "RAG vs pasting a long context",
   "tldr": "Pasting whole documents is simpler and avoids chunking errors but is expensive, slow, and noisy; retrieval pays a one-time chunking/index cost and sends only relevant, citable chunks.",
   "points": [
@@ -138,7 +128,7 @@
    "Choose by cost, latency, and need to cite."
   ]
  },
- "10-16": {
+ "10-15": {
   "title": "Simple RAG pipeline",
   "tldr": "The most common starting point: embed the query, get top-k similar docs, stuff them into the prompt, and generate.",
   "points": [
@@ -147,7 +137,7 @@
    "LLM generates the answer."
   ]
  },
- "10-17": {
+ "10-16": {
   "title": "Modular RAG with reranking",
   "tldr": "The upgrade once simple RAG returns irrelevant context: retrieve a larger candidate set, rerank by relevance, and keep only the top results.",
   "points": [
@@ -156,7 +146,7 @@
    "Keep only the top results."
   ]
  },
- "10-18": {
+ "10-17": {
   "title": "Agentic RAG",
   "tldr": "A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.",
   "points": [
@@ -165,7 +155,7 @@
    "Loop until sufficient or capped."
   ]
  },
- "10-19": {
+ "10-18": {
   "title": "Preventing agentic RAG loops",
   "tldr": "Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.",
   "points": [
@@ -174,7 +164,7 @@
    "Token/cost budget; cache/dedupe."
   ]
  },
- "10-20": {
+ "10-19": {
   "title": "Retrieve again or answer",
   "tldr": "Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.",
   "points": [
@@ -183,7 +173,7 @@
    "Stop on sufficient/no-next-question or the cap."
   ]
  },
- "10-21": {
+ "10-20": {
   "title": "Context window vs retrieval precision",
   "tldr": "A larger context window raises the recall ceiling but doesn't replace retrieval precision; 'lost in the middle' degrades mid-context evidence, and more tokens cost more.",
   "points": [

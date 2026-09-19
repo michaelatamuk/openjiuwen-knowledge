@@ -37,15 +37,6 @@
   ]
  },
  "13-5": {
-  "title": "No relevant documents",
-  "tldr": "When retrieval returns nothing relevant, abstain rather than answer from noise: gate on a score threshold or answerability check and return 'not enough information'.",
-  "points": [
-   "Gate on retrieval score or answerability.",
-   "Abstain or ask a clarifying question.",
-   "Don't generate from out-of-scope chunks."
-  ]
- },
- "13-6": {
   "title": "Different answers on different days",
   "tldr": "Run-to-run variation comes from sampling (temperature/seed), non-deterministic remote rerankers, and embedding drift (provider updates the model behind the same name, or you switch models).",
   "points": [
@@ -54,7 +45,7 @@
    "Embedding drift: fingerprint the model and re-index on change."
   ]
  },
- "13-7": {
+ "13-6": {
   "title": "Vocabulary mismatch",
   "tldr": "The doc says 'myocardial infarction', the user says 'heart attack': use semantic embeddings, query expansion/synonyms, HyDE, and hybrid search to bridge the wording gap.",
   "points": [
@@ -64,7 +55,7 @@
    "Hybrid search catches exact terms."
   ]
  },
- "13-8": {
+ "13-7": {
   "title": "Per-stage error handling",
   "tldr": "Isolate each stage so one failure degrades rather than aborts: retrieval returns empty/flagged, reranking falls back to pre-rerank order, generation surfaces a structured error.",
   "points": [
@@ -73,7 +64,7 @@
    "Degrade, don't abort the whole pipeline."
   ]
  },
- "13-9": {
+ "13-8": {
   "title": "Design a RAG system: tests failure-mode awareness",
   "tldr": "'Design a RAG system' tests whether you know how it fails, not whether you can draw boxes.",
   "points": [
@@ -83,7 +74,7 @@
    "Metadata filters dropped at the retriever."
   ]
  },
- "13-10": {
+ "13-9": {
   "title": "'The model made something up': hallucination handling",
   "tldr": "'The model made something up' is testing hallucination handling, not model quality.",
   "points": [
@@ -93,7 +84,7 @@
    "No faithfulness judge with context."
   ]
  },
- "13-11": {
+ "13-10": {
   "title": "Output validation as a pipeline stage",
   "tldr": "Validation must be three explicit stages with typed pass/fail contracts: syntactic (schema), semantic (faithfulness), policy (safety) — not ad hoc checks.",
   "points": [

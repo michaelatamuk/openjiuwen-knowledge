@@ -284,46 +284,7 @@ There is a real reranker stack (`StandardReranker`, `ChatReranker`, DashScope) a
 
 ---
 
-## 8. Would you rerank every query, or only some, and how do you decide
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Rerank only when it pays off: high-stakes or ambiguous queries with low first-stage precision and a bounded candidate count; skip exact lookups and latency-critical cheap queries.
-
-**Key points.**
-
-- Rerank when precision matters and candidates are bounded.
-- Skip exact-match, high-volume, latency-critical queries.
-- Decide per query, not globally.
-
-**Concept.** Rerank only when it improves the top-k enough to justify its latency: for high-stakes or ambiguous queries where first-stage precision is low, and when the candidate count is bounded. Skip it for exact-match lookups, high-volume cheap queries, or when latency dominates. Measure NDCG/precision with and without rerank on a labeled set to decide, and cache.
-
-![diagram](assets/diagrams/41073ccdb3f7f594713a011a8920868250597f7d.png)
-
-**In Jiuwen.** In Jiuwen reranking is optional and outside the default knowledge-base path — only the graph store/graph memory rerank, gated by a config flag. So default RAG queries are effectively never reranked, and there is no per-query rerank policy or metric-driven decision.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Reranking is **optional and not part of the default KB path** — the `Reranker` classes exist (`StandardReranker`, `ChatReranker`, `DashscopeReranker`) but only the graph store / graph memory call `rerank`, gated by `config_e.rerank`. So the codebase effectively never reranks default RAG queries; there is no per-query rerank policy and no metric-driven decision (only the demo score-delta script).
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182` | KB retrieve has no reranker |
-| `agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87` | rerank in graph store |
-| `agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:645` | config_e.rerank gate |
-| `agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23` | StandardReranker (/rerank) |
-| `agent-core/examples/store/showcase_milvus_graph_store.py:51` | before/after rerank demo (no labels) |
-
-</details>
-
----
-
-## 9. How much latency does reranking add?
+## 8. How much latency does reranking add?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -361,7 +322,7 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 ---
 
-## 10. When is reranking worth the latency cost?
+## 9. When is reranking worth the latency cost?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -384,7 +345,7 @@ Reranking is **optional and not part of the default KB path** — the `Reranker`
 
 **Implementation**
 
-The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy.
+The reranker is optional (`reranker=None` by default), and the product `jiuwenswarm` pins `rerank_enabled: False` in its external memory builder. The only guard is the per-request timeout plus `min_score`; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy. There is no per-query rerank policy and no NDCG-driven decision (only the demo score-delta script).
 
 **Code anchors**
 
@@ -397,7 +358,7 @@ The reranker is optional (`reranker=None` by default), and the product `jiuwensw
 
 ---
 
-## 11. Bi-encoder for retrieval vs. cross-encoder for reranking
+## 10. Bi-encoder for retrieval vs. cross-encoder for reranking
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -435,7 +396,7 @@ Retrieval is bi-encoder (query and docs embedded independently, compared by vect
 
 ---
 
-## 12. How do you chunk documents that mix prose, tables, and code?
+## 11. How do you chunk documents that mix prose, tables, and code?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

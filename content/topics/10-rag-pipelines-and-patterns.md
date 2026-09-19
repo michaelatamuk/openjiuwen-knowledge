@@ -33,40 +33,7 @@ flowchart LR
 
 ---
 
-## 2. The pipeline: query embedding, vector search, context assembly, prompt construction, generation
-
-**General:** Ingest: parse → chunk → embed → index. Query: embed the query → retrieve top-k (dense and/or sparse) → rerank → assemble the retrieved context into the prompt → generate → optionally cite. Each stage is separable; failures and quality drops can occur at any of them.
-
-**Jiuwen:** Ingestion: `KnowledgeBase.parse_files` (parser), then `SimpleKnowledgeBase.add_documents` calls `chunker.chunk_documents`, builds an `IndexConfig`, and `Indexer.build_index` computes embeddings via `compute_chunk_embeddings` and writes them to the vector store. Query: `SimpleKnowledgeBase.retrieve` lazily instantiates `VectorRetriever`/`SparseRetriever`/`HybridRetriever` by `index_type`, embeds the query, and calls `vector_store.search`. The production end-to-end wiring is the workflow `KnowledgeRetrievalComponent`, which returns `results`/`context`; a downstream `LLMComponent` formats them into the prompt.
-
-```mermaid
-flowchart LR
-    subgraph ING["Ingestion"]
-    P["parser"] --> C["chunker"] --> E["embed + index (vector store)"]
-    end
-    subgraph QRY["Query"]
-    Q["query"] --> QE["embed_query"]
-    QE --> RET["retriever (vector/sparse/hybrid) → top_k"]
-    RET --> CTX["KnowledgeRetrievalComponent → context text"]
-    CTX --> LLM["LLMComponent: Context/Question template → answer"]
-    end
-    E -.-> RET
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96</code> — <code>chunk_documents</code>; <code>:110</code> <code>build_index(...)</code>; <code>:182</code> delegate to retriever<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46/73</code> — <code>embed_documents</code> / <code>embed_multimodal</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code> — <code>embed_query</code> → <code>vector_store.search</code><br>&bull; <code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109</code> — <code>retrieve_multi_kb_with_source(...)</code>; <code>:243</code> joins texts into <code>context</code><br>&bull; <code>agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654</code> — template format feeding <code>{{context}}</code>/<code>{{query}}</code></sub>
-
-</details>
-
-**Gap.** No packaged end-to-end RAG agent or retrieval tool in `harness`/`agent_teams`.
-
-<sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
-
----
-
-## 3. What is Modular RAG, and how is it different from a simple RAG pipeline
+## 2. What is Modular RAG, and how is it different from a simple RAG pipeline
 
 **General:** A simple RAG pipeline is a fixed linear chain (retrieve → stuff → generate). Modular RAG decomposes it into interchangeable modules — indexing, retrieval, fusion, reranking, query rewriting, generation, orchestration — with routing and scheduling, so you can swap or add modules (rewrite, rerank, iterative/multi-hop retrieval) and branch conditionally per query. It is "RAG as a configurable graph of components" rather than one hardcoded path. The cost is more moving parts and the need for a router/orchestrator.
 
@@ -94,7 +61,7 @@ flowchart TD
 
 ---
 
-## 4. Deciding chunk size, and what breaks at each extreme
+## 3. Deciding chunk size, and what breaks at each extreme
 
 **General:** Chunk size trades context against precision. Too small and each chunk lacks the context to answer (and the answer may be split across chunks); too large and a chunk covers many topics, diluting the embedding and wasting the prompt budget. Practical defaults are a few hundred tokens with modest overlap, then tune against a retrieval eval. Size is usually measured in tokens (what the model sees), not characters.
 
@@ -126,7 +93,7 @@ flowchart TD
 
 ---
 
-## 5. What happens if your chunks are too small or too large
+## 4. What happens if your chunks are too small or too large
 
 **General:** Too small: each chunk lacks the context to answer, the answer gets split across chunks, and recall of the *answer-bearing* chunk drops while index size/overhead grows. Too large: the embedding averages multiple topics so relevance dilutes, retrieval precision drops, and each hit wastes prompt tokens; it can also exceed the embedding model's max sequence length and get truncated. Both extremes lower end-to-end quality, for opposite reasons.
 
@@ -151,7 +118,7 @@ flowchart TD
 
 ---
 
-## 6. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
+## 5. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
 
 **General:** Fixed-size chunking is deterministic and cheap but cuts mid-sentence or mid-table, producing fragments that embed poorly. Semantic / structure-aware chunking splits on natural boundaries (sentences, paragraphs, headings, records) so each chunk is coherent, at the cost of variable size and extra processing. Sentence-window and recursive-delimiter strategies sit between the two.
 
@@ -178,7 +145,7 @@ flowchart TD
 
 ---
 
-## 7. Overlapping vs. non-overlapping chunks
+## 6. Overlapping vs. non-overlapping chunks
 
 **General:** A small overlap preserves context that straddles a boundary, improving recall for answers that span a cut; too much overlap duplicates content, inflates the index, and can return near-identical hits that crowd out diverse results. Non-overlapping is cheaper and deduplicated but risks losing boundary context.
 
@@ -205,7 +172,7 @@ flowchart LR
 
 ---
 
-## 8. Chunking structured content like tables, code, or nested headings without losing structure
+## 7. Chunking structured content like tables, code, or nested headings without losing structure
 
 **General:** Structure should be captured at parse time and carried as metadata, not thrown away before chunking. Tables should stay intact or be serialized (row/column/record), code should be split on function/class boundaries with fences preserved, and nested headings should be used as split boundaries with the heading path attached to each chunk. A generic text chunker over flattened content loses all of this.
 
@@ -236,7 +203,7 @@ flowchart LR
 
 ---
 
-## 9. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
+## 8. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
 
 **General:** If the answer spans a chunk boundary, the chunk that ranks may contain only half of it, so the model sees an incomplete fact. Remedies: overlap chunks, split on sentence/structure boundaries rather than fixed characters, and at serve time expand a hit with its neighbors. Sentence-aware chunking with overlap is the common fix; fixed-character splitting is the usual culprit.
 
@@ -265,7 +232,7 @@ flowchart TD
 
 ---
 
-## 10. Picking an embedding model, and whether bigger always means better retrieval
+## 9. Picking an embedding model, and whether bigger always means better retrieval
 
 **General:** Bigger is not automatically better: retrieval quality depends on domain fit, the language, whether the model is asymmetric (query vs passage prefixes), the dimension you can afford, and latency/cost. A smaller in-domain model often beats a large general one, and dimensionality reduction (Matryoshka) can trade a little recall for large storage savings. The right way to pick is to measure recall on your own data, not to read a leaderboard.
 
@@ -298,7 +265,7 @@ flowchart LR
 
 ---
 
-## 11. Should queries and documents use the same embedding model
+## 10. Should queries and documents use the same embedding model
 
 **General:** Yes — queries and documents must be embedded by the same model, and for asymmetric models you must also apply the correct role prefix (e.g. `query:` vs `passage:`) to each side. Mixing models produces incomparable vectors; dropping the role prefix on an instruction-tuned model measurably degrades retrieval.
 
@@ -327,7 +294,7 @@ flowchart LR
 
 ---
 
-## 12. Why swapping embedding models forces a full re-embedding of the corpus
+## 11. Why swapping embedding models forces a full re-embedding of the corpus
 
 **General:** Stored vectors are the output of one specific model. A different model — even at the same dimension — projects into a different space, so old and new vectors are not comparable; distance computations become meaningless. You must re-embed every chunk (and often rebuild the index, since the vector width may change too). Good systems persist a model fingerprint/version with the index so a mismatch is detected rather than silently corrupted.
 
@@ -354,7 +321,7 @@ flowchart TD
 
 ---
 
-## 13. Multilingual documents: multilingual embedding models, translate at query or index time
+## 12. Multilingual documents: multilingual embedding models, translate at query or index time
 
 **General:** Use a multilingual/alignment embedding model so queries and documents land in one space; if no good multilingual model exists for a language, translate either at index time (normalize the corpus) or query time (translate the query), and store language metadata so you can route and evaluate per language. Cross-lingual rerankers help at the top.
 
@@ -381,7 +348,7 @@ flowchart TD
 
 ---
 
-## 14. Handling multiple document types and formats in the same system
+## 13. Handling multiple document types and formats in the same system
 
 **General:** Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by MIME/extension, and preserve format-specific structure as metadata. Chunking and indexing then operate on the uniform record. The risks are silent format gaps (a parser that drops structure) and mixed semantics (tables vs prose) needing different chunk policies.
 
@@ -407,7 +374,7 @@ flowchart LR
 
 ---
 
-## 15. RAG vs. pasting retrieved text into a long-context prompt
+## 14. RAG vs. pasting retrieved text into a long-context prompt
 
 **General:** With a large context window you can skip retrieval and paste whole documents. That is simpler and avoids chunking errors, but it is expensive (you pay for every token every call), slow (TTFT grows with context), noisy (irrelevant text dilutes attention), and limited to what fits. RAG pays a one-time indexing cost and per-query retrieval, keeps the prompt small, and scales to corpora far larger than any window. The trade is a retrieval system and its failure modes for token efficiency and scale.
 
@@ -435,7 +402,7 @@ flowchart TD
 
 ---
 
-## 16. Simple RAG pipeline
+## 15. Simple RAG pipeline
 
 **General:** the most common starting point. Query is embedded → a vector database returns top-k similar documents → documents are stuffed into a prompt → the LLM generates the answer. Used for: FAQ bots, internal document search, basic knowledge assistants.
 
@@ -456,7 +423,7 @@ flowchart LR
 
 ---
 
-## 17. Modular RAG with reranking
+## 16. Modular RAG with reranking
 
 **General:** the upgrade once simple RAG returns irrelevant context. A retriever pulls a larger candidate set, a reranker reorders by actual relevance to the query, and only the top results enter the prompt. Used for: legal, medical, or research tools where retrieval accuracy affects trust.
 
@@ -477,7 +444,7 @@ flowchart LR
 
 ---
 
-## 18. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
+## 17. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
 
 **General:** A fixed RAG pipeline always retrieves once and feeds the top-k to the generator. Agentic RAG adds a decision loop: the model chooses whether and when to retrieve, may rewrite or decompose the query, retrieves again based on what it found, and stops when it has enough. It trades latency/cost and non-determinism for better answers on complex questions.
 
@@ -505,7 +472,7 @@ flowchart TD
 
 ---
 
-## 19. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
+## 18. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
 
 **General:** Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, and put a token/cost budget on the retrieval loop itself. Cache retrieval results and dedupe identical queries. Alert on loops.
 
@@ -536,7 +503,7 @@ flowchart TD
 
 ---
 
-## 20. How does an agent decide when to retrieve again versus when it has enough context to answer
+## 19. How does an agent decide when to retrieve again versus when it has enough context to answer
 
 **General:** Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.
 
@@ -564,7 +531,7 @@ flowchart TD
 
 ---
 
-## 21. How does a larger context window change your retrieval strategy — and when does it not help?
+## 20. How does a larger context window change your retrieval strategy — and when does it not help?
 
 **General:** A larger context window lets you stuff more retrieved documents into the prompt, potentially reducing the need for aggressive top-k filtering. But it does not solve retrieval precision: the model still has to attend to the right passage inside a long context, and "lost in the middle" research shows models systematically underweight evidence in the middle of long contexts. More tokens also mean more cost per call and higher latency. Strategy: use retrieval precision (reranking, score thresholds) as the primary filter, and reserve long-context capacity for cases where multiple documents must be read together (multi-hop reasoning, synthesis tasks). Do not trade retrieval quality for window stuffing.
 
