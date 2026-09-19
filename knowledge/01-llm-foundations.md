@@ -138,7 +138,7 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ![diagram](assets/diagrams/66307130755ccf7f3e9f6402eb940892bcd5806c.png)
 
-**In Jiuwen.** Jiuwen does not implement attention itself — it delegates to hosted models or to HuggingFace models loaded by name. Its boundary is the model-client/config layer, which builds request parameters and sends them to a provider; when running a local model it loads a causal language model and consumes the returned logits. Attention lives in the model, not in this codebase.
+**In Jiuwen.** Attention is the model's job: Jiuwen delegates to hosted models or HuggingFace models loaded by name. Its boundary is the model-client/config layer — it builds request parameters and sends them to a provider, and for a local model it loads a causal LM and consumes the returned logits. Attention lives in the model, not in this codebase.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -178,7 +178,7 @@ Attention is the served model's job: provider APIs or HuggingFace models loaded 
 
 ![diagram](assets/diagrams/5cb7b126fbfe5ddc0da4c7d6d95752b7736106fb.png)
 
-**In Jiuwen.** There is no positional-encoding code here — it lives inside the model. Jiuwen only passes through the relevant knobs: an attention-implementation hint for HuggingFace, and RoPE scaling options for the vLLM engine. Any position ids you see in the RL data pipeline are just batching/padding metadata.
+**In Jiuwen.** Positional encoding lives inside the model. Jiuwen only passes the relevant knobs through: an attention-implementation hint for HuggingFace and RoPE scaling options for the vLLM engine. Position ids in the RL data pipeline are batching/padding metadata.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -346,7 +346,7 @@ On every `add_messages`/`get_context_window`, the context engine counts tokens w
 
 ![diagram](assets/diagrams/faca493623a4948c8aed4feae109125b3248e89f.png)
 
-**In Jiuwen.** Jiuwen has no explicit 'lost in the middle' handling. Instead it keeps prompts small and favors recent content: compressors keep the newest messages, offloaders keep only the most recent tool results, and truncation preserves the head and tail rather than only the front. When enabled, an optional mode archives replaced messages and can re-surface the relevant ones using keyword search.
+**In Jiuwen.** The context engine keeps prompts small and favors recent content, and it preserves the middle when trimming: compressors keep the newest messages, offloaders keep only the most recent tool results, and truncation preserves head + middle + tail rather than only the front. When enabled, an optional compression-recall mode archives replaced messages and re-surfaces the relevant ones using keyword search. There is no separate importance-reordering step.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -431,7 +431,7 @@ Temperature is a **passthrough request parameter** — hosted APIs apply the mat
 
 ![diagram](assets/diagrams/f9bc8addc668c21bac4ea20da1df5e21002fcc4c.png)
 
-**In Jiuwen.** Jiuwen implements top-p (nucleus) sampling locally and does not implement top-k sampling — there is simply no top-k field for generation. The local sampler keeps the smallest set of tokens reaching the target cumulative probability, renormalizes, and samples. Hosted models receive top-p normally, and Anthropic also accepts top-k if you pass it. Note the codebase reuses the name 'top-k' elsewhere for retrieval counts and other unrelated things, not sampling.
+**In Jiuwen.** Jiuwen samples locally with top-p (nucleus): it keeps the smallest token set reaching the target cumulative probability, renormalizes, and samples. There is no top-k field for generation; hosted models receive top-p (Anthropic also accepts top-k if passed). Elsewhere the codebase reuses 'top-k' for retrieval counts, unrelated to sampling.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -550,7 +550,7 @@ The repo frames arithmetic/counting as a tool-augmentation problem. A canonical 
 
 ![diagram](assets/diagrams/cf8077ba07e835de38a33a0c3a9216ecbf129b0a.png)
 
-**In Jiuwen.** Jiuwen does not try to detect hallucination inside the model; it provides mitigations around it: retrieval infrastructure to supply evidence; a verification agent limited to read-only/command tools that must show real command output and give a PASS/FAIL/PARTIAL verdict; an LLM reviewer that scores correctness and completeness; anomaly detection for degenerate repetition/loops (not false claims); and security guardrails. There is no claim-to-source attribution checker.
+**In Jiuwen.** Hallucination is addressed by mitigations rather than in-model detection: retrieval infrastructure to supply evidence; a verification agent limited to read-only/command tools that must show real command output and give a PASS/FAIL/PARTIAL verdict; an LLM reviewer scoring correctness and completeness; anomaly detection for degenerate repetition/loops (not false claims); and security guardrails. Claim-to-source attribution is not part of this stack.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -591,7 +591,7 @@ The repo does not model or detect low-level hallucination; it implements downstr
 
 ![diagram](assets/diagrams/07a4334b0eeb57efb62c0bcde2d414d2b06c738a.png)
 
-**In Jiuwen.** Jiuwen captures token log-probabilities but does not turn them into an uncertainty or 'I do not know' signal for normal answers. Logprobs are collected for RL training and used in one specific spot — a reranker that reads the 'yes'/'no' logprobs to make a binary relevance call. Retrieval has its own abstain token, but that is about whether to return a document, not whether the answer is uncertain. There is no calibrated confidence threshold and no abstention on ordinary answers.
+**In Jiuwen.** Jiuwen captures token log-probabilities for RL training and uses them in one place — a reranker that reads the 'yes'/'no' logprobs for a binary relevance call. They are not turned into an uncertainty or 'I do not know' signal for normal answers; retrieval has its own abstain token (about returning a document, not answer uncertainty), and there is no calibrated confidence threshold at which the agent abstains.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

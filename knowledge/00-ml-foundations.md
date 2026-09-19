@@ -163,7 +163,7 @@ Model weights are managed by PyTorch/veRL in `agent_rl/`. Inference-time hyperpa
 
 **Concept.** An iterative optimisation algorithm that minimises a loss function by moving parameters in the direction of steepest descent. Each step: compute the loss, compute the gradient `∂L/∂w` for each parameter, subtract `learning_rate × gradient` from each parameter. Stochastic gradient descent (SGD) does this on a mini-batch rather than the full dataset — the gradient estimate is noisy but each step is cheap and often generalises better. Key variants: SGD with momentum (accumulates gradient history to reduce oscillation), Adam (adaptive per-parameter learning rates based on gradient moments).
 
-**In Jiuwen.** Not implemented in the inference framework. The agent_rl/ subsystem runs SFT and PPO/GRPO via veRL, which manages its own optimisation loop using PyTorch Optimizer.step() internally. There is no hand-written gradient-descent loop anywhere in the codebase. The inference layer calls hosted models and does not perform any parameter updates.
+**In Jiuwen.** Gradient descent lives in the training stack: the agent_rl/ subsystem runs SFT and PPO/GRPO through veRL, which manages the optimisation loop with PyTorch Optimizer.step(). The inference layer calls hosted models and performs no parameter updates, so gradient descent is a training-side concern.
 
 ---
 
@@ -184,7 +184,7 @@ Model weights are managed by PyTorch/veRL in `agent_rl/`. Inference-time hyperpa
 
 ![diagram](assets/diagrams/d1a5c5012333a2b83d7ffbcb1ee6505aa5d4e890.png)
 
-**In Jiuwen.** Not hand-coded in the framework. Vector similarity is computed by the vector store backend (Milvus, Chroma, or similar). IndexConfig accepts a metric_type parameter that is forwarded to the store. There is no custom dot-product or magnitude code; metric choice is a configuration parameter, not an implementation.
+**In Jiuwen.** Vector similarity is computed by the vector store backend (Milvus, Chroma, or similar): IndexConfig takes a metric_type parameter forwarded to the store, so metric choice is configuration rather than hand-written code.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -261,7 +261,7 @@ Not hand-coded. Vector similarity queries go through the vector store (Milvus, C
 
 ![diagram](assets/diagrams/baee0ab4af6b23d6355a70f8788205ad6a806fc2.png)
 
-**In Jiuwen.** Not implemented as a classifier. The retrieval layer is effectively approximate KNN over embedding space: VectorRetriever performs top-k ANN search via the vector store's index (typically HNSW or IVF). The concept is directly instantiated by the embedding retrieval pipeline, just at scale with approximation rather than exact distance computation.
+**In Jiuwen.** k-NN shows up as vector retrieval: VectorRetriever performs top-k approximate nearest-neighbour search over the vector store's index (typically HNSW or IVF) — the same concept at scale with approximation instead of exact distance.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -298,7 +298,7 @@ k-NN shows up as vector retrieval rather than a classifier: `VectorRetriever` pe
 
 ![diagram](assets/diagrams/8ab6f01e44a344d5c804366a2c0a27cdd90ca453.png)
 
-**In Jiuwen.** Not implemented in the inference framework. For the training subsystem, agent_rl/ calls veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd — the graph is recorded on the forward pass and traversed in reverse on .backward(). There is no hand-written backward pass anywhere in the codebase.
+**In Jiuwen.** Backpropagation is handled by the training stack: agent_rl/ runs veRL's SFT and PPO/GRPO loops, which use PyTorch's standard autograd (recorded on the forward pass, traversed in reverse on .backward()). The framework delegates the backward pass to PyTorch.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -335,7 +335,7 @@ Backpropagation is handled by the training stack: `agent_rl/` runs veRL's SFT an
 
 ![diagram](assets/diagrams/57094e728def2e2fc0b484aa2d72eb57e2c480a7.png)
 
-**In Jiuwen.** Not implemented in the inference framework. In agent_rl/, gradient clipping is a veRL/PyTorch training hyperparameter (clip_grad). The inference framework calls hosted models that handle all architectural choices — residual connections, layer norm, initialisation — internally. Gradient stability is not a concern at the inference layer.
+**In Jiuwen.** Gradient clipping is a training-side hyperparameter in agent_rl/ (veRL/PyTorch, clip_grad). At inference, hosted models handle architectural choices — residual connections, layer norm, initialisation — internally, so gradient stability is a training concern.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -371,7 +371,7 @@ Gradient clipping is a training-side hyperparameter in `agent_rl/` (veRL/PyTorch
 
 ![diagram](assets/diagrams/3606e4977c3596ddf3ac1abd8a98d127bb611f60.png)
 
-**In Jiuwen.** Not implemented. The framework calls hosted models that apply normalisation internally. No BatchNorm or LayerNorm code exists in the inference layer. AutoModelForCausalLM.from_pretrained loads whatever norm the model architecture specifies (layer norm for all transformer-based LLMs). The only normalisation-adjacent configuration is attn_implementation and rope_scaling_type forwarded as HuggingFace/vLLM engine args.
+**In Jiuwen.** Normalization is part of the served model: hosted models apply it internally, and AutoModelForCausalLM.from_pretrained loads whatever norm the architecture specifies (layer norm for transformer LLMs). The only norm-adjacent config the framework forwards is attn_implementation and rope_scaling_type as HuggingFace/vLLM engine args.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -407,7 +407,7 @@ Batch/layer normalization is part of the served model: hosted models apply it in
 
 ![diagram](assets/diagrams/336902bf313641668e513e182a8f29df5efe2dfe.png)
 
-**In Jiuwen.** Not implemented in the inference layer. In agent_rl/, dropout rates are hyperparameters forwarded to veRL/PyTorch. For LoRA fine-tuning, LoRA dropout is a config parameter on the PEFT adapter. The inference framework calls models with dropout disabled (standard inference mode) without any framework-level dropout code.
+**In Jiuwen.** Dropout is a training-side hyperparameter: agent_rl/ forwards dropout rates to veRL/PyTorch, and for LoRA fine-tuning it is a PEFT adapter config parameter. At inference, models run with dropout disabled by default (standard inference mode).
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -559,7 +559,7 @@ The framework is built entirely on transfer learning. Model clients call pre-tra
 
 ![diagram](assets/diagrams/738e991d3afc8ab2b6b9ef5b815bbc4c16fd6202.png)
 
-**In Jiuwen.** Not present in the inference framework. The evaluation harness (agent_evolving/eval/) runs on a fixed held-out evaluation set and does not implement k-fold cross-validation. Cross-validation would be a concern for users fine-tuning on small datasets via agent_rl/, but no CV loop is provided by the framework.
+**In Jiuwen.** The evaluation harness (agent_evolving/eval/) runs on a fixed held-out set; k-fold cross-validation is left to users fine-tuning on small datasets via agent_rl/.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -637,7 +637,7 @@ Not a concern in the inference framework. In `agent_rl/`, training hyperparamete
 
 ![diagram](assets/diagrams/26a19f829275e81797c0bee3994c172f97bf26cc.png)
 
-**In Jiuwen.** Not implemented — multi-head attention is entirely delegated to provider APIs or HuggingFace model weights via AutoModelForCausalLM.from_pretrained. There is no number-of-heads configuration in the framework. This entry covers the architectural motivation for using multiple heads over a single head.
+**In Jiuwen.** Multi-head attention is the served model's job — provider APIs or HuggingFace weights via AutoModelForCausalLM.from_pretrained. The framework exposes no number-of-heads configuration; this entry covers the architectural motivation for multiple heads.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
