@@ -252,7 +252,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 ![diagram](assets/diagrams/ccdf5dd63f8b8a1a2338643d0c0a3c2d30146eb5.png)
 
-**In Jiuwen.** agent_rl/ uses PEFT LoRA via veRL for SFT and PPO/GRPO. lora_rank, lora_alpha, lora_dropout, target_modules are config parameters forwarded to the PEFT adapter (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:359). Base model weights are frozen; only A/B matrices are trained. QLoRA (4-bit frozen base) is supported via the quantization config field. LoRA math is entirely delegated to the PEFT library.
+**In Jiuwen.** agent_rl/ uses PEFT LoRA via veRL for SFT and PPO/GRPO. lora_rank, lora_alpha, and target_modules are forwarded to the PEFT adapter (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:342). Base model weights are frozen; only the A/B matrices are trained. LoRA math is delegated to the PEFT library.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -289,7 +289,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 ![diagram](assets/diagrams/92ac41ad87de82ccb4c160167976d795583ae51b.png)
 
-**In Jiuwen.** Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/ppo/) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, eliminating the value model from PPO. No DPO backend exists in the codebase — the preference-based alignment track is absent. SFT path (online/backends/sft/) covers stage 1 of RLHF.
+**In Jiuwen.** Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO is also supported (config/offline_config.py:43), eliminating the value model. DPO is not implemented. SFT (agent_evolving/agent_rl/online/backends/sft/trainer.py) covers stage 1 of RLHF.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -328,7 +328,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 ![diagram](assets/diagrams/80870c55071007554d5358baa9187379660ed74a.png)
 
-**In Jiuwen.** All three levers are implemented. Prompting: PromptTemplate + PromptSection system in harness/prompts/; RuntimePromptRail for dynamic injection. RAG: full retrieval pipeline via RetrieverConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable — agents start with prompting, retrieval is added via RetrieverConfig, and fine-tuning is run offline on collected trajectories.
+**In Jiuwen.** All three levers are implemented. Prompting: PromptTemplate (core/foundation/prompt/template.py) + PromptSection (core/single_agent/prompts/builder.py); RuntimePromptRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py) for dynamic prompt state. RAG: full retrieval pipeline via RetrievalConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

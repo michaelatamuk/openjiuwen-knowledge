@@ -138,7 +138,7 @@ The relevant knobs are static and named: `top_k` defaults to 5 (no adaptive poli
 
 ![diagram](assets/diagrams/273ba137de748e5a5a1094f191d56ba73e713030.png)
 
-**In Jiuwen.** The four constraint levers are each separately configurable: latency via ModelRequestConfig.timeout (agent-core/openjiuwen/core/foundation/llm/schema/config.py:214); volume via ModelPoolEntry tpm/rpm (agent-core/openjiuwen/agent_teams/models/pool.py:278); accuracy via score_threshold (agent-core/openjiuwen/core/retrieval/common/config.py:47); cost via auto_harness budget_rail dollar cap (agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24). None are inferred automatically — operator must set based on use-case constraints.
+**In Jiuwen.** The four constraint levers are each separately configurable: latency via ModelClientConfig.timeout (agent-core/openjiuwen/core/foundation/llm/schema/config.py:102); volume via IntelliRouterDeployment tpm/rpm (agent-core/openjiuwen/agent_teams/models/pool.py:278); accuracy via score_threshold (agent-core/openjiuwen/core/retrieval/common/config.py:47); cost via the auto-harness BudgetRail dollar cap (agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24). The operator sets them per use case.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -178,7 +178,7 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 ![diagram](assets/diagrams/ca630e75b7187b71287dc7416fd4ded2649dfff7.png)
 
-**In Jiuwen.** Quality measurement: FaithfulnessEvaluator, CorrectnessEvaluator, LLMAsJudge in agent-core/openjiuwen/agent_evolving/evaluator/metrics/. Session costs are tracked separately in jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101 via add_session_usage. Gap: cost and latency are not correlated to per-query eval scores in the pipeline — the cost-accuracy curve must be assembled externally by the operator.
+**In Jiuwen.** Quality measurement: ExactMatchMetric and LLMAsJudgeMetric (agent-core/openjiuwen/agent_evolving/evaluator/metrics/). Session costs are tracked separately in jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101 via add_session_usage. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -218,7 +218,7 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 ![diagram](assets/diagrams/596803976c5e2d9db77510d12bf828c3ab72d6fe.png)
 
-**In Jiuwen.** The framework covers Layers 4-6 directly. Layer 4: agent-core/openjiuwen/core/retrieval/ (vector, hybrid, graph, agentic retrievers). Layer 5: harness/prompts/template.py (prompt), core/context_engine/ (memory + context), core/foundation/tool/base.py (tools), core/agentic/react_agent.py (agent loop). Layer 6: harness/rails/security_rail.py, guardrail_rail.py, subagent/verification_rail.py, guardian_rail.py. Layer 7 infrastructure is delegated: Milvus (vector store), vLLM (local inference), provider APIs, harness/observability/event.py (observability). Layers 1-3 (data pipeline, base model training, inference engine) are external.
+**In Jiuwen.** The framework covers Layers 4-6 directly. Layer 4: agent-core/openjiuwen/core/retrieval/ (vector, hybrid, graph, agentic retrievers). Layer 5: core/foundation/prompt/template.py (prompt), core/context_engine/ (memory + context), core/foundation/tool/base.py (tools), core/single_agent/agents/react_agent.py (ReAct loop). Layer 6: auto_harness/rails/security_rail.py, core/security/guardrail/builtin.py, harness/rails/subagent/verification_rail.py. Layer 7 infrastructure is delegated: Milvus, vLLM, provider APIs, harness/observability/rail.py. Layers 1-3 (data pipeline, base model training, inference engine) are external.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
