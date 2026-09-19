@@ -71,46 +71,51 @@
   word-break: break-all;
 }
 
-/* The active Part is already shown by the header tab — drop the duplicate
-   part/title label at the top of the sidebar navigation. */
-.md-nav--primary > .md-nav__title,
-.md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav__link,
-.md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav > .md-nav__title,
-.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__title {
-  display: none !important;
-}
+/* Desktop sidebar only. The mobile drawer needs the full drill-down tree
+   (part labels, section headers, chevrons, Home), so everything below is
+   scoped to the desktop breakpoint. */
+@media screen and (min-width: 76.25em) {
+  /* The active Part is already shown by the header tab — drop the duplicate
+     part/title label at the top of the sidebar navigation. */
+  .md-nav--primary > .md-nav__title,
+  .md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav__link,
+  .md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav > .md-nav__title,
+  .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__title {
+    display: none !important;
+  }
 
-/* Home is a header tab (and the logo) — don't repeat it in the sidebar. */
-.md-nav--primary > .md-nav__list > .md-nav__item:has(> .md-nav__link[href="index.html"]) {
-  display: none !important;
-}
+  /* Home is a header tab (and the logo) — don't repeat it in the sidebar. */
+  .md-nav--primary > .md-nav__list > .md-nav__item:has(> .md-nav__link[href="index.html"]) {
+    display: none !important;
+  }
 
-/* Sections: quiet group labels (not collapsible headers, not bold). They are
-   always expanded, so drop the chevron and separate groups with a hairline. */
-.md-nav--primary .md-nav__item--nested > .md-nav__link {
-  margin-top: 0.5rem;
-  padding-top: 0.3rem;
-  border-top: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
-  font-size: 0.5rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--md-default-fg-color--light, #8a8a8a);
-}
-.md-nav--primary .md-nav__item--nested:first-child > .md-nav__link {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-.md-nav--primary .md-nav__item--nested > .md-nav__link .md-nav__icon {
-  display: none;
-}
-.md-nav--primary .md-nav__item--nested > .md-nav__link:hover {
-  color: var(--md-default-fg-color, #333);
-}
-/* Topics: clear, normal-weight links with room to breathe. */
-.md-nav--primary .md-nav__item > .md-nav__link {
-  font-size: 0.72rem;
-  padding-top: 0.15rem;
-  padding-bottom: 0.15rem;
+  /* Sections: quiet group labels (not collapsible headers, not bold). They are
+     always expanded, so drop the chevron and separate groups with a hairline. */
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    margin-top: 0.5rem;
+    padding-top: 0.3rem;
+    border-top: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--md-default-fg-color--light, #8a8a8a);
+  }
+  .md-nav--primary .md-nav__item--nested:first-child > .md-nav__link {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .md-nav--primary .md-nav__item--nested > .md-nav__link .md-nav__icon {
+    display: none;
+  }
+  .md-nav--primary .md-nav__item--nested > .md-nav__link:hover {
+    color: var(--md-default-fg-color, #333);
+  }
+  /* Topics: clear, normal-weight links with room to breathe. */
+  .md-nav--primary .md-nav__item > .md-nav__link {
+    font-size: 0.72rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+  }
 }
