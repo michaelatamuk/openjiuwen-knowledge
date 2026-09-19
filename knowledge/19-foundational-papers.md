@@ -79,6 +79,16 @@ ICL is done through prompt construction — `PromptTemplate` (`core/foundation/p
 
 **Concept.** Compute-optimal training is ~20 tokens per parameter. Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen. Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters. For a fixed compute budget, scale model size and training tokens equally. Data matters as much as parameters. Smaller model + more data outperforms larger model + less data.
 
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Pretraining is outside the framework's scope; Chinchilla-aware base-model selection is an operator-level decision.
+---
+
+</details>
+
 ---
 
 ## 5. Training Language Models to Follow Instructions with Human Feedback — InstructGPT (Ouyang, 2022)
@@ -184,6 +194,16 @@ ICL is done through prompt construction — `PromptTemplate` (`core/foundation/p
 
 **Concept.** Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time. Stable supervised objective; enables high-quality image generation. Foundation for Stable Diffusion, DALL-E 2. Inference: start from pure noise, run reverse T steps → generated image. Latent Diffusion Models (Stable Diffusion) compress to a VAE latent space for ~8× compute reduction. Quality levers: steps, guidance scale, scheduler.
 
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Image generation is handled by external tools (`ToolCard` calls); diffusion is not part of the framework.
+---
+
+</details>
+
 ---
 
 ## 12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)
@@ -249,6 +269,16 @@ Infrastructure concern handled by vLLM at the serving layer. Jiuwen manages long
 - MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense.
 
 **Concept.** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Model architecture is opaque to the framework: no MoE-aware routing, expert metadata, or active-parameter tracking.
+---
+
+</details>
 
 ---
 

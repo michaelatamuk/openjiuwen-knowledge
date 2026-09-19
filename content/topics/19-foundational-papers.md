@@ -26,6 +26,7 @@
 
 **Definition:** Compute-optimal training is ~20 tokens per parameter. Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen. Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters. For a fixed compute budget, scale model size and training tokens equally. Data matters as much as parameters. Smaller model + more data outperforms larger model + less data.
 
+**Jiuwen:** Pretraining is outside the framework's scope; Chinchilla-aware base-model selection is an operator-level decision.
 ---
 
 ## 5. Training Language Models to Follow Instructions with Human Feedback — InstructGPT (Ouyang, 2022)
@@ -68,6 +69,7 @@
 
 **Definition:** Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time. Stable supervised objective; enables high-quality image generation. Foundation for Stable Diffusion, DALL-E 2. Inference: start from pure noise, run reverse T steps → generated image. Latent Diffusion Models (Stable Diffusion) compress to a VAE latent space for ~8× compute reduction. Quality levers: steps, guidance scale, scheduler.
 
+**Jiuwen:** Image generation is handled by external tools (`ToolCard` calls); diffusion is not part of the framework.
 ---
 
 ## 12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)
@@ -90,6 +92,7 @@
 
 **Definition:** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
 
+**Jiuwen:** Model architecture is opaque to the framework: no MoE-aware routing, expert metadata, or active-parameter tracking.
 ---
 
 ## 15. Constitutional AI: Harmlessness from AI Feedback (Bai, 2022)

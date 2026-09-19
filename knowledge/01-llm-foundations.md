@@ -123,7 +123,7 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ## 4. Explain how self-attention works in a transformer
 
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **TL;DR.** Each token builds a context-aware representation by attending to every other token, weighting them by query–key similarity.
 
@@ -138,11 +138,32 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ![diagram](assets/diagrams/66307130755ccf7f3e9f6402eb940892bcd5806c.png)
 
+**In Jiuwen.** Attention is the model's job: Jiuwen delegates to hosted models or HuggingFace models loaded by name. Its boundary is the model-client/config layer — it builds request parameters and sends them to a provider, and for a local model it loads a causal LM and consumes the returned logits. Attention lives in the model, not in this codebase.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Attention is the served model's job: provider APIs or HuggingFace models loaded by name. The framework's boundary is the model-client/config layer, which serializes request params, sends them to a provider, and (for the local `transformers` client) calls `AutoModelForCausalLM` and consumes the logits. The only `torch.softmax` in the framework is for token sampling, not attention.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType enum: the model-client provider boundary, no architecture logic |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:1491` | builds hosted request params, delegates computation |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_logit_selection/client.py:227` | torch.no_grad() forward; logit extraction only, no attention code |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175` | AutoModelForCausalLM.from_pretrained(...); attention delegated |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:527` | torch.softmax(...) is sampling, not attention |
+
+</details>
+
 ---
 
 ## 5. What is positional encoding, and why do transformers need it if attention has no inherent sense of order
 
-<span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span>
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
 **TL;DR.** Attention is order-blind, so a position signal must be injected — added to embeddings (sinusoidal/learned) or applied as a rotation to Q/K (RoPE).
 
@@ -156,6 +177,27 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 **Concept.** Self-attention is permutation-equivariant — without positional information it cannot distinguish token order, so "dog bites man" and "man bites dog" yield the same multiset of token representations, only reordered (not one identical output). Positional encoding injects order information — by adding a position-dependent signal to the token representations (sinusoidal/learned), or by rotating the query and key vectors inside attention (RoPE) — so the attention scores can depend on relative or absolute position. Without it the model cannot know sequence order.
 
 ![diagram](assets/diagrams/5cb7b126fbfe5ddc0da4c7d6d95752b7736106fb.png)
+
+**In Jiuwen.** Positional encoding lives inside the model. Jiuwen only passes the relevant knobs through: an attention-implementation hint for HuggingFace and RoPE scaling options for the vLLM engine. Position ids in the RL data pipeline are batching/padding metadata.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Positional encoding is the served model's job. The framework only passes related engine settings through: `attn_implementation` to HuggingFace, and `rope_scaling_type`/`rope_scaling_factor` as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches — batching metadata, not an encoding scheme.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/symphony/retrieval/llm/config.py:88` | attn_implementation: str = "" (HF passthrough) |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:171` | model_kwargs["attn_implementation"] |
+| `agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:42` | rope_scaling_type / rope_scaling_factor vLLM defaults |
+| `agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:584` | rope scaling passed through |
+| `agent-core/openjiuwen/agent_evolving/agent_rl/offline/coordinator/batch_builder.py:175` | position_ids from cumsum(attention_mask) (padding metadata) |
+
+</details>
 
 ---
 
@@ -175,12 +217,29 @@ Tokens are counted by a pluggable `TokenCounter` (an ABC; the tiktoken-backed `T
 
 ![diagram](assets/diagrams/fb1f2ca55148359a593f109aea230cb325aa81b3.png)
 
+**In Jiuwen.** Jiuwen does not classify models as encoder or decoder. Behavior is chosen by provider and by the model-name string. The two HuggingFace loaders it uses reveal intent: causal generation loads a decoder language model, while guardrail classification loads a sequence-classification model (encoder-style). GPT is treated simply as a provider/model name.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Architecture type is selected by model/provider choice rather than a config flag, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
 
 **Implementation diagram**
 
 ![diagram](assets/diagrams/c1a6f128cf56f9ef3f538870f5715ca0444241d1.png)
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType; architecture is not a config dimension |
+| `agent-core/openjiuwen/core/foundation/llm/reasoning_profiles.py:100` | model-family patterns used for reasoning-protocol selection (not architecture) |
+| `agent-core/openjiuwen/core/security/guardrail/backends.py:445` | AutoModelForSequenceClassification |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:174` | model_type limited to None \| "bert" \| "qwen" |
+| `agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175` | AutoModelForCausalLM (decoder-only) |
+| `agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:35` | vLLM architectures string |
 
 </details>
 
