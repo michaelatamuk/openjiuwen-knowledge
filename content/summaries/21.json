@@ -1,0 +1,99 @@
+{
+ "21-1": {
+  "title": "What is an agent harness",
+  "tldr": "A harness wraps a raw agent loop with every production concern the reasoning loop cannot own: outer task loop, safety and injection filtering, permission and sensitive-data enforcement, resilience, memory, observability, and config-driven capability composition.",
+  "points": [
+   "Raw loop: one ReAct episode — model → tools → repeat → final answer.",
+   "Outer task loop: drives the inner agent across multiple episodes toward a long-horizon goal.",
+   "Safety layer: injects guardrails before every model call; checks permissions and detects injection before every tool call.",
+   "Resilience layer: detects LLM stream stalls, loop-detects repeated tool calls, retries transient failures.",
+   "Memory layer: reads context before each pass, writes learned state after each pass.",
+   "Observability layer: structured spans for every model call and tool call; cost metering and budget enforcement.",
+   "Inner loop owns reasoning; harness owns everything else. Inner default 5 iterations, harness outer default 15."
+  ]
+ },
+ "21-2": {
+  "title": "Lifecycle hooks and event points",
+  "tldr": "Lifecycle hooks are callbacks registered at specific execution points; a complete hook set covers the invocation boundary, the task loop boundary, and the inner model/tool call boundary — each at a different granularity.",
+  "points": [
+   "10 event points total: BEFORE/AFTER_INVOKE, BEFORE/AFTER_TASK_ITERATION, BEFORE/AFTER_MODEL_CALL, BEFORE/AFTER_TOOL_CALL, ON_MODEL_EXCEPTION, ON_TOOL_EXCEPTION.",
+   "Hooks at invocation level fire once per outer task; hooks at model-call level fire multiple times per outer pass.",
+   "Hooks are priority-ordered — lower number fires first within each event.",
+   "Hooks can read state, inject context, block an action, or emit observability events without the agent knowing."
+  ]
+ },
+ "21-3": {
+  "title": "Hook vs prompt vs tool",
+  "tldr": "Prompts advise reasoning but cannot enforce it; tools execute a domain action but carry no policy; lifecycle hooks intercept at runtime and are the only layer that can block execution — use them for safety filtering, prompt injection detection, permission gating, sensitive-data enforcement, cost metering, and observability.",
+  "points": [
+   "Prompt: advises reasoning — 'do not return passwords' can be ignored by the model.",
+   "Tool: executes on demand with a defined I/O contract — carries no policy itself.",
+   "Hook: the only layer that can block: BEFORE_TOOL_CALL hooks can veto a harmful action before it executes; AFTER_MODEL_CALL hooks can detect a response that contains a secret before it reaches the user.",
+   "Safety / injection: a hook inspects the full context and vetoes; a prompt cannot intercept user input at call time.",
+   "Permission gating: a hook checks the tool's permission tier before execution, regardless of which task requested it.",
+   "Cost and observability: must intercept after every model call — impractical to encode in every prompt or tool."
+  ]
+ },
+ "21-4": {
+  "title": "Rail registration and assembly",
+  "tldr": "Registration (declare a class in a manifest catalog) and assembly (resolve a spec to instances) are separate steps — capability authoring is decoupled from capability composition per agent type.",
+  "points": [
+   "Registration: each middleware class is declared with a name in the manifest at import time.",
+   "Spec: a declarative ordered list of named middleware types plus per-instance parameters.",
+   "Assembly: spec entries are looked up in the registry, instantiated with their params, appended in order.",
+   "Different agent types use different specs built from the same registry."
+  ]
+ },
+ "21-5": {
+  "title": "Task loop vs single invocation",
+  "tldr": "A single agent invocation runs one ReAct episode; the harness task loop calls it repeatedly, evaluating completion after each pass and giving middleware time to update working memory and check budgets between passes.",
+  "points": [
+   "Single invocation: one ReAct episode, inner iteration limit.",
+   "Task loop: BEFORE_TASK_ITERATION → inner agent → AFTER_TASK_ITERATION, repeated until done or budget exhausted.",
+   "Between passes: middleware updates memory, checks cost quota, injects new context.",
+   "Outer budget is separate from the inner max_iterations."
+  ]
+ },
+ "21-6": {
+  "title": "Testing lifecycle hooks in isolation",
+  "tldr": "Structure hook tests around three concerns: which invariant to assert (blocked call, counter, emitted event), which paths to exercise (happy path and exception paths), and composition (state written by hook A at priority N is visible to hook B at priority N+1).",
+  "points": [
+   "Mock the model client boundary — raise controlled exceptions on specific invocations to exercise ON_TOOL_EXCEPTION and ON_MODEL_EXCEPTION paths; a retry hook never tested on failure is functionally untested.",
+   "Assert hook invariants, not output strings: blocked_calls list, trip_count, typed span log — output varies when any hook modifies context.",
+   "Composition test: register two hooks at known priorities and assert that state written by the higher-priority hook is visible to the lower-priority hook at the same event point.",
+   "No framework test harness exists — each test constructs DeepAgent manually with only the rails under test."
+  ]
+ },
+ "21-7": {
+  "title": "Event bridge model",
+  "tldr": "Inner-agent events (model call, tool call, exceptions) bridge into the inner loop's callback manager so hooks fire at execution time; outer events (invocation boundary, task loop boundary) stay on the outer harness because the inner loop does not know it is being called repeatedly.",
+  "points": [
+   "6 bridged events: BEFORE/AFTER_MODEL_CALL, BEFORE/AFTER_TOOL_CALL, ON_MODEL/TOOL_EXCEPTION — registered in both outer and inner callback managers.",
+   "2 outer-only: BEFORE/AFTER_INVOKE — on the harness only.",
+   "2 deep-only: BEFORE/AFTER_TASK_ITERATION — fired by the outer task loop, no inner equivalent.",
+   "Registering a per-model-call hook as a per-invocation hook is a silent design error — it fires, just at the wrong rate."
+  ]
+ },
+ "21-8": {
+  "title": "Hot-loading middleware",
+  "tldr": "Hot-loading binds new middleware to a live agent without restarting it; needed when capabilities are discovered at runtime (skill libraries, mid-session permission grants, external plugins).",
+  "points": [
+   "Standard middleware is bound at construction and fixed; hot-loading appends to the live pipeline.",
+   "New hook joins the priority order without disrupting hooks that are mid-execution.",
+   "Race risk: binding a callback during an active model call requires lock protection.",
+   "No rollback if hot-bind fails partway through."
+  ]
+ },
+ "21-9": {
+  "title": "Skill evolution pipeline",
+  "tldr": "The harness observes every execution and can extract reusable patterns from those trajectories, stage them as skill experience records, and — with a configurable approval gate — persist them so future agents start with accumulated knowledge rather than from zero.",
+  "points": [
+   "Capture: EvolutionRail collects execution spans into clean windows and applies quality gates before staging.",
+   "Single-agent: SkillEvolutionRail detects reusable tool/reasoning patterns; persists via EvolutionStore.",
+   "Multi-agent: TeamSkillEvolutionRail waits for team completion, aggregates member trajectories, detects collaboration patterns.",
+   "Approval gate: EvolutionInterruptRail routes staged records to user confirmation before persistence (auto_save=True bypasses this).",
+   "Trajectory archive: TrajectoryRail (always last, priority 10) writes one canonical trajectory per invoke for offline analysis, independent of evolution rails.",
+   "Trigger paths: passive signal scanning, periodic self-check follow-up, or explicit /evolve command."
+  ]
+ }
+}

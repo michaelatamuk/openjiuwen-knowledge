@@ -29,7 +29,7 @@ FNAME = {
     "15": "15-evaluation", "16": "16-production-cost-and-scale",
     "17": "17-fine-tuning-and-customization", "18": "18-security-and-safety",
     "19": "19-foundational-papers", "20": "20-ai-system-stack",
-    "21": "21-agent-architectures", "22": "22-agent-failure-patterns",
+    "21": "21-agent-harness-and-rails", "22": "22-agent-failure-patterns",
     "23": "23-cost-latency-accuracy", "24": "24-ai-gateway",
     "25": "25-learning-path",
 }

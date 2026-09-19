@@ -1,6 +1,6 @@
 <div class="topic-nav">
 <span class="topic-nav__link topic-nav__link--off">← Previous</span>
-<a class="topic-nav__link topic-nav__next" href="08-agent-frameworks.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent frameworks</span></a>
+<a class="topic-nav__link topic-nav__next" href="21-agent-harness-and-rails.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent harness and middleware</span></a>
 </div>
 
 # Agent fundamentals and the loop

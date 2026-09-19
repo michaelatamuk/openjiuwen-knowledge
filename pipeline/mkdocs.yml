@@ -47,6 +47,7 @@ nav:
   - Building with agents:
       - Agents:
           - Agent fundamentals & the loop: 05-agent-fundamentals-and-the-loop.md
+          - Agent harness & lifecycle hooks: 21-agent-harness-and-rails.md
           - Agent frameworks: 08-agent-frameworks.md
           - Multi-agent systems: 09-multi-agent-systems.md
       - What the agent uses:
