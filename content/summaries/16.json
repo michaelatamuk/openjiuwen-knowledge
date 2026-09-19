@@ -123,14 +123,5 @@
    "Summarize long chunks before insertion.",
    "Trim conversation history."
   ]
- },
- "16-14": {
-  "title": "Structured agent tracing",
-  "tldr": "Emit typed events (model call, tool call, retrieval, decision) with shared trace/span IDs; print-debugging can't be queried, aggregated, or correlated at scale.",
-  "points": [
-   "Minimum event: trace_id, span_id, event_type, payload, duration_ms.",
-   "Enables: offline replay, production latency monitoring, attached eval scoring.",
-   "Jiuwen: ObservabilityEvent + TraceManager cover model/tool calls; retrieval events are not structured spans."
-  ]
  }
 }

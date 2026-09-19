@@ -287,3 +287,42 @@ The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to s
 </details>
 
 ---
+
+## 8. What is the difference between MCP and A2A, and when do you use each?
+
+<span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** MCP = one LLM + many tools (centralized control); A2A = agents talk to agents (decentralized execution). Use both together in production: MCP within agents, A2A between them.
+
+**Key points.**
+
+- MCP (Model Context Protocol): standardized interface for a single LLM to access external tools — databases, browsers, APIs, code. One brain, centralized tool access.
+- A2A (Agent-to-Agent Protocol): communication protocol for multi-agent systems — each agent has own tools/memory/reasoning; orchestrator delegates, never touches tools directly
+- Key difference: MCP = model in control; A2A = agents in control
+- Use MCP for single-agent assistants with broad tool access; add A2A when specialized agents need to run concurrently
+- Jiuwen: MCP via McpServerConfig; A2A-style delegation via SubagentRail (internal, not A2A wire protocol)
+
+**Concept.** **MCP (Model Context Protocol)** is a standardized interface for connecting a single LLM to external tools — the model stays in control, and MCP provides a universal connector layer so the model can call databases, browsers, APIs, and code tools without custom integration for each. One brain, many tools, centralized control. **A2A (Agent-to-Agent Protocol)** is a communication protocol for multi-agent systems — agents collaborate as peers, each with its own tools, memory, and reasoning loop; an orchestrator delegates to specialized agents rather than touching tools directly. The key difference: MCP = a single model gains tool access; A2A = a network of agents coordinate and hand off work to each other. In practice, both are often used together: MCP governs how each individual agent talks to its tools, while A2A governs how agents talk to each other. Use MCP alone for single-agent assistants that need broad tool access. Add A2A when specialized agents need to run concurrently or in sequence, each with their own tool contexts.
+
+![diagram](assets/diagrams/6c0a558ee8c459ea6049ccd3d87b927db9b31382.png)
+
+**In Jiuwen.** MCP: McpServerConfig (agent-core/openjiuwen/core/foundation/tool/mcp/mcp_config.py:1) configures MCP servers; the MCP client discovers tools via tools/list and invokes via tools/call — this is the MCP pattern: one agent + multiple tool providers. A2A-style delegation: SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1) delegates tasks to specialized sub-agents using SubagentRequest/SubagentResponse schemas. This is internal delegation, not the A2A wire protocol — agents must be in the same Jiuwen deployment; cross-deployment agent-to-agent communication is not implemented.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+MCP is supported via `McpServerConfig` (agent-core/openjiuwen/core/foundation/tool/mcp/base.py) — each server exposes tools that the agent discovers via `tools/list` and calls via `tools/call`. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses `SubagentRail` to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:1` | McpServerConfig (MCP tool discovery + calling) |
+| `agent-core/openjiuwen/core/foundation/tool/mcp/` | MCP client implementation |
+| `agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1` | internal agent delegation (not A2A protocol) |
+
+</details>
+
+---

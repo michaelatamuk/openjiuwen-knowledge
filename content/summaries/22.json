@@ -57,5 +57,14 @@
    "At least three termination paths: (1) success — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, retrieved context cited); (2) budget exhaustion — hard cap on iterations and tokens, with a graceful degraded response rather than silence; (3) human escalation — when the agent has exhausted its budget or detected irresolvable ambiguity, it hands off explicitly rather than looping or hallucinating.",
    "Confidence threshold as an optional fourth: if the model's own uncertainty estimate is above a threshold, escalate before acting."
   ]
+ },
+ "22-7": {
+  "title": "Structured agent tracing",
+  "tldr": "Emit typed events (model call, tool call, retrieval, decision) with shared trace/span IDs; print-debugging can't be queried, aggregated, or correlated at scale.",
+  "points": [
+   "Minimum event: trace_id, span_id, event_type, payload, duration_ms.",
+   "Enables: offline replay, production latency monitoring, attached eval scoring.",
+   "Jiuwen: ObservabilityEvent + TraceManager cover model/tool calls; retrieval events are not structured spans."
+  ]
  }
 }
