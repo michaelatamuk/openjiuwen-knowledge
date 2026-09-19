@@ -45,7 +45,6 @@ nav:
   - Building with agents:
       - The agent:
           - Agent fundamentals & the loop: 05-agent-fundamentals-and-the-loop.md
-          - Agent architectures & protocols: 21-agent-architectures.md
       - What the agent uses:
           - Tools & function calling: 06-tools-and-function-calling.md
           - Planning, memory & state: 07-planning-memory-and-state.md

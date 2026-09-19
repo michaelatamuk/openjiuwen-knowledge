@@ -45,7 +45,6 @@ A real entry looks like this:
 
 #### The agent
 - [Agent fundamentals and the loop](05-agent-fundamentals-and-the-loop.md)
-- [Agent architectures and protocols](21-agent-architectures.md)
 
 #### What the agent uses
 - [Tools and function calling](06-tools-and-function-calling.md)
