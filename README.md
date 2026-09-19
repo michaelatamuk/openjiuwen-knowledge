@@ -45,13 +45,13 @@ A real entry looks like this:
 
 #### The agent
 - [Agent fundamentals and the loop](knowledge/05-agent-fundamentals-and-the-loop.md)
+- [Agent frameworks](knowledge/08-agent-frameworks.md)
 
 #### What the agent uses
 - [Tools and function calling](knowledge/06-tools-and-function-calling.md)
 - [Planning, memory and state](knowledge/07-planning-memory-and-state.md)
 
-#### Composing agents
-- [Agent frameworks](knowledge/08-agent-frameworks.md)
+#### Multiple agents
 - [Multi-agent systems](knowledge/09-multi-agent-systems.md)
 
 #### Making agents reliable

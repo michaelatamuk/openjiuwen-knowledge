@@ -1,78 +1,78 @@
 {
- "sections": [
-  {
-   "title": "The agent",
-   "topics": [
-    "05"
-   ]
-  },
-  {
-   "title": "What the agent uses",
-   "topics": [
-    "06",
-    "07"
-   ]
-  },
-  {
-   "title": "Composing agents",
-   "topics": [
-    "08",
-    "09"
-   ]
-  },
-  {
-   "title": "Making agents reliable",
-   "topics": [
-    "22",
-    "15"
-   ]
-  },
-  {
-   "title": "Running agents",
-   "topics": [
-    "16",
-    "24"
-   ]
-  },
-  {
-   "title": "Securing agents",
-   "topics": [
-    "18"
-   ]
-  },
-  {
-   "title": "The model",
-   "topics": [
-    "01",
-    "20",
-    "19"
-   ]
-  },
-  {
-   "title": "Working with the model",
-   "topics": [
-    "02",
-    "04",
-    "17",
-    "23"
-   ]
-  },
-  {
-   "title": "Retrieval internals",
-   "topics": [
-    "10",
-    "11",
-    "12",
-    "14",
-    "13"
-   ]
-  },
-  {
-   "title": "Background",
-   "topics": [
-    "00",
-    "03"
-   ]
-  }
- ]
+  "sections": [
+    {
+      "title": "The agent",
+      "topics": [
+        "05",
+        "08"
+      ]
+    },
+    {
+      "title": "What the agent uses",
+      "topics": [
+        "06",
+        "07"
+      ]
+    },
+    {
+      "title": "Multiple agents",
+      "topics": [
+        "09"
+      ]
+    },
+    {
+      "title": "Making agents reliable",
+      "topics": [
+        "22",
+        "15"
+      ]
+    },
+    {
+      "title": "Running agents",
+      "topics": [
+        "16",
+        "24"
+      ]
+    },
+    {
+      "title": "Securing agents",
+      "topics": [
+        "18"
+      ]
+    },
+    {
+      "title": "The model",
+      "topics": [
+        "01",
+        "20",
+        "19"
+      ]
+    },
+    {
+      "title": "Working with the model",
+      "topics": [
+        "02",
+        "04",
+        "17",
+        "23"
+      ]
+    },
+    {
+      "title": "Retrieval internals",
+      "topics": [
+        "10",
+        "11",
+        "12",
+        "14",
+        "13"
+      ]
+    },
+    {
+      "title": "Background",
+      "topics": [
+        "00",
+        "03"
+      ]
+    }
+  ]
 }
