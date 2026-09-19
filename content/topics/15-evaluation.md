@@ -628,31 +628,7 @@ flowchart TD
 
 ---
 
-## 24. "How do you know it's working" is testing evaluation depth
-
-**General:** This claim holds: it makes the same evaluation-depth point as its companion, under a second heading from another source. faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. In practice: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
-
-**Jiuwen:** Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI rubric, `evaluator_pipeline`), but there is no faithfulness/relevance metric (judges lack the retrieved context), no retrieval metric layer, no CI quality gate (lint/type-check only), no human-sampling pipeline, and no production quality monitoring. The "how would you know it got worse" follow-up exposes real gaps.
-
-```mermaid
-flowchart TD
-    Q["how do you know it works / got worse?"] --> F["faithfulness (absent: no context to judge)"]
-    Q --> R["relevance (absent)"]
-    Q --> H["human sampling (absent)"]
-    Q --> G["regression before deploy (CI = lint/type-check only)"]
-    Q --> OK["offline: exact-match + LLM judge + RSI rubric (present)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — no context input; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12</code> — exact match<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — benchmark eval<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — lint/type-check only; <code>agent-core/pyproject.toml:236</code> — markers not invoked<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code> (operations, not quality)</sub>
-
-</details>
-
----
-
-## 25. Building a retrieval eval set without labeled relevant documents yet
+## 24. Building a retrieval eval set without labeled relevant documents yet
 
 **General:** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
 
@@ -685,7 +661,7 @@ flowchart TD
 
 ---
 
-## 26. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+## 25. How do you test a non-deterministic agent — what does a passing test suite actually assert?
 
 **General:** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
 

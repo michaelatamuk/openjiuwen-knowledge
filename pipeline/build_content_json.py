@@ -32,8 +32,8 @@ SECTIONS_JSON = os.path.join(CONTENT_DIR, "sections.json")
 CLASSIFICATION_JSON = os.path.join(CONTENT_DIR, "classification.json")
 
 # Entries whose title is a claim (from the pattern docs), not a question.
-CLAIMS = {"01-16", "02-5", "04-3", "05-9", "05-10", "13-9", "13-10",
-          "15-23", "15-24", "16-9", "18-10", "18-11"}
+CLAIMS = {"01-16", "02-5", "04-3", "05-9", "13-9", "13-10",
+          "15-23", "16-9", "18-10", "18-11"}
 
 MH = re.compile(r"^##\s*(?:(\d+)\.\s*)?(.+)$")
 DIAGRAM = re.compile(r"```mermaid\r?\n(.*?)```", re.S)

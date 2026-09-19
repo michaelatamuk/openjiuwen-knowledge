@@ -79,10 +79,6 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> R[\"retrieve\"]\n    R --> E{\"enough to answer?\"}\n    E -->|no| R2[\"reformulate + retrieve again\"]\n    R2 --> CAP{\"hop budget reached?\"}\n    CAP -->|no| R\n    CAP -->|yes| STOP[\"stop and answer with what we have\"]\n    E -->|yes| ANS[\"answer\"]"
  },
- "05-8": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
- },
  "06-2": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    TOOL[\"tool function + schema\"] --> REG[\"register with the agent/framework\"]\n    REG --> LIST[\"expose tool definitions\"]\n    LIST --> MODEL[\"provider tool-use API\"]\n    MODEL --> CALL[\"model emits a tool call\"]"
@@ -143,10 +139,6 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    TOOLS[\"agent calls tools repeatedly\"] --> CAPS[\"cap iterations + token/step budget\"]\n    TOOLS --> CACHE[\"cache / dedup identical calls\"]\n    TOOLS --> ROUTE[\"route simple calls to a cheaper model\"]\n    CAPS --> SAVE[\"bounded cost\"]\n    CACHE --> SAVE\n    ROUTE --> SAVE"
  },
- "15-19": {
-  "technical": "__existing__",
-  "concept": "flowchart LR\n    TRAFFIC[\"live traffic\"] --> SAMPLE[\"sample + log\"]\n    SAMPLE --> METRICS[\"quality metrics (groundedness · relevance · task success)\"]\n    METRICS --> ALERT{\"regression?\"}\n    ALERT -->|yes| ROLLBACK[\"alert / roll back\"]\n    ALERT -->|no| MONITOR[\"keep monitoring\"]"
- },
  "16-3": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    SCALE[\"usage scales unpredictably\"] --> LEVERS[\"levers\"]\n    LEVERS --> SMALL[\"route simple queries to smaller models\"]\n    LEVERS --> CACHE[\"cache repeated / similar queries\"]\n    LEVERS --> BUDGET[\"per-user / session budgets + caps\"]\n    LEVERS --> BATCH[\"batch work, reduce top-k\"]"
@@ -196,5 +188,13 @@
  },
  "05-5": {
   "concept": "flowchart TD\n    subgraph PLAN[\"Plan everything upfront\"]\n    I1([\"input\"]) --> P[\"plan all steps\"] --> S1[\"step 1\"] --> S2[\"step 2\"] --> O1([\"answer\"])\n    end\n    subgraph LOOP[\"ReAct loop\"]\n    direction TB\n        I2([\"input\"]) --> R[\"Reason: model call\"]\n        R --> D{\"tool calls?\"}\n        D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    end\n    D -->|\"no tool calls\"| O2([\"answer\"])"
+ },
+ "05-8": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
+ },
+ "15-19": {
+  "technical": "__existing__",
+  "concept": "flowchart LR\n    TRAFFIC[\"live traffic\"] --> SAMPLE[\"sample + log\"]\n    SAMPLE --> METRICS[\"quality metrics (groundedness · relevance · task success)\"]\n    METRICS --> ALERT{\"regression?\"}\n    ALERT -->|yes| ROLLBACK[\"alert / roll back\"]\n    ALERT -->|no| MONITOR[\"keep monitoring\"]"
  }
 }

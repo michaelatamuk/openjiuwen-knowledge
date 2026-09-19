@@ -897,49 +897,7 @@ Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, 
 
 ---
 
-## 24. "How do you know it's working" is testing evaluation depth
-
-<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
-
-**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
-
-**TL;DR.** 'How do you know it's working' is testing evaluation depth.
-
-**Key points.**
-
-- Offline answer-level eval exists.
-- No faithfulness/relevance metric.
-- No retrieval metric layer.
-- No CI quality gate.
-
-**Concept.** This claim holds: it makes the same evaluation-depth point as its companion, under a second heading from another source. faithfulness scoring (does output match retrieved context), relevance scoring (does it answer the query), human eval on a rotating sample, and regression testing before every deploy — not just at launch. In practice: a frozen labeled set, stage-level metrics (retrieval recall/NDCG; generation faithfulness/relevance), a CI regression gate with a baseline threshold, periodic human sampling, and production monitoring with drift alerts.
-
-![diagram](assets/diagrams/89f2dff7d52788034ab87f32c69f65269f39ba6d.png)
-
-**In Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, rubric, pipeline pass rate), but there is no faithfulness or relevance metric (the judges lack the retrieved context), no retrieval metric layer, and no CI quality gate (the gate is lint and type-check).
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI rubric, `evaluator_pipeline`), but there is no faithfulness/relevance metric (judges lack the retrieved context), no retrieval metric layer, no CI quality gate (lint/type-check only), no human-sampling pipeline, and no production quality monitoring. The "how would you know it got worse" follow-up exposes real gaps.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | no context input; agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12 — exact match |
-| `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | weighted rubric |
-| `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167` | benchmark eval |
-| `agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21` | lint/type-check only; agent-core/pyproject.toml:236 — markers not invoked |
-| `jiuwenswarm/jiuwenswarm/observability/store.py:102` | has_error (operations, not quality) |
-
-</details>
-
----
-
-## 25. Building a retrieval eval set without labeled relevant documents yet
+## 24. Building a retrieval eval set without labeled relevant documents yet
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -978,7 +936,7 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 ---
 
-## 26. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+## 25. How do you test a non-deterministic agent — what does a passing test suite actually assert?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 

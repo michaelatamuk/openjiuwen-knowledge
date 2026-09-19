@@ -373,50 +373,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 10. "The agent is stuck in a loop" is testing production experience
-
-<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
-
-**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
-
-**TL;DR.** 'The agent is stuck in a loop' is testing production experience.
-
-**Key points.**
-
-- ReAct max_iterations (5; harness 15).
-- Agentic retriever max_iter (2, clamped).
-- Anomaly rail compact/abort.
-- Dedup rail; idempotent=False default.
-
-**Concept.** This claim is largely true, with a caveat: the framing rewards production experience, but the same question is answerable as knowledge about loop guards and budgets. max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
-
-![diagram](assets/diagrams/d4fd725ea53f07614ecafbef9e25f235267abd2b.png)
-
-**In Jiuwen.** Caps are concrete: ReAct max iterations (5, harness 15), agentic-retriever max iterations (2, clamped), an anomaly-detection rail (identical tool rounds trigger compaction or abort), a tool-call dedup rail, and secure-by-default non-idempotent tool handling.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max_iter` (2, clamped), `ModelAnomalyDetectionRail` (identical tool rounds → compact/abort), `ToolCallDeduplicationRail`, and secure-by-default `idempotent=False` (non-idempotent tools never retried). A session cost cap is enforced when the provider reports cost; a per-step token budget in the task loop is wired but off by default.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` | max_iterations=5; agent-core/openjiuwen/harness/schema/config.py:252 — harness 15 |
-| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133` | max_iter=2 clamped |
-| `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90` | loop compact/abort |
-| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | idempotent default False |
-| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128/145` | non-idempotent guard + retry budget |
-| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | session cost cap |
-
-</details>
-
----
-
-## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+## 10. How do you detect and prevent divergence in an agent loop — not just cap iterations?
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -445,7 +402,7 @@ Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max
 
 ---
 
-## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+## 11. What are the explicit termination conditions an agent needs — beyond "stop when done"?
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -475,7 +432,7 @@ Multiple termination paths are implemented. `ReactAgent.max_iterations` is the h
 
 ---
 
-## 13. When should you use a deterministic workflow instead of an autonomous agent?
+## 12. When should you use a deterministic workflow instead of an autonomous agent?
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 

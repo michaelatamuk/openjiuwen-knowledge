@@ -264,32 +264,7 @@ flowchart TD
 
 ---
 
-## 10. "The agent is stuck in a loop" is testing production experience
-
-**General:** This claim is largely true, with a caveat: the framing rewards production experience, but the same question is answerable as knowledge about loop guards and budgets. max iteration limits per task, token budget caps per step, detecting and killing a failing loop before it burns cost, and retry logic on failed tool calls without infinite recursion. The controls are a hard iteration cap, a per-session/step token or cost budget, repetition detection on canonicalized `(tool, args)`, and bounded retries that never retry non-idempotent tools.
-
-**Jiuwen:** Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max_iter` (2, clamped), `ModelAnomalyDetectionRail` (identical tool rounds → compact/abort), `ToolCallDeduplicationRail`, and secure-by-default `idempotent=False` (non-idempotent tools never retried). A session cost cap is enforced when the provider reports cost; a per-step token budget in the task loop is wired but off by default.
-
-```mermaid
-flowchart TD
-    L["agent stuck in a loop"] --> CAP["hard iteration cap"]
-    L --> DED["repeated (tool, args) detection"]
-    L --> BUD["session token / cost budget"]
-    L --> CB["circuit breaker after repeated failures"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations=5</code>; <code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness 15<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133</code> — <code>max_iter=2</code> clamped<br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90</code> — loop compact/abort<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code> — <code>idempotent</code> default <code>False</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128/145</code> — non-idempotent guard + retry budget<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap</sub>
-
-</details>
-
-<sub>_Canonical source: `source/ai-engineer-interview-patterns_for_engineers.md`; also covered in: ai-agent, ai-technical._</sub>
-
----
-
-## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+## 10. How do you detect and prevent divergence in an agent loop — not just cap iterations?
 
 **General:** A hard iteration cap (`max_iterations`) prevents runaway loops by time but does not detect that the agent is *stuck repeating itself*. Divergence detection is a complementary mechanism: (1) hash `(tool_name, canonicalised_args)` on each turn and compare against prior turns — if the same call recurs, the agent is spinning; (2) compare model output text similarity across consecutive turns — if the reasoning text is structurally identical, the agent is not making progress; (3) on detection, trigger a compaction step (rewrite history to remove the reinforcing noise) before continuing, rather than simply aborting. The goal is to detect the loop early and repair the context, not just stop at a budget limit.
 
@@ -317,7 +292,7 @@ flowchart TD
 
 ---
 
-## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+## 11. What are the explicit termination conditions an agent needs — beyond "stop when done"?
 
 **General:** "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) **success** — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) **budget exhaustion** — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) **human escalation** — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.
 
@@ -346,7 +321,7 @@ flowchart TD
 
 ---
 
-## 13. When should you use a deterministic workflow instead of an autonomous agent?
+## 12. When should you use a deterministic workflow instead of an autonomous agent?
 
 **General:** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
 

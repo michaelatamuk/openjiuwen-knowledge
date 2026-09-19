@@ -1,124 +1,114 @@
 {
-  "05-1": {
-    "title": "Chatbot vs agent",
-    "tldr": "A chatbot maps one input to one model reply; an agent runs a loop (model \u2192 tools \u2192 results \u2192 repeat) until a stopping condition.",
-    "points": [
-      "Chatbot: one model turn, no tools.",
-      "Agent: tool/reason loop with a stopping rule.",
-      "The loop and tools, not the model, define an agent."
-    ]
-  },
-  "05-2": {
-    "title": "Workflow vs agent",
-    "tldr": "A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.",
-    "points": [
-      "Workflow: fixed topology, predictable, cheap.",
-      "Agent: runtime branching on model output.",
-      "A workflow can embed an agent as a node."
-    ]
-  },
-  "05-3": {
-    "title": "Linear chain vs conditional graph",
-    "tldr": "A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).",
-    "points": [
-      "Linear: static edges, fixed order.",
-      "Graph: conditional edges route by state.",
-      "Join/barrier gates merge nodes."
-    ]
-  },
-  "05-4": {
-    "title": "ReAct pattern",
-    "tldr": "ReAct alternates thought \u2192 action \u2192 observation, so each tool result informs the next reasoning step.",
-    "points": [
-      "Alternates reason, act, observe.",
-      "Each observation feeds the next thought.",
-      "Repeats until there are no tool calls."
-    ]
-  },
-  "05-5": {
-    "title": "Why interleave reasoning and actions",
-    "tldr": "A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.",
-    "points": [
-      "An upfront plan executes with no feedback.",
-      "Interleaving grounds each step in real results.",
-      "Adapts when reality differs from the plan."
-    ]
-  },
-  "05-6": {
-    "title": "Hard iteration limit",
-    "tldr": "Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.",
-    "points": [
-      "Max iterations/rounds, enforced.",
-      "Add token and wall-clock budgets.",
-      "Cap each nested loop; make caps configurable."
-    ]
-  },
-  "05-7": {
-    "title": "What stops an agent",
-    "tldr": "Usually the model: no tool calls means the answer is final. Around that sit hard limits \u2014 max iterations, token/time budgets, explicit stop conditions.",
-    "points": [
-      "No tool calls \u2192 final answer.",
-      "Hard limits: iterations, tokens, time.",
-      "Outer loop: stop evaluators + completion promise."
-    ]
-  },
-  "05-8": {
-    "title": "Infinite tool-calling loop",
-    "tldr": "Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.",
-    "points": [
-      "Iteration cap.",
-      "Repetition detection on canonicalized args.",
-      "No-progress nudge/abort + token/time caps."
-    ]
-  },
-  "05-9": {
-    "title": "'The agent is stuck': tests shipped experience",
-    "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
-    "points": [
-      "ReAct max_iterations (5; harness 15).",
-      "Agentic retriever max iter (2, clamped).",
-      "Anomaly rail: identical rounds \u2192 compact/abort.",
-      "Dedup rail + session cost cap."
-    ]
-  },
-  "05-10": {
-    "title": "'Stuck in a loop': production experience",
-    "tldr": "'The agent is stuck in a loop' is testing production experience.",
-    "points": [
-      "ReAct max_iterations (5; harness 15).",
-      "Agentic retriever max_iter (2, clamped).",
-      "Anomaly rail compact/abort.",
-      "Dedup rail; idempotent=False default."
-    ]
-  },
-  "05-11": {
-    "title": "Divergence detection",
-    "tldr": "Cap iterations to stop infinite loops, but also detect meaningless cycling: track tool-call fingerprints and output-text similarity to catch repetitive steps early.",
-    "points": [
-      "ToolCallDeduplicationRail suppresses repeated identical calls within a session.",
-      "ModelAnomalyDetectionRail detects repeated outputs (off by default).",
-      "Gap: no output-text similarity comparison across turns to catch paraphrase loops."
-    ]
-  },
-  "05-12": {
-    "title": "Explicit termination conditions",
-    "tldr": "An agent needs named success, budget-exceeded, and escalation exit paths \u2014 not just 'stop when done' \u2014 so every run terminates predictably and failures degrade gracefully.",
-    "points": [
-      "Success: structured_output or answer action fires.",
-      "Budget: turn/token cap, CircuitBreakerRail.",
-      "Escalation: AskUserRail for human input.",
-      "Gap: no graceful degraded response from any path \u2014 budget exhaustion raises rather than returns a partial result."
-    ]
-  },
-  "05-13": {
-    "title": "Workflows vs autonomous agents",
-    "tldr": "Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.",
-    "points": [
-      "Workflow: fixed developer-defined step sequence \u2014 deterministic, bounded cost, enumerable failure modes, unit-testable.",
-      "Agent: model-driven loop \u2014 model chooses tools and termination, flexible but non-deterministic and harder to test.",
-      "Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.",
-      "Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.",
-      "Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required \u2014 build the workflow path first."
-    ]
-  }
+ "05-1": {
+  "title": "Chatbot vs agent",
+  "tldr": "A chatbot maps one input to one model reply; an agent runs a loop (model → tools → results → repeat) until a stopping condition.",
+  "points": [
+   "Chatbot: one model turn, no tools.",
+   "Agent: tool/reason loop with a stopping rule.",
+   "The loop and tools, not the model, define an agent."
+  ]
+ },
+ "05-2": {
+  "title": "Workflow vs agent",
+  "tldr": "A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.",
+  "points": [
+   "Workflow: fixed topology, predictable, cheap.",
+   "Agent: runtime branching on model output.",
+   "A workflow can embed an agent as a node."
+  ]
+ },
+ "05-3": {
+  "title": "Linear chain vs conditional graph",
+  "tldr": "A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).",
+  "points": [
+   "Linear: static edges, fixed order.",
+   "Graph: conditional edges route by state.",
+   "Join/barrier gates merge nodes."
+  ]
+ },
+ "05-4": {
+  "title": "ReAct pattern",
+  "tldr": "ReAct alternates thought → action → observation, so each tool result informs the next reasoning step.",
+  "points": [
+   "Alternates reason, act, observe.",
+   "Each observation feeds the next thought.",
+   "Repeats until there are no tool calls."
+  ]
+ },
+ "05-5": {
+  "title": "Why interleave reasoning and actions",
+  "tldr": "A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.",
+  "points": [
+   "An upfront plan executes with no feedback.",
+   "Interleaving grounds each step in real results.",
+   "Adapts when reality differs from the plan."
+  ]
+ },
+ "05-6": {
+  "title": "Hard iteration limit",
+  "tldr": "Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.",
+  "points": [
+   "Max iterations/rounds, enforced.",
+   "Add token and wall-clock budgets.",
+   "Cap each nested loop; make caps configurable."
+  ]
+ },
+ "05-7": {
+  "title": "What stops an agent",
+  "tldr": "Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.",
+  "points": [
+   "No tool calls → final answer.",
+   "Hard limits: iterations, tokens, time.",
+   "Outer loop: stop evaluators + completion promise."
+  ]
+ },
+ "05-8": {
+  "title": "Infinite tool-calling loop",
+  "tldr": "Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.",
+  "points": [
+   "Iteration cap.",
+   "Repetition detection on canonicalized args.",
+   "No-progress nudge/abort + token/time caps."
+  ]
+ },
+ "05-9": {
+  "title": "'The agent is stuck': tests shipped experience",
+  "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
+  "points": [
+   "ReAct max_iterations (5; harness 15).",
+   "Agentic retriever max iter (2, clamped).",
+   "Anomaly rail: identical rounds → compact/abort.",
+   "Dedup rail + session cost cap."
+  ]
+ },
+ "05-10": {
+  "title": "Divergence detection",
+  "tldr": "Cap iterations to stop infinite loops, but also detect meaningless cycling: track tool-call fingerprints and output-text similarity to catch repetitive steps early.",
+  "points": [
+   "ToolCallDeduplicationRail suppresses repeated identical calls within a session.",
+   "ModelAnomalyDetectionRail detects repeated outputs (off by default).",
+   "Gap: no output-text similarity comparison across turns to catch paraphrase loops."
+  ]
+ },
+ "05-11": {
+  "title": "Explicit termination conditions",
+  "tldr": "An agent needs named success, budget-exceeded, and escalation exit paths — not just 'stop when done' — so every run terminates predictably and failures degrade gracefully.",
+  "points": [
+   "Success: structured_output or answer action fires.",
+   "Budget: turn/token cap, CircuitBreakerRail.",
+   "Escalation: AskUserRail for human input.",
+   "Gap: no graceful degraded response from any path — budget exhaustion raises rather than returns a partial result."
+  ]
+ },
+ "05-12": {
+  "title": "Workflows vs autonomous agents",
+  "tldr": "Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.",
+  "points": [
+   "Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.",
+   "Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.",
+   "Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.",
+   "Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.",
+   "Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first."
+  ]
+ }
 }
