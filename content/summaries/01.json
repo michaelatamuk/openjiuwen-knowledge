@@ -161,5 +161,32 @@
    "Stage 3 RLHF or DPO: policy optimization toward reward model — produces instruction-following, safety-refusing behavior",
    "Jiuwen: no base/instruct distinction in config; SFT path in agent_rl/ is the stage that produces an instruct model from a base"
   ]
+ },
+ "01-18": {
+  "title": "",
+  "tldr": "The key-value cache in the transformer attention mechanism stores the K and V tensors for every processed token.",
+  "points": [
+   "On a repeated prefix the provider reuses cached tensors, reducing input cost (cache hits are a fraction of normal input price)",
+   "Put stable prompt prefixes (system prompt, few-shot examples) first; variable content last",
+   "Distinguish the inference-layer KV cache (per-request, inside the GPU) from provider-level prompt caching (persisted across requests)",
+   "The framework can observe cache hits via `cached_input_tokens` but cannot control provider-side cache policy"
+  ]
+ },
+ "01-19": {
+  "title": "",
+  "tldr": "The path from calling `client.chat()` to the first token: nine steps, of which the later ones are the provider's infrastructure.",
+  "points": [
+   "SDK constructs a JSON payload",
+   "HTTPS request to the provider API",
+   "API gateway authenticates and rate-limits",
+   "Load balancer selects a server",
+   "Tokenizer converts the prompt to token IDs",
+   "GPU executes prefill (all input tokens in parallel)",
+   "GPU executes the decode loop (one token per step, KV cache active)",
+   "Tokens stream back as SSE",
+   "Usage metadata is attached to the final chunk",
+   "Prefill is compute-bound; decode is memory-bandwidth-bound",
+   "Your code controls request construction and the response; gateway, load balancer, tokenization, and serving are the provider's"
+  ]
  }
 }

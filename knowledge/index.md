@@ -68,15 +68,14 @@ A real entry looks like this:
 ### Part II — Under the hood
 
 #### The model
-- [LLM foundations](01-llm-foundations.md)
-- [AI system stack](20-ai-system-stack.md)
+- [How LLMs work](01-llm-foundations.md)
 - [Foundational papers](19-foundational-papers.md)
+- [Serving and infrastructure](20-ai-system-stack.md)
 
 #### Working with the model
 - [Prompting and output control](02-prompting-and-output-control.md)
-- [Choosing models and approaches](04-choosing-models-and-approaches.md)
+- [Choosing models and tradeoffs](04-choosing-models-and-approaches.md)
 - [Fine-tuning and customization](17-fine-tuning-and-customization.md)
-- [Cost, latency and accuracy tradeoffs](23-cost-latency-accuracy.md)
 
 #### Retrieval internals
 - [RAG pipelines and patterns](10-rag-pipelines-and-patterns.md)

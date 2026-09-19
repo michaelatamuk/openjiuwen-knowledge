@@ -61,14 +61,13 @@ nav:
           - Security & safety: 18-security-and-safety.md
   - Under the hood:
       - The model:
-          - LLM foundations: 01-llm-foundations.md
-          - AI system stack: 20-ai-system-stack.md
+          - How LLMs work: 01-llm-foundations.md
           - Foundational papers: 19-foundational-papers.md
+          - Serving & infrastructure: 20-ai-system-stack.md
       - Working with the model:
           - Prompting & output control: 02-prompting-and-output-control.md
-          - Choosing models & approaches: 04-choosing-models-and-approaches.md
+          - Choosing models & tradeoffs: 04-choosing-models-and-approaches.md
           - Fine-tuning & customization: 17-fine-tuning-and-customization.md
-          - Cost, latency & accuracy tradeoffs: 23-cost-latency-accuracy.md
       - Retrieval internals:
           - RAG pipelines & patterns: 10-rag-pipelines-and-patterns.md
           - Retrieval & ranking: 11-retrieval-and-ranking.md
