@@ -71,8 +71,6 @@ flowchart LR
 
 **General:** Each token is projected into three vectors — query, key, value. The query of a token is dot-producted with the keys of all tokens (scaled by `1/√d_k`), softmaxed into attention weights, and used to take a weighted sum of the values. Doing this with multiple heads in parallel and stacking layers lets each token aggregate information from every other token, with the weights computed from content rather than position. The result is a context-dependent representation per token.
 
-**Jiuwen:** Attention is the served model's job: provider APIs or HuggingFace models loaded by name. The framework's boundary is the model-client/config layer, which serializes request params, sends them to a provider, and (for the local `transformers` client) calls `AutoModelForCausalLM` and consumes the logits. The only `torch.softmax` in the framework is for token sampling, not attention.
-
 ```mermaid
 flowchart LR
     TOK["tokens"] --> PROJ["Q / K / V projection"]
@@ -82,13 +80,6 @@ flowchart LR
     OUT --> CTX(["context-dependent token representations"])
     TOK -.->|"in Jiuwen: delegated"| API["provider API or HF AutoModelForCausalLM"]
 ```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> enum: the model-client provider boundary, no architecture logic<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:1491</code> — builds hosted request params, delegates computation<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_logit_selection/client.py:227</code> — <code>torch.no_grad()</code> forward; logit extraction only, no attention code<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175</code> — <code>AutoModelForCausalLM.from_pretrained(...)</code>; attention delegated<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:527</code> — <code>torch.softmax(...)</code> is sampling, not attention</sub>
-
-</details>
 
 **Gap.** Absent. The closest abstractions are `ModelClientConfig`/`ModelRequestConfig` (provider boundary) and the HF `AutoModelForCausalLM` load.
 
@@ -100,8 +91,6 @@ flowchart LR
 
 **General:** Self-attention is permutation-equivariant — without positional information it cannot distinguish token order, so "dog bites man" and "man bites dog" yield the same multiset of token representations, only reordered (not one identical output). Positional encoding injects order information — by adding a position-dependent signal to the token representations (sinusoidal/learned), or by rotating the query and key vectors inside attention (RoPE) — so the attention scores can depend on relative or absolute position. Without it the model cannot know sequence order.
 
-**Jiuwen:** Positional encoding is the served model's job. The framework only passes related engine settings through: `attn_implementation` to HuggingFace, and `rope_scaling_type`/`rope_scaling_factor` as vLLM engine args. In the RL data pipeline, `position_ids` are computed for padded training batches — batching metadata, not an encoding scheme.
-
 ```mermaid
 flowchart LR
     T["token embeddings (order-agnostic)"] --> ADD["+ positional signal"]
@@ -109,13 +98,6 @@ flowchart LR
     ADD -.->|"sinusoidal / learned / RoPE"| PE["encoding"]
     ATT -.->|"Jiuwen: delegated"| CFG["attn_implementation (HF) · rope_scaling_type/factor (vLLM)"]
 ```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/config.py:88</code> — <code>attn_implementation: str = ""</code> (HF passthrough)<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:171</code> — <code>model_kwargs["attn_implementation"]</code><br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:42</code> — <code>rope_scaling_type</code> / <code>rope_scaling_factor</code> vLLM defaults<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:584</code> — rope scaling passed through<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/offline/coordinator/batch_builder.py:175</code> — <code>position_ids</code> from <code>cumsum(attention_mask)</code> (padding metadata)</sub>
-
-</details>
 
 **Gap.** Absent. Closest = passthrough config (`attn_implementation`, `rope_scaling_*`).
 
@@ -127,8 +109,6 @@ flowchart LR
 
 **General:** Encoder-only models (BERT) read bidirectional context and produce representations — good for classification, embedding, extraction. Decoder-only models (GPT) are autoregressive: they predict the next token attending only leftward, which makes them generators. Encoder-decoder models (T5, original Transformer) encode an input and generate an output, suited to translation/summarization. GPT is decoder-only.
 
-**Jiuwen:** Architecture type is selected by model/provider choice rather than a config flag, no `is_encoder_decoder`/`is_decoder` flag, and no encoder/decoder classification. Behavior is selected by **provider type** and **model-name string** (model-family patterns also drive reasoning/thinking wire protocols and tokenizer selection). The two HuggingFace classes named in the repo imply the intent: causal generation uses `AutoModelForCausalLM` (decoder-only), and guardrail classification uses `AutoModelForSequenceClassification` (typically an encoder-style classifier). GPT is handled purely as a provider/model name.
-
 ```mermaid
 flowchart TD
     M{"model usage in Jiuwen"} --> GEN["generation → AutoModelForCausalLM (decoder-only)"]
@@ -136,13 +116,6 @@ flowchart TD
     M --> API["hosted GPT/Claude/… → ProviderType + model_name string"]
     API -.->|"no encoder/decoder taxonomy"| X["architecture not a config dimension"]
 ```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code>; architecture is not a config dimension<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/reasoning_profiles.py:100</code> — model-family patterns used for reasoning-protocol selection (not architecture)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:445</code> — <code>AutoModelForSequenceClassification</code><br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:174</code> — <code>model_type</code> limited to <code>None | "bert" | "qwen"</code><br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175</code> — <code>AutoModelForCausalLM</code> (decoder-only)<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/search/service/serving.py:35</code> — vLLM <code>architectures</code> string</sub>
-
-</details>
 
 <sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: engineering, genai, llm-fund._</sub>
 
