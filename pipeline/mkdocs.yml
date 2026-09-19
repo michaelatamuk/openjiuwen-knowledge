@@ -17,6 +17,8 @@ theme:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
   features:
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - navigation.expand

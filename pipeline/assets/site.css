@@ -70,3 +70,17 @@
   font-size: 0.72em;
   word-break: break-all;
 }
+
+/* The active Part is already shown by the header tab — drop the duplicate
+   part/title label at the top of the sidebar navigation. */
+.md-nav--primary > .md-nav__title,
+.md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav__link,
+.md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav > .md-nav__title,
+.md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__title {
+  display: none !important;
+}
+
+/* Home is a header tab (and the logo) — don't repeat it in the sidebar. */
+.md-nav--primary > .md-nav__list > .md-nav__item:has(> .md-nav__link[href="index.html"]) {
+  display: none !important;
+}
