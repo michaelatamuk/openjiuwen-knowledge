@@ -298,7 +298,7 @@ Model architecture opaque to framework; no MoE-aware routing, expert metadata, o
 
 **Implementation**
 
-Safety uses static classifiers (`SecurityRail`, `GuardrailRail`, `GuardianRail`); no self-critique loop, no constitution file.
+Safety uses static classifiers (`SecurityRail`, `PromptInjectionGuardrail`, `GuardianRail`); no self-critique loop, no constitution file.
 
 </details>
 

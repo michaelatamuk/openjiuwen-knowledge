@@ -183,7 +183,7 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 **Implementation**
 
-`agent_evolving/evaluator/` has `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudge` — a principled eval framework for quality measurement. `dev_tools/tune/Trainer` supports `early_stop_score` for automated quality gating. Gaps: cost and latency are not recorded *alongside* quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in `usage_cost.py` but not correlated to per-query eval scores.
+`agent_evolving/evaluator/` has `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric` — a principled eval framework for quality measurement. `dev_tools/tune/Trainer` supports `early_stop_score` for automated quality gating. Gaps: cost and latency are not recorded *alongside* quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in `usage_cost.py` but not correlated to per-query eval scores.
 
 **Code anchors**
 
@@ -223,7 +223,7 @@ The deployment surface exposes these constraints as distinct configuration layer
 
 **Implementation**
 
-The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4**: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). **Layer 5**: `PromptTemplate`, `ContextEngine`, `ToolCard` system, `ReactAgent` loop, framework rails. **Layer 6**: `SecurityRail`, `GuardrailRail`, `VerificationRail`, `GuardianRail`. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and `ObservabilityHandler`. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.
+The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4**: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). **Layer 5**: `PromptTemplate`, `ContextEngine`, `ToolCard` system, `ReactAgent` loop, framework rails. **Layer 6**: `SecurityRail`, `PromptInjectionGuardrail`, `VerificationRail`, `GuardianRail`. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and `ObservabilityHandler`. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.
 
 **Code anchors**
 

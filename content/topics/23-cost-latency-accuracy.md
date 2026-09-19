@@ -36,7 +36,7 @@
 
 **Definition:** Define a representative eval set, run every candidate on it, and record quality score, latency, and cost per query. Plot the cost–accuracy and latency–accuracy curves, find the knee (the point of diminishing returns), and pick the option that meets the requirement with the minimum overhead — not the highest-accuracy option.
 
-**Jiuwen:** `agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudge`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
+**Jiuwen:** `agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
 
 ---
 

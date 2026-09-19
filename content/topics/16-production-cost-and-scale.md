@@ -376,7 +376,7 @@ flowchart TD
 
 **General:** Print/log statements produce unstructured text: you can't query "all tool calls in session X", can't aggregate latency by tool, and can't correlate a wrong answer back to which retrieval chunk was in context. Structured tracing means emitting a typed event for every meaningful action — model call started/completed, tool called/returned, retrieval executed, decision made — with a shared trace/span ID so events from the same agent run can be grouped. Each event carries: timestamp, latency, token counts, tool name + arguments, retrieval score, model response. This enables offline debugging (replay a trace), production monitoring (alert on p99 latency), and eval (attach ground truth to a trace for scoring). The minimum viable schema: `trace_id`, `span_id`, `event_type`, `payload`, `duration_ms`.
 
-**Jiuwen:** `ObservabilityEvent` (in `harness/observability/`) is the framework's structured event type; `ObservabilityHandler` receives events and can forward to a backend. `ReactAgent` emits events at major loop points (model call, tool call, final answer). Token counts are available via `ModelResponse.usage`. The `TraceManager` / `TraceHandler` provide span-level tracing with parent-child span linking. However, retrieval events (which chunks were returned, their scores) are not automatically emitted as observability events — they appear only in tool result text, not as structured spans, so cross-run retrieval analytics require manual instrumentation.
+**Jiuwen:** `AgentObservabilityRail` (`harness/observability/rail.py`) emits typed observability events at the major points of each turn — model call, tool call, final answer — and is always the last rail in the profile. Token and cost figures come from the model response's usage metadata. Events are delivered to a subscribing consumer: there is no default log sink, and retrieval details (which chunks, their scores) are not emitted as structured spans — they appear only in tool-result text, so cross-run retrieval analytics need manual instrumentation.
 
 ```mermaid
 flowchart TD
@@ -387,8 +387,8 @@ flowchart TD
     EV --> RET["retrieval (chunks, scores)"]
     EV --> DEC["decision (plan step, branch)"]
     EV --> TID["shared trace_id + span_id for grouping"]
-    JIW["Jiuwen"] --> OBS["ObservabilityEvent + ObservabilityHandler"]
-    JIW --> TM["TraceManager / TraceHandler (span linking)"]
+    JIW["Jiuwen"] --> OBS["AgentObservabilityRail: typed per-turn events"]
+    JIW -.->|"absent"| SINK["default log sink / trace replay"]
     JIW -.->|"absent"| RETEV["retrieval events as structured spans"]
 ```
 
@@ -409,24 +409,23 @@ flowchart TD
 
 **General:** Multi-provider routing has two modes: static (choose provider at config time based on cost, capability, or data residency) and dynamic (route at request time based on load, availability, or task type). Dynamic routing patterns: (1) primary/fallback — always try provider A, fall back to B on error or timeout; (2) capability routing — send code tasks to a coding-optimized model, chat tasks to a general model; (3) cost routing — send cheap queries to a small cheap model, expensive reasoning to a large model (classifier decides). Key considerations: response format compatibility across providers (different tool-call schemas), token counting per-provider, and observable routing decisions (which provider was actually used).
 
-**Jiuwen:** `ModelClientFactory` (or the `model_config` field on each agent) selects a provider at agent construction time. A `ModelConfig` references a named provider (OpenAI, Anthropic, DashScope, Ollama, etc.) and a model ID. There is no built-in runtime routing layer: no primary/fallback chain, no capability classifier, and no cost-based dispatch. Multi-provider setups are achieved by configuring different agents with different `ModelConfig`s (e.g., a fast model for intent classification, a powerful model for reasoning), but the routing logic is in the application layer, not the framework. Circuit-breaker behavior is provided by `CircuitBreakerRail` (trip on consecutive failures, open for a cooldown), which is the closest analogue to a fallback.
+**Jiuwen:** Routing is configured per agent through `ModelClientConfig` and `ProviderType`, and `create_model_client` resolves the provider client. At the team layer there is a real model pool: `ModelPoolEntry` plus allocators (including `IntelliRouterAllocator`) select a model by name, rotation, and health. What is not built in is a per-request capability classifier or cost-based dispatcher that picks a model for each call; those policies live in the application or in the pool configuration. `CircuitBreakerRail` trips on consecutive failures and cools down, which is the closest analogue to provider failover.
 
 ```mermaid
 flowchart TD
     REQ["incoming request"] --> ROUTE{"routing mode"}
-    ROUTE -->|"static"| CONF["provider from ModelConfig (set at construction)"]
-    ROUTE -->|"dynamic"| DYN["runtime router"]
-    DYN --> PF["primary/fallback (CircuitBreakerRail)"]
-    DYN --> CAP["capability (task-type classifier → agent selection)"]
-    DYN --> COST["cost routing (cheap model for simple, expensive for complex)"]
+    ROUTE -->|"static"| CONF["provider from ModelClientConfig at construction"]
+    ROUTE -->|"pool"| POOL["model pool: ModelPoolEntry + allocator (IntelliRouter)"]
+    DYN["per-request policy"] --> CAP["capability classifier"]
+    DYN --> COST["cost routing"]
     CONF --> PROV["provider client (OpenAI / Anthropic / DashScope / Ollama)"]
-    DYN -.->|"absent in framework"| X["no built-in capability or cost router"]
+    DYN -.->|"absent in framework"| X["no built-in capability or cost classifier"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1</code> — <code>ModelClientFactory</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:1</code> — <code>ModelConfig</code> (provider + model_id)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> failure trip + cooldown<br>&bull; <code>agent-core/openjiuwen/core/model/client/</code> — per-provider client implementations</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58</code> — <code>create_model_client</code> provider dispatch<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> / <code>ModelClientConfig</code><br>&bull; <code>agent-core/openjiuwen/agent_teams/models/pool.py:38</code> — <code>ModelPoolEntry</code>; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:22</code> — <code>IntelliRouterAllocator</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> failure trip + cooldown</sub>
 
 </details>
 
@@ -440,7 +439,7 @@ flowchart TD
 
 **General:** Model call failures fall into three categories: transient (timeout, rate limit, 5xx), permanent (auth error, unsupported model, input too long), and quality (response parsed but content invalid/refused). The correct fallback sequence: (1) retry with exponential backoff + jitter for transient errors (max 3 attempts); (2) if still failing, route to a fallback provider/model if one is configured; (3) if the fallback also fails or no fallback exists, return a graceful degraded response — "I was unable to complete this request, please try again" — rather than surfacing a raw exception. Do not retry permanent errors (they will not recover). Do not retry quality failures as-is (retry with a modified prompt or abstain).
 
-**Jiuwen:** `CircuitBreakerRail` tracks consecutive failures and opens the circuit after a threshold (preventing further calls during cooldown), then half-opens to probe recovery. Model clients do not implement their own retry; retries are the responsibility of the rail layer or the caller. There is no automatic fallback-provider routing in the framework — if the primary provider is down, the circuit opens and the agent returns an error. `ModelRequestConfig` has a `timeout` field that is forwarded to the provider client. Graceful degraded responses are not emitted by any rail; an open circuit raises an exception that propagates to the caller.
+**Jiuwen:** `ModelBackupRail` provides failover to a backup model on failure, and `CircuitBreakerRail` tracks consecutive failures, opens the circuit during cooldown, and half-opens to probe recovery. `ModelRequestConfig.timeout` is forwarded to the provider client. There is no structured degraded response emitted by a rail, and no retry-with-modified-prompt path for quality failures.
 
 ```mermaid
 flowchart TD
@@ -450,15 +449,15 @@ flowchart TD
     FBK -->|"also fails"| DEG["graceful degraded response"]
     CAT -->|"permanent (auth, unsupported)"| DEG
     CAT -->|"quality (bad output)"| RPMT["retry with modified prompt or abstain"]
-    JIW["Jiuwen"] --> CB["CircuitBreakerRail: trip → cooldown → half-open probe"]
-    CB -.->|"absent"| AUTO["auto-fallback provider routing"]
+    JIW["Jiuwen"] --> MB["ModelBackupRail: failover to backup model"]
+    JIW --> CB["CircuitBreakerRail: trip → cooldown → half-open probe"]
     CB -.->|"absent"| GDEG["graceful degraded response on open circuit"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> open/closed/half-open states<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:1</code> — <code>ModelRequestConfig.timeout</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1</code> — single provider per agent (no fallback chain)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> open/closed/half-open states<br>&bull; <code>agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9</code> — <code>ModelBackupRail</code> failover<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:1</code> — <code>ModelRequestConfig.timeout</code></sub>
 
 </details>
 

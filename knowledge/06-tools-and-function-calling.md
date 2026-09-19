@@ -453,13 +453,13 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 
 **Implementation**
 
-`ToolCard` has no `idempotent` flag or retry-safe annotation in its schema — every tool is treated equally by `AbilityManager`. `ToolCallDeduplicationRail` deduplicates *identical* tool calls within a single session (same name + same arguments → second call is suppressed), which is a narrow guard against loop-induced repeats, not a general idempotency mechanism. For user-facing writes (email, payment, calendar), idempotency keys and retry semantics are the tool author's responsibility; the framework provides no scaffold. The `retry_on_failure` field in `McpServerConfig` controls MCP connection retries, not tool-call semantic idempotency.
+`ToolCard.idempotent` defaults to `False`, and non-idempotent tools are never retried by the resilience rail — so the framework does distinguish reads from writes at the card level. Retry decisions live in `ToolCallResilienceRail` (only retryable exception types, with a per-invoke budget). `ToolCallDeduplicationRail` additionally suppresses exact repeated calls within a session, which guards against loop-induced repeats rather than providing semantic idempotency. Idempotency keys and "attempted vs confirmed" state are still the tool author's responsibility; the framework provides no scaffold. The `retry_on_failure` field in `McpServerConfig` controls MCP connection retries, not tool-call semantic idempotency.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard schema (no idempotent flag) |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | ToolCard.idempotent (default False) |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1` | session-scoped same-args dedup |
 | `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40` | McpServerConfig.retry_on_failure (connection, not semantic) |
 

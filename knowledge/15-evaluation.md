@@ -990,7 +990,7 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 **Concept.** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
 
-![diagram](assets/diagrams/2048f2899f1eab2f98b2027bf12dd654fc72aabf.png)
+![diagram](assets/diagrams/e1b0e9abf523ac5f63e9e700efc308ea8c32196a.png)
 
 **In Jiuwen.** ModelClientABC (agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1) is the mockable boundary — inject controlled responses in tests to isolate non-determinism to the model call layer. Rail contract invariants: CircuitBreakerRail (agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1) for termination; structured_output tool (agent-core/openjiuwen/harness/tools/structured_output/tool.py:1) for schema; GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) for safety; usage_cost.py:101 for budget. Behavioral correctness: LLMAsJudge (agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40). Gap: no official test harness; evaluator pipeline is offline, not integrated with pytest.
 
@@ -999,13 +999,13 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 **Implementation**
 
-`VerificationRail` and `agent_evolving/evaluator/` provide LLM-as-judge for correctness. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — trips on failure threshold); `StructuredOutputTool` (schema invariant — validates against caller schema); `GuardrailRail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`ModelClientABC`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
+`VerificationRail` and `agent_evolving/evaluator/` provide LLM-as-judge for correctness. Structural invariants map directly to framework rail contracts: `CircuitBreakerRail` (termination invariant — trips on failure threshold); `StructuredOutputTool` (schema invariant — validates against caller schema); `PromptInjectionGuardrail` (safety invariant — blocks classified content); `usage_cost.py` session budget (cost invariant). Test frameworks should mock the model client (`BaseModelClient`) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:1` | ModelClientABC (mockable boundary) |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:1` | BaseModelClient (mockable boundary) |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | termination invariant contract |
 | `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:1` | schema invariant |
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | safety invariant |

@@ -152,7 +152,7 @@ flowchart TB
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92/208/239</code> — <code>TeamScheduler</code> scan/dispatch/review<br>&bull; <code>../../../agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus</code> — supervisor routing<br>&bull; <code>agent-core/openjiuwen/harness/subagents/plan_agent.py:88</code> — dedicated plan subagent</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92/208/239</code> — <code>TeamScheduler</code> scan/dispatch/review<br>&bull; <code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus</code> — supervisor routing<br>&bull; <code>agent-core/openjiuwen/harness/subagents/plan_agent.py:88</code> — dedicated plan subagent</sub>
 
 </details>
 
@@ -468,7 +468,7 @@ flowchart TD
 
 **General:** Memory contamination happens when wrong or hallucinated facts are written to long-term memory and then retrieved into future turns, compounding errors. Prevention: write to memory only from verified/confirmed outputs (not raw model scratchpads); tag memory entries with provenance (source, confidence, timestamp); implement targeted invalidation — delete or overwrite specific wrong entries by key rather than wiping all memory; use versioning so you can roll back. Detection: run a periodic audit query that cross-checks stored facts against the authoritative source.
 
-**Jiuwen:** `LongTermMemory` stores typed entries (`MemoryEntry`) with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
+**Jiuwen:** `LongTermMemory` stores typed memory units with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
 
 ```mermaid
 flowchart TD

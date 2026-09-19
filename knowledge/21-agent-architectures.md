@@ -53,7 +53,7 @@ The graph path (Pregel workflow engine) handles known control flow with static a
 
 **Implementation**
 
-MCP: `McpServerConfig` (in the MCP tool module) configures MCP servers; the client discovers tools via `tools/list` and invokes via `tools/call`. A2A-style delegation: `SubagentRail` delegates tasks to sub-agents using `SubagentRequest`/`SubagentResponse` schemas — this is internal delegation, not the A2A wire protocol. Cross-deployment agent-to-agent communication is not implemented.
+MCP: `McpServerConfig` (in the MCP tool module) configures MCP servers; the client discovers tools via `tools/list` and invokes via `tools/call`. A2A-style delegation: `SubagentRail` delegates tasks to sub-agents through the subagent runtime (`SubagentRail` + `SubagentRuntimeConfig`) — internal delegation, not the A2A wire protocol. Cross-deployment agent-to-agent communication is not implemented.
 
 </details>
 
@@ -84,7 +84,7 @@ MCP: `McpServerConfig` (in the MCP tool module) configures MCP servers; the clie
 
 **Implementation**
 
-Architecture is hierarchical via `SubagentRail` and `TaskPlanningRail`. No peer-to-peer pattern is implemented. Five components: agents (`SubagentSpec` configs), communication (`SubagentRequest`/`SubagentResponse`), coordination (`TaskPlanningRail`), shared memory (`LongTermMemory` + `EphemeralMemory`), environment (tools via `ToolCard` and MCP servers).
+Architecture is hierarchical via `SubagentRail` and `TaskPlanningRail`. No peer-to-peer pattern is implemented. Five components: agents (subagent runtime configs), communication (task-tool envelopes and tool messages), coordination (`TaskPlanningRail`), shared memory (`LongTermMemory`), environment (tools via `ToolCard` and MCP servers).
 
 </details>
 
@@ -116,7 +116,7 @@ Architecture is hierarchical via `SubagentRail` and `TaskPlanningRail`. No peer-
 
 **Implementation**
 
-`ModelClientABC` (in the model-clients package) is the mockable boundary. Rail contract invariants: `CircuitBreakerRail` for termination, the structured-output tool for schema, `GuardrailRail` for safety, `usage_cost.py` for budget. Behavioural correctness: `LLMAsJudge`. The evaluator pipeline is offline and is not integrated with pytest.
+`BaseModelClient` (in the model-clients package) is the mockable boundary. Rail contract invariants: `CircuitBreakerRail` for termination, the structured-output tool for schema, `PromptInjectionGuardrail` for safety, `usage_cost.py` for budget. Behavioural correctness: `LLMAsJudgeMetric`. The evaluator pipeline is offline and is not integrated with pytest.
 
 </details>
 

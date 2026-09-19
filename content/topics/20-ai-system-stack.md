@@ -20,7 +20,7 @@
 
 **Definition:** A base model is the raw pretrained checkpoint — next-token prediction on web-scale data, no instruction following. An instruct (or chat) model is the same weights after the alignment pipeline: supervised fine-tuning (SFT) on demonstration data, reward model training, and RLHF or DPO to match human preferences. The practical difference: a base model will continue text; an instruct model will follow instructions, decline harmful requests, and produce structured responses.
 
-**Jiuwen:** `agent_rl/online/backends/sft/trainer.py` is the SFT stage that produces instruct-model-like behavior from demonstration data. `GuardrailRail` (`harness/rails/guardrail_rail.py`) provides inference-time safety supplement. The framework does not tag served models as base vs instruct in the config schema — `ProviderType + model_name` selects a model.
+**Jiuwen:** `agent_rl/online/backends/sft/trainer.py` is the SFT stage that produces instruct-model-like behavior from demonstration data. `PromptInjectionGuardrail` (`harness/rails/guardrail_rail.py`) provides inference-time safety supplement. The framework does not tag served models as base vs instruct in the config schema — `ProviderType + model_name` selects a model.
 
 ---
 

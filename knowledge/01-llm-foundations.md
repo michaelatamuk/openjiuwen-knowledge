@@ -991,7 +991,7 @@ The context engine is cache-aware: `ProviderUsage` (agent-core/openjiuwen/core/c
 
 **Implementation**
 
-The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. The SFT path in `agent_rl/online/backends/sft/trainer.py` is the stage that transforms a base model into an instruct model, but it applies to the model being fine-tuned, not to the model being served. `GuardrailRail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. The SFT path in `agent_rl/online/backends/sft/trainer.py` is the stage that transforms a base model into an instruct model, but it applies to the model being fine-tuned, not to the model being served. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
 
 **Code anchors**
 

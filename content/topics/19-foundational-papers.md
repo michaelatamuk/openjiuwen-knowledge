@@ -102,6 +102,6 @@
 
 **Definition:** Replace most human preference labeling with model self-critique against explicit principles (the "constitution"). SL-CAI: generate → critique → revise → SFT. RL-CAI: model-generated preference pairs → reward model → RLHF. Far fewer human labels; auditable principle list. The constitution is an explicit, versioned list of principles — easier to update than a latent reward model. Claude's alignment is based on CAI.
 
-**Jiuwen:** Safety uses static classifiers (`SecurityRail`, `GuardrailRail`, `GuardianRail`); no self-critique loop, no constitution file.
+**Jiuwen:** Safety uses static classifiers (`SecurityRail`, `PromptInjectionGuardrail`, `GuardianRail`); no self-critique loop, no constitution file.
 
 ---

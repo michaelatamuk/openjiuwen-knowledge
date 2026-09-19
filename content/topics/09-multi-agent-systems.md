@@ -191,7 +191,7 @@ flowchart TD
 
 **General:** Multi-agent systems (MAS) come in four structural patterns: (1) **Centralized** — all agents report to a single manager/supervisor that assigns tasks and aggregates results. Simple to reason about, single point of failure. (2) **Decentralized** — agents communicate directly with each other (peer-to-peer) with no central coordinator. Resilient but harder to ensure consistency. (3) **Hierarchical** — manager agents oversee sub-agent teams, which may themselves have managers — a tree of authority. Natural for complex decomposition (planner → domain-specialist teams → executors). (4) **Hybrid** — combines patterns; e.g., a centralized orchestrator with peer-to-peer specialist agents underneath. Every MAS needs five components regardless of architecture: **agents** (autonomous entities with specific roles), **communication** (message passing — structured output, shared state, or explicit handoff), **coordination** (how tasks are assigned and conflicts avoided), **shared memory** (knowledge and context accessible across agents), and **environment** (the external world or system agents act on). Choosing an architecture is a tradeoff: centralized is debuggable but bottlenecked; decentralized is resilient but harder to coordinate; hierarchical handles complexity but adds latency through multiple delegation layers.
 
-**Jiuwen:** The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to specialized sub-agents via `SubagentRail`, which itself can call further sub-agents. `TaskPlanningRail` breaks the task and generates a plan before delegation. Shared memory is provided by `LongTermMemory` (cross-session KV store) and `EphemeralMemory` (within-session). Communication is structured via `SubagentRequest`/`SubagentResponse` schemas. There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.
+**Jiuwen:** The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to specialized sub-agents via `SubagentRail`, which itself can call further sub-agents. `TaskPlanningRail` breaks the task and generates a plan before delegation. Shared long-term memory is `LongTermMemory`; within-session state lives in the context buffer rather than a separate memory class. Delegation payloads are handled by the subagent runtime (`SubagentRuntimeConfig`/`SubagentInstance`). There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.
 
 ```mermaid
 flowchart TD
@@ -209,14 +209,14 @@ flowchart TD
     ENV["Environment: external world / systems"]
     end
     JIW["Jiuwen"] --> HIER_J["hierarchical via SubagentRail + TaskPlanningRail"]
-    JIW --> MEM_J["LongTermMemory (cross-session) + EphemeralMemory (in-session)"]
+    JIW --> MEM_J["LongTermMemory (cross-session); in-session state in the context buffer"]
     JIW -.->|"absent"| P2P["peer-to-peer / decentralized pattern"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:1</code> — within-session shared state<br>&bull; Communication schema: <code>SubagentRequest</code>/<code>SubagentResponse</code> in <code>agent-core/openjiuwen/harness/rails/subagent/</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/harness/subagent_runtime/config.py:22</code> — <code>SubagentRuntimeConfig</code> (delegation payloads)</sub>
 
 </details>
 

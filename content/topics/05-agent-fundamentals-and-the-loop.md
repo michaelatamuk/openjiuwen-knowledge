@@ -321,13 +321,13 @@ flowchart TD
 
 **General:** "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) **success** — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) **budget exhaustion** — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) **human escalation** — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.
 
-**Jiuwen:** Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `WorkPlanApprovalRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `WorkPlanApprovalRail` is opt-in per agent config.
+**Jiuwen:** Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `PlanApprovalInterruptRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `PlanApprovalInterruptRail` is opt-in per agent config.
 
 ```mermaid
 flowchart TD
     T["termination decision"] --> S["success: final answer emitted (ReactAgent done)"]
     T --> B["budget: max_iterations (5/15) + session cost cap"]
-    T --> E["escalation: WorkPlanApprovalRail / StructuredAskUserRail (opt-in)"]
+    T --> E["escalation: PlanApprovalInterruptRail / StructuredAskUserRail (opt-in)"]
     T --> A["anomaly abort: ModelAnomalyDetectionRail (off by default)"]
     T -.->|"absent"| D["graceful degraded response at budget exhaustion"]
     T -.->|"absent"| C["confidence-threshold auto-escalation"]
@@ -336,7 +336,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` — `max_iterations: int = Field(default=5)`<br>&bull; `agent-core/openjiuwen/harness/schema/config.py:252` — harness default 15<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` — structured human escalation<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` — `WorkPlanApprovalRail` (opt-in)</sub>
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` — `max_iterations: int = Field(default=5)`<br>&bull; `agent-core/openjiuwen/harness/schema/config.py:252` — harness default 15<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` — structured human escalation<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` — `PlanApprovalInterruptRail` (opt-in)</sub>
 
 </details>
 

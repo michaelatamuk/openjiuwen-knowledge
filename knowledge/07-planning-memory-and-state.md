@@ -157,7 +157,7 @@ Three patterns exist. (a) Scheduled-dispatch leader: `TeamScheduler` scans the t
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92/208/239` | TeamScheduler scan/dispatch/review |
-| `../../../agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus` | supervisor routing |
+| `agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus` | supervisor routing |
 | `agent-core/openjiuwen/harness/subagents/plan_agent.py:88` | dedicated plan subagent |
 
 </details>
@@ -589,7 +589,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 
 **Implementation**
 
-`LongTermMemory` stores typed entries (`MemoryEntry`) with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
+`LongTermMemory` stores typed memory units with metadata fields (category, source). Memory is written by the agent via `MemoryRail` and the `memory_write` / `memory_update` tools. There is no confidence gate before writing — any output the model chooses to commit is stored. `memory_update` allows targeted overwrite of an existing entry by `id`, which is the closest analogue to targeted invalidation; a full category wipe is `memory_delete_by_category`. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.
 
 **Code anchors**
 

@@ -210,7 +210,7 @@ Memory is session-scoped: `session_id` is the isolation unit and contexts do not
 
 **Concept.** "Stop when done" is not a termination condition. An agent needs at least three explicit paths: **success** (a final answer meeting a defined condition, such as required fields populated or context cited); **budget exhaustion** (a hard cap on iterations and tokens, with a graceful degraded response rather than silence); and **human escalation** (handing off when budget is exhausted or ambiguity is unresolvable). A confidence threshold can add a fourth: escalate before acting when the model's uncertainty is high.
 
-![diagram](assets/diagrams/479bf057eed6949d517296c42ceac4e087cd41b9.png)
+![diagram](assets/diagrams/26d584d79e44640a0473d535c21c05ab5ee3f744.png)
 
 **In Jiuwen.** Jiuwen stops on no tool call, on iteration caps, and through optional human-approval rails. It does not return a degraded answer at budget exhaustion or escalate automatically on low confidence.
 
@@ -219,7 +219,7 @@ Memory is session-scoped: `session_id` is the isolation unit and contexts do not
 
 **Implementation**
 
-Several termination paths exist: `ReactAgent.max_iterations` is the hard iteration cap (5, or 15 in the harness); `WorkPlanApprovalRail` and `StructuredAskUserRail` provide human-in-the-loop escalation; `ModelAnomalyDetectionRail` can abort on anomaly detection; and `AgentObservabilityRail` logs every turn. A graceful degraded response at budget exhaustion and confidence-threshold auto-escalation are not included, and the approval rails are opt-in per agent config.
+Several termination paths exist: `ReactAgent.max_iterations` is the hard iteration cap (5, or 15 in the harness); `PlanApprovalInterruptRail` and `StructuredAskUserRail` provide human-in-the-loop escalation; `ModelAnomalyDetectionRail` can abort on anomaly detection; and `AgentObservabilityRail` logs every turn. A graceful degraded response at budget exhaustion and confidence-threshold auto-escalation are not included, and the approval rails are opt-in per agent config.
 
 **Code anchors**
 
@@ -230,7 +230,7 @@ Several termination paths exist: `ReactAgent.max_iterations` is the hard iterati
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74` | anomaly abort (off by default) |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | session cost cap |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` | structured human escalation |
-| `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` | WorkPlanApprovalRail (opt-in) |
+| `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` | PlanApprovalInterruptRail (opt-in) |
 
 </details>
 

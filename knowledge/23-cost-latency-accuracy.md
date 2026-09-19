@@ -110,7 +110,7 @@ Latency is set via `ModelRequestConfig.timeout`; volume via `ModelPoolEntry` `tp
 
 **Implementation**
 
-`agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudge`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
+`agent_evolving/evaluator/` provides `FaithfulnessEvaluator`, `CorrectnessEvaluator`, and `LLMAsJudgeMetric`; session costs are tracked in `usage_cost.py`. Cost and latency are not correlated to per-query eval scores.
 
 </details>
 

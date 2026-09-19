@@ -76,7 +76,7 @@ Layer 4: `agent-core/openjiuwen/core/retrieval/` (vector, hybrid, graph, agentic
 
 **Implementation**
 
-`agent_rl/online/backends/sft/trainer.py` is the SFT stage that produces instruct-model-like behavior from demonstration data. `GuardrailRail` (`harness/rails/guardrail_rail.py`) provides inference-time safety supplement. The framework does not tag served models as base vs instruct in the config schema — `ProviderType + model_name` selects a model.
+`agent_rl/online/backends/sft/trainer.py` is the SFT stage that produces instruct-model-like behavior from demonstration data. `PromptInjectionGuardrail` (`harness/rails/guardrail_rail.py`) provides inference-time safety supplement. The framework does not tag served models as base vs instruct in the config schema — `ProviderType + model_name` selects a model.
 
 </details>
 
