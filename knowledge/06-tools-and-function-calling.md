@@ -460,7 +460,7 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard schema (no idempotent flag) |
-| `agent-core/openjiuwen/harness/rails/subagent/tool_call_deduplication_rail.py:1` | session-scoped same-args dedup |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1` | session-scoped same-args dedup |
 | `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40` | McpServerConfig.retry_on_failure (connection, not semantic) |
 
 </details>

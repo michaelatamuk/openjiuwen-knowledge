@@ -707,7 +707,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1</code> — <code>ModelClientABC</code> (mockable boundary)<br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — termination invariant contract<br>&bull; <code>agent-core/openjiuwen/harness/tools/structured_output/tool.py:1</code> — schema invariant<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — safety invariant<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — cost invariant (session budget)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — behavioral correctness via LLM-as-judge</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:1</code> — <code>ModelClientABC</code> (mockable boundary)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — termination invariant contract<br>&bull; <code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:1</code> — schema invariant<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — safety invariant<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — cost invariant (session budget)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code> — behavioral correctness via LLM-as-judge</sub>
 
 </details>
 

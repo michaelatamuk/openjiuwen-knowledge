@@ -558,11 +558,9 @@ The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and t
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/observability/event.py:1` | ObservabilityEvent schema |
-| `agent-core/openjiuwen/harness/observability/handler.py:1` | ObservabilityHandler |
+| `agent-core/openjiuwen/harness/observability/rail.py:1` | ObservabilityEvent schema |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740` | event emission points |
-| `agent-core/openjiuwen/harness/trace/trace_manager.py:1` | TraceManager span tracking |
-| `agent-core/openjiuwen/core/model/response.py:1` | ModelResponse.usage token counts |
+| `agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:1` | ModelResponse.usage token counts |
 
 </details>
 
@@ -597,9 +595,9 @@ The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and t
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/model/client/factory.py:1` | ModelClientFactory |
-| `agent-core/openjiuwen/core/model/config.py:1` | ModelConfig (provider + model_id) |
-| `agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1` | CircuitBreakerRail failure trip + cooldown |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1` | ModelClientFactory |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:1` | ModelConfig (provider + model_id) |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | CircuitBreakerRail failure trip + cooldown |
 | `agent-core/openjiuwen/core/model/client/` | per-provider client implementations |
 
 </details>
@@ -636,9 +634,9 @@ The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and t
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1` | CircuitBreakerRail open/closed/half-open states |
-| `agent-core/openjiuwen/core/model/config.py:1` | ModelRequestConfig.timeout |
-| `agent-core/openjiuwen/core/model/client/factory.py:1` | single provider per agent (no fallback chain) |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | CircuitBreakerRail open/closed/half-open states |
+| `agent-core/openjiuwen/core/foundation/llm/schema/config.py:1` | ModelRequestConfig.timeout |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1` | single provider per agent (no fallback chain) |
 
 </details>
 

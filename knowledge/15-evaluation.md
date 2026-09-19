@@ -1005,10 +1005,10 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/llm/model_clients/base.py:1` | ModelClientABC (mockable boundary) |
-| `agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1` | termination invariant contract |
-| `agent-core/openjiuwen/harness/tools/structured_output/tool.py:1` | schema invariant |
-| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | safety invariant |
+| `agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:1` | ModelClientABC (mockable boundary) |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | termination invariant contract |
+| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:1` | schema invariant |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | safety invariant |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | cost invariant (session budget) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | behavioral correctness via LLM-as-judge |
 

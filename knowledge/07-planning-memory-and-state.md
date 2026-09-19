@@ -326,7 +326,7 @@ Short-term is `SessionModelContext` with a bounded message buffer. Long-term is 
 | `agent-core/openjiuwen/core/context_engine/context/context.py:44` | SessionModelContext |
 | `agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11` | ContextMessageBuffer |
 | `agent-core/openjiuwen/core/memory/long_term_memory.py:69` | LongTermMemory |
-| `../../../agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py` | memory type taxonomy |
+| `agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py` | memory type taxonomy |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:56` | product hybrid memory index |
 
 </details>
@@ -597,7 +597,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 |---|---|
 | `agent-core/openjiuwen/core/memory/long_term_memory.py:69` | LongTermMemory and entry schema |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167` | memory_write/memory_update/memory_delete_by_category |
-| `agent-core/openjiuwen/harness/rails/subagent/memory_forbidden_rail.py:1` | memory suppression gate |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/memory_forbidden_rail.py:1` | memory suppression gate |
 | `agent-core/openjiuwen/harness/prompts/sections/memory.py:14` | when/what to write |
 
 </details>

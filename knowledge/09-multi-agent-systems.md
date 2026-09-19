@@ -282,7 +282,7 @@ The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to s
 | `agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1` | hierarchical delegation |
 | `agent-core/openjiuwen/harness/rails/task_planning_rail.py:1` | TaskPlanningRail (planner layer) |
 | `agent-core/openjiuwen/core/memory/long_term_memory.py:69` | shared long-term memory |
-| `agent-core/openjiuwen/core/memory/ephemeral_memory.py:1` | within-session shared state |
+| `agent-core/openjiuwen/core/memory/long_term_memory.py:1` | within-session shared state |
 | `SubagentRequest` | /SubagentResponse in agent-core/openjiuwen/harness/rails/subagent/ |
 
 </details>

@@ -8,7 +8,7 @@ What a gateway does: (1) **routing** — send requests to different providers (O
 
 When you need a gateway: multiple services calling LLMs independently (key sprawl, duplicated cost logic), strict per-tenant budgets, multi-provider fallback, or a need for a single audit log of all model calls. Single-service applications with one provider generally do not need a dedicated gateway.
 
-**Jiuwen:** No standalone gateway component. Equivalent functions are distributed across the framework: provider routing via `ModelClientFactory`; cost tracking via `usage_cost.py`; circuit breaking via `CircuitBreakerRail`; content safety via `GuardrailRail`; observability via `ObservabilityHandler`. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
+**Jiuwen:** No standalone gateway component. Its functions are distributed: provider routing through the model pool (`ModelPoolEntry`), cost tracking in `usage_cost.py`, circuit breaking via `CircuitBreakerRail`, content safety via the guardrail layer, and observability events through the harness observability rail. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
 
 ```mermaid
 flowchart TD
@@ -25,7 +25,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; Equivalent in Jiuwen: `usage_cost.py:101` (cost), `circuit_breaker_rail.py:1` (circuit), `guardrail_rail.py:1` (safety), `observability/event.py:1` (logging)<br>&bull; No gateway component in the codebase; these concerns are per-agent, not cross-service</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — cost meter<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code><br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — guardrail<br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:1</code> — observability events<br>&bull; No gateway component in the codebase; these concerns are per-agent, not cross-service</sub>
 
 </details>
 
@@ -38,5 +38,16 @@ flowchart TD
 **Definition:** Each of the gateway's six responsibilities addresses a distinct production concern. **Routing** chooses among providers by cost, latency, or availability. **Fallback** defines what happens when a call fails, so the user does not see an error. **Rate limiting and cost caps** bound spend per tenant or user and prevent a single client from exhausting the budget. **Semantic caching** removes redundant calls when the same or a similar question recurs. **Load balancing and endpoint health** keep healthy endpoints in rotation and drop failing ones. **Observability** attaches span, trace, and cost metadata to every call so behaviour can be audited. **Safety enforcement** rejects or sanitizes requests before they reach the model. Together these are the concerns to name when designing the layer between an application and its model providers.
 
 **Jiuwen:** Routing lives in the `ModelPoolEntry` router with health, rate, and latency scoring; the remaining concerns are configured separately rather than composed by a single component, so a dedicated AI gateway would sit upstream of Jiuwen's model clients.
+
+```mermaid
+flowchart TD
+    GW["gateway responsibilities"] --> R["routing"]
+    GW --> F["fallback"]
+    GW --> Q["rate limit and cost caps"]
+    GW --> C["semantic cache"]
+    GW --> L["load balancing and health"]
+    GW --> O["observability"]
+    GW --> S["safety enforcement"]
+```
 
 ---

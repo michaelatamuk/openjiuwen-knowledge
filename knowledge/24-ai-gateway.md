@@ -2,7 +2,7 @@
 
 ## 1. What is an AI gateway and when do you need one?
 
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
 **TL;DR.** An AI gateway centralises routing, rate-limiting, key isolation, semantic caching, safety enforcement, and observability for all LLM calls across multiple services. Needed when multiple services call LLMs independently, per-tenant budgets are required, or a single audit log is needed.
 
@@ -27,7 +27,16 @@
 
 **Implementation**
 
-No standalone gateway component. Equivalent functions are distributed across the framework: provider routing via `ModelClientFactory`; cost tracking via `usage_cost.py`; circuit breaking via `CircuitBreakerRail`; content safety via `GuardrailRail`; observability via `ObservabilityHandler`. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
+No standalone gateway component. Its functions are distributed: provider routing through the model pool (`ModelPoolEntry`), cost tracking in `usage_cost.py`, circuit breaking via `CircuitBreakerRail`, content safety via the guardrail layer, and observability events through the harness observability rail. A separate AI gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | cost meter |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1` | CircuitBreakerRail |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | guardrail |
+| `agent-core/openjiuwen/harness/observability/rail.py:1` | observability events |
 
 </details>
 
@@ -50,6 +59,10 @@ No standalone gateway component. Equivalent functions are distributed across the
 - Safety enforcement rejects or sanitizes requests before they reach the model
 
 **Concept.** Each of the gateway's six responsibilities addresses a distinct production concern. **Routing** chooses among providers by cost, latency, or availability. **Fallback** defines what happens when a call fails, so the user does not see an error. **Rate limiting and cost caps** bound spend per tenant or user and prevent a single client from exhausting the budget. **Semantic caching** removes redundant calls when the same or a similar question recurs. **Load balancing and endpoint health** keep healthy endpoints in rotation and drop failing ones. **Observability** attaches span, trace, and cost metadata to every call so behaviour can be audited. **Safety enforcement** rejects or sanitizes requests before they reach the model. Together these are the concerns to name when designing the layer between an application and its model providers.
+
+![diagram](assets/diagrams/19d8cad9eed39b3764801d58fcd32bd200d24777.png)
+
+**In Jiuwen.** Given Jiuwen, routing is the model-pool router with health, rate, and latency scoring; the other gateway concerns are configured separately rather than composed into one component.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

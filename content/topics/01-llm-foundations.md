@@ -683,7 +683,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — inference-time safety supplement</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — inference-time safety supplement</sub>
 
 </details>
 
@@ -717,7 +717,7 @@ sequenceDiagram
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865</code> — builds and sends request (step 4+)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — captures usage metadata from step 7<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — billing meter equivalent (step 7)<br>&bull; <code>agent-core/openjiuwen/harness/observability/event.py:1</code> — observability events (step 8 equivalent)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865</code> — builds and sends request (step 4+)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — captures usage metadata from step 7<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — billing meter equivalent (step 7)<br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:1</code> — observability events (step 8 equivalent)</sub>
 
 </details>
 

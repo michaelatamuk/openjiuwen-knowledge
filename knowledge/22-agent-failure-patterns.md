@@ -17,6 +17,8 @@
 
 ![diagram](assets/diagrams/abf47dadfcf5940f288855caecc41ce40b57cb42.png)
 
+**In Jiuwen.** Jiuwen retries at the model-client layer and deduplicates repeated (tool, args) calls. It has no idempotency-key pattern and no attempted-vs-confirmed tracking, so keeping writes safe across retries is left to the developer.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -30,7 +32,7 @@ Retry logic lives in the model-client layer (a per-provider retry decorator in `
 |---|---|
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py` | per-provider retry decorator on API errors |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | ToolCallDeduplicationRail: repeated (tool, args) → warn/compact |
-| `agent-core/openjiuwen/core/foundation/tool/tool_card.py` | ToolCard schema; no idempotent field |
+| `agent-core/openjiuwen/core/foundation/tool/base.py` | ToolCard schema; no idempotent field |
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py` | tool execution path; no confirmed-vs-attempted state |
 
 </details>
@@ -55,6 +57,8 @@ Retry logic lives in the model-client layer (a per-provider retry decorator in `
 
 ![diagram](assets/diagrams/5d3a4e95c944a41b5b63cdd7364f468fd138e8c4.png)
 
+**In Jiuwen.** Jiuwen caps the loop and detects repeated tool rounds. The compaction guard that would break a loop is off by default, and there is no check for repeated model output.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -70,7 +74,7 @@ Concrete mechanisms exist: `ReactAgent.max_iterations` defaults to 5 (the harnes
 | `agent-core/openjiuwen/harness/schema/config.py:252` | harness default iterations 15 |
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74` | ToolLoopCompactConfig (default off); :90 loop → compact → abort |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157` | repeat counter/warning |
-| `agent-core/openjiuwen/symphony/retrieval/retrievers/agentic_retriever.py` | max_iter=2 clamped |
+| `agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py` | max_iter=2 clamped |
 
 </details>
 
@@ -93,6 +97,8 @@ Concrete mechanisms exist: `ReactAgent.max_iterations` defaults to 5 (the harnes
 
 ![diagram](assets/diagrams/8a24a029be3a35f930243f79c20760514ff965fd.png)
 
+**In Jiuwen.** Jiuwen validates tool-call structure and applies guardrails, but it does not check answer claims against retrieved context in the live path; that faithfulness check runs only offline.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -106,7 +112,7 @@ Structured output validation is present through `StructuredAskUserRail` and Pyda
 |---|---|
 | `agent-core/openjiuwen/core/single_agent/agents/react_agent.py` | ToolCall Pydantic parsing; schema-validated tool calls |
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py` | SecurityRail content classification |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py` | structured output rail |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` | structured output rail |
 | `agent-core/openjiuwen/agent_evolving/eval/` | faithfulness evaluation (offline) |
 
 </details>
@@ -129,6 +135,8 @@ Structured output validation is present through `StructuredAskUserRail` and Pyda
 **Concept.** Memory is a liability as well as a feature: a wrong assumption stored early can quietly shape every later decision. Mitigations: scope memory by task or session so assumptions do not leak across sessions; when a tool returns contradictory evidence, flag or discard the related memory instead of letting both coexist; tag memories with the context that produced them so superseded ones can be identified as stale; and compact the context window rather than accumulate it.
 
 ![diagram](assets/diagrams/78a5619848cbe5883aca58f77dff0d1859038d6c.png)
+
+**In Jiuwen.** Jiuwen keeps memory scoped to a session and compacts long histories. It does not detect contradictions or mark memories as stale.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -167,6 +175,8 @@ Memory is session-scoped: `session_id` is the isolation unit and contexts do not
 
 ![diagram](assets/diagrams/0b4cc1c4a0d012e2103e8326623e8dea607f832e.png)
 
+**In Jiuwen.** Jiuwen emits per-turn observable events and streaming events that a consumer can subscribe to. It ships no default log sink, does not capture raw tool input/output, and has no trace replay.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -202,6 +212,8 @@ Memory is session-scoped: `session_id` is the isolation unit and contexts do not
 
 ![diagram](assets/diagrams/479bf057eed6949d517296c42ceac4e087cd41b9.png)
 
+**In Jiuwen.** Jiuwen stops on no tool call, on iteration caps, and through optional human-approval rails. It does not return a degraded answer at budget exhaustion or escalate automatically on low confidence.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -217,7 +229,7 @@ Several termination paths exist: `ReactAgent.max_iterations` is the hard iterati
 | `agent-core/openjiuwen/harness/schema/config.py:252` | harness default iterations 15 |
 | `agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74` | anomaly abort (off by default) |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` | session cost cap |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py` | structured human escalation |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` | structured human escalation |
 | `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` | WorkPlanApprovalRail (opt-in) |
 
 </details>

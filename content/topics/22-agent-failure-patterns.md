@@ -20,7 +20,7 @@ flowchart TD
 
 <details>
 <summary>Anchors</summary>
-<sub><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py</code> — per-provider retry decorator on API errors<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — <code>ToolCallDeduplicationRail</code>: repeated <code>(tool, args)</code> → warn/compact<br><code>agent-core/openjiuwen/core/foundation/tool/tool_card.py</code> — <code>ToolCard</code> schema; no <code>idempotent</code> field<br><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code> — tool execution path; no confirmed-vs-attempted state</sub>
+<sub><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py</code> — per-provider retry decorator on API errors<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — <code>ToolCallDeduplicationRail</code>: repeated <code>(tool, args)</code> → warn/compact<br><code>agent-core/openjiuwen/core/foundation/tool/base.py</code> — <code>ToolCard</code> schema; no <code>idempotent</code> field<br><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code> — tool execution path; no confirmed-vs-attempted state</sub>
 </details>
 
 ---
@@ -44,7 +44,7 @@ flowchart TD
 
 <details>
 <summary>Anchors</summary>
-<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — <code>ToolLoopCompactConfig</code> (default off); <code>:90</code> loop → compact → abort<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — repeat counter/warning<br><code>agent-core/openjiuwen/symphony/retrieval/retrievers/agentic_retriever.py</code> — <code>max_iter=2</code> clamped</sub>
+<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — <code>ToolLoopCompactConfig</code> (default off); <code>:90</code> loop → compact → abort<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — repeat counter/warning<br><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py</code> — <code>max_iter=2</code> clamped</sub>
 </details>
 
 ---
@@ -68,7 +68,7 @@ flowchart TD
 
 <details>
 <summary>Anchors</summary>
-<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code> — <code>ToolCall</code> Pydantic parsing; schema-validated tool calls<br><code>agent-core/openjiuwen/core/security/guardrail/builtin.py</code> — <code>SecurityRail</code> content classification<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py</code> — structured output rail<br><code>agent-core/openjiuwen/agent_evolving/eval/</code> — faithfulness evaluation (offline)</sub>
+<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code> — <code>ToolCall</code> Pydantic parsing; schema-validated tool calls<br><code>agent-core/openjiuwen/core/security/guardrail/builtin.py</code> — <code>SecurityRail</code> content classification<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code> — structured output rail<br><code>agent-core/openjiuwen/agent_evolving/eval/</code> — faithfulness evaluation (offline)</sub>
 </details>
 
 ---
@@ -137,7 +137,7 @@ flowchart TD
 
 <details>
 <summary>Anchors</summary>
-<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — anomaly abort (off by default)<br><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py</code> — structured human escalation<br><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py</code> — <code>WorkPlanApprovalRail</code> (opt-in)</sub>
+<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — anomaly abort (off by default)<br><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code> — structured human escalation<br><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py</code> — <code>WorkPlanApprovalRail</code> (opt-in)</sub>
 </details>
 
 ---

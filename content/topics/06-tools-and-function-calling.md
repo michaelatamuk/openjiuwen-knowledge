@@ -180,7 +180,7 @@ flowchart TD
 
 </details>
 
-**Gap.** **Per-tool retry budget is not actually implemented**: `_resolve_max_attempts` ignores `properties["resilience"]["max_attempts"]`; only the rail-wide `max_attempts` (default 3) applies. There is no per-tool backoff (`request_retry()` supports `delay_seconds`, but the rail always passes 0). The rail is not exported from `rails/__init__.py`, and "opt out" is only the boolean `idempotent`, so you cannot express "retry twice for tool A, never for B" without replacing the rail globally.
+**Gap.** **Per-tool retry budget is not actually implemented**: `_resolve_max_attempts` ignores `properties["resilience"]["max_attempts"]`; only the rail-wide `max_attempts` (default 3) applies. There is no per-tool backoff (`request_retry()` supports `delay_seconds`, but the rail always passes 0). The rail is not exported from `agent-core/openjiuwen/harness/rails/__init__.py`, and "opt out" is only the boolean `idempotent`, so you cannot express "retry twice for tool A, never for B" without replacing the rail globally.
 
 
 
@@ -243,7 +243,7 @@ flowchart TD
 
 </details>
 
-**Gap.** `_resolve_max_attempts` ignores per-tool overrides and always returns the rail default. `ToolCallResilienceRail` is not exported from `rails/__init__.py` and only acts if registered. `TimeoutEvaluator` exists only when a non-`None` `timeout_seconds` is passed. Workflow `ExceptionConfig` is threaded through constructors but has no in-tree consumer implementing component error recovery. `ModelAnomalyDetectionRail` covers repetition and stream-timeout only.
+**Gap.** `_resolve_max_attempts` ignores per-tool overrides and always returns the rail default. `ToolCallResilienceRail` is not exported from `agent-core/openjiuwen/harness/rails/__init__.py` and only acts if registered. `TimeoutEvaluator` exists only when a non-`None` `timeout_seconds` is passed. Workflow `ExceptionConfig` is threaded through constructors but has no in-tree consumer implementing component error recovery. `ModelAnomalyDetectionRail` covers repetition and stream-timeout only.
 
 <sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
 
@@ -329,7 +329,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard</code> schema (no idempotent flag)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/tool_call_deduplication_rail.py:1</code> — session-scoped same-args dedup<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40</code> — <code>McpServerConfig.retry_on_failure</code> (connection, not semantic)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard</code> schema (no idempotent flag)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1</code> — session-scoped same-args dedup<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40</code> — <code>McpServerConfig.retry_on_failure</code> (connection, not semantic)</sub>
 
 </details>
 

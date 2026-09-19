@@ -1,0 +1,6 @@
+{
+ "21-1": "Jiuwen supports both shapes: a declared graph engine for fixed control flow and the ReAct harness for dynamic, model-decided steps. The guidance is to use the graph path when the control flow is known and the agent path when it is open-ended.",
+ "21-2": "Jiuwen speaks MCP: an agent discovers tool servers and invokes their tools. For agent-to-agent delegation it uses an internal sub-agent rail; the cross-vendor A2A wire protocol is not implemented.",
+ "21-3": "Jiuwen's multi-agent collaboration is hierarchical — a planner or supervisor delegates to sub-agents and aggregates their results. There is no peer-to-peer topology.",
+ "21-4": "Jiuwen gives tests a mockable model boundary plus rail contracts for termination, schema, safety, and budget. Behavioural scoring with an LLM judge exists but runs offline, not inside the test runner."
+}

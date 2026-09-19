@@ -328,7 +328,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (prompt injection, static)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:1</code> — <code>GuardrailBackend</code> (sequence classifier, static)<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — <code>GuardrailRail</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/guardian_rail.py:1</code> — <code>GuardianRail</code> (policy filtering)<br>&bull; Framework has no self-critique, constitution file, or model-generated preference pipeline</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/auto_harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (prompt injection, static)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:1</code> — <code>GuardrailBackend</code> (sequence classifier, static)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — <code>GuardrailRail</code><br>&bull; Framework has no self-critique, constitution file, or model-generated preference pipeline</sub>
 
 </details>
 

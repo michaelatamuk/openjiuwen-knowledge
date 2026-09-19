@@ -167,7 +167,7 @@ flowchart TB
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; Layer 4: <code>agent-core/openjiuwen/core/retrieval/</code> — full retrieval pipeline<br>&bull; Layer 5: <code>agent-core/openjiuwen/harness/prompts/template.py</code>; <code>agent-core/openjiuwen/core/context_engine/</code>; <code>agent-core/openjiuwen/core/foundation/tool/base.py</code>; <code>agent-core/openjiuwen/core/agentic/react_agent.py</code><br>&bull; Layer 6: <code>agent-core/openjiuwen/harness/rails/security_rail.py</code>; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py</code>; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py</code><br>&bull; Layer 7: <code>agent-core/openjiuwen/harness/observability/event.py</code>; Milvus + vLLM + provider APIs (external)</sub>
+<sub><strong>Anchors:</strong><br>&bull; Layer 4: <code>agent-core/openjiuwen/core/retrieval/</code> — full retrieval pipeline<br>&bull; Layer 5: <code>agent-core/openjiuwen/harness/prompts/template.py</code>; <code>agent-core/openjiuwen/core/context_engine/</code>; <code>agent-core/openjiuwen/core/foundation/tool/base.py</code>; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code><br>&bull; Layer 6: <code>agent-core/openjiuwen/auto_harness/rails/security_rail.py</code>; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py</code>; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py</code><br>&bull; Layer 7: <code>agent-core/openjiuwen/harness/observability/rail.py</code>; Milvus + vLLM + provider APIs (external)</sub>
 
 </details>
 

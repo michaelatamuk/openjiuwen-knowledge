@@ -216,7 +216,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/core/memory/ephemeral_memory.py:1</code> — within-session shared state<br>&bull; Communication schema: <code>SubagentRequest</code>/<code>SubagentResponse</code> in <code>agent-core/openjiuwen/harness/rails/subagent/</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:1</code> — within-session shared state<br>&bull; Communication schema: <code>SubagentRequest</code>/<code>SubagentResponse</code> in <code>agent-core/openjiuwen/harness/rails/subagent/</code></sub>
 
 </details>
 

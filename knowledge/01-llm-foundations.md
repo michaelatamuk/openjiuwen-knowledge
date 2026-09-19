@@ -999,7 +999,7 @@ The framework consumes models by `ProviderType` + `model_name` string — there 
 |---|---|
 | `agent-core/openjiuwen/core/foundation/llm/schema/config.py:13` | ProviderType (no instruct/base flag) |
 | `agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1` | SFT stage (produces instruct-like model from base) |
-| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | inference-time safety supplement |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | inference-time safety supplement |
 
 </details>
 
@@ -1039,7 +1039,7 @@ The framework operates from step 4 onward. Model clients (`openai_model_client.p
 | `agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865` | builds and sends request (step 4+) |
 | `agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14` | captures usage metadata from step 7 |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | billing meter equivalent (step 7) |
-| `agent-core/openjiuwen/harness/observability/event.py:1` | observability events (step 8 equivalent) |
+| `agent-core/openjiuwen/harness/observability/rail.py:1` | observability events (step 8 equivalent) |
 
 </details>
 

@@ -230,9 +230,9 @@ The framework maps onto Layers 4–6 directly and delegates the rest. **Layer 4*
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/core/retrieval/` | full retrieval pipeline |
-| `agent-core/openjiuwen/harness/prompts/template.py` | ; agent-core/openjiuwen/core/context_engine/; agent-core/openjiuwen/core/foundation/tool/base.py; agent-core/openjiuwen/core/agentic/react_agent.py |
-| `agent-core/openjiuwen/harness/rails/security_rail.py` | ; agent-core/openjiuwen/harness/rails/guardrail_rail.py; agent-core/openjiuwen/harness/rails/subagent/verification_rail.py |
-| `agent-core/openjiuwen/harness/observability/event.py` | ; Milvus + vLLM + provider APIs (external) |
+| `agent-core/openjiuwen/harness/prompts/template.py` | ; agent-core/openjiuwen/core/context_engine/; agent-core/openjiuwen/core/foundation/tool/base.py; agent-core/openjiuwen/core/single_agent/agents/react_agent.py |
+| `agent-core/openjiuwen/auto_harness/rails/security_rail.py` | ; agent-core/openjiuwen/core/security/guardrail/builtin.py; agent-core/openjiuwen/harness/rails/subagent/verification_rail.py |
+| `agent-core/openjiuwen/harness/observability/rail.py` | ; Milvus + vLLM + provider APIs (external) |
 
 </details>
 

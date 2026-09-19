@@ -490,10 +490,9 @@ Safety enforcement in the framework uses fixed classifiers and guardrails: `Secu
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/harness/rails/security_rail.py:1` | SecurityRail (prompt injection, static) |
+| `agent-core/openjiuwen/auto_harness/rails/security_rail.py:1` | SecurityRail (prompt injection, static) |
 | `agent-core/openjiuwen/core/security/guardrail/backends.py:1` | GuardrailBackend (sequence classifier, static) |
-| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | GuardrailRail |
-| `agent-core/openjiuwen/harness/rails/guardian_rail.py:1` | GuardianRail (policy filtering) |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | GuardrailRail |
 
 </details>
 

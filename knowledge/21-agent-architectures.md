@@ -14,6 +14,10 @@
 
 **Concept.** A workflow is a deterministic, pre-defined sequence of steps — the control flow is fixed by the developer. An agent is a dynamic, model-driven loop — the model decides which tools to call and when to stop. Workflows are predictable and auditable; agents are flexible but non-deterministic. The choice depends on whether the task structure is known in advance.
 
+![diagram](assets/diagrams/4efdf638664c7c5e1cb994e8d80f16fba5bc4f1e.png)
+
+**In Jiuwen.** Jiuwen supports both shapes: a declared graph engine for fixed control flow and the ReAct harness for dynamic, model-decided steps. The guidance is to use the graph path when the control flow is known and the agent path when it is open-ended.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
@@ -40,12 +44,16 @@ The graph path (Pregel workflow engine) handles known control flow with static a
 
 **Concept.** Two complementary protocols for extending AI systems. **MCP (Model Context Protocol):** One LLM connects to many tool providers. Centralized control — the agent decides which MCP server to call. Analogous to a single developer with a library of APIs. **A2A (Agent-to-Agent Protocol):** Agents coordinate with other agents. Decentralized execution — agents delegate to other agents asynchronously, potentially across deployments. Analogous to a team of specialists.
 
+![diagram](assets/diagrams/798020bdc7ce1eeefc43af9e8f915a8c3e3b152d.png)
+
+**In Jiuwen.** Jiuwen speaks MCP: an agent discovers tool servers and invokes their tools. For agent-to-agent delegation it uses an internal sub-agent rail; the cross-vendor A2A wire protocol is not implemented.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-MCP: `McpServerConfig` (`core/foundation/tool/mcp/mcp_config.py:1`) configures MCP servers; the client discovers tools via `tools/list` and invokes via `tools/call`. A2A-style delegation: `SubagentRail` (`harness/rails/subagent/subagent_rail.py:1`) delegates tasks to sub-agents using `SubagentRequest`/`SubagentResponse` schemas — this is internal delegation, not the A2A wire protocol. Cross-deployment agent-to-agent communication is not implemented.
+MCP: `McpServerConfig` (in the MCP tool module) configures MCP servers; the client discovers tools via `tools/list` and invokes via `tools/call`. A2A-style delegation: `SubagentRail` delegates tasks to sub-agents using `SubagentRequest`/`SubagentResponse` schemas — this is internal delegation, not the A2A wire protocol. Cross-deployment agent-to-agent communication is not implemented.
 
 </details>
 
@@ -66,6 +74,10 @@ MCP: `McpServerConfig` (`core/foundation/tool/mcp/mcp_config.py:1`) configures M
 - Five components: agents (capabilities and roles), communication (message schemas), coordination (task assignment), shared memory/state, and environment/tool access
 
 **Concept.** Multi-agent systems fall into four architectural types, and every one of them needs the same five components.
+
+![diagram](assets/diagrams/3ec72366635b3d61c9443f93e784ff888b8d3f20.png)
+
+**In Jiuwen.** Jiuwen's multi-agent collaboration is hierarchical — a planner or supervisor delegates to sub-agents and aggregates their results. There is no peer-to-peer topology.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -95,12 +107,16 @@ Architecture is hierarchical via `SubagentRail` and `TaskPlanningRail`. No peer-
 
 **Concept.** Exact output strings cannot be asserted for agents, so tests target invariants: properties that must always hold regardless of the specific output.
 
+![diagram](assets/diagrams/3168393716fd4ccdd8bb7ea86e5fff7cc130674a.png)
+
+**In Jiuwen.** Jiuwen gives tests a mockable model boundary plus rail contracts for termination, schema, safety, and budget. Behavioural scoring with an LLM judge exists but runs offline, not inside the test runner.
+
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-`ModelClientABC` (`core/foundation/llm/model_clients/base.py:1`) is the mockable boundary. Rail contract invariants: `CircuitBreakerRail` for termination, structured output tool for schema, `GuardrailRail` for safety, `usage_cost.py:101` for budget. Behavioral correctness: `LLMAsJudge` (`agent_evolving/evaluator/metrics/llm_as_judge.py:40`). The evaluator pipeline is offline and is not integrated with pytest.
+`ModelClientABC` (in the model-clients package) is the mockable boundary. Rail contract invariants: `CircuitBreakerRail` for termination, the structured-output tool for schema, `GuardrailRail` for safety, `usage_cost.py` for budget. Behavioural correctness: `LLMAsJudge`. The evaluator pipeline is offline and is not integrated with pytest.
 
 </details>
 

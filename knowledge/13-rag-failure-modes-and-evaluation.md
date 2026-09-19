@@ -437,8 +437,8 @@ The framework has components for each stage but they are not wired into a single
 | `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema (syntactic) |
 | `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92` | VerificationRail (semantic) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1` | FaithfulnessEvaluator |
-| `agent-core/openjiuwen/harness/rails/security_rail.py:1` | SecurityRail (policy) |
-| `agent-core/openjiuwen/harness/rails/guardrail_rail.py:1` | GuardrailRail (policy) |
+| `agent-core/openjiuwen/auto_harness/rails/security_rail.py:1` | SecurityRail (policy) |
+| `agent-core/openjiuwen/core/security/guardrail/builtin.py:1` | GuardrailRail (policy) |
 
 </details>
 

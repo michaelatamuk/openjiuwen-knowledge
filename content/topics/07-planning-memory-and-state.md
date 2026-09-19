@@ -284,7 +284,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code> — <code>SessionModelContext</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11</code> — <code>ContextMessageBuffer</code><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code><br>&bull; <code>../../../agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py</code> — memory type taxonomy<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:56</code> — product hybrid memory index</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code> — <code>SessionModelContext</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11</code> — <code>ContextMessageBuffer</code><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code><br>&bull; <code>agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py</code> — memory type taxonomy<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:56</code> — product hybrid memory index</sub>
 
 </details>
 
@@ -484,7 +484,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code> and entry schema<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — <code>memory_write</code>/<code>memory_update</code>/<code>memory_delete_by_category</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/memory_forbidden_rail.py:1</code> — memory suppression gate<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code> — when/what to write</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — <code>LongTermMemory</code> and entry schema<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code> — <code>memory_write</code>/<code>memory_update</code>/<code>memory_delete_by_category</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/memory_forbidden_rail.py:1</code> — memory suppression gate<br>&bull; <code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code> — when/what to write</sub>
 
 </details>
 

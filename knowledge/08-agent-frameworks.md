@@ -427,13 +427,13 @@ Extension is registry/manifest based rather than patch based. Provider modules d
 
 **Implementation**
 
-MCP is supported via `McpServerConfig` (agent-core/openjiuwen/core/foundation/tool/mcp/mcp_config.py) — each server exposes tools that the agent discovers via `tools/list` and calls via `tools/call`. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses `SubagentRail` to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.
+MCP is supported via `McpServerConfig` (agent-core/openjiuwen/core/foundation/tool/mcp/base.py) — each server exposes tools that the agent discovers via `tools/list` and calls via `tools/call`. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses `SubagentRail` to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/foundation/tool/mcp/mcp_config.py:1` | McpServerConfig (MCP tool discovery + calling) |
+| `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:1` | McpServerConfig (MCP tool discovery + calling) |
 | `agent-core/openjiuwen/core/foundation/tool/mcp/` | MCP client implementation |
 | `agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1` | internal agent delegation (not A2A protocol) |
 

@@ -270,6 +270,14 @@ flowchart TD
 
 **Jiuwen:** Caps are concrete: ReAct `max_iterations` (5; harness 15), `AgenticRetriever.max_iter` (2, clamped), `ModelAnomalyDetectionRail` (identical tool rounds → compact/abort), `ToolCallDeduplicationRail`, and secure-by-default `idempotent=False` (non-idempotent tools never retried). A session cost cap is enforced when the provider reports cost; a per-step token budget in the task loop is wired but off by default.
 
+```mermaid
+flowchart TD
+    L["agent stuck in a loop"] --> CAP["hard iteration cap"]
+    L --> DED["repeated (tool, args) detection"]
+    L --> BUD["session token / cost budget"]
+    L --> CB["circuit breaker after repeated failures"]
+```
+
 <details>
 <summary>Anchors</summary>
 
@@ -328,7 +336,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` — `max_iterations: int = Field(default=5)`<br>&bull; `agent-core/openjiuwen/harness/schema/config.py:252` — harness default 15<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/structured_ask_user_rail.py` — structured human escalation<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` — `WorkPlanApprovalRail` (opt-in)</sub>
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288` — `max_iterations: int = Field(default=5)`<br>&bull; `agent-core/openjiuwen/harness/schema/config.py:252` — harness default 15<br>&bull; `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171` — session cost cap<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py` — structured human escalation<br>&bull; `jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py` — `WorkPlanApprovalRail` (opt-in)</sub>
 
 </details>
 
@@ -362,7 +370,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/agentic/react_agent.py` — agent loop (dynamic)<br>&bull; `agent-core/openjiuwen/core/workflow/` — Pregel graph engine (deterministic)<br>&bull; `agent-core/openjiuwen/harness/rails/task_planning_rail.py` — task decomposition in the agent path</sub>
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py` — agent loop (dynamic)<br>&bull; `agent-core/openjiuwen/core/workflow/` — Pregel graph engine (deterministic)<br>&bull; `agent-core/openjiuwen/harness/rails/task_planning_rail.py` — task decomposition in the agent path</sub>
 
 </details>
 

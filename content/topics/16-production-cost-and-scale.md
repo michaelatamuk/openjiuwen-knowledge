@@ -395,7 +395,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/observability/event.py:1</code> — <code>ObservabilityEvent</code> schema<br>&bull; <code>agent-core/openjiuwen/harness/observability/handler.py:1</code> — <code>ObservabilityHandler</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code> — event emission points<br>&bull; <code>agent-core/openjiuwen/harness/trace/trace_manager.py:1</code> — <code>TraceManager</code> span tracking<br>&bull; <code>agent-core/openjiuwen/core/model/response.py:1</code> — <code>ModelResponse.usage</code> token counts</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:1</code> — <code>ObservabilityEvent</code> schema<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code> — event emission points<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:1</code> — <code>ModelResponse.usage</code> token counts</sub>
 
 </details>
 
@@ -426,7 +426,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/model/client/factory.py:1</code> — <code>ModelClientFactory</code><br>&bull; <code>agent-core/openjiuwen/core/model/config.py:1</code> — <code>ModelConfig</code> (provider + model_id)<br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> failure trip + cooldown<br>&bull; <code>agent-core/openjiuwen/core/model/client/</code> — per-provider client implementations</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1</code> — <code>ModelClientFactory</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:1</code> — <code>ModelConfig</code> (provider + model_id)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> failure trip + cooldown<br>&bull; <code>agent-core/openjiuwen/core/model/client/</code> — per-provider client implementations</sub>
 
 </details>
 
@@ -458,7 +458,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> open/closed/half-open states<br>&bull; <code>agent-core/openjiuwen/core/model/config.py:1</code> — <code>ModelRequestConfig.timeout</code><br>&bull; <code>agent-core/openjiuwen/core/model/client/factory.py:1</code> — single provider per agent (no fallback chain)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:1</code> — <code>CircuitBreakerRail</code> open/closed/half-open states<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:1</code> — <code>ModelRequestConfig.timeout</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:1</code> — single provider per agent (no fallback chain)</sub>
 
 </details>
 

@@ -292,7 +292,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema</code> (syntactic)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> (semantic)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1</code> — <code>FaithfulnessEvaluator</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (policy)<br>&bull; <code>agent-core/openjiuwen/harness/rails/guardrail_rail.py:1</code> — <code>GuardrailRail</code> (policy)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema</code> (syntactic)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> (semantic)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/faithfulness_evaluator.py:1</code> — <code>FaithfulnessEvaluator</code><br>&bull; <code>agent-core/openjiuwen/auto_harness/rails/security_rail.py:1</code> — <code>SecurityRail</code> (policy)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — <code>GuardrailRail</code> (policy)</sub>
 
 </details>
 
