@@ -34,7 +34,7 @@
 
 **Implementation**
 
-BERT appears only as a classifier backend for the guardrail framework: `LocalModelBackend._load_model` loads `AutoModelForSequenceClassification` (`core/security/guardrail/backends.py:445`), parsed by `BertBinaryParser` (`core/security/guardrail/context.py:106`). Jiuwen does not use BERT as a frozen embedding encoder.
+BERT-family models are used as a classifier backend for the guardrail framework: `LocalModelBackend._load_model` loads `AutoModelForSequenceClassification` (`core/security/guardrail/backends.py:445`), parsed by `BertBinaryParser` (`core/security/guardrail/context.py:106`). Jiuwen does not use BERT as a frozen embedding encoder.
 
 </details>
 
@@ -78,15 +78,6 @@ ICL is done through prompt construction — `PromptTemplate` (`core/foundation/p
 - Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters.
 
 **Concept.** Compute-optimal training is ~20 tokens per parameter. Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen. Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters. For a fixed compute budget, scale model size and training tokens equally. Data matters as much as parameters. Smaller model + more data outperforms larger model + less data.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Pretraining out of scope; Chinchilla-aware base model selection is an operator-level decision with no framework tooling.
-
-</details>
 
 ---
 
@@ -193,15 +184,6 @@ Pretraining out of scope; Chinchilla-aware base model selection is an operator-l
 
 **Concept.** Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time. Stable supervised objective; enables high-quality image generation. Foundation for Stable Diffusion, DALL-E 2. Inference: start from pure noise, run reverse T steps → generated image. Latent Diffusion Models (Stable Diffusion) compress to a VAE latent space for ~8× compute reduction. Quality levers: steps, guidance scale, scheduler.
 
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Image generation is handled by external tools (`ToolCard` calls); diffusion is not part of the framework.
-
-</details>
-
 ---
 
 ## 12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)
@@ -223,7 +205,7 @@ Image generation is handled by external tools (`ToolCard` calls); diffusion is n
 
 **Implementation**
 
-Cross-modal retrieval here uses provider-based multimodal embeddings rather than CLIP. (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
+Cross-modal retrieval here uses provider-based multimodal embeddings (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) rather than a CLIP encoder; `MultimodalImageRail` prepares image attachments for the generation model, not an embedding index.
 
 </details>
 
@@ -268,15 +250,6 @@ Infrastructure concern handled by vLLM at the serving layer. Jiuwen manages long
 
 **Concept.** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
 
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Model architecture opaque to framework; no MoE-aware routing, expert metadata, or active-parameter tracking.
-
-</details>
-
 ---
 
 ## 15. Constitutional AI: Harmlessness from AI Feedback (Bai, 2022)
@@ -298,7 +271,7 @@ Model architecture opaque to framework; no MoE-aware routing, expert metadata, o
 
 **Implementation**
 
-Safety uses static classifiers and rails (`SecurityRail`, `PromptInjectionGuardrail`, `SafetyPromptRail`); there is no self-critique loop and no constitution file.
+Safety is enforced by static classifiers and rails (`SecurityRail`, `PromptInjectionGuardrail`, `SafetyPromptRail`); alignment follows standard training rather than a constitution-driven self-critique loop.
 
 </details>
 
