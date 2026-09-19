@@ -18,6 +18,17 @@
   ]
  },
  "05-3": {
+  "title": "Workflows vs autonomous agents",
+  "tldr": "Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.",
+  "points": [
+   "Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.",
+   "Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.",
+   "Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.",
+   "Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.",
+   "Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first."
+  ]
+ },
+ "05-4": {
   "title": "Linear chain vs conditional graph",
   "tldr": "A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).",
   "points": [
@@ -26,7 +37,7 @@
    "Join/barrier gates merge nodes."
   ]
  },
- "05-4": {
+ "05-5": {
   "title": "ReAct pattern",
   "tldr": "ReAct alternates thought → action → observation, so each tool result informs the next reasoning step.",
   "points": [
@@ -35,7 +46,7 @@
    "Repeats until there are no tool calls."
   ]
  },
- "05-5": {
+ "05-6": {
   "title": "Why interleave reasoning and actions",
   "tldr": "A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.",
   "points": [
@@ -44,7 +55,7 @@
    "Adapts when reality differs from the plan."
   ]
  },
- "05-6": {
+ "05-7": {
   "title": "Hard iteration limit",
   "tldr": "Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.",
   "points": [
@@ -53,7 +64,7 @@
    "Cap each nested loop; make caps configurable."
   ]
  },
- "05-7": {
+ "05-8": {
   "title": "What stops an agent",
   "tldr": "Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.",
   "points": [
@@ -62,7 +73,7 @@
    "Outer loop: stop evaluators + completion promise."
   ]
  },
- "05-8": {
+ "05-9": {
   "title": "Infinite tool-calling loop",
   "tldr": "Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.",
   "points": [
@@ -71,7 +82,7 @@
    "No-progress nudge/abort + token/time caps."
   ]
  },
- "05-9": {
+ "05-10": {
   "title": "'The agent is stuck': tests shipped experience",
   "tldr": "'The agent is stuck' tests whether you've shipped one, not studied one.",
   "points": [
@@ -81,7 +92,7 @@
    "Dedup rail + session cost cap."
   ]
  },
- "05-10": {
+ "05-11": {
   "title": "Divergence detection",
   "tldr": "Cap iterations to stop infinite loops, but also detect meaningless cycling: track tool-call fingerprints and output-text similarity to catch repetitive steps early.",
   "points": [
@@ -90,7 +101,7 @@
    "Gap: no output-text similarity comparison across turns to catch paraphrase loops."
   ]
  },
- "05-11": {
+ "05-12": {
   "title": "Explicit termination conditions",
   "tldr": "An agent needs named success, budget-exceeded, and escalation exit paths — not just 'stop when done' — so every run terminates predictably and failures degrade gracefully.",
   "points": [
@@ -98,17 +109,6 @@
    "Budget: turn/token cap, CircuitBreakerRail.",
    "Escalation: AskUserRail for human input.",
    "Gap: no graceful degraded response from any path — budget exhaustion raises rather than returns a partial result."
-  ]
- },
- "05-12": {
-  "title": "Workflows vs autonomous agents",
-  "tldr": "Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.",
-  "points": [
-   "Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.",
-   "Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.",
-   "Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.",
-   "Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.",
-   "Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first."
   ]
  }
 }

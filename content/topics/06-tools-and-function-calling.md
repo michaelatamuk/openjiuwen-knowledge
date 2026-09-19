@@ -31,7 +31,35 @@ sequenceDiagram
 
 ---
 
-## 2. How does a framework register and expose tools to the underlying model
+## 2. Agentic tool-calling pattern
+
+**General:** the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.
+
+**Jiuwen:** This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed `tool_calls`, and `LocalFunction.invoke` validates arguments.
+
+```mermaid
+sequenceDiagram
+    participant Model
+    participant Host
+    participant Tool
+    Host->>Model: query + tools
+    Model-->>Host: tool_call
+    Host->>Tool: execute (validate args)
+    Tool-->>Host: result
+    Host->>Model: tool result
+    Model-->>Host: answer (or another tool_call)
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813</code> — loop / answer / execute<br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078</code> — tool list + dispatch<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code> — card → JSON Schema<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:82</code> — argument validation</sub>
+
+</details>
+
+---
+
+## 3. How does a framework register and expose tools to the underlying model
 
 **General:** You register a tool with a name, description, and parameter schema; the framework collects registered tools into the model request in the provider's tool format; the model returns tool calls that the framework dispatches. Auto-deriving the schema from a function signature is the convenience that makes this usable.
 
@@ -60,7 +88,39 @@ flowchart LR
 
 ---
 
-## 3. How do you handle a tool that a framework doesn't natively support
+## 4. How does the framework validate a tool call's structured output before executing it
+
+**General:** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
+
+**Jiuwen:** Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
+
+```mermaid
+flowchart TD
+    RAW["model tool-call arguments (string)"] --> P{"json.loads ok?"}
+    P -->|no| REP["_repair_tool_arguments_json (balance brackets)"]
+    P -->|yes| D
+    REP -->|"still broken"| ERR["AbilityExecutionError → back to model"]
+    REP -->|fixed| D["parsed dict → tool.invoke"]
+    D --> V["SchemaUtils.format_with_schema → validate_with_schema"]
+    V -->|valid| RUN["function runs (defaults filled)"]
+    V -->|invalid| ERR
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code> — <code>_repair_tool_arguments_json()</code>; <code>:537</code> <code>_parse_tool_arguments_with_repair()</code>; <code>:1419</code> execution path rewrites <code>tool_call.arguments</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:76</code> — <code>LocalFunction.invoke</code>; <code>:82</code> validation via <code>SchemaUtils.format_with_schema</code><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema()</code> (jsonschema → Pydantic fallback); <code>:23</code> <code>format_with_schema()</code>; <code>:49</code> calls validate then fills defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208</code> — <code>MCPTool.invoke</code> validates MCP args via the same path<br>&bull; <code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82</code> — <code>input_params = schema_json</code>; <code>:86</code> <code>invoke</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard.input_params</code> is the schema source</sub>
+
+</details>
+
+**Gap.** Validation is skipped only when `input_params` is `None` (the default `{}` still enters validation). The JSON repair only balances brackets/quotes — it does not fix unquoted barewords or trailing commas, which raise and round-trip an error to the model. Schema validation lives inside the tool (`LocalFunction`/`MCPTool`), so a raw `Tool` subclass that does not call `SchemaUtils` gets no automatic argument validation.
+
+<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
+
+
+---
+
+## 5. How do you handle a tool that a framework doesn't natively support
 
 **General:** The framework should let you wrap an arbitrary function as a tool, define a custom tool class for custom transport/auth, or connect an external tool server through a protocol such as MCP. If none of those is possible, that is a real limitation.
 
@@ -89,7 +149,7 @@ flowchart TD
 
 ---
 
-## 4. How do you handle a tool call that fails or returns malformed output
+## 6. How do you handle a tool call that fails or returns malformed output
 
 **General:** Treat failures as data, not crashes: catch the exception, classify whether it is retryable, return a structured error the model can read and react to, and repair obviously broken payloads (e.g., unbalanced JSON) when possible.
 
@@ -123,7 +183,38 @@ flowchart TD
 
 ---
 
-## 5. Designing retry logic that doesn't cause duplicate side effects on a tool call
+## 7. How does the framework handle a step that times out or throws an error
+
+**General:** Bound each step with a timeout; classify errors (retryable vs not); convert failures into data (a tool/observation result) so the loop can adapt; propagate fatal errors with cleanup. Distinguish control-flow exceptions (cancellation, interrupt) from real failures.
+
+**Jiuwen:** Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout resolves from `ToolCard.properties["resilience"]["timeout_s"]` (or a default), and an exempt tool is still bounded by a hard limit. A `TimeoutError` becomes an `AbilityExecutionError` carrying a pre-built `ToolMessage`; `asyncio.CancelledError` and `ToolInterruptException` are re-raised as control flow. `ToolCallResilienceRail.on_tool_exception` decides retryability in layers and calls `ctx.request_retry()`, which the `@rail` decorator consumes to re-run the tool; on budget exhaustion it fabricates a `[Retry Summary]` `ToolMessage` so the model sees the failure as a result. Model-call failures route to `ON_MODEL_EXCEPTION` rails (`ModelAnomalyDetectionRail` retries repeated/stream-timeout errors with backoff; `_call_model` has a one-shot recovery hook). Workflow failures wrap timeout as `WORKFLOW_EXECUTION_TIMEOUT`.
+
+```mermaid
+flowchart TD
+    C["tool call"] --> TO["anyio.fail_after(call_timeout)"]
+    TO -->|"TimeoutError"| EE["AbilityExecutionError + ToolMessage"]
+    TO -->|"exception"| RR["ToolCallResilienceRail.on_tool_exception"]
+    RR --> ID{"idempotent + retryable?"}
+    ID -->|yes| RE["ctx.request_retry() → @rail re-runs"]
+    ID -->|no| ERR["[Retry Summary] ToolMessage → model"]
+    TO -->|"CancelledError / ToolInterruptException"| CTRL["re-raise as control flow"]
+    MC["model call error"] --> MA["ModelAnomalyDetectionRail.on_model_exception (backoff retry)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1455</code> — <code>with anyio.fail_after(call_timeout)</code>; <code>:1457-1463</code> <code>TimeoutError</code> → <code>_build_execution_error</code>; <code>:556</code> <code>_build_execution_error</code>; <code>:1186-1238</code> parallel-batch handling; <code>:1492</code> workflow error wrapping<br>&bull; <code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:106</code> — <code>on_tool_exception</code>; <code>:128-138</code> non-idempotent layer; <code>:145</code> budget; <code>:169-186</code> retry-summary; <code>:196</code> <code>request_retry</code>; <code>:198</code> <code>_is_retryable_exception</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/rail/base.py:1016</code> — <code>@rail</code> retry loop; <code>:1036</code> catch; <code>:1049</code> fire <code>on_exception</code>; <code>:1065</code> consume retry; <code>:633</code> <code>request_force_finish</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:236</code> — <code>on_model_exception</code>; <code>:336</code> <code>ctx.request_retry(delay_seconds=...)</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1016</code> — model exception + one recovery attempt; <code>:2857/2868</code> persist safe prefix then re-raise<br>&bull; <code>agent-core/openjiuwen/harness/schema/stop_condition.py:162</code> — <code>TimeoutEvaluator</code>; <code>agent-core/openjiuwen/harness/deep_agent.py:2712</code> — <code>completion_timeout</code> (600s)<br>&bull; <code>agent-core/openjiuwen/core/workflow/workflow.py:671</code> — <code>WORKFLOW_EXECUTION_TIMEOUT</code>; <code>agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:243</code> — interrupt as <code>AbortError</code></sub>
+
+</details>
+
+**Gap.** `_resolve_max_attempts` ignores per-tool overrides and always returns the rail default. `ToolCallResilienceRail` is not exported from `agent-core/openjiuwen/harness/rails/__init__.py` and only acts if registered. `TimeoutEvaluator` exists only when a non-`None` `timeout_seconds` is passed. Workflow `ExceptionConfig` is threaded through constructors but has no in-tree consumer implementing component error recovery. `ModelAnomalyDetectionRail` covers repetition and stream-timeout only.
+
+<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
+
+---
+
+## 8. Designing retry logic that doesn't cause duplicate side effects on a tool call
 
 **General:** Never blindly retry non-idempotent actions (payments, emails, writes). Mark side-effecting tools, use idempotency keys so a repeated call is recognized, and prefer retry only for reads or explicitly idempotent operations. Bound retries with backoff. On ambiguity, surface to a human rather than guess.
 
@@ -156,7 +247,7 @@ flowchart TD
 
 ---
 
-## 6. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
+## 9. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
 
 **General:** Retry policy should be per-tool and overridable: an idempotency flag, max attempts, backoff, and timeout. A single global retry that ignores non-idempotency is dangerous, but so is a per-tool override that silently disables the framework's safety defaults.
 
@@ -188,7 +279,35 @@ flowchart TD
 
 ---
 
-## 7. Handling concurrent API calls when an agent needs to call multiple tools at once
+## 10. How do you design tools for idempotency and safe retry?
+
+**General:** Separate tools into two categories: idempotent reads (GET-style — safe to retry with backoff, identical result every time) and non-idempotent writes (payment, email send, database insert — must not be executed twice). For writes: attach an idempotency key — a unique request ID generated by the agent before the call and passed with every attempt, so the server deduplicates on that key. Track "attempted vs confirmed" state in the agent's memory so a subsequent retry knows whether the call was received but timed out, or never sent. Never retry a write blindly on timeout; always verify state first.
+
+**Jiuwen:** `ToolCard.idempotent` defaults to `False`, and non-idempotent tools are never retried by the resilience rail — so the framework does distinguish reads from writes at the card level. Retry decisions live in `ToolCallResilienceRail` (only retryable exception types, with a per-invoke budget). `ToolCallDeduplicationRail` additionally suppresses exact repeated calls within a session, which guards against loop-induced repeats rather than providing semantic idempotency. Idempotency keys and "attempted vs confirmed" state are still the tool author's responsibility; the framework provides no scaffold. The `retry_on_failure` field in `McpServerConfig` controls MCP connection retries, not tool-call semantic idempotency.
+
+```mermaid
+flowchart TD
+    TOOL["tool call"] --> CAT{"idempotent?"}
+    CAT -->|"read (GET)"| RETRY["retry with backoff — safe"]
+    CAT -->|"write (POST/pay/email)"| KEY["attach idempotency key + track state"]
+    KEY --> V{"verify state before retry"}
+    V -->|"confirmed executed"| SKIP["skip retry — already done"]
+    V -->|"not received"| SEND["send with same key"]
+    SEND --> KEY
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code> — <code>ToolCard.idempotent</code> (default <code>False</code>)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1</code> — session-scoped same-args dedup<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40</code> — <code>McpServerConfig.retry_on_failure</code> (connection, not semantic)</sub>
+
+</details>
+
+**Gap.** No idempotency key scaffold, no tool-level `idempotent: bool` annotation, and no "attempted vs confirmed" state tracking. The deduplication rail only suppresses exact duplicates within a session, not cross-session or state-aware retries.
+
+<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>
+
+## 11. Handling concurrent API calls when an agent needs to call multiple tools at once
 
 **General:** When a turn contains several independent tool calls, run them concurrently with async tasks rather than a serial `for` loop, but bound the concurrency (semaphore/pool), respect per-resource ordering (two writes to the same file must not interleave), and mark which tools are safe to parallelize. Failures in one call should not silently cancel the others unless you want fail-fast semantics.
 
@@ -217,122 +336,3 @@ flowchart TD
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
 
 ---
-
-## 8. How does the framework handle a step that times out or throws an error
-
-**General:** Bound each step with a timeout; classify errors (retryable vs not); convert failures into data (a tool/observation result) so the loop can adapt; propagate fatal errors with cleanup. Distinguish control-flow exceptions (cancellation, interrupt) from real failures.
-
-**Jiuwen:** Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout resolves from `ToolCard.properties["resilience"]["timeout_s"]` (or a default), and an exempt tool is still bounded by a hard limit. A `TimeoutError` becomes an `AbilityExecutionError` carrying a pre-built `ToolMessage`; `asyncio.CancelledError` and `ToolInterruptException` are re-raised as control flow. `ToolCallResilienceRail.on_tool_exception` decides retryability in layers and calls `ctx.request_retry()`, which the `@rail` decorator consumes to re-run the tool; on budget exhaustion it fabricates a `[Retry Summary]` `ToolMessage` so the model sees the failure as a result. Model-call failures route to `ON_MODEL_EXCEPTION` rails (`ModelAnomalyDetectionRail` retries repeated/stream-timeout errors with backoff; `_call_model` has a one-shot recovery hook). Workflow failures wrap timeout as `WORKFLOW_EXECUTION_TIMEOUT`.
-
-```mermaid
-flowchart TD
-    C["tool call"] --> TO["anyio.fail_after(call_timeout)"]
-    TO -->|"TimeoutError"| EE["AbilityExecutionError + ToolMessage"]
-    TO -->|"exception"| RR["ToolCallResilienceRail.on_tool_exception"]
-    RR --> ID{"idempotent + retryable?"}
-    ID -->|yes| RE["ctx.request_retry() → @rail re-runs"]
-    ID -->|no| ERR["[Retry Summary] ToolMessage → model"]
-    TO -->|"CancelledError / ToolInterruptException"| CTRL["re-raise as control flow"]
-    MC["model call error"] --> MA["ModelAnomalyDetectionRail.on_model_exception (backoff retry)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1455</code> — <code>with anyio.fail_after(call_timeout)</code>; <code>:1457-1463</code> <code>TimeoutError</code> → <code>_build_execution_error</code>; <code>:556</code> <code>_build_execution_error</code>; <code>:1186-1238</code> parallel-batch handling; <code>:1492</code> workflow error wrapping<br>&bull; <code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:106</code> — <code>on_tool_exception</code>; <code>:128-138</code> non-idempotent layer; <code>:145</code> budget; <code>:169-186</code> retry-summary; <code>:196</code> <code>request_retry</code>; <code>:198</code> <code>_is_retryable_exception</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/rail/base.py:1016</code> — <code>@rail</code> retry loop; <code>:1036</code> catch; <code>:1049</code> fire <code>on_exception</code>; <code>:1065</code> consume retry; <code>:633</code> <code>request_force_finish</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:236</code> — <code>on_model_exception</code>; <code>:336</code> <code>ctx.request_retry(delay_seconds=...)</code><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1016</code> — model exception + one recovery attempt; <code>:2857/2868</code> persist safe prefix then re-raise<br>&bull; <code>agent-core/openjiuwen/harness/schema/stop_condition.py:162</code> — <code>TimeoutEvaluator</code>; <code>agent-core/openjiuwen/harness/deep_agent.py:2712</code> — <code>completion_timeout</code> (600s)<br>&bull; <code>agent-core/openjiuwen/core/workflow/workflow.py:671</code> — <code>WORKFLOW_EXECUTION_TIMEOUT</code>; <code>agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:243</code> — interrupt as <code>AbortError</code></sub>
-
-</details>
-
-**Gap.** `_resolve_max_attempts` ignores per-tool overrides and always returns the rail default. `ToolCallResilienceRail` is not exported from `agent-core/openjiuwen/harness/rails/__init__.py` and only acts if registered. `TimeoutEvaluator` exists only when a non-`None` `timeout_seconds` is passed. Workflow `ExceptionConfig` is threaded through constructors but has no in-tree consumer implementing component error recovery. `ModelAnomalyDetectionRail` covers repetition and stream-timeout only.
-
-<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework._</sub>
-
----
-
-## 9. Agentic tool-calling pattern
-
-**General:** the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.
-
-**Jiuwen:** This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed `tool_calls`, and `LocalFunction.invoke` validates arguments.
-
-```mermaid
-sequenceDiagram
-    participant Model
-    participant Host
-    participant Tool
-    Host->>Model: query + tools
-    Model-->>Host: tool_call
-    Host->>Tool: execute (validate args)
-    Tool-->>Host: result
-    Host->>Model: tool result
-    Model-->>Host: answer (or another tool_call)
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813</code> — loop / answer / execute<br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078</code> — tool list + dispatch<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code> — card → JSON Schema<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:82</code> — argument validation</sub>
-
-</details>
-
----
-
-## 10. How does the framework validate a tool call's structured output before executing it
-
-**General:** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
-
-**Jiuwen:** Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
-
-```mermaid
-flowchart TD
-    RAW["model tool-call arguments (string)"] --> P{"json.loads ok?"}
-    P -->|no| REP["_repair_tool_arguments_json (balance brackets)"]
-    P -->|yes| D
-    REP -->|"still broken"| ERR["AbilityExecutionError → back to model"]
-    REP -->|fixed| D["parsed dict → tool.invoke"]
-    D --> V["SchemaUtils.format_with_schema → validate_with_schema"]
-    V -->|valid| RUN["function runs (defaults filled)"]
-    V -->|invalid| ERR
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code> — <code>_repair_tool_arguments_json()</code>; <code>:537</code> <code>_parse_tool_arguments_with_repair()</code>; <code>:1419</code> execution path rewrites <code>tool_call.arguments</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/function/function.py:76</code> — <code>LocalFunction.invoke</code>; <code>:82</code> validation via <code>SchemaUtils.format_with_schema</code><br>&bull; <code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code> — <code>validate_with_schema()</code> (jsonschema → Pydantic fallback); <code>:23</code> <code>format_with_schema()</code>; <code>:49</code> calls validate then fills defaults<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208</code> — <code>MCPTool.invoke</code> validates MCP args via the same path<br>&bull; <code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82</code> — <code>input_params = schema_json</code>; <code>:86</code> <code>invoke</code><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code> — <code>ToolCard.input_params</code> is the schema source</sub>
-
-</details>
-
-**Gap.** Validation is skipped only when `input_params` is `None` (the default `{}` still enters validation). The JSON repair only balances brackets/quotes — it does not fix unquoted barewords or trailing commas, which raise and round-trip an error to the model. Schema validation lives inside the tool (`LocalFunction`/`MCPTool`), so a raw `Tool` subclass that does not call `SchemaUtils` gets no automatic argument validation.
-
-<sub>_Canonical source: `source/ai-agent-framework-interview-questions_for_engineers.md`; also covered in: framework, ai-agent._</sub>
-
-
----
-
-## 11. How do you design tools for idempotency and safe retry?
-
-**General:** Separate tools into two categories: idempotent reads (GET-style — safe to retry with backoff, identical result every time) and non-idempotent writes (payment, email send, database insert — must not be executed twice). For writes: attach an idempotency key — a unique request ID generated by the agent before the call and passed with every attempt, so the server deduplicates on that key. Track "attempted vs confirmed" state in the agent's memory so a subsequent retry knows whether the call was received but timed out, or never sent. Never retry a write blindly on timeout; always verify state first.
-
-**Jiuwen:** `ToolCard.idempotent` defaults to `False`, and non-idempotent tools are never retried by the resilience rail — so the framework does distinguish reads from writes at the card level. Retry decisions live in `ToolCallResilienceRail` (only retryable exception types, with a per-invoke budget). `ToolCallDeduplicationRail` additionally suppresses exact repeated calls within a session, which guards against loop-induced repeats rather than providing semantic idempotency. Idempotency keys and "attempted vs confirmed" state are still the tool author's responsibility; the framework provides no scaffold. The `retry_on_failure` field in `McpServerConfig` controls MCP connection retries, not tool-call semantic idempotency.
-
-```mermaid
-flowchart TD
-    TOOL["tool call"] --> CAT{"idempotent?"}
-    CAT -->|"read (GET)"| RETRY["retry with backoff — safe"]
-    CAT -->|"write (POST/pay/email)"| KEY["attach idempotency key + track state"]
-    KEY --> V{"verify state before retry"}
-    V -->|"confirmed executed"| SKIP["skip retry — already done"]
-    V -->|"not received"| SEND["send with same key"]
-    SEND --> KEY
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code> — <code>ToolCard.idempotent</code> (default <code>False</code>)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1</code> — session-scoped same-args dedup<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40</code> — <code>McpServerConfig.retry_on_failure</code> (connection, not semantic)</sub>
-
-</details>
-
-**Gap.** No idempotency key scaffold, no tool-level `idempotent: bool` annotation, and no "attempted vs confirmed" state tracking. The deduplication rail only suppresses exact duplicates within a session, not cross-session or state-aware retries.
-
-<sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>

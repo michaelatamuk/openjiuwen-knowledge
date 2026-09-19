@@ -112,7 +112,68 @@ flowchart TD
 
 ---
 
-## 5. Designing caching for repeated or semantically similar queries
+## 5. Controlling cost when an agent can call tools repeatedly
+
+**General:** Bound the loop (max iterations/rounds/time), cap tokens, make cheap models do cheap work, cache, and surface per-run cost so it can be budgeted. Retries and huge tool outputs are common hidden cost sources.
+
+**Jiuwen:** Repeated tool calls are bounded at several levels: the ReAct loop's `max_iterations` (default 5, harness 15); `ModelAnomalyDetectionRail`, which detects consecutive identical tool-call rounds and either compacts or bails out; `ToolCallDeduplicationRail`, which suppresses repeated read-only calls; and `ToolCallResilienceRail`, which bounds retries (non-idempotent tools are never retried). Team runs add a `BudgetLedger` token ceiling, and the product tracks provider-reported session cost with a per-session cap (`raise_if_session_cost_limit_exceeded`).
+
+```mermaid
+flowchart TD
+    M["model call"] --> D{"tool calls?"}
+    D -->|yes| T["run tools"]
+    T --> L{"loop guard: repeated (tool,args)"}
+    L -->|"threshold"| CMP["compact / abort"]
+    T --> M
+    SESS["session cost cap (usage_cost.py)"] -.->|"pre-flight + mid-stream"| M
+    BUD["team BudgetLedger token ceiling"] -.-> T
+    ITER["max_iterations 5 / 15"] -.-> M
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — <code>raise_if_session_cost_limit_exceeded</code>; <code>:196</code> <code>set_session_cost_limit</code> (requires provider cost)<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations</code>; <code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default 15<br>&bull; <code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23</code> — <code>BudgetLedger</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90</code> — tool-loop threshold + bailout<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — cross-turn repeat counter; <code>agent-core/openjiuwen/harness/goal/evaluation.py:298</code> — <code>max_attempts</code></sub>
+
+</details>
+
+**Gap.** Cost enforcement is inert unless the provider reports cost metadata, and totals/limits are per-process (not shared across replicas). No cost-aware model downgrade or per-tool hard token budget in the core single-agent path.
+
+<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
+
+---
+
+## 6. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+
+**General:** Reduce prompt tokens by retrieving fewer but better chunks (rerank a larger candidate set down to a small k), summarizing long chunks/passages before insertion, and trimming conversation history. Reranking preserves quality while cutting k; summarization trades fidelity for tokens. Both beat blindly lowering k.
+
+**Jiuwen:** The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and threshold filtering is honored only in `mode="vector"`. Crucially, the KB path never invokes a reranker (the `Reranker` classes are wired only into graph-memory search), so "retrieve N, rerank to K" is absent. Token reduction instead happens in the context engine on the *conversation*: tool results over 50k tokens are offloaded, stale tool results beyond `keep_last_k=3` are windowed, micro-compaction clears old tool results, and full compaction LLM-summarizes at 180k. Chunk text is embedded verbatim — no chunk-level summarization.
+
+```mermaid
+flowchart TD
+    K["cut tokens"] --> R["rerank N → K"]
+    R -.->|"absent in KB (reranker only in graph memory)"| X["no recall-candidate rerank lever"]
+    K --> S["summarize long chunks"]
+    S -.->|"absent in ingest; chunks embedded verbatim"| Y["no chunk summarization"]
+    K --> CE["context engine (conversation, not retrieval)"]
+    CE --> O1["tool_result_budget: offload >50k"]
+    CE --> O2["tool_result_window: keep_last_k=3"]
+    CE --> O3["micro/full compact (180k) — extra LLM call"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code> — <code>top_k: int = 5</code>; <code>:47</code> <code>score_threshold</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:64</code> — threshold rejected unless <code>mode="vector"</code>; <code>:41</code> retrieve path has no reranker<br>&bull; <code>agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:645</code> — reranker only in graph-memory search<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — <code>tokens_threshold=50000</code>; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_window_processor.py:44</code> — <code>keep_last_k=3</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/micro_compact_processor.py:24</code> — threshold 5; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — 180k<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:227/349</code> — <code>compress_range=20</code> + history compression</sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
+
+
+---
+
+## 7. Designing caching for repeated or semantically similar queries
 
 **General:** Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, embedding cache, and — harder — a semantic cache that embeds the query and returns a prior answer for similar queries above a similarity threshold. The semantic cache needs a threshold and invalidation strategy, and exact-match caches need a stable key including model and parameters.
 
@@ -143,7 +204,7 @@ flowchart TD
 
 ---
 
-## 6. Reducing latency in a multi-step LLM pipeline
+## 8. Reducing latency in a multi-step LLM pipeline
 
 **General:** Stream tokens so time-to-first-token matters more than total; run independent steps in parallel; cache prompts/prefixes and embeddings; route easy steps to faster/smaller models; and avoid blocking the event loop. Measure TTFT and per-stage latency to find the bottleneck.
 
@@ -172,7 +233,7 @@ flowchart LR
 
 ---
 
-## 7. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls
+## 9. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls
 
 **General:** For I/O-bound work (network calls to LLM APIs, vector DBs), async I/O or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient (no thread-per-request overhead) when your stack is async end to end; threads are the fallback for blocking SDKs. Multiprocessing only pays off for CPU-bound work (local inference, heavy parsing) because it escapes the GIL.
 
@@ -201,7 +262,7 @@ flowchart TD
 
 ---
 
-## 8. What happens to your architecture at 10x current traffic
+## 10. What happens to your architecture at 10x current traffic
 
 **General:** You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Costs scale roughly linearly with tokens but can super-linearly if retries or coordination rise. Fixes are caching, concurrency limits, queues/shards, backpressure, and cheaper routing — plus autoscaling at the process boundary.
 
@@ -233,7 +294,7 @@ flowchart TD
 
 ---
 
-## 9. Scaling questions test whether you've thought past the demo
+## 11. Scaling questions test whether you've thought past the demo
 
 **General:** This claim holds: scaling questions are answered by naming the bottleneck and the first lever, which shows the system has been run past a demo. Most architectures do not survive 10x traffic. Name one lever *with where it fits*: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".
 
@@ -257,7 +318,7 @@ flowchart TD
 
 ---
 
-## 10. What's your rollback plan if a prompt or model update degrades output quality?
+## 12. What's your rollback plan if a prompt or model update degrades output quality?
 
 **General:** Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, and gate broad rollout on a fixed eval. Monitor quality (not just errors) so you detect the degradation, and keep the previous version warm.
 
@@ -283,7 +344,7 @@ flowchart TD
 
 ---
 
-## 11. A stakeholder wants to ship before your eval scores are ready, how do you handle it
+## 13. A stakeholder wants to ship before your eval scores are ready, how do you handle it
 
 **General:** This is mostly process. De-risk instead of refusing: ship behind a flag or to a small canary, define a rollback path, cap the blast radius, agree on a minimal offline eval before broad rollout, and add monitoring so a quality drop is caught quickly. Make the tradeoff explicit (what's unmeasured, what the fallback is) and put a date on the missing eval.
 
@@ -308,66 +369,5 @@ flowchart TD
 **Gap.** No eval-threshold release gate and no canary/percentage rollout; the decision is human process, supported only by feature flags, explicit activation, CI checks, and manual rollback.
 
 <sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering._</sub>
-
----
-
-## 12. Controlling cost when an agent can call tools repeatedly
-
-**General:** Bound the loop (max iterations/rounds/time), cap tokens, make cheap models do cheap work, cache, and surface per-run cost so it can be budgeted. Retries and huge tool outputs are common hidden cost sources.
-
-**Jiuwen:** Repeated tool calls are bounded at several levels: the ReAct loop's `max_iterations` (default 5, harness 15); `ModelAnomalyDetectionRail`, which detects consecutive identical tool-call rounds and either compacts or bails out; `ToolCallDeduplicationRail`, which suppresses repeated read-only calls; and `ToolCallResilienceRail`, which bounds retries (non-idempotent tools are never retried). Team runs add a `BudgetLedger` token ceiling, and the product tracks provider-reported session cost with a per-session cap (`raise_if_session_cost_limit_exceeded`).
-
-```mermaid
-flowchart TD
-    M["model call"] --> D{"tool calls?"}
-    D -->|yes| T["run tools"]
-    T --> L{"loop guard: repeated (tool,args)"}
-    L -->|"threshold"| CMP["compact / abort"]
-    T --> M
-    SESS["session cost cap (usage_cost.py)"] -.->|"pre-flight + mid-stream"| M
-    BUD["team BudgetLedger token ceiling"] -.-> T
-    ITER["max_iterations 5 / 15"] -.-> M
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — <code>raise_if_session_cost_limit_exceeded</code>; <code>:196</code> <code>set_session_cost_limit</code> (requires provider cost)<br>&bull; <code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations</code>; <code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default 15<br>&bull; <code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23</code> — <code>BudgetLedger</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90</code> — tool-loop threshold + bailout<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code> — cross-turn repeat counter; <code>agent-core/openjiuwen/harness/goal/evaluation.py:298</code> — <code>max_attempts</code></sub>
-
-</details>
-
-**Gap.** Cost enforcement is inert unless the provider reports cost metadata, and totals/limits are per-process (not shared across replicas). No cost-aware model downgrade or per-tool hard token budget in the core single-agent path.
-
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: ai-agent, engineering, llm-applied._</sub>
-
----
-
-## 13. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
-
-**General:** Reduce prompt tokens by retrieving fewer but better chunks (rerank a larger candidate set down to a small k), summarizing long chunks/passages before insertion, and trimming conversation history. Reranking preserves quality while cutting k; summarization trades fidelity for tokens. Both beat blindly lowering k.
-
-**Jiuwen:** The retrieval path exposes only `top_k` (default 5) and `score_threshold`, and threshold filtering is honored only in `mode="vector"`. Crucially, the KB path never invokes a reranker (the `Reranker` classes are wired only into graph-memory search), so "retrieve N, rerank to K" is absent. Token reduction instead happens in the context engine on the *conversation*: tool results over 50k tokens are offloaded, stale tool results beyond `keep_last_k=3` are windowed, micro-compaction clears old tool results, and full compaction LLM-summarizes at 180k. Chunk text is embedded verbatim — no chunk-level summarization.
-
-```mermaid
-flowchart TD
-    K["cut tokens"] --> R["rerank N → K"]
-    R -.->|"absent in KB (reranker only in graph memory)"| X["no recall-candidate rerank lever"]
-    K --> S["summarize long chunks"]
-    S -.->|"absent in ingest; chunks embedded verbatim"| Y["no chunk summarization"]
-    K --> CE["context engine (conversation, not retrieval)"]
-    CE --> O1["tool_result_budget: offload >50k"]
-    CE --> O2["tool_result_window: keep_last_k=3"]
-    CE --> O3["micro/full compact (180k) — extra LLM call"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code> — <code>top_k: int = 5</code>; <code>:47</code> <code>score_threshold</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:64</code> — threshold rejected unless <code>mode="vector"</code>; <code>:41</code> retrieve path has no reranker<br>&bull; <code>agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:645</code> — reranker only in graph-memory search<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code> — <code>tokens_threshold=50000</code>; <code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_window_processor.py:44</code> — <code>keep_last_k=3</code><br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/micro_compact_processor.py:24</code> — threshold 5; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — 180k<br>&bull; <code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:227/349</code> — <code>compress_range=20</code> + history compression</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-practical-interview-questions_for_engineers.md`; also covered in: rag-practical._</sub>
-
 
 ---

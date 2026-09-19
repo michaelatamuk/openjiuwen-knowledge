@@ -78,7 +78,37 @@ flowchart TD
 
 ---
 
-## 3. What's the difference between a linear chain and a graph with conditional branches
+## 3. When should you use a deterministic workflow instead of an autonomous agent?
+
+**General:** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
+
+Choose a workflow when: (1) the task structure is fully known in advance (extract → validate → classify); (2) every execution must follow the same path for compliance or auditability; (3) failure modes must be enumerated and handled explicitly; (4) cost must be bounded (fixed number of model calls). Choose an agent when: (1) the next action depends on the previous result in ways you cannot enumerate; (2) the task requires open-ended tool use across many possible paths; (3) the goal is underspecified and the model must decompose it dynamically.
+
+In practice most production systems are **hybrid**: a deterministic outer workflow that calls agent sub-tasks only where flexibility is genuinely required. Build the workflow path first; add agent autonomy only where the workflow cannot reach.
+
+**Jiuwen:** The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
+
+```mermaid
+flowchart TD
+    TASK["task arrives"] --> Q{"structure known?"}
+    Q -->|yes| WF["workflow: fixed steps, deterministic, bounded cost"]
+    Q -->|no| AG["agent: model chooses tools, variable steps"]
+    WF --> HYB["hybrid: workflow outer shell + agent sub-task where needed"]
+    AG --> HYB
+    WF --> TEST["unit-testable, enumerable failure modes"]
+    AG --> INVAR["invariant-based testing (tool calls, schema, budget)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py` — agent loop (dynamic)<br>&bull; `agent-core/openjiuwen/core/workflow/` — Pregel graph engine (deterministic)<br>&bull; `agent-core/openjiuwen/harness/rails/task_planning_rail.py` — task decomposition in the agent path</sub>
+
+</details>
+
+<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`._</sub>
+
+## 4. What's the difference between a linear chain and a graph with conditional branches
 
 **General:** A linear chain is a fixed sequence where each step always activates the next. A graph adds branching and merging: a router selects successors based on state at runtime, and a join/barrier decides when a merge node is ready (all predecessors, or any of an exclusive group).
 
@@ -112,7 +142,7 @@ flowchart TD
 
 ---
 
-## 4. What's the ReAct pattern?
+## 5. What's the ReAct pattern?
 
 **General:** ReAct alternates thought → action → observation. Each action's real result informs the next thought, so the agent grounds its reasoning in observed state rather than assumptions about it.
 
@@ -129,7 +159,7 @@ flowchart TD
 
 ---
 
-## 5. Why interleave reasoning and actions instead of planning everything upfront?
+## 6. Why interleave reasoning and actions instead of planning everything upfront?
 
 **General:** A fully upfront plan executes with no feedback, so it cannot adapt when reality differs. Interleaving feeds each observation back into the next reasoning step, which corrects drift and grounds the plan in what the tools actually returned.
 
@@ -146,7 +176,7 @@ flowchart TD
 
 ---
 
-## 6. How do you set a hard limit on iterations or steps within a framework
+## 7. How do you set a hard limit on iterations or steps within a framework
 
 **General:** Cap the loop with a max-iteration/max-round counter, plus optional token and wall-clock budgets, and *enforce* them rather than only reporting. Nested loops need a cap at each level, and the caps should be configurable.
 
@@ -179,7 +209,7 @@ flowchart TD
 
 ---
 
-## 7. What decides when an agent stops and returns a final answer instead of calling another tool
+## 8. What decides when an agent stops and returns a final answer instead of calling another tool
 
 **General:** Usually the model itself: when it emits no tool calls, the answer is final. Around that sit hard limits — max iterations, token/time budgets, and explicit stop conditions — so a confused agent does not loop forever.
 
@@ -211,7 +241,7 @@ flowchart TD
 
 ---
 
-## 8. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 **General:** Cap iterations, detect repetition (same tool and arguments repeatedly), nudge or abort when no progress is made, and also cap rounds, tokens, and wall time. Detection should compare canonicalized arguments, not raw strings.
 
@@ -240,7 +270,7 @@ flowchart TD
 
 ---
 
-## 9. "The agent is stuck" tests whether you've shipped one, not studied one
+## 10. "The agent is stuck" tests whether you've shipped one, not studied one
 
 **General:** This claim is fair: diagnosing a stuck agent requires operational experience with loops, budgets, and retries rather than theory alone — though there is a knowledge question underneath the framing. Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are `max_iterations=5`, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized `(tool, args)`, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.
 
@@ -264,7 +294,7 @@ flowchart TD
 
 ---
 
-## 10. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
 
 **General:** A hard iteration cap (`max_iterations`) prevents runaway loops by time but does not detect that the agent is *stuck repeating itself*. Divergence detection is a complementary mechanism: (1) hash `(tool_name, canonicalised_args)` on each turn and compare against prior turns — if the same call recurs, the agent is spinning; (2) compare model output text similarity across consecutive turns — if the reasoning text is structurally identical, the agent is not making progress; (3) on detection, trigger a compaction step (rewrite history to remove the reinforcing noise) before continuing, rather than simply aborting. The goal is to detect the loop early and repair the context, not just stop at a budget limit.
 
@@ -292,7 +322,7 @@ flowchart TD
 
 ---
 
-## 11. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
 
 **General:** "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) **success** — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) **budget exhaustion** — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) **human escalation** — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.
 
@@ -320,33 +350,3 @@ flowchart TD
 <sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`._</sub>
 
 ---
-
-## 12. When should you use a deterministic workflow instead of an autonomous agent?
-
-**General:** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
-
-Choose a workflow when: (1) the task structure is fully known in advance (extract → validate → classify); (2) every execution must follow the same path for compliance or auditability; (3) failure modes must be enumerated and handled explicitly; (4) cost must be bounded (fixed number of model calls). Choose an agent when: (1) the next action depends on the previous result in ways you cannot enumerate; (2) the task requires open-ended tool use across many possible paths; (3) the goal is underspecified and the model must decompose it dynamically.
-
-In practice most production systems are **hybrid**: a deterministic outer workflow that calls agent sub-tasks only where flexibility is genuinely required. Build the workflow path first; add agent autonomy only where the workflow cannot reach.
-
-**Jiuwen:** The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
-
-```mermaid
-flowchart TD
-    TASK["task arrives"] --> Q{"structure known?"}
-    Q -->|yes| WF["workflow: fixed steps, deterministic, bounded cost"]
-    Q -->|no| AG["agent: model chooses tools, variable steps"]
-    WF --> HYB["hybrid: workflow outer shell + agent sub-task where needed"]
-    AG --> HYB
-    WF --> TEST["unit-testable, enumerable failure modes"]
-    AG --> INVAR["invariant-based testing (tool calls, schema, budget)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; `agent-core/openjiuwen/core/single_agent/agents/react_agent.py` — agent loop (dynamic)<br>&bull; `agent-core/openjiuwen/core/workflow/` — Pregel graph engine (deterministic)<br>&bull; `agent-core/openjiuwen/harness/rails/task_planning_rail.py` — task decomposition in the agent path</sub>
-
-</details>
-
-<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`._</sub>

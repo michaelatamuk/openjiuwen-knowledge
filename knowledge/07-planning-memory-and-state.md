@@ -164,7 +164,44 @@ Three patterns exist. (a) Scheduled-dispatch leader: `TeamScheduler` scans the t
 
 ---
 
-## 5. How does a framework track state across multiple steps in an agent's execution
+## 5. Critic or reflection loop
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.
+
+**Key points.**
+
+- Draft, then critique.
+- Revise on failure.
+- Adds a verification step.
+
+**Concept.** a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.
+
+![diagram](assets/diagrams/ffaf47fd89ee029978c791bc6b492ab5d2e18f98.png)
+
+**In Jiuwen.** There is no generic draft-critique-revise loop in the single-agent ReAct path, but the pieces exist: a verification agent restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL, and a team reviewer that scores correctness.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+There is no generic draft→critique→revise loop in the single-agent ReAct path, but the pieces exist: a **verification agent** restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL; an `agent_teams` reviewer that scores `Correctness`/completeness with rework thresholds; and the RSI weighted-rubric judge. These run as separate review layers, not as an in-loop reflection that blocks generation.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92` | VerificationRail allowlist; agent-core/openjiuwen/harness/subagents/verification_agent.py:51 — PASS/FAIL/PARTIAL |
+| `agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279` | review dimensions + rework thresholds |
+| `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | weighted rubric judge |
+
+</details>
+
+---
+
+## 6. How does a framework track state across multiple steps in an agent's execution
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -210,7 +247,7 @@ State lives in three layers that are checkpointed independently. The agent layer
 
 ---
 
-## 6. How would you pause an agent mid-execution and resume it later with the same state
+## 7. How would you pause an agent mid-execution and resume it later with the same state
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -252,7 +289,7 @@ Two mechanisms. *Interrupt rails* abort the current tool call by raising `AbortE
 
 ---
 
-## 7. How would you add human-in-the-loop approval before a specific step executes
+## 8. How would you add human-in-the-loop approval before a specific step executes
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -294,7 +331,7 @@ Tool execution passes through `PermissionInterruptRail` (subclass of `ConfirmInt
 
 ---
 
-## 8. What's the difference between short-term and long-term memory in an agent
+## 9. What's the difference between short-term and long-term memory in an agent
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
@@ -333,7 +370,7 @@ Short-term is `SessionModelContext` with a bounded message buffer. Long-term is 
 
 ---
 
-## 9. How do you decide what to store in memory versus what to discard
+## 10. How do you decide what to store in memory versus what to discard
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -372,7 +409,7 @@ An LLM classifier decides whether a turn has key information, and extraction run
 
 ---
 
-## 10. How do you prevent memory from growing unbounded across a long session
+## 11. How do you prevent memory from growing unbounded across a long session
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -414,7 +451,7 @@ A bounded FIFO buffer drops the oldest messages beyond twice the limit. Budget g
 
 ---
 
-## 11. How would you summarize conversation history without losing important details
+## 12. How would you summarize conversation history without losing important details
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -452,83 +489,7 @@ Compaction replaces the active segment with a structured summary plus a boundary
 
 ---
 
-## 12. Planner–executor pattern
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** A planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response.
-
-**Key points.**
-
-- Planner decomposes the task.
-- Executors carry out subtasks.
-- Results are combined.
-
-**Concept.** a planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response. Common in multi-step agent systems. Used for: research assistants, report generation, multi-source data analysis.
-
-![diagram](assets/diagrams/63661c0791063e7c87c62499c79a8a8ea518e661.png)
-
-**In Jiuwen.** Two paths. The deep agent's outer task loop runs a full inner ReAct invoke per round while a persistent task plan and todos carry state; a task-planning rail registers the todo tools and injects planning guidance (plan mode adds a task tool to delegate).
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Two paths. `DeepAgent`'s outer task loop runs a full inner ReAct invoke per round while a persistent `TaskPlan`/todos carry state; `TaskPlanningRail` registers the todo tools and injects planning guidance (`Plan` mode adds a `task_tool` to delegate). `agent_teams` adds supervisor/leader decomposition, and a dedicated plan subagent exists.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/harness/deep_agent.py:2694` | outer task loop |
-| `agent-core/openjiuwen/harness/rails/task_planning_rail.py:31/108` | planning layer + todo tools |
-| `agent-core/openjiuwen/harness/tools/todo.py:193` | TodoCreateTool |
-| `agent-core/openjiuwen/harness/tools/subagent/task_tool.py:194/657` | subagent delegation |
-| `agent-core/openjiuwen/core/multi_agent/teams/hierarchical_tools/hierarchical_team.py:101/108` | supervisor (agents-as-tools); agent-core/openjiuwen/harness/subagents/plan_agent.py:88 — plan subagent |
-
-</details>
-
----
-
-## 13. Critic or reflection loop
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.
-
-**Key points.**
-
-- Draft, then critique.
-- Revise on failure.
-- Adds a verification step.
-
-**Concept.** a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.
-
-![diagram](assets/diagrams/ffaf47fd89ee029978c791bc6b492ab5d2e18f98.png)
-
-**In Jiuwen.** There is no generic draft-critique-revise loop in the single-agent ReAct path, but the pieces exist: a verification agent restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL, and a team reviewer that scores correctness.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-There is no generic draft→critique→revise loop in the single-agent ReAct path, but the pieces exist: a **verification agent** restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL; an `agent_teams` reviewer that scores `Correctness`/completeness with rework thresholds; and the RSI weighted-rubric judge. These run as separate review layers, not as an in-loop reflection that blocks generation.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92` | VerificationRail allowlist; agent-core/openjiuwen/harness/subagents/verification_agent.py:51 — PASS/FAIL/PARTIAL |
-| `agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279` | review dimensions + rework thresholds |
-| `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | weighted rubric judge |
-
-</details>
-
----
-
-## 14. Memory-augmented agent
+## 13. Memory-augmented agent
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -566,7 +527,7 @@ Short-term is `SessionModelContext` with a bounded `ContextMessageBuffer`; long-
 
 ---
 
-## 15. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+## 14. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 

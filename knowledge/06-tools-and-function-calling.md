@@ -43,7 +43,45 @@ Cards become JSON Schema through the callable schema extractor, the ability mana
 
 ---
 
-## 2. How does a framework register and expose tools to the underlying model
+## 2. Agentic tool-calling pattern
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.
+
+**Key points.**
+
+- Model emits structured tool calls.
+- Runtime executes and feeds back results.
+- Loops until the model answers.
+
+**Concept.** the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.
+
+![diagram](assets/diagrams/199bd406a3f4dd061321b26a680a014fa785f18d.png)
+
+**In Jiuwen.** This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed tool calls, and the local function invoke validates arguments.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed `tool_calls`, and `LocalFunction.invoke` validates arguments.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813` | loop / answer / execute |
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078` | tool list + dispatch |
+| `agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20` | card → JSON Schema |
+| `agent-core/openjiuwen/core/foundation/tool/function/function.py:82` | argument validation |
+
+</details>
+
+---
+
+## 3. How does a framework register and expose tools to the underlying model
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -91,7 +129,51 @@ Abilities are stored as metadata cards (`ToolCard`/`WorkflowCard`/`AgentCard`/`M
 
 ---
 
-## 3. How do you handle a tool that a framework doesn't natively support
+## 4. How does the framework validate a tool call's structured output before executing it
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.
+
+**Key points.**
+
+- json.loads → bracket/quote repair → otherwise a readable error.
+- Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.
+- Return the error to the model so it can self-correct.
+
+**Concept.** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
+
+![diagram](assets/diagrams/ad4fba8d12f4016b60b9192fd65c682dadffdacb.png)
+
+**In Jiuwen.** Before executing, the ability manager parses the model's raw argument string, first trying JSON then repairing brackets and braces; unrecoverable JSON raises an error that is fed back to the model. The parsed dict is passed to the tool, where the function and MCP wrappers run schema validation (jsonschema with a Pydantic fallback) and fill defaults. The structured-output tool uses the caller's schema as its own input, so the same path constrains captured results.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
+
+**Implementation diagram**
+
+![diagram](assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png)
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:482` | _repair_tool_arguments_json(); :537 _parse_tool_arguments_with_repair(); :1419 execution path rewrites tool_call.arguments |
+| `agent-core/openjiuwen/core/foundation/tool/function/function.py:76` | LocalFunction.invoke; :82 validation via SchemaUtils.format_with_schema |
+| `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema() (jsonschema → Pydantic fallback); :23 format_with_schema(); :49 calls validate then fills defaults |
+| `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208` | MCPTool.invoke validates MCP args via the same path |
+| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82` | input_params = schema_json; :86 invoke |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard.input_params is the schema source |
+
+</details>
+
+---
+
+## 5. How do you handle a tool that a framework doesn't natively support
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -137,7 +219,7 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 
 ---
 
-## 4. How do you handle a tool call that fails or returns malformed output
+## 6. How do you handle a tool call that fails or returns malformed output
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -179,131 +261,7 @@ The primary path is the `@tool` decorator, which wraps any plain function into a
 
 ---
 
-## 5. Designing retry logic that doesn't cause duplicate side effects on a tool call
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.
-
-**Key points.**
-
-- Mark non-idempotent tools; never blind-retry.
-- Idempotency keys make repeats detectable.
-- Retry reads/idempotent ops only.
-
-**Concept.** Never blindly retry non-idempotent actions (payments, emails, writes). Mark side-effecting tools, use idempotency keys so a repeated call is recognized, and prefer retry only for reads or explicitly idempotent operations. Bound retries with backoff. On ambiguity, surface to a human rather than guess.
-
-![diagram](assets/diagrams/9b202b032d06a77832ab19eb128f01a3f4337f89.png)
-
-**In Jiuwen.** The tool card's idempotent flag defaults to false (secure by default), and non-idempotent tools are never retried. The resilience rail decides in layers: it rejects retry for non-idempotent cards and allows retry only for retryable exception types such as timeouts and connection resets.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-`ToolCard.idempotent` defaults to `False` (secure-by-default), and non-idempotent tools are never retried. `ToolCallResilienceRail` decides in layers: reject retry for any card with `idempotent is False`; allow retry only for retryable exception types/markers (timeouts, connection resets, MCP transport); enforce a per-invoke budget (default 3). On a retry it calls `ctx.request_retry()` and the `@rail` decorator re-runs the call. Separately, `ToolCallDeduplicationRail` short-circuits repeated *read-only* calls via an exact `(tool_name, args-hash)` cache, setting `_skip_tool` so the real tool never runs.
-
-**Implementation diagram**
-
-![diagram](assets/diagrams/c23f89481ba57d80fe58576f5c9e8c45b4131a6e.png)
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | idempotent default False |
-| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128` | non-idempotent guard; :141 retryable-exception filter; :145 per-invoke budget; :196 ctx.request_retry() |
-| `agent-core/openjiuwen/core/single_agent/rail/base.py:612/1024` | request_retry + decorator retry loop |
-| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:24/109` | read-only whitelist + exact cache interception |
-| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1324` | _skip_tool_calls honored |
-| `agent-core/openjiuwen/harness_providers/native/harness.py:226` | native harness rejects protocol checkpoints (no replay) |
-
-</details>
-
----
-
-## 6. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.
-
-**Key points.**
-
-- Per-tool override: attempts, backoff, timeout.
-- Keep the idempotency safety default.
-- Central policy with per-tool hooks.
-
-**Concept.** Retry policy should be per-tool and overridable: an idempotency flag, max attempts, backoff, and timeout. A single global retry that ignores non-idempotency is dangerous, but so is a per-tool override that silently disables the framework's safety defaults.
-
-![diagram](assets/diagrams/6cba0bd44c5e8a524e7b5c5c7801878b71c220f6.png)
-
-**In Jiuwen.** Retry decisions are centralized in the resilience rail (auto-mounted unless disabled): it resets a per-invoke counter before the call and, on exceptions, applies layered rules starting with refusing to retry non-idempotent tools. So a custom policy is expressed by marking a tool idempotent and letting the central rail handle attempts and backoff, rather than letting a per-tool override bypass the guard.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Retry decisions are centralized in `ToolCallResilienceRail` (priority 70, auto-mounted unless `enable_tool_resilience_rail=False`). It hooks `before_tool_call` to reset a per-invoke counter and `on_tool_exception`, where it applies layers: non-idempotent tools (`ToolCard.idempotent is False`, the default) are never retried; retryable exception types/markers (timeouts, connection resets, MCP transport) are; otherwise it calls `ctx.request_retry()`, consumed by the `@rail` decorator wrapping the tool execution. The per-invoke timeout is read separately from `ToolCard.properties["resilience"]["timeout_s"]` by `AbilityManager._resolve_call_timeout`. Customization without breaking defaults is done by setting `idempotent=True`/`properties={"resilience": {...}}` on the card, or by supplying your own rail (the auto-mount checks `_already_provided`).
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:24` | ToolCallResilienceRail; :102 counter reset; :106 on_tool_exception; :145 budget check; :196 retry request |
-| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:223` | _is_non_idempotent(); :244 _resolve_max_attempts() |
-| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | ToolCard.idempotent (default False); :90/92 properties/parallel_safe |
-| `agent-core/openjiuwen/core/single_agent/ability_manager.py:571` | _resolve_call_timeout() reads properties["resilience"]["timeout_s"]; :137 hard limit |
-| `agent-core/openjiuwen/harness/schema/config.py:294` | enable_tool_resilience_rail: bool = True; agent-core/openjiuwen/harness/schema/deep_agent_spec.py:453 mirror |
-| `agent-core/openjiuwen/harness/factory.py:408` | auto-mount; :411 _already_provided guard |
-| `agent-core/openjiuwen/harness/tools/subagent/subagent_tools.py:45` | _attach_call_timeout() sets properties["resilience"]["timeout_s"] |
-| `agent-core/openjiuwen/core/single_agent/rail/base.py:612` | ctx.request_retry(); agent-core/openjiuwen/harness/prompts/tools/__init__.py:284 — build_tool_card honors ToolCardBuildOptions(idempotent=…) |
-
-</details>
-
----
-
-## 7. Handling concurrent API calls when an agent needs to call multiple tools at once
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.
-
-**Key points.**
-
-- Group the turn's tool calls; run them concurrently.
-- Bound concurrency (semaphore/pool).
-- Respect ordering for conflicting writes.
-
-**Concept.** When a turn contains several independent tool calls, run them concurrently with async tasks rather than a serial `for` loop, but bound the concurrency (semaphore/pool), respect per-resource ordering (two writes to the same file must not interleave), and mark which tools are safe to parallelize. Failures in one call should not silently cancel the others unless you want fail-fast semantics.
-
-![diagram](assets/diagrams/b2932828e43d8f1bcdd5255f45a92689e4019365.png)
-
-**In Jiuwen.** One turn can contain several tool calls. The ability manager normalizes them, creates an isolated callback context per call, and, when parallel tool calls are enabled, dispatches them concurrently with a bounded executor and resource lanes; otherwise it runs them in sequence. The per-call context copy avoids racy mutation across parallel calls.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The ReAct loop can emit a `List[ToolCall]` in one turn. `AbilityManager.execute` normalizes them, builds one coroutine plus an isolated `AgentCallbackContext` per call (copying `extra` to avoid racy dict mutation), and if `parallel_tool_calls=True` dispatches to `_execute_parallel_tool_tasks`. That groups consecutive calls whose `ToolCard.parallel_safe` is true into batches; each batch runs through `_execute_resource_ordered_tool_tasks`, which partitions calls into "lanes" keyed by normalized file path (unknown resources get private lanes) and `asyncio.gather`s across lanes while awaiting sequentially *within* a lane. A `parallel_safe=False` tool acts as an exclusive barrier. Team supervisors override `execute` in `P2PAbilityManager` to fan AgentCard calls out under a semaphore (default 10).
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1083` | parallel_tool_calls parameter; :1148 parallel-vs-sequential branch; :431 _execute_parallel_tool_tasks (batching + barrier); :393 _execute_resource_ordered_tool_tasks (lanes); :421 asyncio.gather across lanes |
-| `agent-core/openjiuwen/core/foundation/tool/base.py:92` | ToolCard.parallel_safe (default True) |
-| `agent-core/openjiuwen/core/graph/pregel/task.py:27` | submit creates a Task; :47 asyncio.wait(..., FIRST_EXCEPTION) cancels siblings |
-| `agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:45` | lazy semaphore for sub-agent fan-out |
-
-</details>
-
----
-
-## 8. How does the framework handle a step that times out or throws an error
+## 7. How does the framework handle a step that times out or throws an error
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -348,89 +306,93 @@ Tool calls are wrapped in `anyio.fail_after(call_timeout)`, where the timeout re
 
 ---
 
-## 9. Agentic tool-calling pattern
+## 8. Designing retry logic that doesn't cause duplicate side effects on a tool call
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
-**TL;DR.** The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.
+**TL;DR.** Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.
 
 **Key points.**
 
-- Model emits structured tool calls.
-- Runtime executes and feeds back results.
-- Loops until the model answers.
+- Mark non-idempotent tools; never blind-retry.
+- Idempotency keys make repeats detectable.
+- Retry reads/idempotent ops only.
 
-**Concept.** the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.
+**Concept.** Never blindly retry non-idempotent actions (payments, emails, writes). Mark side-effecting tools, use idempotency keys so a repeated call is recognized, and prefer retry only for reads or explicitly idempotent operations. Bound retries with backoff. On ambiguity, surface to a human rather than guess.
 
-![diagram](assets/diagrams/199bd406a3f4dd061321b26a680a014fa785f18d.png)
+![diagram](assets/diagrams/9b202b032d06a77832ab19eb128f01a3f4337f89.png)
 
-**In Jiuwen.** This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed tool calls, and the local function invoke validates arguments.
+**In Jiuwen.** The tool card's idempotent flag defaults to false (secure by default), and non-idempotent tools are never retried. The resilience rail decides in layers: it rejects retry for non-idempotent cards and allows retry only for retryable exception types such as timeouts and connection resets.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
 
 **Implementation**
 
-This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed `tool_calls`, and `LocalFunction.invoke` validates arguments.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813` | loop / answer / execute |
-| `agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078` | tool list + dispatch |
-| `agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20` | card → JSON Schema |
-| `agent-core/openjiuwen/core/foundation/tool/function/function.py:82` | argument validation |
-
-</details>
-
----
-
-## 10. How does the framework validate a tool call's structured output before executing it
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.
-
-**Key points.**
-
-- json.loads → bracket/quote repair → otherwise a readable error.
-- Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.
-- Return the error to the model so it can self-correct.
-
-**Concept.** Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.
-
-![diagram](assets/diagrams/ad4fba8d12f4016b60b9192fd65c682dadffdacb.png)
-
-**In Jiuwen.** Before executing, the ability manager parses the model's raw argument string, first trying JSON then repairing brackets and braces; unrecoverable JSON raises an error that is fed back to the model. The parsed dict is passed to the tool, where the function and MCP wrappers run schema validation (jsonschema with a Pydantic fallback) and fill defaults. The structured-output tool uses the caller's schema as its own input, so the same path constrains captured results.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Before executing, `AbilityManager._execute_single_tool_call` parses the model's raw argument string with `_parse_tool_arguments_with_repair`, which first tries `json.loads`, then `_repair_tool_arguments_json` to balance brackets/braces; unrecoverable JSON raises an `AbilityExecutionError` fed back to the model. The parsed dict is passed to `tool.invoke`, where `LocalFunction`/`MCPTool` call `SchemaUtils.format_with_schema`, which runs `validate_with_schema` (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The `structured_output` tool uses the caller's JSON Schema as its own `input_params`, so the same validation path constrains captured results.
+`ToolCard.idempotent` defaults to `False` (secure-by-default), and non-idempotent tools are never retried. `ToolCallResilienceRail` decides in layers: reject retry for any card with `idempotent is False`; allow retry only for retryable exception types/markers (timeouts, connection resets, MCP transport); enforce a per-invoke budget (default 3). On a retry it calls `ctx.request_retry()` and the `@rail` decorator re-runs the call. Separately, `ToolCallDeduplicationRail` short-circuits repeated *read-only* calls via an exact `(tool_name, args-hash)` cache, setting `_skip_tool` so the real tool never runs.
 
 **Implementation diagram**
 
-![diagram](assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png)
+![diagram](assets/diagrams/c23f89481ba57d80fe58576f5c9e8c45b4131a6e.png)
 
 **Code anchors**
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/core/single_agent/ability_manager.py:482` | _repair_tool_arguments_json(); :537 _parse_tool_arguments_with_repair(); :1419 execution path rewrites tool_call.arguments |
-| `agent-core/openjiuwen/core/foundation/tool/function/function.py:76` | LocalFunction.invoke; :82 validation via SchemaUtils.format_with_schema |
-| `agent-core/openjiuwen/core/common/utils/schema_utils.py:115` | validate_with_schema() (jsonschema → Pydantic fallback); :23 format_with_schema(); :49 calls validate then fills defaults |
-| `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208` | MCPTool.invoke validates MCP args via the same path |
-| `agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82` | input_params = schema_json; :86 invoke |
-| `agent-core/openjiuwen/core/foundation/tool/base.py:90` | ToolCard.input_params is the schema source |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | idempotent default False |
+| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128` | non-idempotent guard; :141 retryable-exception filter; :145 per-invoke budget; :196 ctx.request_retry() |
+| `agent-core/openjiuwen/core/single_agent/rail/base.py:612/1024` | request_retry + decorator retry loop |
+| `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:24/109` | read-only whitelist + exact cache interception |
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1324` | _skip_tool_calls honored |
+| `agent-core/openjiuwen/harness_providers/native/harness.py:226` | native harness rejects protocol checkpoints (no replay) |
 
 </details>
 
 ---
 
-## 11. How do you design tools for idempotency and safe retry?
+## 9. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.
+
+**Key points.**
+
+- Per-tool override: attempts, backoff, timeout.
+- Keep the idempotency safety default.
+- Central policy with per-tool hooks.
+
+**Concept.** Retry policy should be per-tool and overridable: an idempotency flag, max attempts, backoff, and timeout. A single global retry that ignores non-idempotency is dangerous, but so is a per-tool override that silently disables the framework's safety defaults.
+
+![diagram](assets/diagrams/6cba0bd44c5e8a524e7b5c5c7801878b71c220f6.png)
+
+**In Jiuwen.** Retry decisions are centralized in the resilience rail (auto-mounted unless disabled): it resets a per-invoke counter before the call and, on exceptions, applies layered rules starting with refusing to retry non-idempotent tools. So a custom policy is expressed by marking a tool idempotent and letting the central rail handle attempts and backoff, rather than letting a per-tool override bypass the guard.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Retry decisions are centralized in `ToolCallResilienceRail` (priority 70, auto-mounted unless `enable_tool_resilience_rail=False`). It hooks `before_tool_call` to reset a per-invoke counter and `on_tool_exception`, where it applies layers: non-idempotent tools (`ToolCard.idempotent is False`, the default) are never retried; retryable exception types/markers (timeouts, connection resets, MCP transport) are; otherwise it calls `ctx.request_retry()`, consumed by the `@rail` decorator wrapping the tool execution. The per-invoke timeout is read separately from `ToolCard.properties["resilience"]["timeout_s"]` by `AbilityManager._resolve_call_timeout`. Customization without breaking defaults is done by setting `idempotent=True`/`properties={"resilience": {...}}` on the card, or by supplying your own rail (the auto-mount checks `_already_provided`).
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:24` | ToolCallResilienceRail; :102 counter reset; :106 on_tool_exception; :145 budget check; :196 retry request |
+| `agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:223` | _is_non_idempotent(); :244 _resolve_max_attempts() |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:109` | ToolCard.idempotent (default False); :90/92 properties/parallel_safe |
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:571` | _resolve_call_timeout() reads properties["resilience"]["timeout_s"]; :137 hard limit |
+| `agent-core/openjiuwen/harness/schema/config.py:294` | enable_tool_resilience_rail: bool = True; agent-core/openjiuwen/harness/schema/deep_agent_spec.py:453 mirror |
+| `agent-core/openjiuwen/harness/factory.py:408` | auto-mount; :411 _already_provided guard |
+| `agent-core/openjiuwen/harness/tools/subagent/subagent_tools.py:45` | _attach_call_timeout() sets properties["resilience"]["timeout_s"] |
+| `agent-core/openjiuwen/core/single_agent/rail/base.py:612` | ctx.request_retry(); agent-core/openjiuwen/harness/prompts/tools/__init__.py:284 — build_tool_card honors ToolCardBuildOptions(idempotent=…) |
+
+</details>
+
+---
+
+## 10. How do you design tools for idempotency and safe retry?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -462,6 +424,44 @@ Before executing, `AbilityManager._execute_single_tool_call` parses the model's 
 | `agent-core/openjiuwen/core/foundation/tool/base.py:109` | ToolCard.idempotent (default False) |
 | `jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1` | session-scoped same-args dedup |
 | `agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40` | McpServerConfig.retry_on_failure (connection, not semantic) |
+
+</details>
+
+---
+
+## 11. Handling concurrent API calls when an agent needs to call multiple tools at once
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.
+
+**Key points.**
+
+- Group the turn's tool calls; run them concurrently.
+- Bound concurrency (semaphore/pool).
+- Respect ordering for conflicting writes.
+
+**Concept.** When a turn contains several independent tool calls, run them concurrently with async tasks rather than a serial `for` loop, but bound the concurrency (semaphore/pool), respect per-resource ordering (two writes to the same file must not interleave), and mark which tools are safe to parallelize. Failures in one call should not silently cancel the others unless you want fail-fast semantics.
+
+![diagram](assets/diagrams/b2932828e43d8f1bcdd5255f45a92689e4019365.png)
+
+**In Jiuwen.** One turn can contain several tool calls. The ability manager normalizes them, creates an isolated callback context per call, and, when parallel tool calls are enabled, dispatches them concurrently with a bounded executor and resource lanes; otherwise it runs them in sequence. The per-call context copy avoids racy mutation across parallel calls.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The ReAct loop can emit a `List[ToolCall]` in one turn. `AbilityManager.execute` normalizes them, builds one coroutine plus an isolated `AgentCallbackContext` per call (copying `extra` to avoid racy dict mutation), and if `parallel_tool_calls=True` dispatches to `_execute_parallel_tool_tasks`. That groups consecutive calls whose `ToolCard.parallel_safe` is true into batches; each batch runs through `_execute_resource_ordered_tool_tasks`, which partitions calls into "lanes" keyed by normalized file path (unknown resources get private lanes) and `asyncio.gather`s across lanes while awaiting sequentially *within* a lane. A `parallel_safe=False` tool acts as an exclusive barrier. Team supervisors override `execute` in `P2PAbilityManager` to fan AgentCard calls out under a semaphore (default 10).
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/core/single_agent/ability_manager.py:1083` | parallel_tool_calls parameter; :1148 parallel-vs-sequential branch; :431 _execute_parallel_tool_tasks (batching + barrier); :393 _execute_resource_ordered_tool_tasks (lanes); :421 asyncio.gather across lanes |
+| `agent-core/openjiuwen/core/foundation/tool/base.py:92` | ToolCard.parallel_safe (default True) |
+| `agent-core/openjiuwen/core/graph/pregel/task.py:27` | submit creates a Task; :47 asyncio.wait(..., FIRST_EXCEPTION) cancels siblings |
+| `agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:45` | lazy semaphore for sub-agent fan-out |
 
 </details>
 

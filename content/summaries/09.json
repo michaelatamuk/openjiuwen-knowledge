@@ -1,59 +1,5 @@
 {
  "09-1": {
-  "title": "Supervisor vs peer-to-peer",
-  "tldr": "A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.",
-  "points": [
-   "Supervisor: top-down, workers-as-tools.",
-   "Peer-to-peer: shared board/bus, equals.",
-   "Different control and failure modes."
-  ]
- },
- "09-2": {
-  "title": "Multi-agent communication",
-  "tldr": "Either a shared blackboard (task board/state) plus a message bus, or direct messaging; messages should be persisted and ordered for auditability, with routing (direct/broadcast/mentions).",
-  "points": [
-   "Shared board + message bus.",
-   "Or direct message passing.",
-   "Persist and order; support routing."
-  ]
- },
- "09-3": {
-  "title": "Agent output as another's input",
-  "tldr": "Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.",
-  "points": [
-   "Subagent/tool call returns the value.",
-   "Handoff transfers control + context.",
-   "Shared board/bus carries the artifact."
-  ]
- },
- "09-4": {
-  "title": "Conflicting/redundant results",
-  "tldr": "Give each unit of work one owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign instead of release, dedupe dispatch, and isolate workspaces.",
-  "points": [
-   "Single owner per task.",
-   "Atomic claim; reassign not release.",
-   "Dedupe dispatch; isolate workspaces."
-  ]
- },
- "09-5": {
-  "title": "Debugging a multi-agent failure",
-  "tldr": "You need per-agent attribution: a trace/span tree where every agent, model, and tool call is a span with agent identity, plus durable conversation/task history to reconstruct order.",
-  "points": [
-   "Per-agent span attribution.",
-   "Trace model/tool calls per member.",
-   "Durable history to reconstruct order."
-  ]
- },
- "09-6": {
-  "title": "When multi-agent is overkill",
-  "tldr": "Multi-agent is justified when workstreams are genuinely independent, scopes differ (tools/permissions), or specialization would otherwise fight for one context; otherwise a single well-designed agent is simpler.",
-  "points": [
-   "Justified: independent parallel workstreams.",
-   "Justified: distinct tool/permission scopes.",
-   "Otherwise: a single agent is simpler."
-  ]
- },
- "09-7": {
   "title": "Four multi-agent architecture types and five required components",
   "tldr": "Centralized, decentralized, hierarchical, or hybrid — every MAS also needs agents, communication, coordination, shared memory, and environment.",
   "points": [
@@ -64,7 +10,7 @@
    "5 components every MAS needs: agents, communication, coordination, shared memory, environment. Jiuwen: hierarchical via SubagentRail; LongTermMemory + EphemeralMemory for shared state; no peer-to-peer pattern"
   ]
  },
- "09-8": {
+ "09-2": {
   "title": "MCP vs A2A: tool access protocol vs agent coordination protocol",
   "tldr": "MCP = one LLM + many tools (centralized control); A2A = agents talk to agents (decentralized execution). Use both together in production: MCP within agents, A2A between them.",
   "points": [
@@ -73,6 +19,60 @@
    "Key difference: MCP = model in control; A2A = agents in control",
    "Use MCP for single-agent assistants with broad tool access; add A2A when specialized agents need to run concurrently",
    "Jiuwen: MCP via McpServerConfig; A2A-style delegation via SubagentRail (internal, not A2A wire protocol)"
+  ]
+ },
+ "09-3": {
+  "title": "Supervisor vs peer-to-peer",
+  "tldr": "A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.",
+  "points": [
+   "Supervisor: top-down, workers-as-tools.",
+   "Peer-to-peer: shared board/bus, equals.",
+   "Different control and failure modes."
+  ]
+ },
+ "09-4": {
+  "title": "Multi-agent communication",
+  "tldr": "Either a shared blackboard (task board/state) plus a message bus, or direct messaging; messages should be persisted and ordered for auditability, with routing (direct/broadcast/mentions).",
+  "points": [
+   "Shared board + message bus.",
+   "Or direct message passing.",
+   "Persist and order; support routing."
+  ]
+ },
+ "09-5": {
+  "title": "Agent output as another's input",
+  "tldr": "Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.",
+  "points": [
+   "Subagent/tool call returns the value.",
+   "Handoff transfers control + context.",
+   "Shared board/bus carries the artifact."
+  ]
+ },
+ "09-6": {
+  "title": "Conflicting/redundant results",
+  "tldr": "Give each unit of work one owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign instead of release, dedupe dispatch, and isolate workspaces.",
+  "points": [
+   "Single owner per task.",
+   "Atomic claim; reassign not release.",
+   "Dedupe dispatch; isolate workspaces."
+  ]
+ },
+ "09-7": {
+  "title": "Debugging a multi-agent failure",
+  "tldr": "You need per-agent attribution: a trace/span tree where every agent, model, and tool call is a span with agent identity, plus durable conversation/task history to reconstruct order.",
+  "points": [
+   "Per-agent span attribution.",
+   "Trace model/tool calls per member.",
+   "Durable history to reconstruct order."
+  ]
+ },
+ "09-8": {
+  "title": "When multi-agent is overkill",
+  "tldr": "Multi-agent is justified when workstreams are genuinely independent, scopes differ (tools/permissions), or specialization would otherwise fight for one context; otherwise a single well-designed agent is simpler.",
+  "points": [
+   "Justified: independent parallel workstreams.",
+   "Justified: distinct tool/permission scopes.",
+   "Otherwise: a single agent is simpler."
   ]
  }
 }

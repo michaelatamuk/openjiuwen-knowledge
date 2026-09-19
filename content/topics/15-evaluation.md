@@ -419,216 +419,7 @@ flowchart TD
 
 ---
 
-## 16. How many examples before eval results are statistically meaningful, not just noise
-
-**General:** It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.
-
-**Jiuwen:** There is no statistical reasoning. The closest construct is Symphony's `_confidence(sample_count)`, which buckets counts into qualitative labels (0→NONE, 1→LOW, <10→NORMAL, ≥10→HIGH) — a hard-coded heuristic, not a confidence interval. Aggregation reports `sample_count` and pass/fail counts but computes no standard error, bootstrap, or significance test.
-
-```mermaid
-flowchart TD
-    N["N examples"] --> C["_confidence(sample_count): 0/1/<10/≥10 → NONE/LOW/NORMAL/HIGH"]
-    N --> AGG["report sample_count + pass/fail"]
-    N --> NEED["need: bootstrap CI · paired significance · power for rare events"]
-    C -.->|"heuristic, not statistics"| X["no confidence interval / variance / significance"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/symphony/evaluation/suite.py:560</code> — <code>_confidence(sample_count)</code> heuristic; <code>:378</code> <code>sample_count</code> attached<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/metrics_collector.py:34</code> — <code>total_cases</code>/<code>passed_cases</code>/<code>average_score</code> (no variance/CI)<br>&bull; <code>agent-core/openjiuwen/symphony/orchestration/config.py:50</code> — <code>min_successes_verified</code> (threshold, not statistics)<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/build/tree/schema.py:232</code> — <code>structure_sample_size</code> (sampling config)</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
----
-
-## 17. How would you compare two models for a specific task, not just a general leaderboard score
-
-**General:** Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.
-
-**Jiuwen:** Model selection here is infrastructure routing, not benchmark comparison. `agent_teams/models/pool.py` defines `ModelRouterConfig` (one endpoint, many model names) and `IntelliRouterConfig` (many deployments behind a reliable client router), with allocator strategies chosen by `build_model_allocator`. IntelliRouter routes by adaptive multi-factor scoring (health, tokens, RPM, latency) and fails over — it does **not** choose by task accuracy. For comparing configs/attempts there is real per-task evaluation: `Trainer` evaluates each candidate on a validation set and keeps the highest score; `rsi best_of_n` ranks attempts by tests/diff/lint; the online judge uses `num_votes` voting. Comparing two models for a task therefore means running your own eval, not a leaderboard feature.
-
-```mermaid
-flowchart TD
-    CMP{"compare two models"} --> ROUTE["IntelliRouter (health/tokens/RPM/latency — NOT accuracy)"]
-    CMP --> EVAL["run both on same held-out task set"]
-    EVAL --> TR["Trainer: per-candidate validation score → keep best"]
-    EVAL --> BON["best_of_n: tests / diff / lint"]
-    EVAL --> JUDGE["judge: num_votes voting"]
-    TR --> DEC(["task-specific decision"])
-    BON --> DEC
-    JUDGE --> DEC
-    ROUTE -.->|"absent"| X["no leaderboard / A-B model-accuracy harness"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_teams/models/pool.py:133-235</code> — <code>ModelRouterConfig</code>; <code>:314-392</code> — <code>IntelliRouterConfig</code> / deployments<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:176/240/357/452/559</code> — allocator strategies + <code>build_model_allocator</code><br>&bull; <code>agent-core/examples/intelli_router/intelliRouter_demo.py:142-160</code> — adaptive routing weights; <code>:249-264</code> route within a pinned model pool<br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:241-272</code> — per-candidate validation scoring, commits best<br>&bull; <code>agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119</code> — rank by tests/lint/diff<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38/58</code> — <code>num_votes</code> judge voting</sub>
-
-</details>
-
-**Gap.** No leaderboard, no A/B model-comparison harness, no per-task model-accuracy registry. Routing optimizes availability/cost/latency, not task quality.
-
-<sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
-
----
-
-## 18. Building a regression test suite to catch a quality drop before it ships
-
-**General:** Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.
-
-**Jiuwen:** Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system_tests/` (E2E, usually skipped). `pytest` defines markers `level0` ("smoke / happy-path; PR gate must stay green") and `level1`, with `testpaths=["tests"]`. Quality evaluation exists separately: `evaluator_pipeline` emits `pass_rate`/`improvement`/`converged`, and `Trainer` compares a candidate's validation score against `best_score` and commits only improvements. But the CI gate that blocks merges (`ci_gate.yaml`) declares only `lint` and `type-check` — no pytest gate and no eval threshold.
-
-```mermaid
-flowchart TD
-    PR["PR"] --> L["lint"] --> TC["type-check"] --> G{"gate (ci_gate.yaml)"}
-    G -->|"configured"| LINT["lint + type-check only"]
-    G -.->|"not configured"| PY["pytest level0 (advertised PR gate, not invoked)"]
-    EVAL["evaluator_pipeline / Trainer"] -.->|"offline CLI, no baseline threshold"| Q["quality regression gate ABSENT"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/pyproject.toml:230</code> — pytest config + <code>level0</code>/<code>level1</code> markers<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — gates are only <code>lint</code> and <code>type-check</code><br>&bull; <code>agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:1098</code> — gate dispatch; <code>agent-core/openjiuwen/auto_harness/stages/verify.py:451</code> <code>ci_gate.run("all")</code>; <code>:509</code> revert on exhaustion<br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code> — <code>improved = val_score &gt; progress.best_score</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:664</code> — <code>_compute_evolution_metrics</code></sub>
-
-</details>
-
-**Gap.** No model/agent-quality regression gate in CI, no golden/snapshot tests for prompts/retrieval/outputs, and credential-requiring system tests are skipped. A quality drop would not be caught before ship by the configured automation.
-
-<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, rag-eval, rag-1._</sub>
-
----
-
-## 19. Evaluating continuously in production, not just once before launch
-
-**General:** Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.
-
-**Jiuwen:** There is a live capture-and-score path, but it serves **online RL training, not quality monitoring**: `CapturePipeline` stages each production completion and a judge later attaches an LLM score or user reward, persisting to a trajectory sample store. The product writes all spans into a per-session SQLite trajectory store (diagnostic, 7-day retention) for replay. There is no drift detection, no eval traffic-sampling policy, no dashboard, and no quality alert.
-
-```mermaid
-flowchart TD
-    LIVE["live traffic"] --> CAP["CapturePipeline: stage request/response"]
-    CAP --> JUD["judge → score or user reward"]
-    JUD --> STORE["trajectory sample store (RL training data)"]
-    LIVE --> TRJ["trajectory store: spans, 7-day retention (diagnostic)"]
-    CAP -.->|"absent"| X["no quality monitoring · drift detection · sampling for eval · alerts"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:59</code> — <code>CapturePipeline</code>; <code>:73</code> before; <code>:110</code> after; <code>:170</code> <code>submit_reward</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</code> — flush + judge on follow-up/session end<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:28</code> — live LLM judge score<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:304</code> — <code>TrajectoryStore</code>; <code>:307</code> 7-day retention (diagnostic)<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/sink.py:578</code> — <code>TrajectorySessionSinkRouter</code>; <code>jiuwenswarm/jiuwenswarm/observability/runtime.py:69</code> — runtime<br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:355</code> — span emission</sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: ai-agent, rag-eval, rag-system._</sub>
-
----
-
-## 20. How do you detect when your retrieval quality has degraded over time
-
-**General:** Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.
-
-**Jiuwen:** There is no retrieval-quality monitoring and no drift detection. Production observability is span-based: OTel spans with an error flag, a per-session trajectory store, and cost/usage facts — error/latency/trajectory, not quality. Offline evaluation exists (`rsi/evaluator`, `evaluator_pipeline`) but is not an online quality monitor, and there is no frozen retrieval metric to trend.
-
-```mermaid
-flowchart TD
-    P["production"] --> SP["OTel spans: error/latency/trajectory (present)"]
-    P -.->|"absent"| Q["retrieval quality trends: zero-result rate · score drift · frozen Recall@k/NDCG · alerts"]
-    P --> OFF["offline rsi/evaluator + evaluator_pipeline (not online)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/observability/run_span.py:289</code> — error status recorded; <code>agent-core/openjiuwen/harness/observability/setup.py:54</code> — OTel lifecycle<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code>; <code>:137</code> <code>trajectory_current_records</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — offline <code>bench.evaluate</code>; <code>:668</code> <code>_compute_evolution_metrics</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code> — validation-score gate (offline)</sub>
-
-</details>
-
-
-
-<sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
-
----
-
-## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
-
-**General:** The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.
-
-**Jiuwen:** Feedback capture is partial, so the gap is not detectable in-product. Explicit like/dislike exists only for **proactive recommendations** (`feedback_collector.record_feedback`); for normal chat, feedback is inferred (an LLM classifying whether a user message is corrective, and the online-RL judge consuming the next user turn as feedback). Session tracking records runtime outcome (`succeeded/failed/waiting_user`), which is execution success, not answer quality. There is no general thumbs-up/down or satisfaction signal to reconcile against eval scores.
-
-```mermaid
-flowchart TD
-    HIGH["high eval scores"] --> GAP["users still complain"]
-    GAP --> WHY["eval set unrepresentative: easy/synthetic · missing slices · wrong metric · unmeasured dims"]
-    WHY --> MINE["mine complaints/failed sessions → add to set → re-baseline"]
-    FB["explicit like/dislike: proactive only; chat feedback inferred; runtime outcome (not quality)"] -.->|"absent general quality feedback"| X["cannot reconcile eval vs users in-product"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/recommendation/feedback_collector.py:47</code> — <code>record_feedback</code> (explicit, proactive only); <code>jiuwenswarm/jiuwenswarm/common/schema/message.py:141</code> — <code>PROACTIVE_FEEDBACK</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/signal/from_conv.py:327</code> — <code>detect_user_intent</code> infers corrective feedback<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/evaluator.py:39</code> — judge takes <code>followup_user_feedback</code>; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:544</code> — <code>_TurnOutcomeTracker</code> (runtime outcome)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/signal/review_feedback.py:117</code> — <code>ReviewFeedbackAttributor</code></sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
----
-
-## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
-
-**General:** Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.
-
-**Jiuwen:** Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator` scores whether an agent objective is `complete`/`blocked`; `SuccessDetector` maps a task to `success/partial/fail`; `evaluator_pipeline`/team verification aggregate `pass_rate`/`avg_score`. The only stakeholder-adjacent signal is **cost**: per-session tracking with an optional limit (`CostLimitExceededError`). There is no conversion, retention, engagement, or user-satisfaction mapping.
-
-```mermaid
-flowchart TD
-    Q["business outcome?"] --> KPI["task success · deflection · time-to-resolution · conversion · retention"]
-    KPI --> BRIDGE["correlate offline metric ↔ KPI on a sample"]
-    EVAL["GoalEvaluator / SuccessDetector / pass_rate (engineering metrics)"] -.->|"no KPI mapping"| X["only cost tracked (usage_cost), never correlated with quality"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/goal/evaluation.py:74</code> — <code>GoalEvaluator</code> (goal completion)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/ttse/success.py:267</code> — <code>SignalBasedSuccessDetector</code> (<code>success/partial/fail</code>); <code>:92</code> <code>classify_explicit_score</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/base.py:232</code> — <code>aggregate()</code><br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/memory.py:160</code> — aggregates <code>pass_rate</code>/<code>avg_score</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:32</code> — cost settings; <code>:65</code> <code>CostLimitExceededError</code></sub>
-
-</details>
-
-<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
-
----
-
-## 23. "How do you know it's working" tests evaluation depth, not confidence
-
-**General:** This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
-
-**Jiuwen:** Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI weighted rubric, `evaluator_pipeline` pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (`ci_gate.yaml` is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.
-
-```mermaid
-flowchart TD
-    Q["how do you know it works / got worse?"] --> FIX["frozen eval set (absent)"]
-    Q --> M["stage metrics: recall/NDCG + faithfulness (retrieval/faithfulness absent)"]
-    Q --> G["CI regression gate (lint/type-check only)"]
-    Q --> P["production sampling + drift alerts (absent)"]
-    Q --> OK["offline: exact-match + LLM judge + RSI rubric (present)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code> — LLM judge; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12</code> — exact match<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — benchmark eval<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — gates are only <code>lint</code>/<code>type-check</code>; <code>agent-core/pyproject.toml:236</code> — <code>level0</code>/<code>level1</code> markers (not invoked)<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code> (operations, not quality)</sub>
-
-</details>
-
----
-
-## 24. Building a retrieval eval set without labeled relevant documents yet
+## 16. Building a retrieval eval set without labeled relevant documents yet
 
 **General:** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
 
@@ -661,7 +452,192 @@ flowchart TD
 
 ---
 
-## 25. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+## 17. How many examples before eval results are statistically meaningful, not just noise
+
+**General:** It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.
+
+**Jiuwen:** There is no statistical reasoning. The closest construct is Symphony's `_confidence(sample_count)`, which buckets counts into qualitative labels (0→NONE, 1→LOW, <10→NORMAL, ≥10→HIGH) — a hard-coded heuristic, not a confidence interval. Aggregation reports `sample_count` and pass/fail counts but computes no standard error, bootstrap, or significance test.
+
+```mermaid
+flowchart TD
+    N["N examples"] --> C["_confidence(sample_count): 0/1/<10/≥10 → NONE/LOW/NORMAL/HIGH"]
+    N --> AGG["report sample_count + pass/fail"]
+    N --> NEED["need: bootstrap CI · paired significance · power for rare events"]
+    C -.->|"heuristic, not statistics"| X["no confidence interval / variance / significance"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/symphony/evaluation/suite.py:560</code> — <code>_confidence(sample_count)</code> heuristic; <code>:378</code> <code>sample_count</code> attached<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/metrics_collector.py:34</code> — <code>total_cases</code>/<code>passed_cases</code>/<code>average_score</code> (no variance/CI)<br>&bull; <code>agent-core/openjiuwen/symphony/orchestration/config.py:50</code> — <code>min_successes_verified</code> (threshold, not statistics)<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/build/tree/schema.py:232</code> — <code>structure_sample_size</code> (sampling config)</sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
+
+---
+
+## 18. How would you compare two models for a specific task, not just a general leaderboard score
+
+**General:** Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.
+
+**Jiuwen:** Model selection here is infrastructure routing, not benchmark comparison. `agent_teams/models/pool.py` defines `ModelRouterConfig` (one endpoint, many model names) and `IntelliRouterConfig` (many deployments behind a reliable client router), with allocator strategies chosen by `build_model_allocator`. IntelliRouter routes by adaptive multi-factor scoring (health, tokens, RPM, latency) and fails over — it does **not** choose by task accuracy. For comparing configs/attempts there is real per-task evaluation: `Trainer` evaluates each candidate on a validation set and keeps the highest score; `rsi best_of_n` ranks attempts by tests/diff/lint; the online judge uses `num_votes` voting. Comparing two models for a task therefore means running your own eval, not a leaderboard feature.
+
+```mermaid
+flowchart TD
+    CMP{"compare two models"} --> ROUTE["IntelliRouter (health/tokens/RPM/latency — NOT accuracy)"]
+    CMP --> EVAL["run both on same held-out task set"]
+    EVAL --> TR["Trainer: per-candidate validation score → keep best"]
+    EVAL --> BON["best_of_n: tests / diff / lint"]
+    EVAL --> JUDGE["judge: num_votes voting"]
+    TR --> DEC(["task-specific decision"])
+    BON --> DEC
+    JUDGE --> DEC
+    ROUTE -.->|"absent"| X["no leaderboard / A-B model-accuracy harness"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_teams/models/pool.py:133-235</code> — <code>ModelRouterConfig</code>; <code>:314-392</code> — <code>IntelliRouterConfig</code> / deployments<br>&bull; <code>agent-core/openjiuwen/agent_teams/models/allocator.py:176/240/357/452/559</code> — allocator strategies + <code>build_model_allocator</code><br>&bull; <code>agent-core/examples/intelli_router/intelliRouter_demo.py:142-160</code> — adaptive routing weights; <code>:249-264</code> route within a pinned model pool<br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:241-272</code> — per-candidate validation scoring, commits best<br>&bull; <code>agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119</code> — rank by tests/lint/diff<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38/58</code> — <code>num_votes</code> judge voting</sub>
+
+</details>
+
+**Gap.** No leaderboard, no A/B model-comparison harness, no per-task model-accuracy registry. Routing optimizes availability/cost/latency, not task quality.
+
+<sub>_Canonical source: `source/llm-fundamentals-interview-questions_for_engineers.md`; also covered in: llm-fund._</sub>
+
+---
+
+## 19. Building a regression test suite to catch a quality drop before it ships
+
+**General:** Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.
+
+**Jiuwen:** Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system_tests/` (E2E, usually skipped). `pytest` defines markers `level0` ("smoke / happy-path; PR gate must stay green") and `level1`, with `testpaths=["tests"]`. Quality evaluation exists separately: `evaluator_pipeline` emits `pass_rate`/`improvement`/`converged`, and `Trainer` compares a candidate's validation score against `best_score` and commits only improvements. But the CI gate that blocks merges (`ci_gate.yaml`) declares only `lint` and `type-check` — no pytest gate and no eval threshold.
+
+```mermaid
+flowchart TD
+    PR["PR"] --> L["lint"] --> TC["type-check"] --> G{"gate (ci_gate.yaml)"}
+    G -->|"configured"| LINT["lint + type-check only"]
+    G -.->|"not configured"| PY["pytest level0 (advertised PR gate, not invoked)"]
+    EVAL["evaluator_pipeline / Trainer"] -.->|"offline CLI, no baseline threshold"| Q["quality regression gate ABSENT"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/pyproject.toml:230</code> — pytest config + <code>level0</code>/<code>level1</code> markers<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — gates are only <code>lint</code> and <code>type-check</code><br>&bull; <code>agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:1098</code> — gate dispatch; <code>agent-core/openjiuwen/auto_harness/stages/verify.py:451</code> <code>ci_gate.run("all")</code>; <code>:509</code> revert on exhaustion<br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code> — <code>improved = val_score &gt; progress.best_score</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:664</code> — <code>_compute_evolution_metrics</code></sub>
+
+</details>
+
+**Gap.** No model/agent-quality regression gate in CI, no golden/snapshot tests for prompts/retrieval/outputs, and credential-requiring system tests are skipped. A quality drop would not be caught before ship by the configured automation.
+
+<sub>_Canonical source: `source/ai-engineer-technical-questions_for_engineers.md`; also covered in: engineering, genai, llm-applied, rag-eval, rag-1._</sub>
+
+---
+
+## 20. Evaluating continuously in production, not just once before launch
+
+**General:** Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.
+
+**Jiuwen:** There is a live capture-and-score path, but it serves **online RL training, not quality monitoring**: `CapturePipeline` stages each production completion and a judge later attaches an LLM score or user reward, persisting to a trajectory sample store. The product writes all spans into a per-session SQLite trajectory store (diagnostic, 7-day retention) for replay. There is no drift detection, no eval traffic-sampling policy, no dashboard, and no quality alert.
+
+```mermaid
+flowchart TD
+    LIVE["live traffic"] --> CAP["CapturePipeline: stage request/response"]
+    CAP --> JUD["judge → score or user reward"]
+    JUD --> STORE["trajectory sample store (RL training data)"]
+    LIVE --> TRJ["trajectory store: spans, 7-day retention (diagnostic)"]
+    CAP -.->|"absent"| X["no quality monitoring · drift detection · sampling for eval · alerts"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:59</code> — <code>CapturePipeline</code>; <code>:73</code> before; <code>:110</code> after; <code>:170</code> <code>submit_reward</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</code> — flush + judge on follow-up/session end<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:28</code> — live LLM judge score<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:304</code> — <code>TrajectoryStore</code>; <code>:307</code> 7-day retention (diagnostic)<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/sink.py:578</code> — <code>TrajectorySessionSinkRouter</code>; <code>jiuwenswarm/jiuwenswarm/observability/runtime.py:69</code> — runtime<br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:355</code> — span emission</sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: ai-agent, rag-eval, rag-system._</sub>
+
+---
+
+## 21. How do you detect when your retrieval quality has degraded over time
+
+**General:** Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.
+
+**Jiuwen:** There is no retrieval-quality monitoring and no drift detection. Production observability is span-based: OTel spans with an error flag, a per-session trajectory store, and cost/usage facts — error/latency/trajectory, not quality. Offline evaluation exists (`rsi/evaluator`, `evaluator_pipeline`) but is not an online quality monitor, and there is no frozen retrieval metric to trend.
+
+```mermaid
+flowchart TD
+    P["production"] --> SP["OTel spans: error/latency/trajectory (present)"]
+    P -.->|"absent"| Q["retrieval quality trends: zero-result rate · score drift · frozen Recall@k/NDCG · alerts"]
+    P --> OFF["offline rsi/evaluator + evaluator_pipeline (not online)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/observability/run_span.py:289</code> — error status recorded; <code>agent-core/openjiuwen/harness/observability/setup.py:54</code> — OTel lifecycle<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code>; <code>:137</code> <code>trajectory_current_records</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — offline <code>bench.evaluate</code>; <code>:668</code> <code>_compute_evolution_metrics</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code> — validation-score gate (offline)</sub>
+
+</details>
+
+
+
+<sub>_Canonical source: `source/rag-part1-interview-questions_for_engineers.md`; also covered in: rag-1._</sub>
+
+---
+
+## 22. High eval scores but users still complaining — what does that gap tell you about your eval set
+
+**General:** The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.
+
+**Jiuwen:** Feedback capture is partial, so the gap is not detectable in-product. Explicit like/dislike exists only for **proactive recommendations** (`feedback_collector.record_feedback`); for normal chat, feedback is inferred (an LLM classifying whether a user message is corrective, and the online-RL judge consuming the next user turn as feedback). Session tracking records runtime outcome (`succeeded/failed/waiting_user`), which is execution success, not answer quality. There is no general thumbs-up/down or satisfaction signal to reconcile against eval scores.
+
+```mermaid
+flowchart TD
+    HIGH["high eval scores"] --> GAP["users still complain"]
+    GAP --> WHY["eval set unrepresentative: easy/synthetic · missing slices · wrong metric · unmeasured dims"]
+    WHY --> MINE["mine complaints/failed sessions → add to set → re-baseline"]
+    FB["explicit like/dislike: proactive only; chat feedback inferred; runtime outcome (not quality)"] -.->|"absent general quality feedback"| X["cannot reconcile eval vs users in-product"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/recommendation/feedback_collector.py:47</code> — <code>record_feedback</code> (explicit, proactive only); <code>jiuwenswarm/jiuwenswarm/common/schema/message.py:141</code> — <code>PROACTIVE_FEEDBACK</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/signal/from_conv.py:327</code> — <code>detect_user_intent</code> infers corrective feedback<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/evaluator.py:39</code> — judge takes <code>followup_user_feedback</code>; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:544</code> — <code>_TurnOutcomeTracker</code> (runtime outcome)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/signal/review_feedback.py:117</code> — <code>ReviewFeedbackAttributor</code></sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
+
+---
+
+## 23. Tying an eval metric back to a business outcome a stakeholder actually cares about
+
+**General:** Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.
+
+**Jiuwen:** Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator` scores whether an agent objective is `complete`/`blocked`; `SuccessDetector` maps a task to `success/partial/fail`; `evaluator_pipeline`/team verification aggregate `pass_rate`/`avg_score`. The only stakeholder-adjacent signal is **cost**: per-session tracking with an optional limit (`CostLimitExceededError`). There is no conversion, retention, engagement, or user-satisfaction mapping.
+
+```mermaid
+flowchart TD
+    Q["business outcome?"] --> KPI["task success · deflection · time-to-resolution · conversion · retention"]
+    KPI --> BRIDGE["correlate offline metric ↔ KPI on a sample"]
+    EVAL["GoalEvaluator / SuccessDetector / pass_rate (engineering metrics)"] -.->|"no KPI mapping"| X["only cost tracked (usage_cost), never correlated with quality"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/goal/evaluation.py:74</code> — <code>GoalEvaluator</code> (goal completion)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/ttse/success.py:267</code> — <code>SignalBasedSuccessDetector</code> (<code>success/partial/fail</code>); <code>:92</code> <code>classify_explicit_score</code><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/base.py:232</code> — <code>aggregate()</code><br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/memory.py:160</code> — aggregates <code>pass_rate</code>/<code>avg_score</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:32</code> — cost settings; <code>:65</code> <code>CostLimitExceededError</code></sub>
+
+</details>
+
+<sub>_Canonical source: `source/rag-evaluation-interview-questions_for_engineers.md`; also covered in: rag-eval._</sub>
+
+---
+
+## 24. How do you test a non-deterministic agent — what does a passing test suite actually assert?
 
 **General:** Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is **invariant-based testing**: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) **Tool invariants** — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) **Termination invariants** — the agent stopped within `max_turns`; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) **Schema invariants** — structured output matched the declared JSON schema; required fields were present. (4) **Safety invariants** — no guardrail-blocked content in the output; no injected content executed. (5) **Latency/cost invariants** — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).
 
@@ -690,3 +666,27 @@ flowchart TD
 **Gap.** No official test harness for invariant-based agent testing ships with the framework; test authors must implement their own BaseModelClient mock and rail-contract assertions. The evaluator pipeline (`agent_evolving/`) is offline, not integrated with a pytest-style test runner.
 
 <sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>
+
+## 25. "How do you know it's working" tests evaluation depth, not confidence
+
+**General:** This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
+
+**Jiuwen:** Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI weighted rubric, `evaluator_pipeline` pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (`ci_gate.yaml` is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.
+
+```mermaid
+flowchart TD
+    Q["how do you know it works / got worse?"] --> FIX["frozen eval set (absent)"]
+    Q --> M["stage metrics: recall/NDCG + faithfulness (retrieval/faithfulness absent)"]
+    Q --> G["CI regression gate (lint/type-check only)"]
+    Q --> P["production sampling + drift alerts (absent)"]
+    Q --> OK["offline: exact-match + LLM judge + RSI rubric (present)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code> — LLM judge; <code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12</code> — exact match<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric<br>&bull; <code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code> — benchmark eval<br>&bull; <code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code> — gates are only <code>lint</code>/<code>type-check</code>; <code>agent-core/pyproject.toml:236</code> — <code>level0</code>/<code>level1</code> markers (not invoked)<br>&bull; <code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code> — <code>has_error</code> (operations, not quality)</sub>
+
+</details>
+
+---

@@ -118,31 +118,7 @@ flowchart TD
 
 ---
 
-## 6. Termination conditions
-
-**Definition:** "Stop when done" is not a termination condition. An agent needs at least three explicit paths: **success** (a final answer meeting a defined condition, such as required fields populated or context cited); **budget exhaustion** (a hard cap on iterations and tokens, with a graceful degraded response rather than silence); and **human escalation** (handing off when budget is exhausted or ambiguity is unresolvable). A confidence threshold can add a fourth: escalate before acting when the model's uncertainty is high.
-
-**Jiuwen:** Several termination paths exist: `ReactAgent.max_iterations` is the hard iteration cap (5, or 15 in the harness); `PlanApprovalInterruptRail` and `StructuredAskUserRail` provide human-in-the-loop escalation; `ModelAnomalyDetectionRail` can abort on anomaly detection; and `AgentObservabilityRail` logs every turn. A graceful degraded response at budget exhaustion and confidence-threshold auto-escalation are not included, and the approval rails are opt-in per agent config.
-
-```mermaid
-flowchart TD
-    T["termination decision"] --> S["success: final answer emitted (ReactAgent done)"]
-    T --> B["budget: max_iterations (5 / 15) + session cost cap"]
-    T --> E["escalation: PlanApprovalInterruptRail / StructuredAskUserRail (opt-in)"]
-    T --> A["anomaly abort: ModelAnomalyDetectionRail (off by default)"]
-    T -.->|"not included"| D["graceful degraded response at budget exhaustion"]
-    T -.->|"not included"| C["confidence-threshold-based auto-escalation"]
-    E -.->|"opt-in only"| CONF["PlanApprovalInterruptRail must be in profile config"]
-```
-
-<details>
-<summary>Anchors</summary>
-<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — anomaly abort (off by default)<br><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code> — structured human escalation<br><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py</code> — <code>PlanApprovalInterruptRail</code> (opt-in)</sub>
-</details>
-
----
-
-## 7. What does structured agent tracing look like, and why does print-debugging fail at scale?
+## 6. What does structured agent tracing look like, and why does print-debugging fail at scale?
 
 **General:** Print/log statements produce unstructured text: you can't query "all tool calls in session X", can't aggregate latency by tool, and can't correlate a wrong answer back to which retrieval chunk was in context. Structured tracing means emitting a typed event for every meaningful action — model call started/completed, tool called/returned, retrieval executed, decision made — with a shared trace/span ID so events from the same agent run can be grouped. Each event carries: timestamp, latency, token counts, tool name + arguments, retrieval score, model response. This enables offline debugging (replay a trace), production monitoring (alert on p99 latency), and eval (attach ground truth to a trace for scoring). The minimum viable schema: `trace_id`, `span_id`, `event_type`, `payload`, `duration_ms`.
 
@@ -172,5 +148,29 @@ flowchart TD
 **Gap.** Retrieval events (chunk ids, scores, query) are not emitted as structured observability spans; they appear only in the tool result text, making cross-run retrieval analysis require custom instrumentation.
 
 <sub>_Canonical source: `source/agent-failure-patterns_for_engineers.md`; also covered in: agent-failure._</sub>
+
+---
+
+## 7. Termination conditions
+
+**Definition:** "Stop when done" is not a termination condition. An agent needs at least three explicit paths: **success** (a final answer meeting a defined condition, such as required fields populated or context cited); **budget exhaustion** (a hard cap on iterations and tokens, with a graceful degraded response rather than silence); and **human escalation** (handing off when budget is exhausted or ambiguity is unresolvable). A confidence threshold can add a fourth: escalate before acting when the model's uncertainty is high.
+
+**Jiuwen:** Several termination paths exist: `ReactAgent.max_iterations` is the hard iteration cap (5, or 15 in the harness); `PlanApprovalInterruptRail` and `StructuredAskUserRail` provide human-in-the-loop escalation; `ModelAnomalyDetectionRail` can abort on anomaly detection; and `AgentObservabilityRail` logs every turn. A graceful degraded response at budget exhaustion and confidence-threshold auto-escalation are not included, and the approval rails are opt-in per agent config.
+
+```mermaid
+flowchart TD
+    T["termination decision"] --> S["success: final answer emitted (ReactAgent done)"]
+    T --> B["budget: max_iterations (5 / 15) + session cost cap"]
+    T --> E["escalation: PlanApprovalInterruptRail / StructuredAskUserRail (opt-in)"]
+    T --> A["anomaly abort: ModelAnomalyDetectionRail (off by default)"]
+    T -.->|"not included"| D["graceful degraded response at budget exhaustion"]
+    T -.->|"not included"| C["confidence-threshold-based auto-escalation"]
+    E -.->|"opt-in only"| CONF["PlanApprovalInterruptRail must be in profile config"]
+```
+
+<details>
+<summary>Anchors</summary>
+<sub><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code> — <code>max_iterations: int = Field(default=5)</code><br><code>agent-core/openjiuwen/harness/schema/config.py:252</code> — harness default iterations 15<br><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code> — anomaly abort (off by default)<br><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code> — session cost cap<br><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code> — structured human escalation<br><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py</code> — <code>PlanApprovalInterruptRail</code> (opt-in)</sub>
+</details>
 
 ---

@@ -578,7 +578,46 @@ The advertised `rsi/dataset_generator` is not runnable source: `DatasetGenerator
 
 ---
 
-## 16. How many examples before eval results are statistically meaningful, not just noise
+## 16. Building a retrieval eval set without labeled relevant documents yet
+
+<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
+
+**TL;DR.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
+
+**Key points.**
+
+- Mine real queries from logs.
+- Label via LLM judge or a strong model's citations.
+- Or synthesize queries from known documents (doc = gold).
+
+**Concept.** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
+
+![diagram](assets/diagrams/d8d020da2a0703d725bd5e991703c39309fd0b48.png)
+
+**In Jiuwen.** There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (`eval_proactive_dataset.py` runs inference; `score_proactive_judge.py:annotate` uses an LLM to judge memory moments). `tests/unit_tests/core/retrieval/` contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35` | annotate(...) LLM judge (memory, not retrieval) |
+| `agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121` | run_inference, dataset build for memory task |
+| `agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py` | mock-based unit fixtures |
+| `agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py` | mock-based agentic test |
+| `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | rewrite (query generation from user input, not eval-set synthesis) |
+
+</details>
+
+---
+
+## 17. How many examples before eval results are statistically meaningful, not just noise
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -616,7 +655,7 @@ There is no statistical reasoning. The closest construct is Symphony's `_confide
 
 ---
 
-## 17. How would you compare two models for a specific task, not just a general leaderboard score
+## 18. How would you compare two models for a specific task, not just a general leaderboard score
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -656,7 +695,7 @@ Model selection here is infrastructure routing, not benchmark comparison. `agent
 
 ---
 
-## 18. Building a regression test suite to catch a quality drop before it ships
+## 19. Building a regression test suite to catch a quality drop before it ships
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -695,7 +734,7 @@ Tests split into `tests/unit_tests/` (fast, deterministic, CI) and `tests/system
 
 ---
 
-## 19. Evaluating continuously in production, not just once before launch
+## 20. Evaluating continuously in production, not just once before launch
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -739,7 +778,7 @@ There is a live capture-and-score path, but it serves **online RL training, not 
 
 ---
 
-## 20. How do you detect when your retrieval quality has degraded over time
+## 21. How do you detect when your retrieval quality has degraded over time
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -777,7 +816,7 @@ There is no retrieval-quality monitoring and no drift detection. Production obse
 
 ---
 
-## 21. High eval scores but users still complaining — what does that gap tell you about your eval set
+## 22. High eval scores but users still complaining — what does that gap tell you about your eval set
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -816,7 +855,7 @@ Feedback capture is partial, so the gap is not detectable in-product. Explicit l
 
 ---
 
-## 22. Tying an eval metric back to a business outcome a stakeholder actually cares about
+## 23. Tying an eval metric back to a business outcome a stakeholder actually cares about
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -855,88 +894,7 @@ Metrics here are engineering/task-completion, not business KPIs. `GoalEvaluator`
 
 ---
 
-## 23. "How do you know it's working" tests evaluation depth, not confidence
-
-<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
-
-**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
-
-**TL;DR.** 'How do you know it's working' tests evaluation depth, not confidence.
-
-**Key points.**
-
-- Offline answer-level eval exists.
-- No retrieval metric layer.
-- No faithfulness/claim scoring.
-- No CI quality gate.
-
-**Concept.** This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
-
-![diagram](assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png)
-
-**In Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI weighted rubric, `evaluator_pipeline` pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (`ci_gate.yaml` is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47` | LLM judge; agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12 — exact match |
-| `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | weighted rubric |
-| `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167` | benchmark eval |
-| `agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21` | gates are only lint/type-check; agent-core/pyproject.toml:236 — level0/level1 markers (not invoked) |
-| `jiuwenswarm/jiuwenswarm/observability/store.py:102` | has_error (operations, not quality) |
-
-</details>
-
----
-
-## 24. Building a retrieval eval set without labeled relevant documents yet
-
-<span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
-
-**TL;DR.** Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.
-
-**Key points.**
-
-- Mine real queries from logs.
-- Label via LLM judge or a strong model's citations.
-- Or synthesize queries from known documents (doc = gold).
-
-**Concept.** Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.
-
-![diagram](assets/diagrams/d8d020da2a0703d725bd5e991703c39309fd0b48.png)
-
-**In Jiuwen.** There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (`eval_proactive_dataset.py` runs inference; `score_proactive_judge.py:annotate` uses an LLM to judge memory moments). `tests/unit_tests/core/retrieval/` contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.
-
-**Code anchors**
-
-| Code anchor | What it points to |
-|---|---|
-| `agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35` | annotate(...) LLM judge (memory, not retrieval) |
-| `agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121` | run_inference, dataset build for memory task |
-| `agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py` | mock-based unit fixtures |
-| `agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py` | mock-based agentic test |
-| `agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412` | rewrite (query generation from user input, not eval-set synthesis) |
-
-</details>
-
----
-
-## 25. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+## 24. How do you test a non-deterministic agent — what does a passing test suite actually assert?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span>
 
@@ -973,6 +931,48 @@ There is no synthetic-query generation, no retrieval eval harness, and no LLM ju
 | `agent-core/openjiuwen/core/security/guardrail/builtin.py:60` | safety invariant |
 | `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` | cost invariant (session budget) |
 | `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40` | behavioral correctness via LLM-as-judge |
+
+</details>
+
+---
+
+## 25. "How do you know it's working" tests evaluation depth, not confidence
+
+<span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
+
+**Claim, not a question.** The heading is an assertion about what these questions probe; the notes below assess whether it holds.
+
+**TL;DR.** 'How do you know it's working' tests evaluation depth, not confidence.
+
+**Key points.**
+
+- Offline answer-level eval exists.
+- No retrieval metric layer.
+- No faithfulness/claim scoring.
+- No CI quality gate.
+
+**Concept.** This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got *worse*, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.
+
+![diagram](assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png)
+
+**In Jiuwen.** Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+Offline answer-level evaluation exists (`ExactMatchMetric`, `LLMAsJudgeMetric`, RSI weighted rubric, `evaluator_pipeline` pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (`ci_gate.yaml` is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.
+
+**Code anchors**
+
+| Code anchor | What it points to |
+|---|---|
+| `agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47` | LLM judge; agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12 — exact match |
+| `agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193` | weighted rubric |
+| `agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167` | benchmark eval |
+| `agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21` | gates are only lint/type-check; agent-core/pyproject.toml:236 — level0/level1 markers (not invoked) |
+| `jiuwenswarm/jiuwenswarm/observability/store.py:102` | has_error (operations, not quality) |
 
 </details>
 

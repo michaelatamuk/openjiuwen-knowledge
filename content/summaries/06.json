@@ -9,69 +9,6 @@
   ]
  },
  "06-2": {
-  "title": "Registering tools",
-  "tldr": "Register a tool with name, description, and parameter schema; the framework collects them into the model request in the provider's tool format; returned tool calls are dispatched.",
-  "points": [
-   "Register name + description + schema.",
-   "Framework builds the provider tool list.",
-   "Model tool calls are parsed and dispatched."
-  ]
- },
- "06-3": {
-  "title": "Unsupported tool",
-  "tldr": "Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.",
-  "points": [
-   "Wrap any function as a tool.",
-   "Custom tool class for transport/auth.",
-   "MCP for external tool servers."
-  ]
- },
- "06-4": {
-  "title": "Failed or malformed tool call",
-  "tldr": "Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).",
-  "points": [
-   "Catch and classify retryable vs not.",
-   "Return a structured, model-readable error.",
-   "Repair broken payloads when possible."
-  ]
- },
- "06-5": {
-  "title": "Retry without duplicate effects",
-  "tldr": "Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.",
-  "points": [
-   "Mark non-idempotent tools; never blind-retry.",
-   "Idempotency keys make repeats detectable.",
-   "Retry reads/idempotent ops only."
-  ]
- },
- "06-6": {
-  "title": "Custom per-tool retry policy",
-  "tldr": "Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.",
-  "points": [
-   "Per-tool override: attempts, backoff, timeout.",
-   "Keep the idempotency safety default.",
-   "Central policy with per-tool hooks."
-  ]
- },
- "06-7": {
-  "title": "Concurrent tool calls",
-  "tldr": "Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.",
-  "points": [
-   "Group the turn's tool calls; run them concurrently.",
-   "Bound concurrency (semaphore/pool).",
-   "Respect ordering for conflicting writes."
-  ]
- },
- "06-8": {
-  "title": "Step timeout or error",
-  "tldr": "Bound each step with a timeout, classify errors, convert failures into data (an observation) so the loop can adapt, and propagate fatal errors with cleanup.",
-  "points": [
-   "Timeout each step.",
-   "Classify retryable vs fatal.",
-   "Convert failure into a model-readable result."
-  ]
- },
- "06-9": {
   "title": "Agentic tool-calling pattern",
   "tldr": "The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.",
   "points": [
@@ -80,7 +17,16 @@
    "Loops until the model answers."
   ]
  },
- "06-10": {
+ "06-3": {
+  "title": "Registering tools",
+  "tldr": "Register a tool with name, description, and parameter schema; the framework collects them into the model request in the provider's tool format; returned tool calls are dispatched.",
+  "points": [
+   "Register name + description + schema.",
+   "Framework builds the provider tool list.",
+   "Model tool calls are parsed and dispatched."
+  ]
+ },
+ "06-4": {
   "title": "Validating tool-call output",
   "tldr": "Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.",
   "points": [
@@ -89,13 +35,67 @@
    "Return the error to the model so it can self-correct."
   ]
  },
- "06-11": {
+ "06-5": {
+  "title": "Unsupported tool",
+  "tldr": "Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.",
+  "points": [
+   "Wrap any function as a tool.",
+   "Custom tool class for transport/auth.",
+   "MCP for external tool servers."
+  ]
+ },
+ "06-6": {
+  "title": "Failed or malformed tool call",
+  "tldr": "Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).",
+  "points": [
+   "Catch and classify retryable vs not.",
+   "Return a structured, model-readable error.",
+   "Repair broken payloads when possible."
+  ]
+ },
+ "06-7": {
+  "title": "Step timeout or error",
+  "tldr": "Bound each step with a timeout, classify errors, convert failures into data (an observation) so the loop can adapt, and propagate fatal errors with cleanup.",
+  "points": [
+   "Timeout each step.",
+   "Classify retryable vs fatal.",
+   "Convert failure into a model-readable result."
+  ]
+ },
+ "06-8": {
+  "title": "Retry without duplicate effects",
+  "tldr": "Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.",
+  "points": [
+   "Mark non-idempotent tools; never blind-retry.",
+   "Idempotency keys make repeats detectable.",
+   "Retry reads/idempotent ops only."
+  ]
+ },
+ "06-9": {
+  "title": "Custom per-tool retry policy",
+  "tldr": "Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.",
+  "points": [
+   "Per-tool override: attempts, backoff, timeout.",
+   "Keep the idempotency safety default.",
+   "Central policy with per-tool hooks."
+  ]
+ },
+ "06-10": {
   "title": "Tool idempotency and safe retry",
   "tldr": "Separate tools into idempotent reads (safe to retry) and non-idempotent writes (require idempotency keys and attempted-vs-confirmed tracking).",
   "points": [
    "Reads: retry with backoff — same result every time.",
    "Writes: attach an idempotency key; verify state before retrying.",
    "Jiuwen: no idempotent flag on ToolCard; ToolCallDeduplicationRail is narrow (same args in session only)."
+  ]
+ },
+ "06-11": {
+  "title": "Concurrent tool calls",
+  "tldr": "Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.",
+  "points": [
+   "Group the turn's tool calls; run them concurrently.",
+   "Bound concurrency (semaphore/pool).",
+   "Respect ordering for conflicting writes."
   ]
  }
 }

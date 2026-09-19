@@ -36,78 +36,6 @@
   ]
  },
  "07-5": {
-  "title": "State across steps",
-  "tldr": "A state object threaded through (or held per session) that each step reads/writes; conversation history is usually separate from working state; persist via checkpoints.",
-  "points": [
-   "Working state object per session.",
-   "Separate conversation history from task state.",
-   "Checkpoint for persistence."
-  ]
- },
- "07-6": {
-  "title": "Pause and resume an agent",
-  "tldr": "Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.",
-  "points": [
-   "Durable checkpoint or interrupt signal.",
-   "Preserve state while unwinding.",
-   "Resume by reload or replay."
-  ]
- },
- "07-7": {
-  "title": "Human-in-the-loop approval",
-  "tldr": "Route sensitive steps through a permission check returning allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and remember/persist rules; fail closed on unknown.",
-  "points": [
-   "Permission check: allow/ask/deny.",
-   "Pause on ask; resume with the decision.",
-   "Persist allow rules; fail closed."
-  ]
- },
- "07-8": {
-  "title": "Short vs long-term memory",
-  "tldr": "Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.",
-  "points": [
-   "Short-term: live context window.",
-   "Long-term: durable, cross-session.",
-   "Long-term is retrieved into the turn."
-  ]
- },
- "07-9": {
-  "title": "What to store vs discard",
-  "tldr": "Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.",
-  "points": [
-   "Keep durable/reused/preference facts.",
-   "Discard transient and contradicted.",
-   "LLM extract then dedupe/resolve."
-  ]
- },
- "07-10": {
-  "title": "Bounding memory growth",
-  "tldr": "Bound on multiple axes: hard-drop/truncate oldest context, offload large blobs, compact old tool results, summarize/archive, and cap stored long-term entries.",
-  "points": [
-   "FIFO/truncate oldest context.",
-   "Offload large blobs; compact tool results.",
-   "Summarize/archive; cap long-term entries."
-  ]
- },
- "07-11": {
-  "title": "Summarizing history safely",
-  "tldr": "Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.",
-  "points": [
-   "Recent turns verbatim.",
-   "Structured summary, not free prose.",
-   "Re-inject durable state (plan, status, files)."
-  ]
- },
- "07-12": {
-  "title": "Planner–executor pattern",
-  "tldr": "A planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response.",
-  "points": [
-   "Planner decomposes the task.",
-   "Executors carry out subtasks.",
-   "Results are combined."
-  ]
- },
- "07-13": {
   "title": "Critic or reflection loop",
   "tldr": "A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.",
   "points": [
@@ -116,7 +44,70 @@
    "Adds a verification step."
   ]
  },
- "07-14": {
+ "07-6": {
+  "title": "State across steps",
+  "tldr": "A state object threaded through (or held per session) that each step reads/writes; conversation history is usually separate from working state; persist via checkpoints.",
+  "points": [
+   "Working state object per session.",
+   "Separate conversation history from task state.",
+   "Checkpoint for persistence."
+  ]
+ },
+ "07-7": {
+  "title": "Pause and resume an agent",
+  "tldr": "Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.",
+  "points": [
+   "Durable checkpoint or interrupt signal.",
+   "Preserve state while unwinding.",
+   "Resume by reload or replay."
+  ]
+ },
+ "07-8": {
+  "title": "Human-in-the-loop approval",
+  "tldr": "Route sensitive steps through a permission check returning allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and remember/persist rules; fail closed on unknown.",
+  "points": [
+   "Permission check: allow/ask/deny.",
+   "Pause on ask; resume with the decision.",
+   "Persist allow rules; fail closed."
+  ]
+ },
+ "07-9": {
+  "title": "Short vs long-term memory",
+  "tldr": "Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.",
+  "points": [
+   "Short-term: live context window.",
+   "Long-term: durable, cross-session.",
+   "Long-term is retrieved into the turn."
+  ]
+ },
+ "07-10": {
+  "title": "What to store vs discard",
+  "tldr": "Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.",
+  "points": [
+   "Keep durable/reused/preference facts.",
+   "Discard transient and contradicted.",
+   "LLM extract then dedupe/resolve."
+  ]
+ },
+ "07-11": {
+  "title": "Bounding memory growth",
+  "tldr": "Bound on multiple axes: hard-drop/truncate oldest context, offload large blobs, compact old tool results, summarize/archive, and cap stored long-term entries.",
+  "points": [
+   "FIFO/truncate oldest context.",
+   "Offload large blobs; compact tool results.",
+   "Summarize/archive; cap long-term entries."
+  ]
+ },
+ "07-12": {
+  "title": "Summarizing history safely",
+  "tldr": "Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.",
+  "points": [
+   "Recent turns verbatim.",
+   "Structured summary, not free prose.",
+   "Re-inject durable state (plan, status, files)."
+  ]
+ },
+ "07-13": {
   "title": "Memory-augmented agent",
   "tldr": "Context across sessions: short-term is the active window; long-term is a store of past interactions; retrieval decides what long-term memory returns.",
   "points": [
@@ -125,7 +116,7 @@
    "Retrieval brings memory back."
   ]
  },
- "07-15": {
+ "07-14": {
   "title": "Memory contamination and targeted invalidation",
   "tldr": "Wrong facts written to memory compound across sessions; prevent via write gating, and fix via targeted overwrite — not full wipes.",
   "points": [

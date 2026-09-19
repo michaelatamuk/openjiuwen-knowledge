@@ -31,10 +31,6 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    REQ[\"want structured output\"] --> CONSTRAIN[\"constrain generation: JSON schema / tool mode\"]\n    CONSTRAIN --> GEN[\"model generates\"]\n    GEN --> VALID{\"valid against schema?\"}\n    VALID -->|yes| OK[\"use the object\"]\n    VALID -->|no| RETRY[\"return error → model retries\"]"
  },
- "06-10": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    RAW[\"model tool-call arguments (string)\"] --> PARSE{\"valid JSON?\"}\n    PARSE -->|no| REPAIR[\"repair brackets / quotes\"]\n    PARSE -->|yes| SCHEMA\n    REPAIR -->|\"still broken\"| ERR[\"readable error → back to model\"]\n    REPAIR --> SCHEMA[\"validate against the tool's schema\"]\n    SCHEMA -->|valid| RUN[\"run function (defaults filled)\"]\n    SCHEMA -->|invalid| ERR"
- },
  "02-4": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    P[\"prompt version\"] --> VCS[\"source control / prompt store\"]\n    VCS --> ID[\"immutable id / content hash\"]\n    ID --> DEPLOY[\"activate or roll back without redeploying\"]\n    DEPLOY --> LOG[\"log version with model + params + outputs\"]"
@@ -79,26 +75,6 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> R[\"retrieve\"]\n    R --> E{\"enough to answer?\"}\n    E -->|no| R2[\"reformulate + retrieve again\"]\n    R2 --> CAP{\"hop budget reached?\"}\n    CAP -->|no| R\n    CAP -->|yes| STOP[\"stop and answer with what we have\"]\n    E -->|yes| ANS[\"answer\"]"
  },
- "06-2": {
-  "technical": "__existing__",
-  "concept": "flowchart LR\n    TOOL[\"tool function + schema\"] --> REG[\"register with the agent/framework\"]\n    REG --> LIST[\"expose tool definitions\"]\n    LIST --> MODEL[\"provider tool-use API\"]\n    MODEL --> CALL[\"model emits a tool call\"]"
- },
- "06-3": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    NEED[\"capability not built in\"] --> WRAP[\"wrap it as a custom tool (function / MCP)\"]\n    WRAP --> SCHEMA[\"describe input schema + docstring\"]\n    SCHEMA --> REG[\"register\"]\n    REG --> MODEL[\"model can now call it\"]"
- },
- "06-5": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    CALL[\"tool call fails\"] --> ID{\"idempotent?\"}\n    ID -->|yes| RETRY[\"retry with backoff\"]\n    ID -->|no| GUARD[\"don't blind-retry: dedupe key · confirm · make it idempotent\"]\n    RETRY --> OK[\"success\"]\n    GUARD --> OK"
- },
- "06-8": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    STEP[\"run step\"] --> E{\"timeout or error?\"}\n    E -->|transient| RETRY[\"retry with backoff\"]\n    E -->|permanent| FAIL[\"surface a clear error\"]\n    E -->|none| NEXT[\"next step\"]"
- },
- "07-5": {
-  "technical": "__existing__",
-  "concept": "flowchart LR\n    S1[\"step 1\"] --> STATE[\"shared state (messages · plan · todos · memory)\"]\n    STATE --> S2[\"step 2\"]\n    S2 --> STATE\n    STATE --> S3[\"next step sees prior results\"]"
- },
  "08-1": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    RAW[\"raw API calls\"] --> BUILD[\"you build: loop · retries · state · tools · streaming\"]\n    FW[\"agent framework\"] --> GIVE[\"gives you: loop + tool plumbing + state + rails\"]\n    GIVE --> FOCUS[\"you focus on the task\"]"
@@ -123,10 +99,6 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    DONE[\"node finishes\"] --> ROUTE{\"router / conditional edge\"}\n    ROUTE -->|A| NA[\"node A\"]\n    ROUTE -->|B| NB[\"node B\"]\n    NA --> CH[\"update shared state\"]\n    NB --> CH\n    CH --> NEXT[\"next ready node\"]"
  },
- "09-5": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    FAIL[\"bad final result\"] --> TRACE[\"follow the handoff trace (who produced what)\"]\n    TRACE --> FIND[\"locate the failing agent / step\"]\n    FIND --> FIX[\"fix that step; re-run from there\"]"
- },
  "10-18": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    Q[\"question\"] --> A[\"agent decides: retrieve? which query? enough?\"]\n    A --> R[\"retrieve\"]\n    R --> A\n    A -->|enough| ANS[\"answer\"]\n    FIXED[\"fixed RAG: retrieve once, then generate\"] -.->|\"no decisions\"| ANS2[\"answer\"]"
@@ -135,15 +107,69 @@
   "technical": "__existing__",
   "concept": "flowchart TD\n    A[\"agentic retrieval\"] --> L{\"need to retrieve again?\"}\n    L -->|no| ANS[\"answer\"]\n    L -->|yes| CAP{\"hop / cost budget left?\"}\n    CAP -->|no| STOP[\"stop and answer\"]\n    CAP -->|yes| R[\"retrieve\"]"
  },
- "16-12": {
+ "08-9": {
   "technical": "__existing__",
-  "concept": "flowchart TD\n    TOOLS[\"agent calls tools repeatedly\"] --> CAPS[\"cap iterations + token/step budget\"]\n    TOOLS --> CACHE[\"cache / dedup identical calls\"]\n    TOOLS --> ROUTE[\"route simple calls to a cheaper model\"]\n    CAPS --> SAVE[\"bounded cost\"]\n    CACHE --> SAVE\n    ROUTE --> SAVE"
+  "concept": "flowchart TD\n    FW[\"framework choice\"] --> TEAM{\"fits the team + change rate?\"}\n    TEAM -->|small team, few devs| LIGHT[\"lighter, less magic\"]\n    TEAM -->|large team, many features| STRUCT[\"more structure / abstraction\"]\n    LIGHT --> OK[\"scales with the team\"]\n    STRUCT --> OK"
+ },
+ "03-20": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    INJ[\"prompt injection\"] --> WHY[\"untrusted content carries instructions\"]\n    WHY --> RISK[\"model may act on them\"]\n    RISK --> DEF[\"treat as data + enforce controls outside the model\"]"
+ },
+ "05-4": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    subgraph L[\"linear chain\"]\n    A[\"step 1\"] --> B[\"step 2\"] --> C[\"step 3\"]\n    end\n    subgraph G[\"graph with conditional branches\"]\n    S[\"start\"] --> D{\"condition?\"}\n    D -->|\"yes\"| Y[\"branch A\"]\n    D -->|\"no\"| N[\"branch B\"]\n    Y --> E[\"join\"]\n    N --> E\n    end"
+ },
+ "05-5": {
+  "concept": "flowchart TD\n    I([\"input\"]) --> R[\"Reason: model call\"]\n    R --> D{\"tool calls?\"}\n    D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    D -->|\"no tool calls\"| O([\"answer\"])"
+ },
+ "05-6": {
+  "concept": "flowchart TD\n    subgraph PLAN[\"Plan everything upfront\"]\n    I1([\"input\"]) --> P[\"plan all steps\"] --> S1[\"step 1\"] --> S2[\"step 2\"] --> O1([\"answer\"])\n    end\n    subgraph LOOP[\"ReAct loop\"]\n    direction TB\n        I2([\"input\"]) --> R[\"Reason: model call\"]\n        R --> D{\"tool calls?\"}\n        D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    end\n    D -->|\"no tool calls\"| O2([\"answer\"])"
+ },
+ "05-9": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
+ },
+ "06-3": {
+  "technical": "__existing__",
+  "concept": "flowchart LR\n    TOOL[\"tool function + schema\"] --> REG[\"register with the agent/framework\"]\n    REG --> LIST[\"expose tool definitions\"]\n    LIST --> MODEL[\"provider tool-use API\"]\n    MODEL --> CALL[\"model emits a tool call\"]"
+ },
+ "06-4": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    RAW[\"model tool-call arguments (string)\"] --> PARSE{\"valid JSON?\"}\n    PARSE -->|no| REPAIR[\"repair brackets / quotes\"]\n    PARSE -->|yes| SCHEMA\n    REPAIR -->|\"still broken\"| ERR[\"readable error → back to model\"]\n    REPAIR --> SCHEMA[\"validate against the tool's schema\"]\n    SCHEMA -->|valid| RUN[\"run function (defaults filled)\"]\n    SCHEMA -->|invalid| ERR"
+ },
+ "06-5": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    NEED[\"capability not built in\"] --> WRAP[\"wrap it as a custom tool (function / MCP)\"]\n    WRAP --> SCHEMA[\"describe input schema + docstring\"]\n    SCHEMA --> REG[\"register\"]\n    REG --> MODEL[\"model can now call it\"]"
+ },
+ "06-7": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    STEP[\"run step\"] --> E{\"timeout or error?\"}\n    E -->|transient| RETRY[\"retry with backoff\"]\n    E -->|permanent| FAIL[\"surface a clear error\"]\n    E -->|none| NEXT[\"next step\"]"
+ },
+ "06-8": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    CALL[\"tool call fails\"] --> ID{\"idempotent?\"}\n    ID -->|yes| RETRY[\"retry with backoff\"]\n    ID -->|no| GUARD[\"don't blind-retry: dedupe key · confirm · make it idempotent\"]\n    RETRY --> OK[\"success\"]\n    GUARD --> OK"
+ },
+ "07-6": {
+  "technical": "__existing__",
+  "concept": "flowchart LR\n    S1[\"step 1\"] --> STATE[\"shared state (messages · plan · todos · memory)\"]\n    STATE --> S2[\"step 2\"]\n    S2 --> STATE\n    STATE --> S3[\"next step sees prior results\"]"
+ },
+ "09-7": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    FAIL[\"bad final result\"] --> TRACE[\"follow the handoff trace (who produced what)\"]\n    TRACE --> FIND[\"locate the failing agent / step\"]\n    FIND --> FIX[\"fix that step; re-run from there\"]"
+ },
+ "15-20": {
+  "technical": "__existing__",
+  "concept": "flowchart LR\n    TRAFFIC[\"live traffic\"] --> SAMPLE[\"sample + log\"]\n    SAMPLE --> METRICS[\"quality metrics (groundedness · relevance · task success)\"]\n    METRICS --> ALERT{\"regression?\"}\n    ALERT -->|yes| ROLLBACK[\"alert / roll back\"]\n    ALERT -->|no| MONITOR[\"keep monitoring\"]"
  },
  "16-3": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    SCALE[\"usage scales unpredictably\"] --> LEVERS[\"levers\"]\n    LEVERS --> SMALL[\"route simple queries to smaller models\"]\n    LEVERS --> CACHE[\"cache repeated / similar queries\"]\n    LEVERS --> BUDGET[\"per-user / session budgets + caps\"]\n    LEVERS --> BATCH[\"batch work, reduce top-k\"]"
  },
  "16-5": {
+  "technical": "__existing__",
+  "concept": "flowchart TD\n    TOOLS[\"agent calls tools repeatedly\"] --> CAPS[\"cap iterations + token/step budget\"]\n    TOOLS --> CACHE[\"cache / dedup identical calls\"]\n    TOOLS --> ROUTE[\"route simple calls to a cheaper model\"]\n    CAPS --> SAVE[\"bounded cost\"]\n    CACHE --> SAVE\n    ROUTE --> SAVE"
+ },
+ "16-7": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    Q[\"query\"] --> HIT{\"exact or semantic match in cache?\"}\n    HIT -->|yes| RETURN[\"return cached answer (no model call)\"]\n    HIT -->|no| GEN[\"generate, then store under a key\"]\n    GEN --> STORE[\"cache (normalized query / embedding)\"]"
  },
@@ -163,38 +189,12 @@
   "technical": "__existing__",
   "concept": "flowchart LR\n    GEN[\"model output\"] --> CHECK[\"safety checks (policy · classifier)\"]\n    CHECK -->|unsafe| BLOCK[\"block / rewrite / safe fallback\"]\n    CHECK -->|ok| RETURN[\"return\"]"
  },
- "08-9": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    FW[\"framework choice\"] --> TEAM{\"fits the team + change rate?\"}\n    TEAM -->|small team, few devs| LIGHT[\"lighter, less magic\"]\n    TEAM -->|large team, many features| STRUCT[\"more structure / abstraction\"]\n    LIGHT --> OK[\"scales with the team\"]\n    STRUCT --> OK"
- },
- "03-20": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    INJ[\"prompt injection\"] --> WHY[\"untrusted content carries instructions\"]\n    WHY --> RISK[\"model may act on them\"]\n    RISK --> DEF[\"treat as data + enforce controls outside the model\"]"
- },
- "18-10": {
+ "18-11": {
   "technical": "__existing__",
   "concept": "flowchart LR\n    Q[\"seemingly normal question (tool output, retrieved doc)\"] --> REAL[\"really testing: prompt-injection awareness\"]\n    REAL --> ANSWER[\"treat tool / retrieved content as untrusted data\"]"
  },
- "18-11": {
+ "18-12": {
   "technical": "__existing__",
   "concept": "flowchart TD\n    IN[\"question about untrusted input\"] --> REAL[\"tests prompt-injection awareness\"]\n    REAL --> GOOD[\"treat as data · sanitize · enforce outside the model\"]"
- },
- "05-3": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    subgraph L[\"linear chain\"]\n    A[\"step 1\"] --> B[\"step 2\"] --> C[\"step 3\"]\n    end\n    subgraph G[\"graph with conditional branches\"]\n    S[\"start\"] --> D{\"condition?\"}\n    D -->|\"yes\"| Y[\"branch A\"]\n    D -->|\"no\"| N[\"branch B\"]\n    Y --> E[\"join\"]\n    N --> E\n    end"
- },
- "05-4": {
-  "concept": "flowchart TD\n    I([\"input\"]) --> R[\"Reason: model call\"]\n    R --> D{\"tool calls?\"}\n    D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    D -->|\"no tool calls\"| O([\"answer\"])"
- },
- "05-5": {
-  "concept": "flowchart TD\n    subgraph PLAN[\"Plan everything upfront\"]\n    I1([\"input\"]) --> P[\"plan all steps\"] --> S1[\"step 1\"] --> S2[\"step 2\"] --> O1([\"answer\"])\n    end\n    subgraph LOOP[\"ReAct loop\"]\n    direction TB\n        I2([\"input\"]) --> R[\"Reason: model call\"]\n        R --> D{\"tool calls?\"}\n        D -->|yes| TA[\"Act: run tools\"] --> OB[\"Observe: tool result\"] --> R\n    end\n    D -->|\"no tool calls\"| O2([\"answer\"])"
- },
- "05-8": {
-  "technical": "__existing__",
-  "concept": "flowchart TD\n    L[\"agent wants another tool call\"] --> D{\"identical (tool, args) repeated?\"}\n    D -->|yes| STOP[\"stop: warn or abort\"]\n    D -->|no| CAP{\"iteration cap reached?\"}\n    CAP -->|yes| STOP\n    CAP -->|no| CONT[\"continue the loop\"]"
- },
- "15-19": {
-  "technical": "__existing__",
-  "concept": "flowchart LR\n    TRAFFIC[\"live traffic\"] --> SAMPLE[\"sample + log\"]\n    SAMPLE --> METRICS[\"quality metrics (groundedness · relevance · task success)\"]\n    METRICS --> ALERT{\"regression?\"}\n    ALERT -->|yes| ROLLBACK[\"alert / roll back\"]\n    ALERT -->|no| MONITOR[\"keep monitoring\"]"
  }
 }

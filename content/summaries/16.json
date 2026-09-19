@@ -39,6 +39,24 @@
   ]
  },
  "16-5": {
+  "title": "Cost with repeated tool calls",
+  "tldr": "Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.",
+  "points": [
+   "Bound loop: iterations/rounds/time.",
+   "Cap tokens; route cheap work to small models.",
+   "Cache; watch retries and large tool outputs."
+  ]
+ },
+ "16-6": {
+  "title": "Cutting tokens without losing quality",
+  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
+  "points": [
+   "Retrieve many, rerank to few (needs a reranker).",
+   "Summarize long chunks before insertion.",
+   "Trim conversation history."
+  ]
+ },
+ "16-7": {
   "title": "Designing caching",
   "tldr": "Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.",
   "points": [
@@ -48,7 +66,7 @@
    "Semantic cache with a similarity threshold."
   ]
  },
- "16-6": {
+ "16-8": {
   "title": "Reducing latency",
   "tldr": "Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.",
   "points": [
@@ -58,7 +76,7 @@
    "Route easy steps to faster models."
   ]
  },
- "16-7": {
+ "16-9": {
   "title": "Threads vs processes for I/O-bound LLM calls",
   "tldr": "For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.",
   "points": [
@@ -67,7 +85,7 @@
    "Multiprocessing only for CPU-bound work."
   ]
  },
- "16-8": {
+ "16-10": {
   "title": "Architecture at 10x traffic",
   "tldr": "You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.",
   "points": [
@@ -77,7 +95,7 @@
    "Connection pools."
   ]
  },
- "16-9": {
+ "16-11": {
   "title": "Scaling questions: thinking past the demo",
   "tldr": "Scaling questions test whether you've thought past the demo.",
   "points": [
@@ -86,7 +104,7 @@
    "Missing: autoscaling, distributed queues."
   ]
  },
- "16-10": {
+ "16-12": {
   "title": "Rollback plan for a bad update",
   "tldr": "Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).",
   "points": [
@@ -96,7 +114,7 @@
    "Gate on eval; monitor quality."
   ]
  },
- "16-11": {
+ "16-13": {
   "title": "Shipping before eval is ready",
   "tldr": "Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.",
   "points": [
@@ -104,24 +122,6 @@
    "Define rollback and cap blast radius.",
    "Minimal offline eval gate.",
    "Monitoring to detect drops."
-  ]
- },
- "16-12": {
-  "title": "Cost with repeated tool calls",
-  "tldr": "Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.",
-  "points": [
-   "Bound loop: iterations/rounds/time.",
-   "Cap tokens; route cheap work to small models.",
-   "Cache; watch retries and large tool outputs."
-  ]
- },
- "16-13": {
-  "title": "Cutting tokens without losing quality",
-  "tldr": "Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.",
-  "points": [
-   "Retrieve many, rerank to few (needs a reranker).",
-   "Summarize long chunks before insertion.",
-   "Trim conversation history."
   ]
  }
 }

@@ -160,7 +160,30 @@ flowchart TB
 
 ---
 
-## 5. How does a framework track state across multiple steps in an agent's execution
+## 5. Critic or reflection loop
+
+**General:** a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.
+
+**Jiuwen:** There is no generic draft→critique→revise loop in the single-agent ReAct path, but the pieces exist: a **verification agent** restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL; an `agent_teams` reviewer that scores `Correctness`/completeness with rework thresholds; and the RSI weighted-rubric judge. These run as separate review layers, not as an in-loop reflection that blocks generation.
+
+```mermaid
+flowchart TD
+    D["primary draft"] --> CR["critic: verification agent / reviewer / RSI judge"]
+    CR -->|"pass"| OUT["return"]
+    CR -->|"fail"| REV["revise"] --> CR
+    CR -.->|"not in-loop: separate review layer"| X["no generic reflection loop"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> allowlist; <code>agent-core/openjiuwen/harness/subagents/verification_agent.py:51</code> — PASS/FAIL/PARTIAL<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279</code> — review dimensions + rework thresholds<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric judge</sub>
+
+</details>
+
+---
+
+## 6. How does a framework track state across multiple steps in an agent's execution
 
 **General:** A state object (dict or dataclass) is threaded through the steps or held per session; each node reads and writes it. Conversation history is usually separate from working state. Frameworks persist state via checkpoints so a run can be resumed or audited.
 
@@ -189,7 +212,7 @@ flowchart TD
 
 ---
 
-## 6. How would you pause an agent mid-execution and resume it later with the same state
+## 7. How would you pause an agent mid-execution and resume it later with the same state
 
 **General:** Pause requires either a durable checkpoint at a safe boundary or a first-class interrupt/suspend signal that unwinds the run while preserving state. Resume reloads the checkpoint (or replays the suspended step) and continues. The hard part is non-idempotent side effects: replay must be safe.
 
@@ -225,7 +248,7 @@ sequenceDiagram
 
 ---
 
-## 7. How would you add human-in-the-loop approval before a specific step executes
+## 8. How would you add human-in-the-loop approval before a specific step executes
 
 **General:** Route sensitive steps through a permission check that returns allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and optionally remember or persist allow rules. Fail closed: unknown should mean "ask", not "allow".
 
@@ -258,7 +281,7 @@ flowchart TD
 
 ---
 
-## 8. What's the difference between short-term and long-term memory in an agent
+## 9. What's the difference between short-term and long-term memory in an agent
 
 **General:** Short-term is the live working context (recent turns, current task state) needed for the next model call. Long-term is durable knowledge distilled across sessions — facts, preferences, summaries — retrieved on demand.
 
@@ -292,7 +315,7 @@ flowchart TD
 
 ---
 
-## 9. How do you decide what to store in memory versus what to discard
+## 10. How do you decide what to store in memory versus what to discard
 
 **General:** Keep durable, reused, preference-like, and decision-relevant facts; discard transient chatter, redundant restatements, and stale/contradicted entries. Most systems extract candidates with an LLM, then dedupe and resolve conflicts against existing memory.
 
@@ -325,7 +348,7 @@ flowchart TD
 
 ---
 
-## 10. How do you prevent memory from growing unbounded across a long session
+## 11. How do you prevent memory from growing unbounded across a long session
 
 **General:** Bound it on multiple axes: hard-drop or truncate the oldest context, offload large blobs, compact old tool results, summarize and archive, and cap the number of stored long-term entries.
 
@@ -359,7 +382,7 @@ flowchart TD
 
 ---
 
-## 11. How would you summarize conversation history without losing important details
+## 12. How would you summarize conversation history without losing important details
 
 **General:** Keep the most recent turns verbatim, summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose, and re-inject the durable state (plan, task status, key artifacts) separately so it is not lost inside a summary. Boundary markers separate summary from live turns, and the summary should be updated incrementally so each pass only processes new messages.
 
@@ -391,55 +414,7 @@ flowchart TD
 
 ---
 
-## 12. Planner–executor pattern
-
-**General:** a planner breaks a complex request into subtasks; one or more executors carry each out; results are combined into a final response. Common in multi-step agent systems. Used for: research assistants, report generation, multi-source data analysis.
-
-**Jiuwen:** Two paths. `DeepAgent`'s outer task loop runs a full inner ReAct invoke per round while a persistent `TaskPlan`/todos carry state; `TaskPlanningRail` registers the todo tools and injects planning guidance (`Plan` mode adds a `task_tool` to delegate). `agent_teams` adds supervisor/leader decomposition, and a dedicated plan subagent exists.
-
-```mermaid
-flowchart TD
-    T["complex task"] --> P["planner: task plan / todos"]
-    P --> E1["executor round 1 (inner ReAct)"]
-    P --> E2["executor round 2"]
-    E1 --> C["combine (task loop state)"]
-    E2 --> C
-    C --> A["final answer"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/deep_agent.py:2694</code> — outer task loop<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:31/108</code> — planning layer + todo tools<br>&bull; <code>agent-core/openjiuwen/harness/tools/todo.py:193</code> — <code>TodoCreateTool</code><br>&bull; <code>agent-core/openjiuwen/harness/tools/subagent/task_tool.py:194/657</code> — subagent delegation<br>&bull; <code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_tools/hierarchical_team.py:101/108</code> — supervisor (agents-as-tools); <code>agent-core/openjiuwen/harness/subagents/plan_agent.py:88</code> — plan subagent</sub>
-
-</details>
-
----
-
-## 13. Critic or reflection loop
-
-**General:** a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.
-
-**Jiuwen:** There is no generic draft→critique→revise loop in the single-agent ReAct path, but the pieces exist: a **verification agent** restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL; an `agent_teams` reviewer that scores `Correctness`/completeness with rework thresholds; and the RSI weighted-rubric judge. These run as separate review layers, not as an in-loop reflection that blocks generation.
-
-```mermaid
-flowchart TD
-    D["primary draft"] --> CR["critic: verification agent / reviewer / RSI judge"]
-    CR -->|"pass"| OUT["return"]
-    CR -->|"fail"| REV["revise"] --> CR
-    CR -.->|"not in-loop: separate review layer"| X["no generic reflection loop"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code> — <code>VerificationRail</code> allowlist; <code>agent-core/openjiuwen/harness/subagents/verification_agent.py:51</code> — PASS/FAIL/PARTIAL<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279</code> — review dimensions + rework thresholds<br>&bull; <code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code> — weighted rubric judge</sub>
-
-</details>
-
----
-
-## 14. Memory-augmented agent
+## 13. Memory-augmented agent
 
 **General:** context across sessions, not just one conversation. Short-term memory is the active context window; long-term memory is a vector store/DB of past interactions; retrieval decides what long-term memory is relevant to the current turn. Used for: personal assistants, customer support.
 
@@ -464,7 +439,7 @@ flowchart TD
 
 ---
 
-## 15. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+## 14. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
 
 **General:** Memory contamination happens when wrong or hallucinated facts are written to long-term memory and then retrieved into future turns, compounding errors. Prevention: write to memory only from verified/confirmed outputs (not raw model scratchpads); tag memory entries with provenance (source, confidence, timestamp); implement targeted invalidation — delete or overwrite specific wrong entries by key rather than wiping all memory; use versioning so you can roll back. Detection: run a periodic audit query that cross-checks stored facts against the authoritative source.
 

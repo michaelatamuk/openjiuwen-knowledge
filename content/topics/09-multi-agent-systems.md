@@ -1,6 +1,78 @@
 # Multi-agent systems
 
-## 1. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
+## 1. What are the four multi-agent architecture types and what components does every MAS need?
+
+**General:** Multi-agent systems (MAS) come in four structural patterns: (1) **Centralized** — all agents report to a single manager/supervisor that assigns tasks and aggregates results. Simple to reason about, single point of failure. (2) **Decentralized** — agents communicate directly with each other (peer-to-peer) with no central coordinator. Resilient but harder to ensure consistency. (3) **Hierarchical** — manager agents oversee sub-agent teams, which may themselves have managers — a tree of authority. Natural for complex decomposition (planner → domain-specialist teams → executors). (4) **Hybrid** — combines patterns; e.g., a centralized orchestrator with peer-to-peer specialist agents underneath. Every MAS needs five components regardless of architecture: **agents** (autonomous entities with specific roles), **communication** (message passing — structured output, shared state, or explicit handoff), **coordination** (how tasks are assigned and conflicts avoided), **shared memory** (knowledge and context accessible across agents), and **environment** (the external world or system agents act on). Choosing an architecture is a tradeoff: centralized is debuggable but bottlenecked; decentralized is resilient but harder to coordinate; hierarchical handles complexity but adds latency through multiple delegation layers.
+
+**Jiuwen:** The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to specialized sub-agents via `SubagentRail`, which itself can call further sub-agents. `TaskPlanningRail` breaks the task and generates a plan before delegation. Shared long-term memory is `LongTermMemory`; within-session state lives in the context buffer rather than a separate memory class. Delegation payloads are handled by the subagent runtime (`SubagentRuntimeConfig`/`SubagentInstance`). There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.
+
+```mermaid
+flowchart TD
+    subgraph ARCH["4 Architecture Types"]
+    CENT["Centralized: single manager, all agents report up"]
+    DECENT["Decentralized: peer-to-peer, no coordinator"]
+    HIER["Hierarchical: manager → sub-teams → executors (tree)"]
+    HYB["Hybrid: combines multiple patterns"]
+    end
+    subgraph COMP["5 Required Components"]
+    AG["Agents: autonomous, role-specific"]
+    COMM["Communication: message passing / structured handoff"]
+    COORD["Coordination: task assignment, conflict avoidance"]
+    MEM["Shared Memory: cross-agent knowledge + context"]
+    ENV["Environment: external world / systems"]
+    end
+    JIW["Jiuwen"] --> HIER_J["hierarchical via SubagentRail + TaskPlanningRail"]
+    JIW --> MEM_J["LongTermMemory (cross-session); in-session state in the context buffer"]
+    JIW -.->|"absent"| P2P["peer-to-peer / decentralized pattern"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/harness/subagent_runtime/config.py:22</code> — <code>SubagentRuntimeConfig</code> (delegation payloads)</sub>
+
+</details>
+
+<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>
+
+## 2. What is the difference between MCP and A2A, and when do you use each?
+
+**General:** **MCP (Model Context Protocol)** is a standardized interface for connecting a single LLM to external tools — the model stays in control, and MCP provides a universal connector layer so the model can call databases, browsers, APIs, and code tools without custom integration for each. One brain, many tools, centralized control. **A2A (Agent-to-Agent Protocol)** is a communication protocol for multi-agent systems — agents collaborate as peers, each with its own tools, memory, and reasoning loop; an orchestrator delegates to specialized agents rather than touching tools directly. The key difference: MCP = a single model gains tool access; A2A = a network of agents coordinate and hand off work to each other. In practice, both are often used together: MCP governs how each individual agent talks to its tools, while A2A governs how agents talk to each other. Use MCP alone for single-agent assistants that need broad tool access. Add A2A when specialized agents need to run concurrently or in sequence, each with their own tool contexts.
+
+**Jiuwen:** MCP is supported via `McpServerConfig` (agent-core/openjiuwen/core/foundation/tool/mcp/base.py) — each server exposes tools that the agent discovers via `tools/list` and calls via `tools/call`. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses `SubagentRail` to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.
+
+```mermaid
+flowchart TD
+    subgraph MCP["MCP — Model Context Protocol"]
+    LLM_M["LLM agent"] --> MCP_C["MCP Client"]
+    MCP_C --> S1["MCP Server (DB)"]
+    MCP_C --> S2["MCP Server (Browser)"]
+    MCP_C --> S3["MCP Server (GitHub)"]
+    end
+    subgraph A2A["A2A — Agent-to-Agent Protocol"]
+    ORCH["Orchestrator Agent"] --> A1["Flight Agent (own tools + memory)"]
+    ORCH --> A2["Calendar Agent (own tools + memory)"]
+    A1 --> ORCH
+    A2 --> ORCH
+    end
+    WHEN_MCP["Use MCP: single agent needs broad tool access"]
+    WHEN_A2A["Use A2A: specialized agents run concurrently or in sequence"]
+    JIW["Jiuwen"] --> MCP_J["McpServerConfig: MCP pattern (tool discovery + calling)"]
+    JIW --> SUB["SubagentRail: internal delegation (not A2A wire protocol)"]
+```
+
+<details>
+<summary>Anchors</summary>
+
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:1</code> — <code>McpServerConfig</code> (MCP tool discovery + calling)<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/</code> — MCP client implementation<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — internal agent delegation (not A2A protocol)<br>&bull; A2A wire protocol: not implemented; multi-agent coordination is framework-internal via SubagentRail</sub>
+
+</details>
+
+**Gap.** A2A as an interoperability wire protocol (agents from different deployments/providers communicating) is not implemented. Multi-agent coordination is internal to the Jiuwen framework via SubagentRail.
+
+<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>
+
+## 3. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
 
 **General:** A supervisor is one controller that plans and dispatches to workers (often workers-as-tools); control is top-down and data returns synchronously up the call stack. Peer-to-peer has agents share a board/bus and claim/communicate directly; control is distributed, needs arbitration (atomic claims, one-active-task invariants), but scales autonomy.
 
@@ -37,7 +109,7 @@ flowchart TD
 
 ---
 
-## 2. How does a framework handle communication between multiple agents
+## 4. How does a framework handle communication between multiple agents
 
 **General:** Either a shared blackboard (task board/state) plus a message bus, or direct message passing. Messages should be persistent and ordered for auditability, with routing (direct, broadcast, mentions). Direct handoffs must carry enough context and be bounded.
 
@@ -71,7 +143,7 @@ sequenceDiagram
 
 ---
 
-## 3. How does the framework handle one agent's output becoming another agent's input
+## 5. How does the framework handle one agent's output becoming another agent's input
 
 **General:** Either a call returns the value (subagent/tool), or a handoff transfers control and context, or a shared board/bus carries the artifact. The framework must define how results and context propagate, and whether propagation is automatic or requires the consumer to re-read.
 
@@ -101,7 +173,7 @@ flowchart TD
 
 ---
 
-## 4. How do you prevent multiple agents from producing conflicting or redundant results
+## 6. How do you prevent multiple agents from producing conflicting or redundant results
 
 **General:** Give each unit of work a single owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign rather than release (to avoid race windows), dedupe dispatch, and isolate workspaces so edits don't collide.
 
@@ -129,7 +201,7 @@ flowchart TD
 
 ---
 
-## 5. How do you debug a failure when it's unclear which agent in the chain caused it
+## 7. How do you debug a failure when it's unclear which agent in the chain caused it
 
 **General:** You need per-agent attribution: a trace/span tree where every agent, model call, and tool call is a span carrying agent identity, plus durable conversation and task history to reconstruct ordering. Root-cause is then manual or LLM-assisted, not automatic.
 
@@ -159,7 +231,7 @@ flowchart TB
 
 ---
 
-## 6. When is a multi-agent system overkill compared to a single well-designed agent
+## 8. When is a multi-agent system overkill compared to a single well-designed agent
 
 **General:** Multi-agent is justified when you need genuinely separated context/ownership: parallel independent workstreams, distinct tool/permission scopes, or specialization that would otherwise fight for one context window. It is overkill when a single agent with good tools, memory, and a clear prompt can do the job — multi-agent adds coordination cost, latency, and new failure modes (ping-pong, conflicting results) without adding "intelligence".
 
@@ -186,75 +258,3 @@ flowchart TD
 
 
 ---
-
-## 7. What are the four multi-agent architecture types and what components does every MAS need?
-
-**General:** Multi-agent systems (MAS) come in four structural patterns: (1) **Centralized** — all agents report to a single manager/supervisor that assigns tasks and aggregates results. Simple to reason about, single point of failure. (2) **Decentralized** — agents communicate directly with each other (peer-to-peer) with no central coordinator. Resilient but harder to ensure consistency. (3) **Hierarchical** — manager agents oversee sub-agent teams, which may themselves have managers — a tree of authority. Natural for complex decomposition (planner → domain-specialist teams → executors). (4) **Hybrid** — combines patterns; e.g., a centralized orchestrator with peer-to-peer specialist agents underneath. Every MAS needs five components regardless of architecture: **agents** (autonomous entities with specific roles), **communication** (message passing — structured output, shared state, or explicit handoff), **coordination** (how tasks are assigned and conflicts avoided), **shared memory** (knowledge and context accessible across agents), and **environment** (the external world or system agents act on). Choosing an architecture is a tradeoff: centralized is debuggable but bottlenecked; decentralized is resilient but harder to coordinate; hierarchical handles complexity but adds latency through multiple delegation layers.
-
-**Jiuwen:** The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to specialized sub-agents via `SubagentRail`, which itself can call further sub-agents. `TaskPlanningRail` breaks the task and generates a plan before delegation. Shared long-term memory is `LongTermMemory`; within-session state lives in the context buffer rather than a separate memory class. Delegation payloads are handled by the subagent runtime (`SubagentRuntimeConfig`/`SubagentInstance`). There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.
-
-```mermaid
-flowchart TD
-    subgraph ARCH["4 Architecture Types"]
-    CENT["Centralized: single manager, all agents report up"]
-    DECENT["Decentralized: peer-to-peer, no coordinator"]
-    HIER["Hierarchical: manager → sub-teams → executors (tree)"]
-    HYB["Hybrid: combines multiple patterns"]
-    end
-    subgraph COMP["5 Required Components"]
-    AG["Agents: autonomous, role-specific"]
-    COMM["Communication: message passing / structured handoff"]
-    COORD["Coordination: task assignment, conflict avoidance"]
-    MEM["Shared Memory: cross-agent knowledge + context"]
-    ENV["Environment: external world / systems"]
-    end
-    JIW["Jiuwen"] --> HIER_J["hierarchical via SubagentRail + TaskPlanningRail"]
-    JIW --> MEM_J["LongTermMemory (cross-session); in-session state in the context buffer"]
-    JIW -.->|"absent"| P2P["peer-to-peer / decentralized pattern"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — hierarchical delegation<br>&bull; <code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code> — <code>TaskPlanningRail</code> (planner layer)<br>&bull; <code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code> — shared long-term memory<br>&bull; <code>agent-core/openjiuwen/harness/subagent_runtime/config.py:22</code> — <code>SubagentRuntimeConfig</code> (delegation payloads)</sub>
-
-</details>
-
-<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>
-
-## 8. What is the difference between MCP and A2A, and when do you use each?
-
-**General:** **MCP (Model Context Protocol)** is a standardized interface for connecting a single LLM to external tools — the model stays in control, and MCP provides a universal connector layer so the model can call databases, browsers, APIs, and code tools without custom integration for each. One brain, many tools, centralized control. **A2A (Agent-to-Agent Protocol)** is a communication protocol for multi-agent systems — agents collaborate as peers, each with its own tools, memory, and reasoning loop; an orchestrator delegates to specialized agents rather than touching tools directly. The key difference: MCP = a single model gains tool access; A2A = a network of agents coordinate and hand off work to each other. In practice, both are often used together: MCP governs how each individual agent talks to its tools, while A2A governs how agents talk to each other. Use MCP alone for single-agent assistants that need broad tool access. Add A2A when specialized agents need to run concurrently or in sequence, each with their own tool contexts.
-
-**Jiuwen:** MCP is supported via `McpServerConfig` (agent-core/openjiuwen/core/foundation/tool/mcp/base.py) — each server exposes tools that the agent discovers via `tools/list` and calls via `tools/call`. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses `SubagentRail` to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.
-
-```mermaid
-flowchart TD
-    subgraph MCP["MCP — Model Context Protocol"]
-    LLM_M["LLM agent"] --> MCP_C["MCP Client"]
-    MCP_C --> S1["MCP Server (DB)"]
-    MCP_C --> S2["MCP Server (Browser)"]
-    MCP_C --> S3["MCP Server (GitHub)"]
-    end
-    subgraph A2A["A2A — Agent-to-Agent Protocol"]
-    ORCH["Orchestrator Agent"] --> A1["Flight Agent (own tools + memory)"]
-    ORCH --> A2["Calendar Agent (own tools + memory)"]
-    A1 --> ORCH
-    A2 --> ORCH
-    end
-    WHEN_MCP["Use MCP: single agent needs broad tool access"]
-    WHEN_A2A["Use A2A: specialized agents run concurrently or in sequence"]
-    JIW["Jiuwen"] --> MCP_J["McpServerConfig: MCP pattern (tool discovery + calling)"]
-    JIW --> SUB["SubagentRail: internal delegation (not A2A wire protocol)"]
-```
-
-<details>
-<summary>Anchors</summary>
-
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:1</code> — <code>McpServerConfig</code> (MCP tool discovery + calling)<br>&bull; <code>agent-core/openjiuwen/core/foundation/tool/mcp/</code> — MCP client implementation<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code> — internal agent delegation (not A2A protocol)<br>&bull; A2A wire protocol: not implemented; multi-agent coordination is framework-internal via SubagentRail</sub>
-
-</details>
-
-**Gap.** A2A as an interoperability wire protocol (agents from different deployments/providers communicating) is not implemented. Multi-agent coordination is internal to the Jiuwen framework via SubagentRail.
-
-<sub>_Canonical source: `source/agent-design-patterns-2026_for_engineers.md`; also covered in: agent-design-patterns._</sub>

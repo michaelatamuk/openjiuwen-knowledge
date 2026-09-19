@@ -136,79 +136,6 @@
   ]
  },
  "15-16": {
-  "title": "How many eval examples",
-  "tldr": "Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.",
-  "points": [
-   "~100–200 for a usable single-metric signal.",
-   "Comparing systems needs power for the effect size.",
-   "Report confidence/variance, not a bare mean."
-  ]
- },
- "15-17": {
-  "title": "Comparing two models",
-  "tldr": "Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.",
-  "points": [
-   "Same held-out set, same prompts/decoding.",
-   "Task-appropriate metrics.",
-   "Compare accuracy + latency + cost."
-  ]
- },
- "15-18": {
-  "title": "Regression test suite",
-  "tldr": "Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.",
-  "points": [
-   "Fast unit tests for components.",
-   "Quality eval on a fixed dataset.",
-   "Baseline + fail on regression."
-  ]
- },
- "15-19": {
-  "title": "Continuous production eval",
-  "tldr": "Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.",
-  "points": [
-   "Sample live traffic; score on a schedule.",
-   "Alert on quality drops, not just errors.",
-   "Watch drift in queries and hit rates."
-  ]
- },
- "15-20": {
-  "title": "Detecting retrieval degradation",
-  "tldr": "Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.",
-  "points": [
-   "Zero-result rate + score distributions.",
-   "Periodic re-run of a frozen set.",
-   "Slice per query type/language."
-  ]
- },
- "15-21": {
-  "title": "High eval, users still unhappy",
-  "tldr": "The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.",
-  "points": [
-   "Eval set not representative of real usage.",
-   "Missing adversarial/long-tail/slices.",
-   "Metric rewards the wrong thing."
-  ]
- },
- "15-22": {
-  "title": "Tying eval to business outcome",
-  "tldr": "Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.",
-  "points": [
-   "Pick the business proxy (success, deflection, cost).",
-   "Correlate the offline metric to the proxy.",
-   "Use the offline metric as the fast proxy."
-  ]
- },
- "15-23": {
-  "title": "How do you know it's working: eval depth",
-  "tldr": "'How do you know it's working' tests evaluation depth, not confidence.",
-  "points": [
-   "Offline answer-level eval exists.",
-   "No retrieval metric layer.",
-   "No faithfulness/claim scoring.",
-   "No CI quality gate."
-  ]
- },
- "15-24": {
   "title": "Building a retrieval eval set",
   "tldr": "Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.",
   "points": [
@@ -217,7 +144,70 @@
    "Or synthesize queries from known documents (doc = gold)."
   ]
  },
- "15-25": {
+ "15-17": {
+  "title": "How many eval examples",
+  "tldr": "Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.",
+  "points": [
+   "~100–200 for a usable single-metric signal.",
+   "Comparing systems needs power for the effect size.",
+   "Report confidence/variance, not a bare mean."
+  ]
+ },
+ "15-18": {
+  "title": "Comparing two models",
+  "tldr": "Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.",
+  "points": [
+   "Same held-out set, same prompts/decoding.",
+   "Task-appropriate metrics.",
+   "Compare accuracy + latency + cost."
+  ]
+ },
+ "15-19": {
+  "title": "Regression test suite",
+  "tldr": "Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.",
+  "points": [
+   "Fast unit tests for components.",
+   "Quality eval on a fixed dataset.",
+   "Baseline + fail on regression."
+  ]
+ },
+ "15-20": {
+  "title": "Continuous production eval",
+  "tldr": "Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.",
+  "points": [
+   "Sample live traffic; score on a schedule.",
+   "Alert on quality drops, not just errors.",
+   "Watch drift in queries and hit rates."
+  ]
+ },
+ "15-21": {
+  "title": "Detecting retrieval degradation",
+  "tldr": "Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.",
+  "points": [
+   "Zero-result rate + score distributions.",
+   "Periodic re-run of a frozen set.",
+   "Slice per query type/language."
+  ]
+ },
+ "15-22": {
+  "title": "High eval, users still unhappy",
+  "tldr": "The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.",
+  "points": [
+   "Eval set not representative of real usage.",
+   "Missing adversarial/long-tail/slices.",
+   "Metric rewards the wrong thing."
+  ]
+ },
+ "15-23": {
+  "title": "Tying eval to business outcome",
+  "tldr": "Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.",
+  "points": [
+   "Pick the business proxy (success, deflection, cost).",
+   "Correlate the offline metric to the proxy.",
+   "Use the offline metric as the fast proxy."
+  ]
+ },
+ "15-24": {
   "title": "Testing non-deterministic agents: invariant-based assertions instead of exact outputs",
   "tldr": "Assert on structural and behavioral invariants (right tool called, correct exit path, schema valid, within budget) rather than exact output strings — those will always fail on agents.",
   "points": [
@@ -226,6 +216,16 @@
    "Schema invariants: structured output matched declared JSON schema; required fields present",
    "Safety and cost invariants: no guardrail-blocked content executed; total tokens within budget",
    "Jiuwen strategy: mock ModelClientABC to inject controlled responses; test each rail contract independently; use LLM-as-judge for behavioral correctness on eval set"
+  ]
+ },
+ "15-25": {
+  "title": "How do you know it's working: eval depth",
+  "tldr": "'How do you know it's working' tests evaluation depth, not confidence.",
+  "points": [
+   "Offline answer-level eval exists.",
+   "No retrieval metric layer.",
+   "No faithfulness/claim scoring.",
+   "No CI quality gate."
   ]
  }
 }

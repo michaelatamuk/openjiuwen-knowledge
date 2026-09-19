@@ -82,7 +82,38 @@ The workflow engine is a Pregel-style graph machine. Topology is declared up fro
 
 ---
 
-## 3. What's the difference between a linear chain and a graph with conditional branches
+## 3. When should you use a deterministic workflow instead of an autonomous agent?
+
+<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
+
+**TL;DR.** Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.
+
+**Key points.**
+
+- Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.
+- Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.
+- Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.
+- Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.
+- Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first.
+
+**Concept.** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
+
+![diagram](assets/diagrams/abe0963426d0474a1996974eb0641754eb0e1e57.png)
+
+**In Jiuwen.** The graph path (Pregel-based workflow engine) handles known control flow with static and conditional routers, barriers, and OR-groups. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration. Hybrid: a workflow can delegate a sub-step to an agent sub-task.
+
+<details markdown="1">
+<summary><b>Under the hood</b></summary>
+
+**Implementation**
+
+The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
+
+</details>
+
+---
+
+## 4. What's the difference between a linear chain and a graph with conditional branches
 
 <span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span>
 
@@ -127,7 +158,7 @@ Both are built on the same `PregelGraph`. `add_connection` registers a static ed
 
 ---
 
-## 4. What's the ReAct pattern?
+## 5. What's the ReAct pattern?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span>
 
@@ -167,7 +198,7 @@ The loop is exactly reason/act/observe: model call, branch on `tool_calls`, exec
 
 ---
 
-## 5. Why interleave reasoning and actions instead of planning everything upfront?
+## 6. Why interleave reasoning and actions instead of planning everything upfront?
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -205,7 +236,7 @@ Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-
 
 ---
 
-## 6. How do you set a hard limit on iterations or steps within a framework
+## 7. How do you set a hard limit on iterations or steps within a framework
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -246,7 +277,7 @@ The inner ReAct loop is bounded by `ReActAgentConfig.max_iterations` (default 5)
 
 ---
 
-## 7. What decides when an agent stops and returns a final answer instead of calling another tool
+## 8. What decides when an agent stops and returns a final answer instead of calling another tool
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -287,7 +318,7 @@ Two levels. Inner: in `ReActAgent`, no tool calls means a final answer, bounded 
 
 ---
 
-## 8. Preventing an agent from getting stuck in an infinite tool-calling loop
+## 9. Preventing an agent from getting stuck in an infinite tool-calling loop
 
 <span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -331,7 +362,7 @@ Inner cap `max_iterations` (ReAct default 5, harness default 15). Repetition det
 
 ---
 
-## 9. "The agent is stuck" tests whether you've shipped one, not studied one
+## 10. "The agent is stuck" tests whether you've shipped one, not studied one
 
 <span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -373,7 +404,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 10. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+## 11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -402,7 +433,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ---
 
-## 11. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+## 12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
 
 <span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
 
@@ -427,37 +458,6 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 **Implementation**
 
 Multiple termination paths are implemented. `ReactAgent.max_iterations` is the hard iteration cap (default 5, harness 15). `PlanApprovalInterruptRail` and `StructuredAskUserRail` provide the human-in-the-loop escalation path. `ModelAnomalyDetectionRail` can abort on anomaly detection. `AgentObservabilityRail` always runs last, ensuring every turn is logged even at termination. What is **absent**: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and `PlanApprovalInterruptRail` is opt-in per agent config.
-
-</details>
-
----
-
-## 12. When should you use a deterministic workflow instead of an autonomous agent?
-
-<span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span>
-
-**TL;DR.** Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.
-
-**Key points.**
-
-- Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.
-- Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.
-- Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.
-- Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.
-- Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first.
-
-**Concept.** A **workflow** is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An **agent** is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.
-
-![diagram](assets/diagrams/abe0963426d0474a1996974eb0641754eb0e1e57.png)
-
-**In Jiuwen.** The graph path (Pregel-based workflow engine) handles known control flow with static and conditional routers, barriers, and OR-groups. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration. Hybrid: a workflow can delegate a sub-step to an agent sub-task.
-
-<details markdown="1">
-<summary><b>Under the hood</b></summary>
-
-**Implementation**
-
-The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.
 
 </details>
 
