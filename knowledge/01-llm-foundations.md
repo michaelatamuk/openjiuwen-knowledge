@@ -261,9 +261,9 @@ Architecture type is selected by model/provider choice rather than a config flag
 
 **Concept.** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
 
-![diagram](assets/diagrams/a304b162e1d37615c8b1c48fbc8784eab24df514.png)
+![diagram](assets/diagrams/9f47f43047fbfb202cc84a3d9c07428752ce7383.png)
 
-**In Jiuwen.** No base/instruct distinction in model config schema: ProviderType + model_name string selects a model (agent-core/openjiuwen/core/foundation/llm/schema/config.py:13). agent_rl/online/backends/sft/trainer.py:1 is the SFT stage that produces an instruct-model-like output from demonstration data — the framework implements the alignment training pipeline but does not tag served models as base vs instruct. GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) provides inference-time safety supplement but does not substitute for RLHF/DPO training.
+**In Jiuwen.** No base/instruct distinction in model config schema: ProviderType + model_name string selects a model (agent-core/openjiuwen/core/foundation/llm/schema/config.py:13). agent_evolving/agent_rl/online/backends/sft/trainer.py is the SFT stage that produces an instruct-model-like output from demonstration data — the framework implements the alignment training pipeline but does not tag served models as base vs instruct. PromptInjectionGuardrail (agent-core/openjiuwen/core/security/guardrail/builtin.py:60) provides an inference-time safety supplement but does not substitute for RLHF/DPO training.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

@@ -420,7 +420,7 @@ Concrete caps exist: ReAct `max_iterations` (default 5, harness 15), `AgenticRet
 
 ![diagram](assets/diagrams/a2f28c1d97be76f28914e8cd647a73ae1f87f26c.png)
 
-**In Jiuwen.** ToolCallDeduplicationRail (agent-core/openjiuwen/harness/rails/subagent/tool_call_deduplication_rail.py) suppresses repeated identical tool calls within a session. ModelAnomalyDetectionRail exists for output-pattern anomalies but is off by default. No output-text similarity comparison across turns exists — paraphrase loops that change argument wording pass the dedup rail.
+**In Jiuwen.** ToolCallDeduplicationRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47) suppresses repeated identical (tool, args) calls within a session. ModelAnomalyDetectionRail exists for output-pattern anomalies but is off by default. There is no output-text similarity comparison across turns, so paraphrase loops that change argument wording pass the dedup rail.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

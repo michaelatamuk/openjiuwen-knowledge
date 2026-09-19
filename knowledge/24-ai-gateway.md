@@ -20,7 +20,7 @@
 
 ![diagram](assets/diagrams/89ae7e3f15542f482fe75960b461601504bce372.png)
 
-**In Jiuwen.** No standalone AI gateway component. Equivalent functions are distributed: provider routing via ModelClientFactory; cost tracking via usage_cost.py:101; circuit breaking via CircuitBreakerRail (circuit_breaker_rail.py:1); content safety via GuardrailRail (guardrail_rail.py:1); observability via ObservabilityHandler (observability/event.py:1). These are per-agent, not cross-service. A separate gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
+**In Jiuwen.** No standalone AI gateway component. Equivalent functions are distributed: provider routing via create_model_client (agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58) and ModelPoolEntry (agent-core/openjiuwen/agent_teams/models/pool.py:38); cost tracking via usage_cost.py:101; circuit breaking via CircuitBreakerRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303); content safety via PromptInjectionGuardrail (agent-core/openjiuwen/core/security/guardrail/builtin.py:60); observability via AgentObservabilityRail (agent-core/openjiuwen/harness/observability/rail.py:355). These are per-agent, not cross-service. A separate gateway upstream of Jiuwen would handle cross-service key isolation and semantic caching.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -91,7 +91,7 @@ Routing lives in the `ModelPoolEntry` router with health, rate, and latency scor
 
 ![diagram](assets/diagrams/b526968e91678e6dd67d8f79308e61a57013f551.png)
 
-**In Jiuwen.** ModelClientFactory (agent-core/openjiuwen/core/model/client/factory.py) selects a provider at agent construction time. ModelConfig references a named provider + model ID. No built-in runtime routing layer exists — no primary/fallback chain, no capability classifier, no cost-based dispatch. Multi-provider setups require application-layer orchestration (configuring different agents with different ModelConfigs). CircuitBreakerRail trips on consecutive failures and opens the circuit, but does not reroute to an alternate provider.
+**In Jiuwen.** create_model_client (agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58) resolves the provider client; routing is configured per agent through ModelClientConfig and ProviderType. At the team layer a real model pool exists (ModelPoolEntry, agent-core/openjiuwen/agent_teams/models/pool.py:38) with allocators including IntelliRouterAllocator. No built-in per-request capability classifier or cost-based dispatcher exists. CircuitBreakerRail trips on consecutive failures and opens the circuit, but does not reroute to an alternate provider.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -130,7 +130,7 @@ Routing is configured per agent through `ModelClientConfig` and `ProviderType`, 
 
 ![diagram](assets/diagrams/e049824f1e4298cf27e384d4cd34a66c64e7e2be.png)
 
-**In Jiuwen.** CircuitBreakerRail (agent-core/openjiuwen/harness/rails/circuit_breaker_rail.py) tracks consecutive failures, opens after a threshold, then half-opens to probe recovery. ModelRequestConfig.timeout is forwarded to the provider client. No automatic fallback-provider routing exists — an open circuit raises an exception. No retry-with-modified-prompt path for quality failures. Graceful degraded responses are not emitted by any rail.
+**In Jiuwen.** CircuitBreakerRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303) tracks consecutive failures, opens after a threshold, then half-opens to probe recovery. ModelClientConfig.timeout is forwarded to the provider client. No automatic fallback-provider routing exists — an open circuit raises an exception. No retry-with-modified-prompt path for quality failures. Graceful degraded responses are not emitted by any rail.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

@@ -408,7 +408,7 @@ Retry decisions are centralized in `ToolCallResilienceRail` (priority 70, auto-m
 
 ![diagram](assets/diagrams/d84185f59313ca40b2c7d40f22b2d0bb1347df22.png)
 
-**In Jiuwen.** ToolCard schema (agent-core/openjiuwen/core/foundation/tool/base.py:90) has no idempotent flag. ToolCallDeduplicationRail (agent-core/openjiuwen/harness/rails/subagent/tool_call_deduplication_rail.py) suppresses identical (name + args) calls within a session — a narrow guard, not general idempotency. McpServerConfig.retry_on_failure controls MCP connection retries, not semantic idempotency. Idempotency keys and attempted-vs-confirmed state are the tool author's responsibility.
+**In Jiuwen.** ToolCard schema (agent-core/openjiuwen/core/foundation/tool/base.py:90) has no idempotent flag. ToolCallDeduplicationRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47) suppresses identical (name + args) calls within a session — a narrow guard, not general idempotency. McpServerConfig.retry_on_failure (agent-core/openjiuwen/core/foundation/tool/mcp/base.py:137) controls MCP connection retries, not semantic idempotency. Idempotency keys and attempted-vs-confirmed state are the tool author's responsibility.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

@@ -329,7 +329,7 @@ The offline RL trainer has a real train/val pipeline (`train_data_path`/`val_dat
 
 ![diagram](assets/diagrams/92ac41ad87de82ccb4c160167976d795583ae51b.png)
 
-**In Jiuwen.** Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO is also supported (config/offline_config.py:43), eliminating the value model. DPO is not implemented. SFT (agent_evolving/agent_rl/online/backends/sft/trainer.py) covers stage 1 of RLHF.
+**In Jiuwen.** Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO is also supported (agent_evolving/agent_rl/config/offline_config.py:43), eliminating the value model. DPO is not implemented. SFT (agent_evolving/agent_rl/online/backends/sft/trainer.py) covers stage 1 of RLHF.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

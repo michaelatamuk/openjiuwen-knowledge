@@ -383,13 +383,13 @@ The only separation primitive is the collection name derived from `kb_id` (`kb_{
 - RL-CAI: model generates preference pairs (chosen/rejected) scored against principles → reward model → RLHF
 - Far fewer human labels needed than standard RLHF; the constitution is explicit and auditable
 - Easier to update behavior: edit the principle list, not retrain a black-box reward model
-- Jiuwen gap: safety rails are static classifiers (SecurityRail, GuardrailRail); no self-critique loop or constitutional principle file
+- Jiuwen gap: safety rails are static classifiers (SecurityRail, PromptInjectionGuardrail); no self-critique loop or constitutional principle file
 
 **Concept.** Constitutional AI (Bai et al. 2022, Anthropic) replaces a large portion of human preference labeling with **model self-critique**. The pipeline has two stages. (1) **SL-CAI**: generate responses, have the model critique each against a list of explicit principles (the "constitution" — rules like "do not assist with illegal activities", "be honest"), then revise based on the critique. Use these revised responses for supervised fine-tuning. (2) **RL-CAI**: use a reward model trained on model-generated preference pairs (not human-labeled pairs) to run RLHF. The result: steering a model toward a set of principles requires far fewer human labels. The "constitution" is an **explicit, auditable list** — easier to update and inspect than a black-box reward model trained on opaque human ratings. Claude's alignment training is based on CAI.
 
 ![diagram](assets/diagrams/cd5aaca33f9a6730908d57a102fce72ef669fb35.png)
 
-**In Jiuwen.** Safety enforcement uses static classifiers: SecurityRail (agent-core/openjiuwen/harness/rails/security_rail.py:1) for prompt injection, GuardrailRail (agent-core/openjiuwen/harness/rails/guardrail_rail.py:1) with AutoModelForSequenceClassification backend (agent-core/openjiuwen/core/security/guardrail/backends.py:1), and GuardianRail (agent-core/openjiuwen/harness/rails/guardian_rail.py:1) for policy filtering. No self-critique loop, no constitutional principle list, no model-generates-then-revises pipeline. To add a principle, an operator must update the classifier weights or the system prompt, not append to a principle document.
+**In Jiuwen.** Safety enforcement uses static classifiers: SecurityRail (agent-core/openjiuwen/auto_harness/rails/security_rail.py:48) for prompt injection, PromptInjectionGuardrail (agent-core/openjiuwen/core/security/guardrail/builtin.py:60) with an AutoModelForSequenceClassification backend (agent-core/openjiuwen/core/security/guardrail/backends.py), and SafetyPromptRail (advisory prompt-level safety). No self-critique loop, no constitutional principle list, no model-generates-then-revises pipeline. To add a principle, an operator must update the classifier weights or the system prompt, not append to a principle document.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

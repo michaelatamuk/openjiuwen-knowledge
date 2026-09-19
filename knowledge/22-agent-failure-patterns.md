@@ -207,13 +207,13 @@ Memory is session-scoped: `session_id` is the isolation unit and contexts do not
 
 - Minimum event: trace_id, span_id, event_type, payload, duration_ms.
 - Enables: offline replay, production latency monitoring, attached eval scoring.
-- Jiuwen: ObservabilityEvent + TraceManager cover model/tool calls; retrieval events are not structured spans.
+- Jiuwen: ObservabilityEvent + AgentObservabilityRail cover model/tool calls; retrieval events are not structured spans.
 
 **Concept.** Print/log statements produce unstructured text: you can't query "all tool calls in session X", can't aggregate latency by tool, and can't correlate a wrong answer back to which retrieval chunk was in context. Structured tracing means emitting a typed event for every meaningful action — model call started/completed, tool called/returned, retrieval executed, decision made — with a shared trace/span ID so events from the same agent run can be grouped. Each event carries: timestamp, latency, token counts, tool name + arguments, retrieval score, model response. This enables offline debugging (replay a trace), production monitoring (alert on p99 latency), and eval (attach ground truth to a trace for scoring). The minimum viable schema: `trace_id`, `span_id`, `event_type`, `payload`, `duration_ms`.
 
 ![diagram](assets/diagrams/0bb368400fc1e9aeec6289ea5b003e19ba6923d3.png)
 
-**In Jiuwen.** ObservabilityEvent (agent-core/openjiuwen/harness/observability/event.py) is the framework's structured event type; ObservabilityHandler forwards events to a backend. ReactAgent emits events at model call, tool call, and final answer points. TraceManager/TraceHandler (agent-core/openjiuwen/harness/trace/trace_manager.py) provide span-level tracing with parent-child linking. Retrieval events (chunk ids, scores) are not emitted as structured spans — they appear only in tool result text.
+**In Jiuwen.** AgentObservabilityRail (agent-core/openjiuwen/harness/observability/rail.py:355) emits typed observability events at each turn's major points — model call, tool call, final answer — and is always last in the rail profile. Events are delivered to a subscribing consumer; there is no default log sink. Retrieval events (chunk ids, scores) are not emitted as structured spans — they appear only in tool result text.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>

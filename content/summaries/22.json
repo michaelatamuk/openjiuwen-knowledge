@@ -56,7 +56,7 @@
   "points": [
    "Minimum event: trace_id, span_id, event_type, payload, duration_ms.",
    "Enables: offline replay, production latency monitoring, attached eval scoring.",
-   "Jiuwen: ObservabilityEvent + TraceManager cover model/tool calls; retrieval events are not structured spans."
+   "Jiuwen: ObservabilityEvent + AgentObservabilityRail cover model/tool calls; retrieval events are not structured spans."
   ]
  },
  "22-7": {

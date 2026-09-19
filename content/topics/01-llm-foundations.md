@@ -161,8 +161,8 @@ flowchart TD
     RM --> RLHF_S["Stage 3: RLHF / DPO — optimize policy toward reward model"]
     RLHF_S --> INST["instruct / chat model"]
     INST --> PROD["follows instructions, declines harmful requests, consistent persona"]
-    JIW["Jiuwen"] --> SFT_J["agent_rl/sft/trainer.py (stage 1 pipeline)"]
-    JIW --> GR_J["GuardrailRail + SecurityRail (inference-time supplement, not substitute)"]
+    JIW["Jiuwen"] --> SFT_J["agent_evolving/agent_rl/online/backends/sft/trainer.py"]
+    JIW --> GR_J["PromptInjectionGuardrail + SecurityRail (inference-time supplement, not substitute)"]
     JIW -.->|"absent"| DIST["base vs instruct distinction in model config"]
 ```
 

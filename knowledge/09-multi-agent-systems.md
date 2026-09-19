@@ -58,7 +58,7 @@ The `SubagentRail` pattern is **hierarchical**: a top-level agent delegates to s
 
 ![diagram](assets/diagrams/6c0a558ee8c459ea6049ccd3d87b927db9b31382.png)
 
-**In Jiuwen.** MCP: McpServerConfig (agent-core/openjiuwen/core/foundation/tool/mcp/mcp_config.py:1) configures MCP servers; the MCP client discovers tools via tools/list and invokes via tools/call — this is the MCP pattern: one agent + multiple tool providers. A2A-style delegation: SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1) delegates tasks to specialized sub-agents using SubagentRequest/SubagentResponse schemas. This is internal delegation, not the A2A wire protocol — agents must be in the same Jiuwen deployment; cross-deployment agent-to-agent communication is not implemented.
+**In Jiuwen.** MCP: McpServerConfig (agent-core/openjiuwen/core/foundation/tool/mcp/base.py:137) configures MCP servers; the MCP client discovers tools via tools/list and invokes via tools/call — one agent plus multiple tool providers. A2A-style delegation: SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py) delegates tasks to specialized sub-agents using SubagentRequest/SubagentResponse schemas. This is internal delegation, not the A2A wire protocol — cross-deployment agent-to-agent communication is not implemented.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -143,7 +143,7 @@ Supervisor teams are built on `core/multi_agent`'s `HierarchicalTeam`, in two im
 
 **Implementation**
 
-The `agent_teams` stack uses a persisted mailbox plus an event bus. `TeamMessageManager.send_message()` writes a `TeamMessage` row through `MessageDao` and then publishes a `MessageEvent`/`BroadcastEvent` on the team's messager topic; recipients are woken by coordination handlers, which poll their unread mailbox (`MessageHandler._process_unread_messages`) and feed rendered `<team-inbound>` text into the harness via `deliver_input`. External input enters through `interaction/router.py` (`parse_interact_str` → `resolve_targets`, strict `@member` routing) and `TeamRuntimeManager._dispatch_payload`. The lower-level `core/multi_agent` stack has a separate `TeamRuntime`/`MessageBus` with `send` (P2P, waits for response) and `publish` (pub/sub). Subagents are a third, synchronous channel: `TaskTool` builds a child session and returns the terminal output directly.
+The `agent_teams` stack uses a persisted mailbox plus an event bus. `TeamMessageManager.send_message()` writes a `TeamMessage` row through `MessageDao` and then publishes a `MessageEvent`/`BroadcastEvent` on the team's messager topic; recipients are woken by coordination handlers, which poll their unread mailbox (`MessageHandler._process_unread_messages`) and feed rendered `<team-inbound>` text into the harness via `deliver_input`. External input enters through `agent-core/openjiuwen/agent_teams/interaction/router.py` (`parse_interact_str` → `resolve_targets`, strict `@member` routing) and `TeamRuntimeManager._dispatch_payload`. The lower-level `core/multi_agent` stack has a separate `TeamRuntime`/`MessageBus` with `send` (P2P, waits for response) and `publish` (pub/sub). Subagents are a third, synchronous channel: `TaskTool` builds a child session and returns the terminal output directly.
 
 **Code anchors**
 

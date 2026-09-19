@@ -68,7 +68,7 @@ All three appear in the framework. The model clients call LLMs pre-trained with 
 | Code anchor | What it points to |
 |---|---|
 | `agent-core/openjiuwen/agent_evolving/agent_rl/` | SFT + PPO/GRPO training |
-| `agent-core/openjiuwen/extensions/knowledge_base/retrieval/vector_retriever.py` | embedding-based retrieval (unsupervised representation) |
+| `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py` | embedding-based retrieval (unsupervised representation) |
 
 </details>
 
@@ -197,8 +197,8 @@ Not hand-coded. Vector similarity queries go through the vector store (Milvus, C
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/extensions/knowledge_base/schema/index_config.py` | IndexConfig with metric_type |
-| `agent-core/openjiuwen/extensions/knowledge_base/vector_store/` | search delegated to backing store |
+| `agent-core/openjiuwen/core/retrieval/common/config.py:56` | IndexConfig with metric_type |
+| `agent-core/openjiuwen/core/retrieval/vector_store/` | search delegated to backing store |
 
 </details>
 
@@ -274,8 +274,8 @@ k-NN shows up as vector retrieval rather than a classifier: `VectorRetriever` pe
 
 | Code anchor | What it points to |
 |---|---|
-| `agent-core/openjiuwen/extensions/knowledge_base/retrieval/vector_retriever.py` | VectorRetriever; top-k ANN search |
-| `agent-core/openjiuwen/extensions/knowledge_base/vector_store/` | backing ANN index |
+| `agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py` | VectorRetriever; top-k ANN search |
+| `agent-core/openjiuwen/core/retrieval/vector_store/` | backing ANN index |
 
 </details>
 

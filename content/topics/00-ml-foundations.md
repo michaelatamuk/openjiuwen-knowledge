@@ -43,7 +43,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/</code> — SFT + PPO/GRPO training<br>&bull; <code>agent-core/openjiuwen/extensions/knowledge_base/retrieval/vector_retriever.py</code> — embedding-based retrieval (unsupervised representation)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/</code> — SFT + PPO/GRPO training<br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py</code> — embedding-based retrieval (unsupervised representation)</sub>
 
 </details>
 
@@ -175,7 +175,7 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/extensions/knowledge_base/schema/index_config.py</code> — <code>IndexConfig</code> with <code>metric_type</code><br>&bull; <code>agent-core/openjiuwen/extensions/knowledge_base/vector_store/</code> — search delegated to backing store</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/common/config.py:56</code> — <code>IndexConfig</code> with <code>metric_type</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/</code> — search delegated to backing store</sub>
 
 </details>
 
@@ -253,7 +253,7 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/extensions/knowledge_base/retrieval/vector_retriever.py</code> — <code>VectorRetriever</code>; top-k ANN search<br>&bull; <code>agent-core/openjiuwen/extensions/knowledge_base/vector_store/</code> — backing ANN index</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py</code> — <code>VectorRetriever</code>; top-k ANN search<br>&bull; <code>agent-core/openjiuwen/core/retrieval/vector_store/</code> — backing ANN index</sub>
 
 </details>
 

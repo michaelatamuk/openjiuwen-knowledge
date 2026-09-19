@@ -95,7 +95,7 @@
    "RL-CAI: model generates preference pairs (chosen/rejected) scored against principles → reward model → RLHF",
    "Far fewer human labels needed than standard RLHF; the constitution is explicit and auditable",
    "Easier to update behavior: edit the principle list, not retrain a black-box reward model",
-   "Jiuwen gap: safety rails are static classifiers (SecurityRail, GuardrailRail); no self-critique loop or constitutional principle file"
+   "Jiuwen gap: safety rails are static classifiers (SecurityRail, PromptInjectionGuardrail); no self-critique loop or constitutional principle file"
   ]
  },
  "18-11": {
