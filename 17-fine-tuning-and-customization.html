@@ -1,0 +1,2283 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="04-choosing-models-and-approaches.html">
+      
+      
+        <link rel="next" href="10-rag-pipelines-and-patterns.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Fine-tuning & customization - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fine-tuning-and-customization" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Fine-tuning & customization
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-whats-the-difference-between-pretraining-and-fine-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What's the difference between pretraining and fine-tuning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-instruction-tuning-and-how-is-it-different-from-base-model-pretraining" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is instruction tuning, and how is it different from base model pretraining
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-full-fine-tuning-and-parameter-efficient-fine-tuning-like-lora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-when-would-you-fine-tune-instead-of-using-a-longer-more-detailed-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. When would you fine-tune instead of using a longer, more detailed prompt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fine-tuning-vs-prompting-vs-rag-when-does-each-win" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Fine-tuning vs prompting vs RAG: when does each win?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-whats-the-risk-of-fine-tuning-on-a-small-narrow-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What's the risk of fine-tuning on a small, narrow dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-rlhf-vs-dpo-what-changes-and-when-do-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. RLHF vs DPO: what changes and when do you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-whats-the-difference-between-pretraining-and-fine-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What's the difference between pretraining and fine-tuning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-instruction-tuning-and-how-is-it-different-from-base-model-pretraining" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is instruction tuning, and how is it different from base model pretraining
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-full-fine-tuning-and-parameter-efficient-fine-tuning-like-lora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-when-would-you-fine-tune-instead-of-using-a-longer-more-detailed-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. When would you fine-tune instead of using a longer, more detailed prompt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fine-tuning-vs-prompting-vs-rag-when-does-each-win" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Fine-tuning vs prompting vs RAG: when does each win?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-whats-the-risk-of-fine-tuning-on-a-small-narrow-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What's the risk of fine-tuning on a small, narrow dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-rlhf-vs-dpo-what-changes-and-when-do-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. RLHF vs DPO: what changes and when do you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="04-choosing-models-and-approaches.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Choosing models and tradeoffs</span></a>
+<a class="topic-nav__link topic-nav__next" href="10-rag-pipelines-and-patterns.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">RAG pipelines and patterns</span></a>
+</div>
+
+<h1 id="fine-tuning-and-customization">Fine-tuning and customization</h1>
+<h2 id="1-whats-the-difference-between-pretraining-and-fine-tuning">1. What's the difference between pretraining and fine-tuning</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Pretraining learns general language structure from a huge unlabeled corpus (self-supervised); fine-tuning adapts a pretrained model to a task with labeled data. Here 'evolution' optimizes prompts, not weights.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Pretraining: self-supervised, general, expensive.</li>
+<li>Fine-tuning: task adaptation with labels.</li>
+<li>Jiuwen's default evolution tunes prompts, not weights.</li>
+</ul>
+<p><strong>Concept.</strong> Pretraining learns general language structure from a huge unlabeled corpus with a self-supervised objective (next-token or masked-token); it is expensive and done once per base model. Fine-tuning adapts a pretrained model to a task/domain/behavior on a much smaller labeled or demonstration dataset, updating some or all weights. Instruction tuning is a specific kind of fine-tuning on instruction→response pairs.</p>
+<p><img alt="diagram" src="assets/diagrams/3e8fce3e434469ba4760c6086c2931ff7fed28bd.png" /></p>
+<p><strong>In Jiuwen.</strong> Two distinct things live here. The default evolution path does not train weights: the evolving trainer runs evaluate, LLM-generated update, validate, and checkpoint, then writes back operators and parameters (prompts, configs) using textual gradients — prompt optimization. Weight training happens only in separate SFT/RL trainers via LoRA adapters.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Two distinct things live here. The default "evolution" path does <strong>not</strong> train weights: <code>agent_evolving.Trainer</code> runs evaluate → LLM-generated update → validate → checkpoint and writes back <strong>operators/parameters</strong> (system/user prompts, configs) via <code>Operator.set_parameter</code> using "textual gradients" — prompt optimization, not gradient descent. <code>rsi/</code> and <code>auto_harness</code> evolve harness code/prompt sections. Separately, the optional <code>agent_evolving/agent_rl/</code> subsystem genuinely trains weights with veRL (PPO actor/critic updates, SFT) and exports <strong>LoRA/PEFT adapters</strong>. The training subsystems start from an existing base model rather than pretraining from scratch.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:145</code></td>
+<td>train() loop; :359 op.set_parameter(target, value)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/optimizer/llm_call/instruction_optimizer.py:30</code></td>
+<td>prompt rewrite via textual gradients</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/__init__.py:2</code></td>
+<td>recursive self-improvement over harness/prompt/code</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147</code></td>
+<td>update_actor / :145 update_critic (real PPO)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:211</code></td>
+<td>async SFT producing a LoRA</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438</code></td>
+<td>export_lora(...); :489 _convert_fsdp_to_peft(...)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:51</code></td>
+<td>versioned adapter store</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-what-is-instruction-tuning-and-how-is-it-different-from-base-model-pretraining">2. What is instruction tuning, and how is it different from base model pretraining</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Pretraining is self-supervised and yields a base model that completes text; instruction tuning is supervised fine-tuning on (instruction, response) pairs so the model follows instructions.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Pretraining: next/masked token, not instruction-following.</li>
+<li>Instruction tuning: supervised on instruction/response pairs.</li>
+<li>Produces an assistant that follows instructions.</li>
+</ul>
+<p><strong>Concept.</strong> Pretraining is self-supervised on raw text (predict the next/masked token) and produces a base model that completes text but does not follow instructions. Instruction tuning is supervised fine-tuning on (instruction, response) pairs that teaches the base model to follow commands, formats, and safety behavior. It is a small, high-quality stage relative to pretraining.</p>
+<p><img alt="diagram" src="assets/diagrams/de5ec6530f18e245a937c208f97375dc9a041050.png" /></p>
+<p><strong>In Jiuwen.</strong> Instruction tuning is implemented as SFT over agent chat trajectories: messages are normalized, tool calls are rendered into Qwen XML, and each assistant turn is tokenized with a loss mask that is zero for prompt, user, and tool tokens and nonzero only on assistant output tokens. A supervise option can train only the final turn.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Instruction tuning is implemented as <strong>SFT over agent chat trajectories</strong>: messages are normalized, tool calls are rendered into Qwen XML, and each assistant turn is tokenized with a <code>loss_mask</code> that is 0 for prompt/user/tool tokens and non-zero only on assistant output tokens. <code>supervise="last"</code> trains only the final assistant turn; <code>loss_norm</code> (<code>token</code>/<code>turn</code>/<code>sqrt</code>) controls per-turn weighting. The output is a pre-tokenized parquet consumed by a custom multi-turn dataset in veRL. This is behavior tuning on demonstrations, not continued pretraining.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/sft_data_formatter.py:201-249</code></td>
+<td>build_sft_tokenized_sample, loss mask on assistant only; :270-345 write_sft_parquet; :101-133 convert_message_openai; :50-60 Qwen <tool_call> XML; :77-84 <think> → reasoning_content</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:136-176</code></td>
+<td>train_batch; :395-398 QwenMultiTurnSFTDataset; :270-276 parquet write</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-whats-the-difference-between-full-fine-tuning-and-parameter-efficient-fine-tuning-like-lora">3. What's the difference between full fine-tuning and parameter-efficient fine-tuning like LoRA</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Full fine-tuning updates every weight (most capacity, but the full model in memory and easy to overfit/drift). LoRA freezes the base and trains small low-rank adapters (cheap, portable).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Full: updates all weights, high cost/capacity.</li>
+<li>LoRA: freezes base, trains low-rank adapters.</li>
+<li>LoRA is cheaper and portable.</li>
+</ul>
+<p><strong>Concept.</strong> Full fine-tuning updates every weight in the model — highest capacity to adapt but needs the full model in memory per training run, large checkpoints, and is easy to overfit/drift. LoRA freezes the base weights and trains small low-rank adapter matrices injected into the attention/MLP projections, so you store and serve only the adapters, need far less memory, and can keep many task adapters over one base model. Quality is often close to full FT for style/format/domain adaptation; full FT is preferred when the task needs deep capability change.</p>
+<p><img alt="diagram" src="assets/diagrams/7948d187282ef265af6b8ff854e9aa0a0b8646cb.png" /></p>
+<p><strong>In Jiuwen.</strong> The repo trains weights but only via LoRA/PEFT adapters — there is no full-parameter mode. Two backends exist: an online SFT backend and an online/offline RL/PPO backend. The SFT trainer writes a parquet dataset, invokes the RL framework's SFT trainer (FSDP plus LoRA), then merges the FSDP checkpoint and exports it.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The repo trains weights, but only via <strong>LoRA/PEFT adapters</strong> — there is no full-parameter fine-tuning mode. Two backends exist: an online SFT backend and an online/offline RL/PPO backend (veRL). The SFT trainer writes a parquet dataset, invokes veRL's SFT trainer (FSDP + LoRA), then merges the FSDP checkpoint and exports a PEFT adapter directory (<code>adapter_config.json</code> + <code>adapter_model.safetensors</code>). The RL path saves a checkpoint and <code>_convert_fsdp_to_peft</code> filters only <code>lora_</code> params and writes a PEFT <code>adapter_config.json</code> (<code>peft_type: LORA</code>, <code>r</code>, and an explicit <code>target_modules</code> list — the q/k/v/o and gate/up/down projections). Published adapters are versioned (<code>v1</code>, <code>v2</code>, …) with an atomic <code>latest</code> symlink, then hot-loaded on the inference service.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code></td>
+<td>SFTTrainingExecutor (owns SFT + LoRA publish); :328-345 lora_rank/alpha/target_modules; :455-482 _export_sft_lora_adapter; :577-586 _is_publishable_lora_dir</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/optimizer/task_runner.py:438-470</code></td>
+<td>export_lora; :543-579 PEFT adapter_config.json; :550-552 warn+fallback if no LoRA params</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/storage/lora_repo.py:56-131</code></td>
+<td>versioned publish + atomic latest</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/config/online_config.py:42-45</code></td>
+<td>PPO overlay lora_rank: 16, lora_alpha: 32, target_modules: all-linear</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/rl_trainer/ppo_step.py:147</code></td>
+<td>update_actor (PPO)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-when-would-you-fine-tune-instead-of-using-a-longer-more-detailed-prompt">4. When would you fine-tune instead of using a longer, more detailed prompt</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Fine-tune when the behavior is hard to specify in words (style, jargon, strict schema), when you want to compress a long few-shot prompt into weights for latency/cost, or when you have many labeled examples of the target behavior.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Hard-to-specify behavior (style/schema).</li>
+<li>Compress a long few-shot prompt into weights.</li>
+<li>Many labeled examples exist.</li>
+</ul>
+<p><strong>Concept.</strong> Fine-tune when the behavior is hard to specify in words (style, tone, domain jargon, strict output schema), when you need to compress a long few-shot prompt into the weights for latency/cost, when you have many labeled examples of the desired behavior, or when the task is high-volume and a smaller tuned model is cheaper. Prefer prompting when the task is general, examples are few, the requirement changes often, or you need to iterate quickly — prompt changes ship in seconds, fine-tunes in hours/days.</p>
+<p><img alt="diagram" src="assets/diagrams/f3dc82f27273b4c6f4f2139d17a56a6e38349d2e.png" /></p>
+<p><strong>In Jiuwen.</strong> The repo contains conceptual guidance plus two separate mechanisms, not a decision function. A design doc states the rationale: fine-tuning on bad cases is expensive and its fix cycle is tied to model release versions, so openJiuwen instead does automatic prompt, instruction, and example optimization. The practical path is evolution, with weight training available separately.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The repo contains conceptual guidance plus two separate mechanisms, not a decision function. A design doc states the rationale directly: fine-tuning on bad cases is expensive and its fix cycle is tied to model release versions, so openJiuwen instead does automatic prompt/instruction-and-example optimization. The practical default is <code>Trainer</code> + <code>InstructionOptimizer</code>/<code>JointOptimizer</code> (rewrite prompts via textual gradients, evaluate candidates, keep the best). For choosing <em>which model/endpoint</em> serves a task, IntelliRouter routes among deployments by adaptive health/token/RPM/latency scoring — availability/cost routing, not "tune vs prompt" reasoning. Weight-level SFT/LoRA exists as a heavier escalation path, but no selection criteria are encoded in code.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/optimizer/llm_call/instruction_optimizer.py:30-38</code></td>
+<td>prompt rewriting via textual gradients</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:241-272</code></td>
+<td>evaluates candidate prompt-config updates, keeps best</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44-45</code></td>
+<td>alternate weight-training (SFT/LoRA) path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/pool.py:133-235</code></td>
+<td>ModelRouterConfig; agent-core/openjiuwen/agent_teams/models/allocator.py:176/240/357/452/559 — allocator strategies / build_model_allocator</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/intelli_router/intelliRouter_demo.py:142-160</code></td>
+<td>adaptive routing weights (w_health, w_token, w_rpm, w_latency)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-fine-tuning-vs-prompting-vs-rag-when-does-each-win">5. Fine-tuning vs prompting vs RAG: when does each win?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Prompt first (zero cost), add RAG when knowledge gaps appear (dynamic corpus), fine-tune only when prompting+RAG can't close the gap and you have quality data.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Prompting: format/persona/instructions — zero cost, instantly reversible.</li>
+<li>RAG: dynamic/private/large corpora — updatable without retraining.</li>
+<li>Fine-tuning: new skills/behaviors — training cost, highest latency gain.</li>
+<li>Jiuwen: all three are implemented and composable.</li>
+</ul>
+<p><strong>Concept.</strong> Three complementary customization levers, not competitors. <strong>Prompting</strong> (including few-shot): zero additional training cost, instantly reversible, works well when the base model already has the knowledge and just needs format/persona/instructions. Fails when the required knowledge is absent from pre-training or must be current/private. <strong>RAG</strong>: grounds responses in a retrievable knowledge base, handles dynamic/private/large corpora without retraining, updatable in real time. Fails when retrieved content is insufficient for complex reasoning chains, or when the model needs new behavioral patterns (not just facts). <strong>Fine-tuning</strong>: teaches new skills, formats, or consistent behavioral patterns; bakes in knowledge that doesn't fit in a prompt or a retrieval pipeline; required for latency-critical paths where you can't afford a retrieval step. Fails when data is scarce (overfitting), distribution shifts frequently (stale), or compute is unavailable. In practice: prompt first, add RAG when knowledge gaps appear, fine-tune only when prompting + RAG cannot close the gap and you have quality data.</p>
+<p><img alt="diagram" src="assets/diagrams/80870c55071007554d5358baa9187379660ed74a.png" /></p>
+<p><strong>In Jiuwen.</strong> All three levers are implemented. Prompting: PromptTemplate (core/foundation/prompt/template.py) + PromptSection (core/single_agent/prompts/builder.py); RuntimePromptRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py) for dynamic prompt state. RAG: full retrieval pipeline via RetrievalConfig (vector, hybrid, graph, agentic retrievers). Fine-tuning: agent_rl/ SFT + PPO/GRPO via veRL. The three are independent and composable.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>All three are implemented. Prompting: <code>PromptTemplate</code> (<code>core/foundation/prompt/template.py</code>) + <code>PromptSection</code> (<code>core/single_agent/prompts/builder.py</code>); <code>RuntimePromptRail</code> (<code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py</code>) for dynamic prompt state. RAG: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). Fine-tuning: <code>agent_rl/</code> SFT + PPO/GRPO via veRL. Agents start with prompting, retrieval is added via <code>RetrievalConfig</code>, and fine-tuning (via <code>agent_rl/</code>) runs offline to improve on collected trajectories. The three levers are independent and composable.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/prompt/template.py:14</code></td>
+<td>PromptTemplate</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39</code></td>
+<td>RuntimePromptRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:8</code></td>
+<td>RetrievalConfig</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code></td>
+<td>SFT path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19</code></td>
+<td>PPO/GRPO path</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-whats-the-risk-of-fine-tuning-on-a-small-narrow-dataset">6. What's the risk of fine-tuning on a small, narrow dataset</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Small/narrow data risks overfitting (memorizing rather than generalizing), catastrophic forgetting of general ability, brittleness, and amplified bias or format lock-in.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Overfitting to the sample.</li>
+<li>Catastrophic forgetting.</li>
+<li>Brittleness to new inputs.</li>
+<li>Amplified bias / format lock-in.</li>
+</ul>
+<p><strong>Concept.</strong> Small/narrow data risks overfitting (memorizing the sample rather than generalizing), catastrophic forgetting of general ability, brittleness to slightly different inputs, and amplified bias/format lock-in from the narrow distribution. Mitigations: held-out validation with early stopping, regularization (weight decay, LoRA's low rank), data augmentation/diversity, and evaluating on a broader set than you trained on. The smaller the data, the more you should prefer PEFT and prompt engineering over full fine-tuning.</p>
+<p><img alt="diagram" src="assets/diagrams/84d1e7a59a1083fd58cdbda415230dd70abca63e.png" /></p>
+<p><strong>In Jiuwen.</strong> The offline RL trainer has a train/val pipeline with periodic validation and metric persistence, and a tuning trainer has an early-stop score gate. But the SFT path has no held-out validation at all: the SFT config sets no validation file, so overfitting on small data is not guarded against there.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The offline RL trainer has a real train/val pipeline (<code>train_data_path</code>/<code>val_data_path</code>, <code>val_before_train</code>, periodic <code>test_freq</code> validation with metric persistence), and the <code>dev_tools.tune.Trainer</code> has an <code>early_stop_score</code> gate. But the SFT path has <strong>no held-out validation</strong> at all: <code>_build_sft_config</code> sets <code>val_files: None</code> and <code>test_freq: -1</code>, and <code>total_epochs</code> defaults to 1. The SFT formatter applies only internal structural filters (dropping multimodal and non-assistant-ending rows); there is no external sample-quality gate. <code>weight_decay</code>/<code>clip_grad</code>/warmup are exposed only as raw veRL knobs, not framed as overfitting controls.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:32</code></td>
+<td>train_data_path/val_data_path; :53/69 test_freq=20, val_before_train=True</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/offline/main_trainer.py:160</code></td>
+<td>validate() full pass + metric persistence; :232 validate before train</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/offline/coordinator/processors.py:55</code></td>
+<td>rollout validate gating</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/dev_tools/tune/trainer/trainer.py:38</code></td>
+<td>early_stop_score; :99 val gate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:377</code></td>
+<td>val_files: None; :420 test_freq: -1; :359 weight_decay/clip_grad knobs</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/agent_evolving/react_agent_evolving.py:156</code></td>
+<td>split(ratio=0.6) train/val; :202 early_stop_score=0.95</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-rlhf-vs-dpo-what-changes-and-when-do-you-use-each">7. RLHF vs DPO: what changes and when do you use each?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> RLHF needs a separate reward model + PPO; DPO skips both and directly maximizes chosen-over-rejected via weighted cross-entropy — simpler and more stable, but less flexible for non-differentiable rewards.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>RLHF: SFT → reward model → PPO (3 stages, 2 models in memory).</li>
+<li>DPO: (prompt, chosen, rejected) → weighted CE (no reward model, no RL loop).</li>
+<li>Use RLHF/PPO when reward is external (code pass rate, tool success).</li>
+<li>Use DPO when you have a preference dataset and want stability.</li>
+<li>Jiuwen: PPO/GRPO only; no DPO track.</li>
+</ul>
+<p><strong>Concept.</strong> RLHF (Reinforcement Learning from Human Feedback) has three stages: supervised fine-tuning (SFT), reward model training (human preferences → a scalar reward model), and RL optimization (PPO to maximize the reward model's score subject to a KL divergence penalty against the SFT model). It works but is complex: two models in memory during PPO training, reward model can be gamed (reward hacking), requires online sampling. DPO (Direct Preference Optimization) is a mathematical simplification: given a preference dataset of (prompt, chosen, rejected) pairs, DPO directly optimizes the policy to increase the probability of chosen over rejected without needing a separate reward model or RL loop — it reduces to a weighted cross-entropy loss. DPO is simpler, more stable, and requires less compute; RLHF/PPO is more flexible for non-differentiable rewards (binary pass/fail, code execution, tool call success) and allows online improvement. Use DPO when you have a preference dataset and want stability; use PPO when your reward is computed externally (unit test pass rate, API call success).</p>
+<p><img alt="diagram" src="assets/diagrams/92ac41ad87de82ccb4c160167976d795583ae51b.png" /></p>
+<p><strong>In Jiuwen.</strong> Online PPO path (agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19) trains against verifiable reward signals (code execution, math grading, tool-use success). GRPO is also supported (agent_evolving/agent_rl/config/offline_config.py:43), eliminating the value model. DPO is not implemented. SFT (agent_evolving/agent_rl/online/backends/sft/trainer.py) covers stage 1 of RLHF.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>agent_rl/</code> implements both paths via veRL. The online PPO path (<code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py</code>) trains against a verifiable reward signal (code execution, math grading, tool-use success). GRPO (Group Relative Policy Optimization) is also supported, which eliminates the value model from PPO. There is no DPO path in the current codebase — the preference-based alignment track is absent; the framework's RL is entirely reward-signal-based (PPO/GRPO), not preference-based (DPO/IPO). The SFT path (<code>online/backends/sft/</code>) covers the first stage of RLHF.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/rl/ppo_engine.py:19</code></td>
+<td>PPOBatchEngine</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code></td>
+<td>SFTTrainingExecutor (stage 1)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:43</code></td>
+<td>GRPO config (no value model)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/</code></td>
+<td>no DPO backend present</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

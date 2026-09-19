@@ -1,0 +1,2649 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="09-multi-agent-systems.html">
+      
+      
+        <link rel="next" href="07-planning-memory-and-state.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Tools & function calling - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tools-and-function-calling" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tools & function calling
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="06-tools-and-function-calling.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-does-function-calling-actually-work-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How does function calling actually work under the hood
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-agentic-tool-calling-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Agentic tool-calling pattern
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-does-a-framework-register-and-expose-tools-to-the-underlying-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How does a framework register and expose tools to the underlying model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-does-the-framework-validate-a-tool-calls-structured-output-before-executing-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How does the framework validate a tool call's structured output before executing it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-do-you-handle-a-tool-that-a-framework-doesnt-natively-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How do you handle a tool that a framework doesn't natively support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-handle-a-tool-call-that-fails-or-returns-malformed-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you handle a tool call that fails or returns malformed output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-does-the-framework-handle-a-step-that-times-out-or-throws-an-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How does the framework handle a step that times out or throws an error
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-designing-retry-logic-that-doesnt-cause-duplicate-side-effects-on-a-tool-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Designing retry logic that doesn't cause duplicate side effects on a tool call
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-would-you-add-a-custom-retry-policy-for-a-specific-tool-without-breaking-the-frameworks-default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-how-do-you-design-tools-for-idempotency-and-safe-retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. How do you design tools for idempotency and safe retry?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-handling-concurrent-api-calls-when-an-agent-needs-to-call-multiple-tools-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Handling concurrent API calls when an agent needs to call multiple tools at once
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-does-function-calling-actually-work-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How does function calling actually work under the hood
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-agentic-tool-calling-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Agentic tool-calling pattern
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-does-a-framework-register-and-expose-tools-to-the-underlying-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How does a framework register and expose tools to the underlying model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-does-the-framework-validate-a-tool-calls-structured-output-before-executing-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How does the framework validate a tool call's structured output before executing it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-do-you-handle-a-tool-that-a-framework-doesnt-natively-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How do you handle a tool that a framework doesn't natively support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-handle-a-tool-call-that-fails-or-returns-malformed-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you handle a tool call that fails or returns malformed output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-does-the-framework-handle-a-step-that-times-out-or-throws-an-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How does the framework handle a step that times out or throws an error
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-designing-retry-logic-that-doesnt-cause-duplicate-side-effects-on-a-tool-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Designing retry logic that doesn't cause duplicate side effects on a tool call
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-would-you-add-a-custom-retry-policy-for-a-specific-tool-without-breaking-the-frameworks-default-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-how-do-you-design-tools-for-idempotency-and-safe-retry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. How do you design tools for idempotency and safe retry?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-handling-concurrent-api-calls-when-an-agent-needs-to-call-multiple-tools-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Handling concurrent API calls when an agent needs to call multiple tools at once
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="09-multi-agent-systems.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Multi-agent systems</span></a>
+<a class="topic-nav__link topic-nav__next" href="07-planning-memory-and-state.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Planning, memory and state</span></a>
+</div>
+
+<h1 id="tools-and-function-calling">Tools and function calling</h1>
+<h2 id="1-how-does-function-calling-actually-work-under-the-hood">1. How does function calling actually work under the hood</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Tool schemas (name, description, JSON-Schema params) go in the request; the model returns a structured tool_calls list; the host validates args, executes, and feeds results back.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Send tool schemas with the request.</li>
+<li>Model returns structured tool_calls (not prose).</li>
+<li>Host validates args, runs the tool, feeds the result back.</li>
+</ul>
+<p><strong>Concept.</strong> Tool definitions (name, description, JSON-Schema parameters) are sent to the model in the request. The model returns a structured <code>tool_calls</code> list instead of prose; the host parses it, validates arguments against the schema, invokes the function, and appends the result as a tool message for the next model turn. The model never runs code — it only emits a request to.</p>
+<p><img alt="diagram" src="assets/diagrams/888c97c8dd9798f651bcf531a56fee4c77c93c21.png" /></p>
+<p><strong>In Jiuwen.</strong> Tool cards become JSON Schema, the ability manager builds the model-facing tool list, and the model client converts it to the provider's tool format. The model's tool calls are parsed (non-streaming, streaming, and a provider-specific path), validated, and dispatched by the ability manager, with schema validation inside the local function call.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Cards become JSON Schema through the callable schema extractor, the ability manager builds the model-facing tool list, and the model client converts it to OpenAI/Anthropic tool format. The model's <code>tool_calls</code> are parsed (non-streaming, streaming, and Anthropic), validated, and dispatched by the ability manager, with schema validation inside <code>LocalFunction.invoke</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code></td>
+<td>card → JSON Schema</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984</code></td>
+<td>builds the model-facing tool list</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:483</code></td>
+<td>OpenAI tool format</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:494</code></td>
+<td>Anthropic tool format</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:2388</code></td>
+<td>parse non-streaming tool calls</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:2612</code></td>
+<td>parse streaming tool-call deltas</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:1229</code></td>
+<td>parse Anthropic tool_use</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1078</code></td>
+<td>dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/function/function.py:82</code></td>
+<td>argument schema validation</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-agentic-tool-calling-pattern">2. Agentic tool-calling pattern</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> The model decides when to call external functions: it emits a structured tool call, the tool executes, the result is fed back, and the loop continues.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Model emits structured tool calls.</li>
+<li>Runtime executes and feeds back results.</li>
+<li>Loops until the model answers.</li>
+</ul>
+<p><strong>Concept.</strong> the model decides when to call external functions. It receives the query and a tool list, emits a structured tool call instead of an answer, the tool executes and the result is fed back, and the model either calls another tool or returns a final answer. Used for: data lookups, sending emails, querying a database, checking live information.</p>
+<p><img alt="diagram" src="assets/diagrams/199bd406a3f4dd061321b26a680a014fa785f18d.png" /></p>
+<p><strong>In Jiuwen.</strong> This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed tool calls, and the local function invoke validates arguments.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>This is the ReAct loop plus the ability manager. Cards become JSON Schema via the callable schema extractor, the ability manager builds the model-facing tool list and dispatches parsed <code>tool_calls</code>, and <code>LocalFunction.invoke</code> validates arguments.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740/2793/2813</code></td>
+<td>loop / answer / execute</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984/1078</code></td>
+<td>tool list + dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code></td>
+<td>card → JSON Schema</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/function/function.py:82</code></td>
+<td>argument validation</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-how-does-a-framework-register-and-expose-tools-to-the-underlying-model">3. How does a framework register and expose tools to the underlying model</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Register a tool with name, description, and parameter schema; the framework collects them into the model request in the provider's tool format; returned tool calls are dispatched.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Register name + description + schema.</li>
+<li>Framework builds the provider tool list.</li>
+<li>Model tool calls are parsed and dispatched.</li>
+</ul>
+<p><strong>Concept.</strong> You register a tool with a name, description, and parameter schema; the framework collects registered tools into the model request in the provider's tool format; the model returns tool calls that the framework dispatches. Auto-deriving the schema from a function signature is the convenience that makes this usable.</p>
+<p><img alt="diagram" src="assets/diagrams/c8ade5e1b91d9e9ce5cf562c59f018f74105dd9f.png" /></p>
+<p><strong>In Jiuwen.</strong> Abilities are stored as metadata cards (tool, workflow, agent, MCP) in the ability manager's per-type maps, while executable instances live in the runner's resource manager, bound when the ability is added. Each ReAct iteration flattens the cards into the model-facing tool list, and returned tool calls are parsed and dispatched.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Abilities are stored as metadata cards (<code>ToolCard</code>/<code>WorkflowCard</code>/<code>AgentCard</code>/<code>McpServerConfig</code>) in <code>AbilityManager</code>'s per-type dicts via <code>add()</code>; executable instances live separately in <code>Runner.resource_mgr</code>, bound by <code>add_ability()</code>. On each ReAct iteration, <code>list_tool_info()</code> flattens cards into <code>ToolInfo(name, description, parameters)</code>, and MCP servers are resolved lazily with an <code>mcp_&lt;server&gt;_</code> prefix. The list is placed on <code>ctx.inputs.tools</code> (after rails may filter it) and converted by the model client — OpenAI-style <code>_convert_tools_to_dict</code> emits <code>{"type":"function","function":{...}}</code>, Anthropic <code>_convert_tool_schemas</code> renames <code>parameters</code> → <code>input_schema</code>. Function/<code>@tool</code> backends auto-derive the schema via <code>CallableSchemaExtractor</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/34c616223b9111063e002a7c166ec340de492872.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:616</code></td>
+<td>add() registers any ability card; ToolCard branch stores at :669</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:772</code></td>
+<td>add_ability() card + concrete Tool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:984</code></td>
+<td>list_tool_info() cards → ToolInfo</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1047</code></td>
+<td>MCP path (get_mcp_tool_infos, mcp_model_tool_name); :1067 lazy ToolCard</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:120</code></td>
+<td>ToolCard.tool_info()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/utils/callable_schema_extractor.py:20</code></td>
+<td>generate_schema() from a callable signature</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:483</code></td>
+<td>_convert_tools_to_dict(); attached at :576</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:494</code></td>
+<td>_convert_tool_schemas() → input_schema</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2683</code></td>
+<td>per-invoke list_tool_info(); set at :1538</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:443</code></td>
+<td>registers tool instances (add_ability); :453 pure cards (add)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-how-does-the-framework-validate-a-tool-calls-structured-output-before-executing-it">4. How does the framework validate a tool call's structured output before executing it</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Parse arguments against the tool's schema, repair obvious damage, reject with a readable error, and never run the function on unvalidated input.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>json.loads → bracket/quote repair → otherwise a readable error.</li>
+<li>Schema-validate (jsonschema/Pydantic) and fill defaults before invoking.</li>
+<li>Return the error to the model so it can self-correct.</li>
+</ul>
+<p><strong>Concept.</strong> Parse the model's arguments against the tool's JSON Schema; repair obviously damaged JSON (unbalanced brackets) when possible; reject with a readable error so the model can retry. Never run a function on unvalidated arguments.</p>
+<p><img alt="diagram" src="assets/diagrams/ad4fba8d12f4016b60b9192fd65c682dadffdacb.png" /></p>
+<p><strong>In Jiuwen.</strong> Before executing, the ability manager parses the model's raw argument string, first trying JSON then repairing brackets and braces; unrecoverable JSON raises an error that is fed back to the model. The parsed dict is passed to the tool, where the function and MCP wrappers run schema validation (jsonschema with a Pydantic fallback) and fill defaults. The structured-output tool uses the caller's schema as its own input, so the same path constrains captured results.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Before executing, <code>AbilityManager._execute_single_tool_call</code> parses the model's raw argument string with <code>_parse_tool_arguments_with_repair</code>, which first tries <code>json.loads</code>, then <code>_repair_tool_arguments_json</code> to balance brackets/braces; unrecoverable JSON raises an <code>AbilityExecutionError</code> fed back to the model. The parsed dict is passed to <code>tool.invoke</code>, where <code>LocalFunction</code>/<code>MCPTool</code> call <code>SchemaUtils.format_with_schema</code>, which runs <code>validate_with_schema</code> (jsonschema, falling back to a dynamically created Pydantic model) and then fills defaults. The <code>structured_output</code> tool uses the caller's JSON Schema as its own <code>input_params</code>, so the same validation path constrains captured results.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/fbda74deb1484deab578ebc9d9c8dbfc82173356.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code></td>
+<td>_repair_tool_arguments_json(); :537 _parse_tool_arguments_with_repair(); :1419 execution path rewrites tool_call.arguments</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/function/function.py:76</code></td>
+<td>LocalFunction.invoke; :82 validation via SchemaUtils.format_with_schema</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/common/utils/schema_utils.py:115</code></td>
+<td>validate_with_schema() (jsonschema → Pydantic fallback); :23 format_with_schema(); :49 calls validate then fills defaults</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:208</code></td>
+<td>MCPTool.invoke validates MCP args via the same path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:82</code></td>
+<td>input_params = schema_json; :86 invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:90</code></td>
+<td>ToolCard.input_params is the schema source</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-do-you-handle-a-tool-that-a-framework-doesnt-natively-support">5. How do you handle a tool that a framework doesn't natively support</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Wrap an arbitrary function as a tool, define a custom tool class for special transport/auth, or connect an external tool server via a protocol like MCP.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Wrap any function as a tool.</li>
+<li>Custom tool class for transport/auth.</li>
+<li>MCP for external tool servers.</li>
+</ul>
+<p><strong>Concept.</strong> The framework should let you wrap an arbitrary function as a tool, define a custom tool class for custom transport/auth, or connect an external tool server through a protocol such as MCP. If none of those is possible, that is a real limitation.</p>
+<p><img alt="diagram" src="assets/diagrams/9fdc8e2d8bff62b90310587ac705b51618c7497e.png" /></p>
+<p><strong>In Jiuwen.</strong> The primary path is the tool decorator, which wraps a plain function into a local tool with an auto-extracted or explicit parameter schema, then registers it with the ability manager. For other transports there are custom tool classes and MCP servers, so the framework does not need a built-in for every tool.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The primary path is the <code>@tool</code> decorator, which wraps any plain function into a <code>LocalFunction</code> (a <code>Tool</code> subclass) with an auto-extracted or explicit <code>input_params</code>, then registers it via <code>ability_manager.add_ability(card, resource)</code>. The decorator builds a fresh <code>ToolCard</code> (<code>_create_new_tool_card</code>) or derives one from a prebuilt card (<code>_handle_prebuilt_card</code>), so callers can override <code>name</code>/<code>description</code>/<code>input_params</code>/<code>stateless</code>. Unsupported tools can also be declared as a <code>ToolCard</code> plus a concrete <code>Tool</code> subclass, or exposed through MCP: a <code>McpServerConfig</code> is added to the ability manager, and the runner materializes each discovered <code>McpToolCard</code> into an <code>MCPTool</code>. <code>build_tool_card</code> is the harness-standard card factory.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/eef9c6d5dbc4de81dc160a39fddbb89fafa8a79f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/tool.py:31</code></td>
+<td>tool() universal decorator; :95/115 returns decorated LocalFunction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/tool.py:120</code></td>
+<td>_handle_prebuilt_card(); :160 _create_new_tool_card()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/function/function.py:48</code></td>
+<td>LocalFunction.<strong>init</strong>; :76 invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/__init__.py:19</code></td>
+<td>tool; :29 LocalFunction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:137</code></td>
+<td>McpServerConfig; :178 MCPTool; :198 invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/runner/resources_manager/tool_manager.py:281</code></td>
+<td>discovered MCP cards materialized into MCPTool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/extensions/context_evolver/tool/wikipedia_tool.py:86</code></td>
+<td>minimal ToolCard + LocalFunction example</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/tools/__init__.py:250</code></td>
+<td>build_tool_card()</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-how-do-you-handle-a-tool-call-that-fails-or-returns-malformed-output">6. How do you handle a tool call that fails or returns malformed output</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Treat failures as data: catch, classify retryable, return a structured error the model can read, and repair obvious damage (e.g., unbalanced JSON).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Catch and classify retryable vs not.</li>
+<li>Return a structured, model-readable error.</li>
+<li>Repair broken payloads when possible.</li>
+</ul>
+<p><strong>Concept.</strong> Treat failures as data, not crashes: catch the exception, classify whether it is retryable, return a structured error the model can read and react to, and repair obviously broken payloads (e.g., unbalanced JSON) when possible.</p>
+<p><img alt="diagram" src="assets/diagrams/170e5b61706772cd84bea93060dd65d1cbd567b9.png" /></p>
+<p><strong>In Jiuwen.</strong> A resilience rail is auto-mounted: it classifies retryable versus not, never retries non-idempotent tools, and returns a retry summary when the budget is exhausted. Broken tool arguments are repaired by bracket balancing, and if unrepairable the raw JSON is surfaced to the model. The generic JSON parser, by contrast, does not repair — it returns nothing on failure.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>ToolCallResilienceRail</code> is auto-mounted. It classifies retryable vs not, never retries non-idempotent tools, and returns a <code>[Retry Summary]</code> when the budget is exhausted. Broken tool arguments are repaired by bracket balancing; if unrepairable, the raw JSON is surfaced to the model. The general-purpose <code>JsonOutputParser</code>, by contrast, does not repair — it returns <code>None</code> on failure.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:294</code></td>
+<td>resilience rail enabled by default</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:408</code></td>
+<td>auto-mount</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:198</code></td>
+<td>retryability classification</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:222</code></td>
+<td>never retry non-idempotent tools</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:169</code></td>
+<td>retry-summary on exhaustion</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:482</code></td>
+<td>JSON bracket-repair</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1424</code></td>
+<td>surface raw JSON to the model</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/output_parsers/json_output_parser.py:56</code></td>
+<td>no repair (returns None)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-does-the-framework-handle-a-step-that-times-out-or-throws-an-error">7. How does the framework handle a step that times out or throws an error</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Bound each step with a timeout, classify errors, convert failures into data (an observation) so the loop can adapt, and propagate fatal errors with cleanup.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Timeout each step.</li>
+<li>Classify retryable vs fatal.</li>
+<li>Convert failure into a model-readable result.</li>
+</ul>
+<p><strong>Concept.</strong> Bound each step with a timeout; classify errors (retryable vs not); convert failures into data (a tool/observation result) so the loop can adapt; propagate fatal errors with cleanup. Distinguish control-flow exceptions (cancellation, interrupt) from real failures.</p>
+<p><img alt="diagram" src="assets/diagrams/69a96d9ca1c9578f002ecb13f856bca49a1a631d.png" /></p>
+<p><strong>In Jiuwen.</strong> Tool calls are wrapped with a timeout resolved from the tool's resilience config (with a hard ceiling for exempt tools). A timeout becomes an execution error carrying a prebuilt tool message so the model sees the failure as data; other exceptions are classified and surfaced similarly, so the loop can adapt instead of crashing.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Tool calls are wrapped in <code>anyio.fail_after(call_timeout)</code>, where the timeout resolves from <code>ToolCard.properties["resilience"]["timeout_s"]</code> (or a default), and an exempt tool is still bounded by a hard limit. A <code>TimeoutError</code> becomes an <code>AbilityExecutionError</code> carrying a pre-built <code>ToolMessage</code>; <code>asyncio.CancelledError</code> and <code>ToolInterruptException</code> are re-raised as control flow. <code>ToolCallResilienceRail.on_tool_exception</code> decides retryability in layers and calls <code>ctx.request_retry()</code>, which the <code>@rail</code> decorator consumes to re-run the tool; on budget exhaustion it fabricates a <code>[Retry Summary]</code> <code>ToolMessage</code> so the model sees the failure as a result. Model-call failures route to <code>ON_MODEL_EXCEPTION</code> rails (<code>ModelAnomalyDetectionRail</code> retries repeated/stream-timeout errors with backoff; <code>_call_model</code> has a one-shot recovery hook). Workflow failures wrap timeout as <code>WORKFLOW_EXECUTION_TIMEOUT</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/85e5a2c1392557c926adcfc6379b13ae6f1c0c5a.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1455</code></td>
+<td>with anyio.fail_after(call_timeout); :1457-1463 TimeoutError → _build_execution_error; :556 _build_execution_error; :1186-1238 parallel-batch handling; :1492 workflow error wrapping</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:106</code></td>
+<td>on_tool_exception; :128-138 non-idempotent layer; :145 budget; :169-186 retry-summary; :196 request_retry; :198 _is_retryable_exception</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:1016</code></td>
+<td>@rail retry loop; :1036 catch; :1049 fire on_exception; :1065 consume retry; :633 request_force_finish</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:236</code></td>
+<td>on_model_exception; :336 ctx.request_retry(delay_seconds=...)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1016</code></td>
+<td>model exception + one recovery attempt; :2857/2868 persist safe prefix then re-raise</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/stop_condition.py:162</code></td>
+<td>TimeoutEvaluator; agent-core/openjiuwen/harness/deep_agent.py:2712 — completion_timeout (600s)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:671</code></td>
+<td>WORKFLOW_EXECUTION_TIMEOUT; agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:243 — interrupt as AbortError</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-designing-retry-logic-that-doesnt-cause-duplicate-side-effects-on-a-tool-call">8. Designing retry logic that doesn't cause duplicate side effects on a tool call</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Never blindly retry non-idempotent actions; mark side-effecting tools, use idempotency keys, and retry only reads or explicitly idempotent operations.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mark non-idempotent tools; never blind-retry.</li>
+<li>Idempotency keys make repeats detectable.</li>
+<li>Retry reads/idempotent ops only.</li>
+</ul>
+<p><strong>Concept.</strong> Never blindly retry non-idempotent actions (payments, emails, writes). Mark side-effecting tools, use idempotency keys so a repeated call is recognized, and prefer retry only for reads or explicitly idempotent operations. Bound retries with backoff. On ambiguity, surface to a human rather than guess.</p>
+<p><img alt="diagram" src="assets/diagrams/9b202b032d06a77832ab19eb128f01a3f4337f89.png" /></p>
+<p><strong>In Jiuwen.</strong> The tool card's idempotent flag defaults to false (secure by default), and non-idempotent tools are never retried. The resilience rail decides in layers: it rejects retry for non-idempotent cards and allows retry only for retryable exception types such as timeouts and connection resets.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>ToolCard.idempotent</code> defaults to <code>False</code> (secure-by-default), and non-idempotent tools are never retried. <code>ToolCallResilienceRail</code> decides in layers: reject retry for any card with <code>idempotent is False</code>; allow retry only for retryable exception types/markers (timeouts, connection resets, MCP transport); enforce a per-invoke budget (default 3). On a retry it calls <code>ctx.request_retry()</code> and the <code>@rail</code> decorator re-runs the call. Separately, <code>ToolCallDeduplicationRail</code> short-circuits repeated <em>read-only</em> calls via an exact <code>(tool_name, args-hash)</code> cache, setting <code>_skip_tool</code> so the real tool never runs.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/c23f89481ba57d80fe58576f5c9e8c45b4131a6e.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code></td>
+<td>idempotent default False</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:128</code></td>
+<td>non-idempotent guard; :141 retryable-exception filter; :145 per-invoke budget; :196 ctx.request_retry()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:612/1024</code></td>
+<td>request_retry + decorator retry loop</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:24/109</code></td>
+<td>read-only whitelist + exact cache interception</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1324</code></td>
+<td>_skip_tool_calls honored</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness_providers/native/harness.py:226</code></td>
+<td>native harness rejects protocol checkpoints (no replay)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-how-would-you-add-a-custom-retry-policy-for-a-specific-tool-without-breaking-the-frameworks-default-behavior">9. How would you add a custom retry policy for a specific tool without breaking the framework's default behavior</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Retry policy should be per-tool and overridable — idempotency flag, max attempts, backoff, timeout — without silently disabling safety.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Per-tool override: attempts, backoff, timeout.</li>
+<li>Keep the idempotency safety default.</li>
+<li>Central policy with per-tool hooks.</li>
+</ul>
+<p><strong>Concept.</strong> Retry policy should be per-tool and overridable: an idempotency flag, max attempts, backoff, and timeout. A single global retry that ignores non-idempotency is dangerous, but so is a per-tool override that silently disables the framework's safety defaults.</p>
+<p><img alt="diagram" src="assets/diagrams/6cba0bd44c5e8a524e7b5c5c7801878b71c220f6.png" /></p>
+<p><strong>In Jiuwen.</strong> Retry decisions are centralized in the resilience rail (auto-mounted unless disabled): it resets a per-invoke counter before the call and, on exceptions, applies layered rules starting with refusing to retry non-idempotent tools. So a custom policy is expressed by marking a tool idempotent and letting the central rail handle attempts and backoff, rather than letting a per-tool override bypass the guard.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Retry decisions are centralized in <code>ToolCallResilienceRail</code> (priority 70, auto-mounted unless <code>enable_tool_resilience_rail=False</code>). It hooks <code>before_tool_call</code> to reset a per-invoke counter and <code>on_tool_exception</code>, where it applies layers: non-idempotent tools (<code>ToolCard.idempotent is False</code>, the default) are never retried; retryable exception types/markers (timeouts, connection resets, MCP transport) are; otherwise it calls <code>ctx.request_retry()</code>, consumed by the <code>@rail</code> decorator wrapping the tool execution. The per-invoke timeout is read separately from <code>ToolCard.properties["resilience"]["timeout_s"]</code> by <code>AbilityManager._resolve_call_timeout</code>. Customization without breaking defaults is done by setting <code>idempotent=True</code>/<code>properties={"resilience": {...}}</code> on the card, or by supplying your own rail (the auto-mount checks <code>_already_provided</code>).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:24</code></td>
+<td>ToolCallResilienceRail; :102 counter reset; :106 on_tool_exception; :145 budget check; :196 retry request</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:223</code></td>
+<td>_is_non_idempotent(); :244 _resolve_max_attempts()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code></td>
+<td>ToolCard.idempotent (default False); :90/92 properties/parallel_safe</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:571</code></td>
+<td>_resolve_call_timeout() reads properties["resilience"]["timeout_s"]; :137 hard limit</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:294</code></td>
+<td>enable_tool_resilience_rail: bool = True; agent-core/openjiuwen/harness/schema/deep_agent_spec.py:453 mirror</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:408</code></td>
+<td>auto-mount; :411 _already_provided guard</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/subagent/subagent_tools.py:45</code></td>
+<td>_attach_call_timeout() sets properties["resilience"]["timeout_s"]</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:612</code></td>
+<td>ctx.request_retry(); agent-core/openjiuwen/harness/prompts/tools/<strong>init</strong>.py:284 — build_tool_card honors ToolCardBuildOptions(idempotent=…)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-how-do-you-design-tools-for-idempotency-and-safe-retry">10. How do you design tools for idempotency and safe retry?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Separate tools into idempotent reads (safe to retry) and non-idempotent writes (require idempotency keys and attempted-vs-confirmed tracking).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Reads: retry with backoff — same result every time.</li>
+<li>Writes: attach an idempotency key; verify state before retrying.</li>
+<li>Jiuwen: no idempotent flag on ToolCard; ToolCallDeduplicationRail is narrow (same args in session only).</li>
+</ul>
+<p><strong>Concept.</strong> Separate tools into two categories: idempotent reads (GET-style — safe to retry with backoff, identical result every time) and non-idempotent writes (payment, email send, database insert — must not be executed twice). For writes: attach an idempotency key — a unique request ID generated by the agent before the call and passed with every attempt, so the server deduplicates on that key. Track "attempted vs confirmed" state in the agent's memory so a subsequent retry knows whether the call was received but timed out, or never sent. Never retry a write blindly on timeout; always verify state first.</p>
+<p><img alt="diagram" src="assets/diagrams/d84185f59313ca40b2c7d40f22b2d0bb1347df22.png" /></p>
+<p><strong>In Jiuwen.</strong> ToolCard schema (agent-core/openjiuwen/core/foundation/tool/base.py:90) has no idempotent flag. ToolCallDeduplicationRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47) suppresses identical (name + args) calls within a session — a narrow guard, not general idempotency. McpServerConfig.retry_on_failure (agent-core/openjiuwen/core/foundation/tool/mcp/base.py:137) controls MCP connection retries, not semantic idempotency. Idempotency keys and attempted-vs-confirmed state are the tool author's responsibility.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>ToolCard.idempotent</code> defaults to <code>False</code>, and non-idempotent tools are never retried by the resilience rail — so the framework does distinguish reads from writes at the card level. Retry decisions live in <code>ToolCallResilienceRail</code> (only retryable exception types, with a per-invoke budget). <code>ToolCallDeduplicationRail</code> additionally suppresses exact repeated calls within a session, which guards against loop-induced repeats rather than providing semantic idempotency. Idempotency keys and "attempted vs confirmed" state are still the tool author's responsibility; the framework provides no scaffold. The <code>retry_on_failure</code> field in <code>McpServerConfig</code> controls MCP connection retries, not tool-call semantic idempotency.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:109</code></td>
+<td>ToolCard.idempotent (default False)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:1</code></td>
+<td>session-scoped same-args dedup</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:40</code></td>
+<td>McpServerConfig.retry_on_failure (connection, not semantic)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-handling-concurrent-api-calls-when-an-agent-needs-to-call-multiple-tools-at-once">11. Handling concurrent API calls when an agent needs to call multiple tools at once</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Run independent tool calls from one turn concurrently with async tasks, but bound concurrency and respect per-resource ordering.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Group the turn's tool calls; run them concurrently.</li>
+<li>Bound concurrency (semaphore/pool).</li>
+<li>Respect ordering for conflicting writes.</li>
+</ul>
+<p><strong>Concept.</strong> When a turn contains several independent tool calls, run them concurrently with async tasks rather than a serial <code>for</code> loop, but bound the concurrency (semaphore/pool), respect per-resource ordering (two writes to the same file must not interleave), and mark which tools are safe to parallelize. Failures in one call should not silently cancel the others unless you want fail-fast semantics.</p>
+<p><img alt="diagram" src="assets/diagrams/b2932828e43d8f1bcdd5255f45a92689e4019365.png" /></p>
+<p><strong>In Jiuwen.</strong> One turn can contain several tool calls. The ability manager normalizes them, creates an isolated callback context per call, and, when parallel tool calls are enabled, dispatches them concurrently with a bounded executor and resource lanes; otherwise it runs them in sequence. The per-call context copy avoids racy mutation across parallel calls.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The ReAct loop can emit a <code>List[ToolCall]</code> in one turn. <code>AbilityManager.execute</code> normalizes them, builds one coroutine plus an isolated <code>AgentCallbackContext</code> per call (copying <code>extra</code> to avoid racy dict mutation), and if <code>parallel_tool_calls=True</code> dispatches to <code>_execute_parallel_tool_tasks</code>. That groups consecutive calls whose <code>ToolCard.parallel_safe</code> is true into batches; each batch runs through <code>_execute_resource_ordered_tool_tasks</code>, which partitions calls into "lanes" keyed by normalized file path (unknown resources get private lanes) and <code>asyncio.gather</code>s across lanes while awaiting sequentially <em>within</em> a lane. A <code>parallel_safe=False</code> tool acts as an exclusive barrier. Team supervisors override <code>execute</code> in <code>P2PAbilityManager</code> to fan AgentCard calls out under a semaphore (default 10).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1083</code></td>
+<td>parallel_tool_calls parameter; :1148 parallel-vs-sequential branch; :431 _execute_parallel_tool_tasks (batching + barrier); :393 _execute_resource_ordered_tool_tasks (lanes); :421 asyncio.gather across lanes</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:92</code></td>
+<td>ToolCard.parallel_safe (default True)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/task.py:27</code></td>
+<td>submit creates a Task; :47 asyncio.wait(..., FIRST_EXCEPTION) cancels siblings</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:45</code></td>
+<td>lazy semaphore for sub-agent fan-out</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

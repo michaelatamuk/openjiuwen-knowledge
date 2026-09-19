@@ -1,0 +1,3540 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="22-agent-failure-patterns.html">
+      
+      
+        <link rel="next" href="18-security-and-safety.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Evaluation - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#evaluation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Evaluation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="15-evaluation.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-do-you-evaluate-an-llms-output-beyond-it-looks-correct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How do you evaluate an LLM's output beyond "it looks correct"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-why-evaluate-retrieval-and-generation-as-two-separate-stages-instead-of-one-end-to-end-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-exact-match-scoring-fails-when-a-correct-answer-can-be-phrased-multiple-valid-ways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-recallk-and-what-a-low-score-tells-you-about-your-retrieval-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Recall@k, and what a low score tells you about your retrieval setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-precisionk-differ-from-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does Precision@k differ from Recall@k?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-can-precision-and-recall-both-look-fine-while-the-pipeline-is-broken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why can precision and recall both look fine while the pipeline is broken?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-mrr-and-when-it-matters-more-than-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. MRR, and when it matters more than Recall@k
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-ndcg-weights-relevant-results-by-position-against-an-ideal-ranking-why-position-matters-beyond-was-it-retrieved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-faithfulness-vs-relevance-in-rag-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Faithfulness vs. relevance in RAG evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-computing-faithfulness-decomposing-an-answer-into-atomic-claims-scoring-each-against-the-source-with-an-nli-model-or-llm-as-judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-measuring-hallucination-rate-claim-extraction-from-the-output-then-verification-against-retrieved-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-is-perplexity-and-what-does-a-lower-score-actually-tell-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What is perplexity, and what does a lower score actually tell you
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-known-limitations-of-using-an-llm-as-a-judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Known limitations of using an LLM as a judge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-how-do-you-evaluate-when-theres-no-ground-truth-answer-only-a-query-and-a-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. How do you evaluate when there's no ground truth answer, only a query and a corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-how-would-you-build-an-eval-dataset-from-scratch-if-you-dont-have-one-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. How would you build an eval dataset from scratch if you don't have one yet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-building-a-retrieval-eval-set-without-labeled-relevant-documents-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. Building a retrieval eval set without labeled relevant documents yet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-how-many-examples-before-eval-results-are-statistically-meaningful-not-just-noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. How many examples before eval results are statistically meaningful, not just noise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-how-would-you-compare-two-models-for-a-specific-task-not-just-a-general-leaderboard-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. How would you compare two models for a specific task, not just a general leaderboard score
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-building-a-regression-test-suite-to-catch-a-quality-drop-before-it-ships" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. Building a regression test suite to catch a quality drop before it ships
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-evaluating-continuously-in-production-not-just-once-before-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20. Evaluating continuously in production, not just once before launch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21-how-do-you-detect-when-your-retrieval-quality-has-degraded-over-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21. How do you detect when your retrieval quality has degraded over time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#22-high-eval-scores-but-users-still-complaining-what-does-that-gap-tell-you-about-your-eval-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        22. High eval scores but users still complaining — what does that gap tell you about your eval set
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#23-tying-an-eval-metric-back-to-a-business-outcome-a-stakeholder-actually-cares-about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        23. Tying an eval metric back to a business outcome a stakeholder actually cares about
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#24-how-do-you-test-a-non-deterministic-agent-what-does-a-passing-test-suite-actually-assert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25-how-do-you-know-its-working-tests-evaluation-depth-not-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        25. "How do you know it's working" tests evaluation depth, not confidence
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-do-you-evaluate-an-llms-output-beyond-it-looks-correct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How do you evaluate an LLM's output beyond "it looks correct"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-why-evaluate-retrieval-and-generation-as-two-separate-stages-instead-of-one-end-to-end-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-exact-match-scoring-fails-when-a-correct-answer-can-be-phrased-multiple-valid-ways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-recallk-and-what-a-low-score-tells-you-about-your-retrieval-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Recall@k, and what a low score tells you about your retrieval setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-precisionk-differ-from-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does Precision@k differ from Recall@k?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-can-precision-and-recall-both-look-fine-while-the-pipeline-is-broken" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why can precision and recall both look fine while the pipeline is broken?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-mrr-and-when-it-matters-more-than-recallk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. MRR, and when it matters more than Recall@k
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-ndcg-weights-relevant-results-by-position-against-an-ideal-ranking-why-position-matters-beyond-was-it-retrieved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-faithfulness-vs-relevance-in-rag-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Faithfulness vs. relevance in RAG evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-computing-faithfulness-decomposing-an-answer-into-atomic-claims-scoring-each-against-the-source-with-an-nli-model-or-llm-as-judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-measuring-hallucination-rate-claim-extraction-from-the-output-then-verification-against-retrieved-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-is-perplexity-and-what-does-a-lower-score-actually-tell-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What is perplexity, and what does a lower score actually tell you
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-known-limitations-of-using-an-llm-as-a-judge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Known limitations of using an LLM as a judge
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-how-do-you-evaluate-when-theres-no-ground-truth-answer-only-a-query-and-a-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. How do you evaluate when there's no ground truth answer, only a query and a corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-how-would-you-build-an-eval-dataset-from-scratch-if-you-dont-have-one-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. How would you build an eval dataset from scratch if you don't have one yet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-building-a-retrieval-eval-set-without-labeled-relevant-documents-yet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. Building a retrieval eval set without labeled relevant documents yet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-how-many-examples-before-eval-results-are-statistically-meaningful-not-just-noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. How many examples before eval results are statistically meaningful, not just noise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-how-would-you-compare-two-models-for-a-specific-task-not-just-a-general-leaderboard-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. How would you compare two models for a specific task, not just a general leaderboard score
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-building-a-regression-test-suite-to-catch-a-quality-drop-before-it-ships" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. Building a regression test suite to catch a quality drop before it ships
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-evaluating-continuously-in-production-not-just-once-before-launch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20. Evaluating continuously in production, not just once before launch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21-how-do-you-detect-when-your-retrieval-quality-has-degraded-over-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21. How do you detect when your retrieval quality has degraded over time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#22-high-eval-scores-but-users-still-complaining-what-does-that-gap-tell-you-about-your-eval-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        22. High eval scores but users still complaining — what does that gap tell you about your eval set
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#23-tying-an-eval-metric-back-to-a-business-outcome-a-stakeholder-actually-cares-about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        23. Tying an eval metric back to a business outcome a stakeholder actually cares about
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#24-how-do-you-test-a-non-deterministic-agent-what-does-a-passing-test-suite-actually-assert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        24. How do you test a non-deterministic agent — what does a passing test suite actually assert?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25-how-do-you-know-its-working-tests-evaluation-depth-not-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        25. "How do you know it's working" tests evaluation depth, not confidence
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="22-agent-failure-patterns.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent failure modes</span></a>
+<a class="topic-nav__link topic-nav__next" href="18-security-and-safety.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Security and safety</span></a>
+</div>
+
+<h1 id="evaluation">Evaluation</h1>
+<h2 id="1-how-do-you-evaluate-an-llms-output-beyond-it-looks-correct">1. How do you evaluate an LLM's output beyond "it looks correct"</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Combine automatic metrics (exact match, F1, tests), an LLM-as-judge with a rubric for open-ended quality, and human review on a held-out set; track regressions.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Automatic metrics where deterministic (EM, F1, tests).</li>
+<li>LLM-as-judge with a rubric for open-ended quality.</li>
+<li>Human review on a sample.</li>
+<li>Held-out set + regression tracking.</li>
+</ul>
+<p><strong>Concept.</strong> Combine automatic metrics (exact match, F1, ROUGE/BLEU where applicable, functional/tests for code), an LLM-as-judge with a rubric for open-ended quality, and human review for a sample. Build a held-out eval set with representative and adversarial cases, score consistently, and track regressions across changes. The judge itself must be validated against human agreement; a single metric rarely captures "quality".</p>
+<p><img alt="diagram" src="assets/diagrams/070bfc3c5df8ace56cfc7b9798c08ce88070aa3f.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has several eval layers: the agent-evolution evaluator provides a base evaluator plus exact-match and LLM-judge metrics; the RSI judge uses a structured rubric with per-behavior scores, evidence, and penalties; the online RL judge scores turns with voting; and an example harness scores with a judge. There is no retrieval metric, no golden set, and the judges do not see retrieved context.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Several independent eval layers exist. <code>agent_evolving/evaluator/</code> provides <code>BaseEvaluator</code>/<code>DefaultEvaluator</code> plus <code>Metric</code>s: <code>ExactMatchMetric</code> (normalized string match) and <code>LLMAsJudgeMetric</code> (model judge returns 0/1 with a template). The RSI subsystem has a rigorous LLM-as-judge contract requiring a structured JSON verdict with per-behavior scores, evidence, weights, and forbidden-behavior penalties. The online RL judge scores single turns as reward with <code>num_votes</code> voting. PerStream uses GPT-3.5 as a judge and aggregates accuracy/score/latency/VRAM, and <code>rsi best_of_n</code> scores workspaces by test pass counts, diff size, and lint errors. <code>EvolutionPipeline</code> runs an agent against a benchmark for N iterations and reports pass rate/convergence.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:17-66</code></td>
+<td>LLMAsJudgeMetric; agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12-45 — ExactMatchMetric; agent-core/openjiuwen/agent_evolving/evaluator/metrics/<strong>init</strong>.py:7-11 registry</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator.py:1-9</code></td>
+<td>DefaultEvaluator / MetricEvaluator</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:57-88</code></td>
+<td>rubric/required/forbidden contract; :167-214 weighted scoring + evidence</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:28-104</code></td>
+<td>judge reward, num_votes</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/score_passive_judge.py:28-124</code></td>
+<td>GPT-3.5 judge; :247-366 aggregate metrics</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119</code></td>
+<td>tests/lint/diff scoring</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/evaluators.py:1-16</code></td>
+<td>static/trace evaluators incl. LLMJudgeEvaluator</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-why-evaluate-retrieval-and-generation-as-two-separate-stages-instead-of-one-end-to-end-score">2. Why evaluate retrieval and generation as two separate stages instead of one end-to-end score</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> An end-to-end score says 'wrong' but not why: if retrieval missed the doc, no generator can fix it; if the doc was retrieved, it's a generation/grounding failure.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Separate stages → attribution.</li>
+<li>A retrieval miss can't be fixed by the generator.</li>
+<li>Retrieved-but-wrong = generation/grounding.</li>
+</ul>
+<p><strong>Concept.</strong> An end-to-end score tells you "the answer was wrong" but not why. If retrieval missed the document, no generator can fix it; if the document was retrieved but the answer is wrong, the generator (or grounding) is at fault. Stage-level metrics — Recall@k / precision@k / NDCG for retrieval, faithfulness / correctness for generation — let you attribute the failure and fix the right component. End-to-end stays as the final acceptance check.</p>
+<p><img alt="diagram" src="assets/diagrams/c991db3a87cf489e85ffa4e522236ad73667c887.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen the two stages are structurally separate but also separately un-instrumented: retrieval has no quality metric (no recall, precision, MRR, or NDCG), and the answer-level judges never receive the retrieved context. So it can produce an end-to-end score but cannot attribute a failure to retrieval versus generation.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The stages are structurally separate but also separately un-instrumented. Retrieval (<code>core/retrieval</code>) has no quality metric of any kind (no Recall@k/Precision@k/MRR/NDCG). Generation has answer-level judges that do not receive the retrieved context. So the codebase can produce end-to-end grader scores (<code>evaluator_pipeline</code> <code>pass_rate</code>, RSI weighted score) but cannot say whether a failure was retrieval or generation.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:42</code></td>
+<td>Metric.compute(prediction, label), no ranked-list/k signature</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/__init__.py:11</code></td>
+<td>exports only Metric, ExactMatchMetric, LLMAsJudgeMetric</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code></td>
+<td>judge gets question/expected/answer, not retrieved context</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:311</code></td>
+<td>end-to-end pass_rate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code></td>
+<td>end-to-end weighted score</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-why-exact-match-scoring-fails-when-a-correct-answer-can-be-phrased-multiple-valid-ways">3. Why exact-match scoring fails when a correct answer can be phrased multiple valid ways</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Exact match needs the output to equal the reference, so 'Paris' and 'The capital is Paris' both fail despite being correct; it's brittle to wording and format.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Requires full-string equality.</li>
+<li>Brittle to wording, articles, ordering.</li>
+<li>Use only on constrained answers; judge for paraphrase.</li>
+</ul>
+<p><strong>Concept.</strong> Exact match requires the output string to equal the reference, so "Paris" vs "The capital is Paris" both fail even when correct. It is brittle to wording, formatting, articles, and ordering. Use it only for tasks with a canonical form (classification labels, IDs, single tokens); otherwise use semantic/normalized metrics (LLM judge, embedding similarity, or task-specific parsers).</p>
+<p><img alt="diagram" src="assets/diagrams/eff1fc98d63abea84a80b8376b012a06b5d33403.png" /></p>
+<p><strong>In Jiuwen.</strong> There are two exact-match implementations: one normalizes case and whitespace but still requires full-string equality, and the RSI judge is strict equality with no normalization. Paraphrase is covered only by the LLM judges, so exact match should be reserved for constrained answers.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Two exact-match implementations exist. <code>ExactMatchMetric</code> normalizes lowercase/strip/whitespace but still requires full-string equality; RSI's <code>ExactMatchJudger</code> is strict <code>==</code> with no normalization. The LLM judges cover paraphrase — the <code>LLMAsJudgeMetric</code> prompt judges semantic consistency, and PerStream's GPT judge explicitly accepts synonyms/paraphrases — but they are non-deterministic and uncalibrated, and there is no deterministic paraphrase-robust metric (e.g. normalized/embedding similarity).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:36</code></td>
+<td>normalized equality; :40 _normalize (lower/strip/collapse)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/exact_match.py:50</code></td>
+<td>strict == expected; :30 rejects rubric/files</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:4</code></td>
+<td>semantic consistency judge</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/evaluators.py:520</code></td>
+<td>exact-match shortcut then LLM fallback</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/score_passive_judge.py:57</code></td>
+<td>"Consider synonyms or paraphrases as valid matches"</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-recallk-and-what-a-low-score-tells-you-about-your-retrieval-setup">4. Recall@k, and what a low score tells you about your retrieval setup</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Fraction of a query's relevant documents retrieved in the top-k, averaged over queries (hit-rate when one relevant doc). A low score means retrieval is missing content.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Recall@k = relevant-in-top-k / total relevant.</li>
+<li>Low → retrieval (embedding/chunking/query) is failing.</li>
+<li>Distinguishes missing content from ranking issues.</li>
+</ul>
+<p><strong>Concept.</strong> Recall@k is the fraction of a query's relevant documents that are retrieved in the top-k, averaged over queries (when each query has exactly one relevant document this reduces to hit-rate/success@k). A low score means retrieval (not generation) is the failure: relevant content is missing from the candidate set, so no reranker or prompt can recover it. Diagnose by checking chunking (answer split/lost), embedding fit, whether the query and index use the same model, and whether exact-match terms need a sparse leg.</p>
+<p><img alt="diagram" src="assets/diagrams/68b2a2c38f5c7b57e3faf375d076f3acebab1555.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has no Recall@k implementation. The only recall-looking code is a classification evaluator for the proactive-memory gate in an example, which is not ranked retrieval against gold documents. Recall must be computed externally with your own labeled set.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no <code>Recall@k</code> implementation. The only recall-looking code is a <strong>classification</strong> evaluator for the proactive-memory gate in <code>examples/PerStream/src/eval/</code> ("TA (Recall)" = TP/(TP+FN) over proactive-memory moments), which is not ranking retrieval against gold documents. <code>recall_compressed_context</code> is named "recall" but is a BM25 lookup returning chunks, not a metric. Nothing computes retrieved-vs-relevant overlap at rank k.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:355</code></td>
+<td>get_ta_recall = TP/(TP+FN) (classification, not retrieval@k)</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/test_remember_gate.py:180</code></td>
+<td>sklearn recall_score (gate classifier)</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:92</code></td>
+<td>LLM-judged memory metrics</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/forked/compressor/recall/retriever.py:27</code></td>
+<td>recall_compressed_context (name only)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-does-precisionk-differ-from-recallk">5. How does Precision@k differ from Recall@k?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Fraction of the top-k that are relevant; trades off with recall — raising k raises recall and usually lowers precision.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Precision@k = relevant-in-top-k / k.</li>
+<li>Higher k → recall up, precision usually down.</li>
+<li>Both can look fine while real quality is poor.</li>
+</ul>
+<p><strong>Concept.</strong> Precision@k is the fraction of the top-k that are relevant; recall@k is the fraction of all relevant documents that were retrieved. They trade off: raising k raises recall but usually lowers precision.</p>
+<p><img alt="diagram" src="assets/diagrams/56c1c00f9a8a4a86115c8e9abaf3120da3b06b08.png" /></p>
+<p><strong>In Jiuwen.</strong> Precision@k is absent; the only precision present is classification/answer precision in an example and a gate test. The retrieval stack returns an ordered candidate list but never scores how many of the top-k were relevant, so retrieval precision must be measured externally.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Precision@k is <strong>absent</strong>. The only precision present is classification/answer precision: PerStream's “TV (Precision)” = TP/(TP+FP) and sklearn <code>precision_score</code> in a gate test. The retrieval stack returns an ordered candidate list and a cross-encoder can re-sort it, but never compares the ordering to graded relevance.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:362</code></td>
+<td><code>get_tv_precision()</code> = <code>tp / total_pred_not_nil</code></td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/eval_proactive_reduction.py:189</code></td>
+<td><code>tv_precision</code></td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/test_remember_gate.py:22</code></td>
+<td>sklearn <code>precision_score</code></td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code></td>
+<td><code>rerank(...)</code> re-sorts, no precision measurement</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-why-can-precision-and-recall-both-look-fine-while-the-pipeline-is-broken">6. Why can precision and recall both look fine while the pipeline is broken?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Both can be low when embedding/chunking is wrong or the corpus lacks the answer — a plausible top-3 can be mostly irrelevant.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Wrong embedding/chunking → nothing relevant ranked.</li>
+<li>Corpus lacks the answer → nothing to retrieve.</li>
+<li>Plausible output is not quality; measure it.</li>
+</ul>
+<p><strong>Concept.</strong> Both can be low even when the outputs look plausible: if the embedding or chunking is wrong, nothing relevant is ranked highly; and if the corpus simply lacks the answer, no retriever can find it. A plausible top-3 can still be mostly irrelevant — which is exactly why you need numbers, not vibes.</p>
+<p><img alt="diagram" src="assets/diagrams/00ecc4062fc27e339a3e96893f686699d002877f.png" /></p>
+<p><strong>In Jiuwen.</strong> The retrieval stack ranks and can re-sort candidates, but never compares the ordering to graded relevance, and the evaluator zips predictions/labels without a relevance-per-rank notion — so the gap stays invisible.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The retrieval stack produces an ordered candidate list — and a cross-encoder can re-sort it — but never compares that ordering against graded relevance, so there is no precision@k/recall@k to reveal the gap. Evaluation metrics zip predictions/labels without any relevance-per-rank notion.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code></td>
+<td><code>rerank(...)</code> re-sorts, no precision measurement</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:60</code></td>
+<td><code>compute_batch</code> zips predictions/labels, no relevance-per-rank</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-mrr-and-when-it-matters-more-than-recallk">7. MRR, and when it matters more than Recall@k</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Mean of 1/rank of the first relevant result; matters when the single best hit and its position are what count.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>MRR = mean of 1/rank of first relevant hit.</li>
+<li>Best when one strong hit is needed (lookup/FAQ).</li>
+<li>Complements recall/NDCG.</li>
+</ul>
+<p><strong>Concept.</strong> MRR is the mean of <code>1/rank</code> of the first relevant result. It matters when the user/system mostly needs the single best hit and the position of the first correct answer is what counts (FAQ lookup, "open the right doc", navigation). Recall@k matters when a set of results is consumed together (context stuffing). MRR ignores everything after the first relevant hit, so it is blind to recall.</p>
+<p><img alt="diagram" src="assets/diagrams/9eb6d7f8332f5d17c4be68e85d856aa08e318f44.png" /></p>
+<p><strong>In Jiuwen.</strong> MRR is not implemented. The retrieval stack uses reciprocal rank fusion to merge candidate lists and a weighted score combination in the graph store — those are rank-fusion algorithms, not an evaluation metric — so MRR must be computed externally.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>MRR is not implemented anywhere; there is no reciprocal-rank or first-relevant-rank helper. The retrieval stack uses Reciprocal <strong>Rank Fusion</strong> (<code>rrf_fusion</code>, <code>1/(k+rank)</code>) and a separate weighted score combination (<code>WeightedRankConfig</code>) in the graph store — rank-fusion algorithms, not an evaluation metric. The product's <code>bm25_rank_to_score</code> converts an FTS5 rank to a similarity score, also not MRR.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/utils/fusion.py:15</code></td>
+<td>rrf_fusion (rank fusion, not MRR)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/result_ranking.py:85</code></td>
+<td>RRFRankConfig (k=40 fusion config); :61 WeightedRankConfig</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/internal.py:165</code></td>
+<td>bm25_rank_to_score (rank→score)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/index/simple_memory_index.py:348</code></td>
+<td>sorts by score only</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-ndcg-weights-relevant-results-by-position-against-an-ideal-ranking-why-position-matters-beyond-was-it-retrieved">8. NDCG: weights relevant results by position against an ideal ranking — why position matters beyond "was it retrieved"</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Discounts each relevant result by log2(rank+1) and normalizes by the ideal ordering, rewarding good positions and supporting graded relevance.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Discount by position (log2 rank+1).</li>
+<li>Normalize by the ideal ranking.</li>
+<li>Supports graded relevance.</li>
+</ul>
+<p><strong>Concept.</strong> NDCG discounts each relevant result by <code>log2(rank+1)</code> and normalizes by the ideal (best-possible) ordering, so it rewards putting the most relevant documents at the top and supports graded relevance (not just binary). It matters when ranking quality — not just presence — drives the user experience, and is the standard metric for reranker comparisons. Recall@k treats all positions within k equally; NDCG does not.</p>
+<p><img alt="diagram" src="assets/diagrams/0bbb023c69ad0bdb455774db4317c72cd77bbc74.png" /></p>
+<p><strong>In Jiuwen.</strong> NDCG is absent: there is no discounted cumulative gain, no gain/discount term, and no graded relevance. Ranking code produces cross-encoder and fusion scores used to sort, but never evaluates an ordering against relevance grades.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>NDCG is <strong>absent</strong> — no discounted cumulative gain, no gain/discount term, and no graded relevance anywhere. Ranking code produces cross-encoder scores and RRF fusion scores used to sort, but never evaluates an ordering against relevance grades.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code></td>
+<td>cross-encoder re-rank produces scores, no DCG</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/result_ranking.py:85</code></td>
+<td>RRF/WeightedRank configs; no gain/discount</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/utils/fusion.py:20</code></td>
+<td>RRF only</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/__init__.py:11</code></td>
+<td>only three metrics exported</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-faithfulness-vs-relevance-in-rag-evaluation">9. Faithfulness vs. relevance in RAG evaluation</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Relevance = are the retrieved passages on-topic for the query. Faithfulness/groundedness = is the answer actually supported by the retrieved context.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Relevance: context vs query.</li>
+<li>Faithfulness: answer vs context.</li>
+<li>Both are needed; they fail differently.</li>
+</ul>
+<p><strong>Concept.</strong> Relevance asks whether retrieved passages are on-topic for the query (context precision/recall). Faithfulness/groundedness asks whether the answer's claims are actually supported by the retrieved context (does it hallucinate beyond the evidence). A system can retrieve relevant context and still be unfaithful, or be faithful to irrelevant context. Measuring faithfulness requires giving the judge the context and checking claim support/citations, not just answer-vs-reference correctness.</p>
+<p><img alt="diagram" src="assets/diagrams/00fc1adee631d63d0410b83517928da3105d8bc0.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest is an accuracy evaluator that judges factual correctness with a rubric but never receives the retrieved context, so it cannot detect unsupported claims; faithfulness must be measured externally.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no retrieval-groundedness, faithfulness, attribution, or context-relevance metric. The closest concepts: symphony's <code>AccuracyEvaluator</code> judges factual correctness with a rubric about hallucination but does not receive the retrieved context, so it cannot detect unsupported-but-plausible claims; the reviewer rubric lists a <code>Correctness</code> dimension ("no hallucination") at weight 0.3; and the RSI judge accepts arbitrary <code>rubric</code>/<code>required_behaviors</code>, so a user <em>could</em> encode a groundedness rule, but none is defined.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/evaluators.py:438</code></td>
+<td>AccuracyEvaluator (correctness, no context input); :560 Completeness; :621 CapabilitySelection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:58</code></td>
+<td>parses only result: true/false, no context/attribution input</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:68</code></td>
+<td>generic rubric contract (no built-in faithfulness dimension)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/web/free_search.py:299</code></td>
+<td>"simple relevance checks" (lexical, not RAG relevance)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-computing-faithfulness-decomposing-an-answer-into-atomic-claims-scoring-each-against-the-source-with-an-nli-model-or-llm-as-judge">10. Computing faithfulness: decomposing an answer into atomic claims, scoring each against the source with an NLI model or LLM-as-judge</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Faithfulness = supported claims / total claims: decompose the answer into atomic claims, check each against the retrieved source (NLI or LLM judge), and average.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Decompose the answer into atomic claims.</li>
+<li>Verify each against the retrieved source.</li>
+<li>Average → faithfulness score.</li>
+</ul>
+<p><strong>Concept.</strong> Faithfulness = supported claims / total claims. Decompose the answer into atomic, verifiable claims; for each, ask an NLI model or LLM judge whether the retrieved source entails it; average. It needs the source context and is claim-level, not answer-level. Low faithfulness with high relevance points at the generator skipping or distorting retrieved evidence.</p>
+<p><img alt="diagram" src="assets/diagrams/9c7fd574e97a0b0d7317268347b7a8b727360532.png" /></p>
+<p><strong>In Jiuwen.</strong> Absent. No judge receives a retrieved source context for faithfulness: the agent-evolution judge template has question, expected answer, and model response but no context slot; the RSI judge carries task, reference, rubric, and evidence artifacts but no retrieved context. Faithfulness is not computable in-repo.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><strong>Absent.</strong> No judge receives a retrieved source context for faithfulness. <code>agent_evolving</code>'s judge template has fields <code>[Question]</code>, <code>[Expected Answer]</code>, <code>[Model Response]</code> with no context/evidence slot; RSI's judge receives task/reference/rubric/evidence artifacts but no retrieval context and does no claim decomposition. Symphony's judge payload can incidentally include the message trace, but it is not a faithfulness pipeline.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/templates.py:32</code></td>
+<td>template fields [Question]/[Expected Answer]/[Model Response]; no context</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code></td>
+<td>prompt formatted with three fields only</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator.py:116</code></td>
+<td>same three fields</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/base.py:336</code></td>
+<td>redacted fingerprint+case (incidental context)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/evaluators.py:546</code></td>
+<td>payload filters trace</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-measuring-hallucination-rate-claim-extraction-from-the-output-then-verification-against-retrieved-context">11. Measuring hallucination rate: claim extraction from the output, then verification against retrieved context</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Extract atomic claims, verify each against the retrieved context (LLM judge or NLI), and compute unsupported claims / total claims (or fraction of answers with any unsupported claim).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Extract claims from the answer.</li>
+<li>Verify each against retrieved context.</li>
+<li>Rate = unsupported / total claims.</li>
+</ul>
+<p><strong>Concept.</strong> Extract atomic claims from the answer, then verify each against the retrieved context (LLM-judge or NLI). Hallucination rate = unsupported claims / total claims (or fraction of answers with any unsupported claim). This is stricter than "is the answer correct": it catches answers that are plausible but not grounded, and it requires passing the retrieved context to the checker.</p>
+<p><img alt="diagram" src="assets/diagrams/daac185ecc4dad44d3b302de925949a29aebe676.png" /></p>
+<p><strong>In Jiuwen.</strong> Claim extraction and verification are absent: there is no atomic-claim decomposition, entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is told to cite concrete evidence and not invent observations, but it grades a supplied rubric rather than retrieved context.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Claim extraction and verification are <strong>absent</strong>. There is no atomic-claim decomposition, NLI/entailment model, or groundedness/attribution scorer. The closest is the RSI judge, which is instructed to cite concrete evidence and not invent observations, but grades supplied rubric behaviors rather than extracted claims; Symphony's <code>AccuracyEvaluator</code> asks an LLM to find factual errors but produces a single score with no claim-level decomposition.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/judge_prompt.md:61</code></td>
+<td>"Cite concrete evidence for every verdict… Do not invent observations"</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/judge_evidence.py:90</code></td>
+<td>prepare_judge_workspace (evidence snapshot, no claim checker)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/evaluators.py:438</code></td>
+<td>AccuracyEvaluator; :447 factual-error rubric</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/templates.py:7</code></td>
+<td>judge compares response vs expected answer (no context)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="12-what-is-perplexity-and-what-does-a-lower-score-actually-tell-you">12. What is perplexity, and what does a lower score actually tell you</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Perplexity = exp(-(1/N) sum log p(token_i)); lower means the text is more predictable. It compares LMs on the same text, not a task metric.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Exponential of average negative log-likelihood.</li>
+<li>Lower = more predictable; compare on the same text.</li>
+<li>Not a task/quality metric.</li>
+</ul>
+<p><strong>Concept.</strong> Perplexity is the exponentiated average negative log-likelihood the model assigns to a token sequence: <code>exp(-(1/N)·Σ log p(token_i))</code>. Lower means the model finds the text more predictable — useful for comparing language models on the same data or detecting distribution shift/overfitting. It does not measure factuality, reasoning, instruction-following, or usefulness, and it is only comparable across models that share a tokenizer and data.</p>
+<p><img alt="diagram" src="assets/diagrams/f44deee57ac92814cdd9ba39a83d2e5b3d4f7f99.png" /></p>
+<p><strong>In Jiuwen.</strong> Perplexity is absent: no perplexity or loss-based language-modeling metric is computed. The nearest primitives are token log-probabilities and a softmax over candidate logits used for retrieval or trie selection, not a perplexity score.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Perplexity is absent as a concept or metric — no <code>perplexity</code>/<code>ppl</code>/loss-based language-modeling metric is computed anywhere. The nearest primitives are token log-probabilities and a softmax over candidate logits: candidate logits are normalized to probabilities for retrieval selection, per-completion <code>cumulative_logprob</code> is captured (used for generation summaries/RL) but not converted to perplexity, and <code>ChatReranker</code> exponentiates token logprobs for a yes/no rerank score. The only literal "perplexity" strings are the Perplexity web-search vendor, not the metric.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/retrieval/llm/base/scoring.py:98-115</code></td>
+<td>softmax over candidate logits → probability (retrieval)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:847</code></td>
+<td>cumulative_logprob per completion (not perplexity)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:94-107</code></td>
+<td>exp(logprob) yes/no</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:408-418</code></td>
+<td>stores token logprobs for RL</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/web/paid_search.py:42</code></td>
+<td>"Perplexity" is the search vendor, not the metric</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="13-known-limitations-of-using-an-llm-as-a-judge">13. Known limitations of using an LLM as a judge</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and gameable/injectable; mitigate with position-swapping, voting, agreement reporting, and human calibration.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Biases: position, verbosity, self-preference.</li>
+<li>Noisy, non-deterministic, gameable.</li>
+<li>Mitigate: swap positions, vote, calibrate with humans.</li>
+</ul>
+<p><strong>Concept.</strong> LLM judges are biased (position/order, verbosity, self-preference), noisy, non-deterministic, and can be gamed or prompt-injected. They need position-swapping, multiple votes, agreement reporting, human calibration on a golden set, and must distinguish "judge failed" from "answer wrong". A single unvalidated judge score is a weak signal.</p>
+<p><img alt="diagram" src="assets/diagrams/76fbb9e96c1e3c7e88444c8bb680395ac7bda46f.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has four judge implementations. One is a single call that parses to true/false and converts exceptions to zero (conflating judge failure with a wrong answer); the RSI judge does one format retry on frozen evidence and guards against injecting prior output; the online judge uses voting. Bias mitigations are partial.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Four judge implementations exist. <code>agent_evolving</code>'s <code>LLMAsJudgeMetric</code> is a single call, parses to <code>true/false</code>, and converts exceptions to <code>0.0</code> (conflating "judge failed" with "answer wrong"). RSI's judge does one format retry on frozen evidence and guards against injecting "prior output" as trusted data, but is still single-judgment. Symphony's <code>LLMJudgeEvaluator</code> is <code>temperature=0.0</code> with one repair retry. Only the online RL <code>JudgeScorer</code> uses <code>num_votes</code> parallel votes averaged together. None handles position bias or reports agreement.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:53</code></td>
+<td>single invoke, exception → 0.0; agent-core/openjiuwen/agent_evolving/evaluator/evaluator.py:123 — same failure pattern</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/llm_as_judge.py:121</code></td>
+<td>two-attempt loop; :152 untrusted prior-output guard</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/base.py:262</code></td>
+<td>single judge call + one repair retry; :401 temperature=0.0</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/evaluator.py:66</code></td>
+<td>num_votes averaged; :92 raw votes retained</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38</code></td>
+<td>num_votes</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:127</code></td>
+<td>strict single-verdict parsing</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="14-how-do-you-evaluate-when-theres-no-ground-truth-answer-only-a-query-and-a-corpus">14. How do you evaluate when there's no ground truth answer, only a query and a corpus</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Without gold labels: generate synthetic queries from known documents (doc = gold) for retrieval, use an LLM judge with a rubric, or pairwise/few-shot judging.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Synthetic queries from known docs (doc = gold).</li>
+<li>LLM judge with a rubric.</li>
+<li>Pairwise / few-shot judging.</li>
+</ul>
+<p><strong>Concept.</strong> Bootstraps without gold labels: (a) generate synthetic queries from known documents and treat the source document as the gold retrieval target (cheap, works well for retrieval metrics); (b) use an LLM to answer and treat cited passages as relevant (RAGAS-style); (c) judge faithfulness against the retrieved context rather than a reference answer; (d) sample and label by hand a small set to calibrate. The key is that retrieval can be graded with synthetic (query, source-doc) pairs even when answers are unlabeled.</p>
+<p><img alt="diagram" src="assets/diagrams/d69282f8cf361fc39dd683bb5292643df40a0e11.png" /></p>
+<p><strong>In Jiuwen.</strong> Synthetic dataset generation is largely not runnable: the advertised dataset generator exists only as compiled bytecode, and its components are stubs that raise NotImplementedError. The one runnable label-free path is an example harness that generates and judges proactive-memory data.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Synthetic dataset generation is largely not runnable. The advertised <code>rsi/dataset_generator</code> (<code>DatasetGenerator</code>, "model-driven synthetic evaluation dataset generation") exists only as compiled bytecode; its <code>case_generator</code>/<code>task_analyzer</code>/<code>coverage_validator</code> sources are stubs raising <code>NotImplementedError</code>, and the harness explicitly "never generates a dataset". The one runnable label-free builder is the PerStream example, which generates QA/memory pairs from source datasets using GPT-4o-mini. There is no query-generation loop tied to the core evaluator.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/single_harness/iterative.py:134</code></td>
+<td>"never generates a dataset"</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/scripts/generate_dataset.sh:31</code></td>
+<td>LLM-driven QA/memory generation (example only)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code></td>
+<td>LLM judge usable on unlabeled answers but no context</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/dataset_generator/__pycache__/case_generator.cpython-311.pyc</code></td>
+<td>NotImplementedError stubs (no .py source)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="15-how-would-you-build-an-eval-dataset-from-scratch-if-you-dont-have-one-yet">15. How would you build an eval dataset from scratch if you don't have one yet</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Mine real queries, then label by synthetic queries from known documents, by an LLM answering with cited chunks as gold, or by human labeling.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mine real queries from logs.</li>
+<li>Synthetic queries (doc = gold).</li>
+<li>Or LLM answers with citations as gold.</li>
+</ul>
+<p><strong>Concept.</strong> Mine queries from real logs or user questions, then label relevance by (a) synthetic queries generated from known documents (the document is the gold target), (b) LLM answering and treating cited chunks as relevant, or (c) a small hand-labeled calibration set. Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate. For retrieval you can bootstrap (query, source-doc) pairs with no answer labels at all.</p>
+<p><img alt="diagram" src="assets/diagrams/6f3750f6d968767791c5f8c6c6c4fe0285ae49cf.png" /></p>
+<p><strong>In Jiuwen.</strong> The advertised dataset generator is not runnable source: the class exists only as bytecode and its helpers are stubs, and the harness never generates a dataset. The only runnable label-free approach is an example that generates and scores proactive-memory moments, so you must build the dataset yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The advertised <code>rsi/dataset_generator</code> is not runnable source: <code>DatasetGenerator</code> exists only as compiled bytecode, and <code>case_generator</code>/<code>task_analyzer</code>/<code>coverage_validator</code> are stubs raising <code>NotImplementedError</code>; the harness "never generates a dataset". The one runnable label-free builder is the PerStream example (<code>generate_dataset.sh</code> → GPT-4o-mini QA/memory generation). There is no query-generation loop integrated with the core evaluator.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/single_harness/iterative.py:134</code></td>
+<td>"never generates a dataset"</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/scripts/generate_dataset.sh:31</code></td>
+<td>LLM-driven QA/memory generation (example)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/dataset_generator/__pycache__/case_generator.cpython-311.pyc</code></td>
+<td>NotImplementedError stubs (no source)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/base.py:42</code></td>
+<td>metric interface lacks ranked-list eval</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="16-building-a-retrieval-eval-set-without-labeled-relevant-documents-yet">16. Building a retrieval eval set without labeled relevant documents yet</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Bootstrap with real queries from logs, then label relevance with an LLM judge, RAGAS-style (a strong model's cited chunks as gold), or synthetic queries built from known documents.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mine real queries from logs.</li>
+<li>Label via LLM judge or a strong model's citations.</li>
+<li>Or synthesize queries from known documents (doc = gold).</li>
+</ul>
+<p><strong>Concept.</strong> Common bootstraps: mine queries from real logs or user questions, then label relevance by (a) LLM judging candidate chunks, (b) using a strong model to answer and treating cited chunks as relevant (RAGAS-style), or (c) creating synthetic queries from known documents (the document is the gold answer). Start small (50–200 queries), cover query types including exact-match and multi-hop, and iterate; a tiny labeled set beats none.</p>
+<p><img alt="diagram" src="assets/diagrams/d8d020da2a0703d725bd5e991703c39309fd0b48.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no synthetic-query generator, no retrieval eval harness, and no retrieval-relevance judge. The only generate-and-judge code is the proactive-memory evaluation example, which runs inference and uses an LLM to judge memory moments — unrelated to retrieval. So you must build the retrieval eval set and tooling yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no synthetic-query generation, no retrieval eval harness, and no LLM judge for retrieval relevance. The only "generate data + judge" code is the PerStream proactive-memory eval (<code>eval_proactive_dataset.py</code> runs inference; <code>score_proactive_judge.py:annotate</code> uses an LLM to judge memory moments). <code>tests/unit_tests/core/retrieval/</code> contains unit fixtures with mocked retrievers/embeddings asserting shapes, not gold relevance labels. So there is no established path to bootstrap a retrieval eval set here.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/score_proactive_judge.py:35</code></td>
+<td>annotate(...) LLM judge (memory, not retrieval)</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/PerStream/src/eval/eval_proactive_dataset.py:121</code></td>
+<td>run_inference, dataset build for memory task</td>
+</tr>
+<tr>
+<td><code>agent-core/tests/unit_tests/core/retrieval/query_rewriter/test_query_rewriter.py</code></td>
+<td>mock-based unit fixtures</td>
+</tr>
+<tr>
+<td><code>agent-core/tests/unit_tests/core/retrieval/retriever/test_agentic_retriever.py</code></td>
+<td>mock-based agentic test</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code></td>
+<td>rewrite (query generation from user input, not eval-set synthesis)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="17-how-many-examples-before-eval-results-are-statistically-meaningful-not-just-noise">17. How many examples before eval results are statistically meaningful, not just noise</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Depends on effect size and variance; ~100–200 gives a usable signal for one metric, and comparing two systems needs enough to detect the difference. Report variance/confidence, not just a mean.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>~100–200 for a usable single-metric signal.</li>
+<li>Comparing systems needs power for the effect size.</li>
+<li>Report confidence/variance, not a bare mean.</li>
+</ul>
+<p><strong>Concept.</strong> It depends on the effect size and metric variance. As a rule of thumb, ~100–200 examples give a usable signal for a common metric, but if you are comparing two systems you need enough to detect the delta above noise — report confidence intervals (bootstrap) and use paired significance tests on the same examples. For rare events (e.g. hallucination) you need far more, and minority-slice analysis needs hundreds per slice. Never quote a bare average without an error bound.</p>
+<p><img alt="diagram" src="assets/diagrams/300e07924c2551cd180a53fc27a76f7f6a268f09.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no statistical reasoning. The closest is a confidence helper that buckets sample counts into qualitative labels (none, low, normal, high), a hard-coded heuristic rather than a confidence interval; aggregation reports sample counts and pass rates with no significance testing.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no statistical reasoning. The closest construct is Symphony's <code>_confidence(sample_count)</code>, which buckets counts into qualitative labels (0→NONE, 1→LOW, &lt;10→NORMAL, ≥10→HIGH) — a hard-coded heuristic, not a confidence interval. Aggregation reports <code>sample_count</code> and pass/fail counts but computes no standard error, bootstrap, or significance test.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/evaluation/suite.py:560</code></td>
+<td>_confidence(sample_count) heuristic; :378 sample_count attached</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/metrics_collector.py:34</code></td>
+<td>total_cases/passed_cases/average_score (no variance/CI)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/orchestration/config.py:50</code></td>
+<td>min_successes_verified (threshold, not statistics)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/retrieval/build/tree/schema.py:232</code></td>
+<td>structure_sample_size (sampling config)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="18-how-would-you-compare-two-models-for-a-specific-task-not-just-a-general-leaderboard-score">18. How would you compare two models for a specific task, not just a general leaderboard score</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Run both on the same held-out set with identical prompts/decoding, score with task metrics, and compare accuracy plus latency and cost.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Same held-out set, same prompts/decoding.</li>
+<li>Task-appropriate metrics.</li>
+<li>Compare accuracy + latency + cost.</li>
+</ul>
+<p><strong>Concept.</strong> Run both models on the same held-out task set with the same prompts/decoding, score with task-appropriate metrics (exact match, tests, rubric judge), and compare accuracy plus latency and cost; check statistical significance and inspect failure cases. A leaderboard is a prior, not a decision — task fit, cost, latency, and controllability often matter more than a few points of general score.</p>
+<p><img alt="diagram" src="assets/diagrams/f5fbc32f049faedcafcd2e35fbad802d3ede88dc.png" /></p>
+<p><strong>In Jiuwen.</strong> Model selection here is infrastructure routing, not benchmark comparison: the models config defines a router across endpoints and model names with allocation strategies chosen by name, and routing scores health, rate, and latency — not task accuracy. So A/B model comparison must be done externally.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Model selection here is infrastructure routing, not benchmark comparison. <code>agent_teams/models/pool.py</code> defines <code>ModelRouterConfig</code> (one endpoint, many model names) and <code>IntelliRouterConfig</code> (many deployments behind a reliable client router), with allocator strategies chosen by <code>build_model_allocator</code>. IntelliRouter routes by adaptive multi-factor scoring (health, tokens, RPM, latency) and fails over — it does <strong>not</strong> choose by task accuracy. For comparing configs/attempts there is real per-task evaluation: <code>Trainer</code> evaluates each candidate on a validation set and keeps the highest score; <code>rsi best_of_n</code> ranks attempts by tests/diff/lint; the online judge uses <code>num_votes</code> voting. Comparing two models for a task therefore means running your own eval, not a leaderboard feature.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/pool.py:133-235</code></td>
+<td>ModelRouterConfig; :314-392 — IntelliRouterConfig / deployments</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/allocator.py:176/240/357/452/559</code></td>
+<td>allocator strategies + build_model_allocator</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/intelli_router/intelliRouter_demo.py:142-160</code></td>
+<td>adaptive routing weights; :249-264 route within a pinned model pool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:241-272</code></td>
+<td>per-candidate validation scoring, commits best</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/auto_harness/pipelines/best_of_n/attempt_scorer.py:17-119</code></td>
+<td>rank by tests/lint/diff</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:38/58</code></td>
+<td>num_votes judge voting</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="19-building-a-regression-test-suite-to-catch-a-quality-drop-before-it-ships">19. Building a regression test suite to catch a quality drop before it ships</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Fast deterministic unit tests on pipeline components plus a quality eval on a fixed dataset scored the same way each time; store a baseline and fail the build on a drop.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Fast unit tests for components.</li>
+<li>Quality eval on a fixed dataset.</li>
+<li>Baseline + fail on regression.</li>
+</ul>
+<p><strong>Concept.</strong> Combine fast deterministic unit tests on the pipeline components with a quality eval suite on a fixed dataset scored by the same metrics each time; store a baseline and fail the build when the score drops beyond a threshold. Add golden/snapshot tests for prompts and outputs, and gate merges on the suite.</p>
+<p><img alt="diagram" src="assets/diagrams/bb23b220eafd924d3e1e6e3f0be59549d456c665.png" /></p>
+<p><strong>In Jiuwen.</strong> Tests split into fast deterministic unit tests (CI) and end-to-end system tests (usually skipped), with markers for smoke/happy-path versus deeper tests — there is no quality-regression gate in CI. Quality evaluation exists but offline and separate, without a baseline threshold.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Tests split into <code>tests/unit_tests/</code> (fast, deterministic, CI) and <code>tests/system_tests/</code> (E2E, usually skipped). <code>pytest</code> defines markers <code>level0</code> ("smoke / happy-path; PR gate must stay green") and <code>level1</code>, with <code>testpaths=["tests"]</code>. Quality evaluation exists separately: <code>evaluator_pipeline</code> emits <code>pass_rate</code>/<code>improvement</code>/<code>converged</code>, and <code>Trainer</code> compares a candidate's validation score against <code>best_score</code> and commits only improvements. But the CI gate that blocks merges (<code>ci_gate.yaml</code>) declares only <code>lint</code> and <code>type-check</code> — no pytest gate and no eval threshold.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/pyproject.toml:230</code></td>
+<td>pytest config + level0/level1 markers</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code></td>
+<td>gates are only lint and type-check</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:1098</code></td>
+<td>gate dispatch; agent-core/openjiuwen/auto_harness/stages/verify.py:451 ci_gate.run("all"); :509 revert on exhaustion</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code></td>
+<td>improved = val_score &gt; progress.best_score</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:664</code></td>
+<td>_compute_evolution_metrics</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="20-evaluating-continuously-in-production-not-just-once-before-launch">20. Evaluating continuously in production, not just once before launch</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Sample live traffic, score on a schedule or from feedback, and alert on quality drops — separate from error/latency monitoring; watch query drift and retrieval hit rates.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Sample live traffic; score on a schedule.</li>
+<li>Alert on quality drops, not just errors.</li>
+<li>Watch drift in queries and hit rates.</li>
+</ul>
+<p><strong>Concept.</strong> Sample live traffic, score it on a schedule or on feedback, and alert on quality drops — separate from error/latency monitoring. Look for drift in query distribution and retrieval hit rates, track online metrics (thumbs, task success, escalation), and periodically re-run the offline suite on fresh data. The goal is to detect degradation before users report it.</p>
+<p><img alt="diagram" src="assets/diagrams/8099424a1d62e91f65b7bc75a6eb5c7630ba000b.png" /></p>
+<p><strong>In Jiuwen.</strong> There is a live capture-and-score path, but it feeds online RL training, not quality monitoring: it stages each production completion and a judge attaches a score or user reward persisted to a trajectory store. Observability is span, error, and latency based, so there is no production quality monitoring or drift detection.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is a live capture-and-score path, but it serves <strong>online RL training, not quality monitoring</strong>: <code>CapturePipeline</code> stages each production completion and a judge later attaches an LLM score or user reward, persisting to a trajectory sample store. The product writes all spans into a per-session SQLite trajectory store (diagnostic, 7-day retention) for replay. There is no drift detection, no eval traffic-sampling policy, no dashboard, and no quality alert.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/961b27df3d1ec939c1b0f7e8804acd6eac50c743.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/capture_pipeline.py:59</code></td>
+<td>CapturePipeline; :73 before; :110 after; :170 submit_reward</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</code></td>
+<td>flush + judge on follow-up/session end</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/judge_scorer.py:28</code></td>
+<td>live LLM judge score</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/observability/store.py:304</code></td>
+<td>TrajectoryStore; :307 7-day retention (diagnostic)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/observability/sink.py:578</code></td>
+<td>TrajectorySessionSinkRouter; jiuwenswarm/jiuwenswarm/observability/runtime.py:69 — runtime</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py:355</code></td>
+<td>span emission</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="21-how-do-you-detect-when-your-retrieval-quality-has-degraded-over-time">21. How do you detect when your retrieval quality has degraded over time</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Monitor retrieval signals over time — zero-result rate, top-score distributions, click rate, and a periodic re-run of a frozen set — and alert on shifts, sliced per query type.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Zero-result rate + score distributions.</li>
+<li>Periodic re-run of a frozen set.</li>
+<li>Slice per query type/language.</li>
+</ul>
+<p><strong>Concept.</strong> Monitor retrieval-specific signals over time — zero-result rate, top-score distributions, click/select rate, and a periodic re-run of a frozen labeled set (Recall@k/NDCG) — and alert on shifts. Slice by query type/tenant/language, since degradation is often localized (a new format, a corpus change, an embedding-model update). Pair it with generation-side faithfulness/relevance tracking so you can tell a retrieval regression from a generation one.</p>
+<p><img alt="diagram" src="assets/diagrams/65c2bd2586a7ef7b5c121df26f9affe40b7e7330.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no retrieval-quality monitoring and no drift detection: production observability is span-based (error flag, per-session trajectory, cost and usage), i.e., error, latency, and trajectory rather than quality. Offline evaluation exists but does not track retrieval over time, so you would build this monitoring yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no retrieval-quality monitoring and no drift detection. Production observability is span-based: OTel spans with an error flag, a per-session trajectory store, and cost/usage facts — error/latency/trajectory, not quality. Offline evaluation exists (<code>rsi/evaluator</code>, <code>evaluator_pipeline</code>) but is not an online quality monitor, and there is no frozen retrieval metric to trend.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/run_span.py:289</code></td>
+<td>error status recorded; agent-core/openjiuwen/harness/observability/setup.py:54 — OTel lifecycle</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code></td>
+<td>has_error; :137 trajectory_current_records</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code></td>
+<td>offline bench.evaluate; :668 _compute_evolution_metrics</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trainer/trainer.py:217</code></td>
+<td>validation-score gate (offline)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="22-high-eval-scores-but-users-still-complaining-what-does-that-gap-tell-you-about-your-eval-set">22. High eval scores but users still complaining — what does that gap tell you about your eval set</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> The eval set doesn't represent real usage: too-easy or synthetic queries, no adversarial/long-tail cases, missing slices, or a metric that rewards style over task success.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Eval set not representative of real usage.</li>
+<li>Missing adversarial/long-tail/slices.</li>
+<li>Metric rewards the wrong thing.</li>
+</ul>
+<p><strong>Concept.</strong> The gap means the eval set does not represent real usage: too-easy or synthetic queries, no adversarial or long-tail cases, missing slices (language, domain, intent), a metric that rewards style over usefulness, or unmeasured dimensions (latency, verbosity, tone, refusals). The fix is to mine real complaints/failed sessions for queries, add them to the set, and re-baseline — the eval set is a moving target aligned to production.</p>
+<p><img alt="diagram" src="assets/diagrams/d2e26afd1cdcd6655070b212d4506bb79d047632.png" /></p>
+<p><strong>In Jiuwen.</strong> Feedback capture is partial, so the gap is not detectable in-product: explicit like/dislike exists only for proactive recommendations, and for normal chat feedback is inferred (a classifier judging whether a message is corrective and whether tasks succeeded). There is no in-product signal tying eval scores to user satisfaction.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Feedback capture is partial, so the gap is not detectable in-product. Explicit like/dislike exists only for <strong>proactive recommendations</strong> (<code>feedback_collector.record_feedback</code>); for normal chat, feedback is inferred (an LLM classifying whether a user message is corrective, and the online-RL judge consuming the next user turn as feedback). Session tracking records runtime outcome (<code>succeeded/failed/waiting_user</code>), which is execution success, not answer quality. There is no general thumbs-up/down or satisfaction signal to reconcile against eval scores.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/recommendation/feedback_collector.py:47</code></td>
+<td>record_feedback (explicit, proactive only); jiuwenswarm/jiuwenswarm/common/schema/message.py:141 — PROACTIVE_FEEDBACK</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/signal/from_conv.py:327</code></td>
+<td>detect_user_intent infers corrective feedback</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/agent_rl/online/judge/evaluator.py:39</code></td>
+<td>judge takes followup_user_feedback; agent-core/openjiuwen/agent_evolving/agent_rl/online/gateway/trajectory/judge_dispatcher.py:30</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:544</code></td>
+<td>_TurnOutcomeTracker (runtime outcome)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/signal/review_feedback.py:117</code></td>
+<td>ReviewFeedbackAttributor</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="23-tying-an-eval-metric-back-to-a-business-outcome-a-stakeholder-actually-cares-about">23. Tying an eval metric back to a business outcome a stakeholder actually cares about</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Translate quality into the business proxy it moves (task success, deflection, time-to-resolution, cost per resolution), and build a labeled bridge from the offline metric to that outcome.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Pick the business proxy (success, deflection, cost).</li>
+<li>Correlate the offline metric to the proxy.</li>
+<li>Use the offline metric as the fast proxy.</li>
+</ul>
+<p><strong>Concept.</strong> Translate model quality into the business proxy it moves: task success rate, deflection/containment, time-to-resolution, conversion, retention, or cost-per-resolution. Build a labeled bridge — correlate your offline metric with the business KPI on a sample — and report both. A metric no stakeholder can act on will not survive budget season; pick one that maps to money or time saved.</p>
+<p><img alt="diagram" src="assets/diagrams/165148484c024008f2a8da8a93ca91b2a2bb6b63.png" /></p>
+<p><strong>In Jiuwen.</strong> Metrics here are engineering and task-completion, not business KPIs: a goal evaluator scores whether an objective is complete or blocked, a success detector maps a task to success, partial, or fail, and the pipeline aggregates pass rate and average score. The only business-adjacent tracking is infrastructure cost and usage, not outcomes.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Metrics here are engineering/task-completion, not business KPIs. <code>GoalEvaluator</code> scores whether an agent objective is <code>complete</code>/<code>blocked</code>; <code>SuccessDetector</code> maps a task to <code>success/partial/fail</code>; <code>evaluator_pipeline</code>/team verification aggregate <code>pass_rate</code>/<code>avg_score</code>. The only stakeholder-adjacent signal is <strong>cost</strong>: per-session tracking with an optional limit (<code>CostLimitExceededError</code>). There is no conversion, retention, engagement, or user-satisfaction mapping.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/goal/evaluation.py:74</code></td>
+<td>GoalEvaluator (goal completion)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/ttse/success.py:267</code></td>
+<td>SignalBasedSuccessDetector (success/partial/fail); :92 classify_explicit_score</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/base.py:232</code></td>
+<td>aggregate()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/verification/memory.py:160</code></td>
+<td>aggregates pass_rate/avg_score</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:32</code></td>
+<td>cost settings; :65 CostLimitExceededError</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="24-how-do-you-test-a-non-deterministic-agent-what-does-a-passing-test-suite-actually-assert">24. How do you test a non-deterministic agent — what does a passing test suite actually assert?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Assert on structural and behavioral invariants (right tool called, correct exit path, schema valid, within budget) rather than exact output strings — those will always fail on agents.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Tool invariants: right tool called, call was schema-valid, no prohibited tools invoked</li>
+<li>Termination invariants: exited within max_turns via expected path (success/escalation/budget), not exception</li>
+<li>Schema invariants: structured output matched declared JSON schema; required fields present</li>
+<li>Safety and cost invariants: no guardrail-blocked content executed; total tokens within budget</li>
+<li>Jiuwen strategy: mock ModelClientABC to inject controlled responses; test each rail contract independently; use LLM-as-judge for behavioral correctness on eval set</li>
+</ul>
+<p><strong>Concept.</strong> Standard unit tests break on agents: two runs of the same input produce different outputs, so asserting exact output is both fragile and wrong. The correct approach is <strong>invariant-based testing</strong>: assert on structural and behavioral properties that must hold regardless of the specific output. Examples: (1) <strong>Tool invariants</strong> — the right tool was called; the tool call was well-formed and matched the declared schema; no prohibited tools were called. (2) <strong>Termination invariants</strong> — the agent stopped within <code>max_turns</code>; it exited via the expected path (success, escalation, or budget exhaustion), not an exception. (3) <strong>Schema invariants</strong> — structured output matched the declared JSON schema; required fields were present. (4) <strong>Safety invariants</strong> — no guardrail-blocked content in the output; no injected content executed. (5) <strong>Latency/cost invariants</strong> — total tokens stayed within the budget; wall-clock time was under the SLA. For behavioral correctness, use LLM-as-judge on a representative eval set (not a regression test). Reserve exact-string assertions for the small class of deterministic outputs (structured tool arguments with known values, fixed tool names).</p>
+<p><img alt="diagram" src="assets/diagrams/5c11c4e71cc44a08b68c5eb0d0bab6016e52dcbb.png" /></p>
+<p><strong>In Jiuwen.</strong> BaseModelClient (agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:45) is the mockable boundary — inject controlled responses in tests to isolate non-determinism to the model call layer. Rail contract invariants: CircuitBreakerRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303) for termination; StructuredOutputTool (agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:46) for schema; PromptInjectionGuardrail (agent-core/openjiuwen/core/security/guardrail/builtin.py:60) for safety; usage_cost.py:101 for budget. Behavioral correctness: LLMAsJudgeMetric (agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40). Gap: no official test harness; evaluator pipeline is offline, not integrated with pytest.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>agent_evolving/evaluator/</code> provides LLM-as-judge (<code>LLMAsJudgeMetric</code>) for correctness, and the verification agent emits a PASS/FAIL/PARTIAL verdict. Structural invariants map directly to framework rail contracts: <code>CircuitBreakerRail</code> (termination invariant — detects repeated/ping-pong tool calls and aborts); <code>StructuredOutputTool</code> (schema invariant — validates against caller schema); <code>PromptInjectionGuardrail</code> (safety invariant — blocks classified content); <code>usage_cost.py</code> session budget (cost invariant). Test frameworks should mock the model client (<code>BaseModelClient</code>) and inject controlled responses to test each invariant independently. Non-determinism should be isolated to the model call layer so all surrounding logic is unit-testable.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:45</code></td>
+<td>BaseModelClient (mockable boundary)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/execution_guard/circuit_breaker_rail.py:303</code></td>
+<td>termination invariant contract</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/structured_output_tool.py:46</code></td>
+<td>schema invariant</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code></td>
+<td>safety invariant</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code></td>
+<td>cost invariant (session budget)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:40</code></td>
+<td>behavioral correctness via LLM-as-judge</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="25-how-do-you-know-its-working-tests-evaluation-depth-not-confidence">25. "How do you know it's working" tests evaluation depth, not confidence</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> 'How do you know it's working' tests evaluation depth, not confidence.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Offline answer-level eval exists.</li>
+<li>No retrieval metric layer.</li>
+<li>No faithfulness/claim scoring.</li>
+<li>No CI quality gate.</li>
+</ul>
+<p><strong>Concept.</strong> This claim holds: the useful answer is a concrete evaluation process (frozen set, metrics, regression gate), not stated confidence. A fixed eval set, faithfulness scoring on generated claims, and a way to catch silent degradation after an unflagged prompt change. The harder question is how you would know if quality got <em>worse</em>, not just whether it works now: a frozen labeled eval set scored on every change, stage-level metrics (retrieval recall/NDCG; generation faithfulness), a regression gate in CI, and production sampling with drift alerts. Name the baseline and the threshold.</p>
+<p><img alt="diagram" src="assets/diagrams/0d798b3126ce1f3c931a54a6e894ed1ddd7aae95.png" /></p>
+<p><strong>In Jiuwen.</strong> Offline answer-level evaluation exists (exact match, LLM judge, weighted rubric, pipeline pass rate), but there is no retrieval metric layer, no faithfulness or claim-level scoring, and no quality regression gate in CI (the gate config is lint and type-check).</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Offline answer-level evaluation exists (<code>ExactMatchMetric</code>, <code>LLMAsJudgeMetric</code>, RSI weighted rubric, <code>evaluator_pipeline</code> pass-rate), but there is no retrieval metric layer, no faithfulness/claim-level scoring, no quality regression gate in CI (<code>ci_gate.yaml</code> is lint/type-check only), and no production quality monitoring or drift detection — so the "how would you know it got worse" question exposes real gaps.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:47</code></td>
+<td>LLM judge; agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12 — exact match</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code></td>
+<td>weighted rubric</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/evaluator_pipeline/pipeline.py:167</code></td>
+<td>benchmark eval</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code></td>
+<td>gates are only lint/type-check; agent-core/pyproject.toml:236 — level0/level1 markers (not invoked)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/observability/store.py:102</code></td>
+<td>has_error (operations, not quality)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

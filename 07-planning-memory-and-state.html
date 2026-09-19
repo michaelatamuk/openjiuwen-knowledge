@@ -1,0 +1,2828 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="06-tools-and-function-calling.html">
+      
+      
+        <link rel="next" href="22-agent-failure-patterns.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Planning, memory & state - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#planning-memory-and-state" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Planning, memory & state
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="07-planning-memory-and-state.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-does-an-agent-break-a-complex-task-into-smaller-subtasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How does an agent break a complex task into smaller subtasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-you-handle-a-task-where-the-plan-needs-to-change-mid-execution-based-on-a-tools-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How do you handle a task where the plan needs to change mid-execution based on a tool's result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-a-single-step-agent-and-a-multi-step-planning-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between a single-step agent and a multi-step planning agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-whats-the-planner-executor-pattern-and-when-do-you-need-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What's the planner-executor pattern, and when do you need it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-critic-or-reflection-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Critic or reflection loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-does-a-framework-track-state-across-multiple-steps-in-an-agents-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How does a framework track state across multiple steps in an agent's execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-would-you-pause-an-agent-mid-execution-and-resume-it-later-with-the-same-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How would you pause an agent mid-execution and resume it later with the same state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-would-you-add-human-in-the-loop-approval-before-a-specific-step-executes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How would you add human-in-the-loop approval before a specific step executes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-whats-the-difference-between-short-term-and-long-term-memory-in-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. What's the difference between short-term and long-term memory in an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-how-do-you-decide-what-to-store-in-memory-versus-what-to-discard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. How do you decide what to store in memory versus what to discard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-prevent-memory-from-growing-unbounded-across-a-long-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you prevent memory from growing unbounded across a long session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-how-would-you-summarize-conversation-history-without-losing-important-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. How would you summarize conversation history without losing important details
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-memory-augmented-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Memory-augmented agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-how-do-you-detect-and-prevent-memory-contamination-an-agent-remembering-incorrect-facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-how-does-an-agent-break-a-complex-task-into-smaller-subtasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. How does an agent break a complex task into smaller subtasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-you-handle-a-task-where-the-plan-needs-to-change-mid-execution-based-on-a-tools-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How do you handle a task where the plan needs to change mid-execution based on a tool's result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-a-single-step-agent-and-a-multi-step-planning-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between a single-step agent and a multi-step planning agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-whats-the-planner-executor-pattern-and-when-do-you-need-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What's the planner-executor pattern, and when do you need it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-critic-or-reflection-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Critic or reflection loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-does-a-framework-track-state-across-multiple-steps-in-an-agents-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How does a framework track state across multiple steps in an agent's execution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-would-you-pause-an-agent-mid-execution-and-resume-it-later-with-the-same-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How would you pause an agent mid-execution and resume it later with the same state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-would-you-add-human-in-the-loop-approval-before-a-specific-step-executes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How would you add human-in-the-loop approval before a specific step executes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-whats-the-difference-between-short-term-and-long-term-memory-in-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. What's the difference between short-term and long-term memory in an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-how-do-you-decide-what-to-store-in-memory-versus-what-to-discard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. How do you decide what to store in memory versus what to discard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-prevent-memory-from-growing-unbounded-across-a-long-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you prevent memory from growing unbounded across a long session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-how-would-you-summarize-conversation-history-without-losing-important-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. How would you summarize conversation history without losing important details
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-memory-augmented-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Memory-augmented agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-how-do-you-detect-and-prevent-memory-contamination-an-agent-remembering-incorrect-facts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. How do you detect and prevent memory contamination — an agent remembering incorrect facts?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="06-tools-and-function-calling.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Tools and function calling</span></a>
+<a class="topic-nav__link topic-nav__next" href="22-agent-failure-patterns.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent failure modes</span></a>
+</div>
+
+<h1 id="planning-memory-and-state">Planning, memory and state</h1>
+<h2 id="1-how-does-an-agent-break-a-complex-task-into-smaller-subtasks">1. How does an agent break a complex task into smaller subtasks</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Either ask the model to emit a plan/todo list up front, or decompose lazily and revise; store it as structured tasks that can be marked in-progress/done.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Model emits a plan/todo list.</li>
+<li>Or decompose lazily and revise.</li>
+<li>Store as structured tasks with status.</li>
+</ul>
+<p><strong>Concept.</strong> Either the model is asked to emit a plan/todo list up front, or the agent decomposes lazily and revises. Often the decomposition is stored as structured tasks the agent can mark in-progress/completed.</p>
+<p><img alt="diagram" src="assets/diagrams/a23c957ee94dfecd6435ab963205c9bf30d81b6d.png" /></p>
+<p><strong>In Jiuwen.</strong> Decomposition is model-driven through todo tools, not an algorithmic planner: the model's reply requests a todo-create call (prompted by the planning rail's guidance), the ReAct loop executes it, and the tool validates and persists the list. There is no separate planner component producing a plan graph.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Model-driven todo tools, not an algorithmic planner. The model's answer <em>requests</em> a <code>todo_create</code> tool call (prompted by the rail's guidance to plan when the task warrants it); the ReAct loop then executes it, and the tool validates and persists the list. <code>TodoCreateTool</code> takes a JSON array of <code>{id, content, activeForm, description}</code> and persists a <code>todo.json</code> per session; <code>TaskPlan</code> stores the goal plus ordered <code>TodoItem</code>s with <code>depends_on</code> and resolves the next task. <code>TaskPlanningRail</code> registers the todo tools and injects planning guidance, and the <code>Plan</code> agent mode adds a <code>task_tool</code> to delegate subtasks to subagents.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/todo.py:193</code></td>
+<td>TodoCreateTool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/todo.py:113</code></td>
+<td>per-session todo.json</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/task.py:97</code></td>
+<td>TaskPlan</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:31/108/152</code></td>
+<td>rail, tool registration, guidance</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/agent_mode_rail.py:645</code></td>
+<td>plan-mode task_tool</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-how-do-you-handle-a-task-where-the-plan-needs-to-change-mid-execution-based-on-a-tools-result">2. How do you handle a task where the plan needs to change mid-execution based on a tool's result</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Allow plan mutation during the run — add, reorder, cancel, replace tasks — and support steering with new instructions; keep the authoritative plan separate from live state.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mutate: add/reorder/cancel/replace tasks.</li>
+<li>Steer with new instructions.</li>
+<li>Reconcile plan vs live state.</li>
+</ul>
+<p><strong>Concept.</strong> Allow plan mutation during the run: the agent can add, reorder, cancel, or replace tasks, and can be steered by new instructions. Track the authoritative plan separately from the live state so they can be reconciled.</p>
+<p><img alt="diagram" src="assets/diagrams/3c1a704b9c4a01a858c4c3ad3b3ac6db60e0c4d9.png" /></p>
+<p><strong>In Jiuwen.</strong> Several mechanisms: a todo tool supports update/delete/cancel/append/insert with a single-in-progress invariant; the planning rail reconciles todos against the authoritative plan each outer round; and steering messages inject new instructions that are drained before the next model call. So the plan can be revised mid-execution while staying consistent.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Several mechanisms. <code>TodoModifyTool</code> supports update/delete/cancel/append/insert operations with a single-in-progress invariant. <code>TaskPlanningRail._sync_todos_from_plan</code> reconciles todos against the authoritative <code>TaskPlan</code> each outer round. Steering messages inject new instructions and are drained before each model call. Mode transitions enter/exit plan with an approval gate.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/todo.py:473</code></td>
+<td>TodoModifyTool operations</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/todo.py:621</code></td>
+<td>single-in-progress invariant</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:320</code></td>
+<td>reconcile todos from plan</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2756</code></td>
+<td>drain steering before model call</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:687</code></td>
+<td>ctx.push_steering</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/agent_mode_rail.py:460</code></td>
+<td>enter/exit plan gate</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_rail.py:74</code></td>
+<td>product plan-approval rail</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-whats-the-difference-between-a-single-step-agent-and-a-multi-step-planning-agent">3. What's the difference between a single-step agent and a multi-step planning agent</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Two axes: single-step vs multi-step (how many model↔tool cycles) and reactive vs planning (whether an explicit plan is kept and updated).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Axis 1: number of model/tool cycles.</li>
+<li>Axis 2: explicit plan vs none.</li>
+<li>The two are independent.</li>
+</ul>
+<p><strong>Concept.</strong> Two axes, not one. <em>Single-step vs multi-step</em> is how many model↔tool cycles run. <em>Reactive vs planning</em> is whether the agent keeps an explicit plan (a todo list / task plan) that it creates up front and updates as it goes. Planning normally implies multi-step, but multi-step does not imply planning.</p>
+<p><img alt="diagram" src="assets/diagrams/0df0bb6cd5d43b2e475625866e0ae54cfa598033.png" /></p>
+<p><img alt="diagram" src="assets/diagrams/40703c4541db583934d1e8819c88cbbcf1baf854.png" /></p>
+<p><img alt="diagram" src="assets/diagrams/221482e3e6e20d1b49998d32477d1275f69781a3.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen keeps the axes separate: the ReAct agent is multi-step reactive (loops with no explicit plan), while planning is an additive rail that registers todo tools and persists an ordered plan; the DeepAgent outer task loop adds the planning layer. So 'planning' is a rail you add to a reactive loop, not a different loop.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Jiuwen keeps the two axes as separate layers. <code>ReActAgent</code> is multi-step <strong>reactive</strong>: it loops (bounded by <code>max_iterations</code>) with no explicit plan. Planning is an <em>additive</em> rail: <code>TaskPlanningRail</code> registers the todo tools and <code>TaskPlan</code> persists an ordered plan. <code>DeepAgent</code>'s outer task loop is multi-step <strong>with</strong> planning: each outer round runs a full inner <code>react_agent.invoke</code>, while the persistent <code>TaskPlan</code>/todos carry state between rounds and <code>TaskCompletionRail</code> bounds the loop. So "multi-step" and "planning" are orthogonal.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code></td>
+<td>multi-step reactive loop</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>iteration bound</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:31</code></td>
+<td>planning layer (additive)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:108/152</code></td>
+<td>registers todo tools, injects planning prompt</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/todo.py:193</code></td>
+<td>TodoCreateTool writes todo.json</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/task.py:97</code></td>
+<td>TaskPlan</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2694</code></td>
+<td>multi-step + planning (outer loop)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/task_loop/task_loop_event_executor.py:222</code></td>
+<td>one outer round = one inner invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_completion_rail.py:74</code></td>
+<td>completion rail bounds the loop</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-whats-the-planner-executor-pattern-and-when-do-you-need-it">4. What's the planner-executor pattern, and when do you need it</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A planner produces the steps; one or more executors carry them out, often with a supervisor re-planning — useful when planning needs a global view and execution is parallel/specialized.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Planner produces steps.</li>
+<li>Executors carry them out.</li>
+<li>Supervisor re-plans; parallel/specialized execution.</li>
+</ul>
+<p><strong>Concept.</strong> A planner produces the plan/steps; one or more executors carry them out, often with a supervisor re-planning. Useful when planning needs a global view while execution is parallelizable or specialized, and when separating "decide" from "do" improves reliability.</p>
+<p><img alt="diagram" src="assets/diagrams/238f1629d89cfebce27746bb0ebbe9cc92852319.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has three related patterns: a scheduled-dispatch leader (a scheduler scans the task board and hands pending tasks to idle members, then reviews); supervisor routing (a hierarchical team sends to a supervisor agent that calls sub-agents as tools); and a dedicated plan subagent. Planner-executor here is realized through team scheduling and supervision rather than a single class.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Three patterns exist. (a) Scheduled-dispatch leader: <code>TeamScheduler</code> scans the task board and dispatches assigned pending tasks to idle members, then reviews. (b) Supervisor routing: <code>HierarchicalTeam</code> sends to a <code>SupervisorAgent</code> that calls sub-agents-as-tools via <code>P2PAbilityManager</code>. (c) A dedicated plan subagent invoked via <code>task_tool</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92/208/239</code></td>
+<td>TeamScheduler scan/dispatch/review</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus</code></td>
+<td>supervisor routing</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/subagents/plan_agent.py:88</code></td>
+<td>dedicated plan subagent</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-critic-or-reflection-loop">5. Critic or reflection loop</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A self-check before returning: the primary agent drafts, a critic reviews against the request or rules, and the primary revises if it fails.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Draft, then critique.</li>
+<li>Revise on failure.</li>
+<li>Adds a verification step.</li>
+</ul>
+<p><strong>Concept.</strong> a self-check before returning. The primary agent drafts; a critic reviews it against the request or rules; if it fails, the primary revises. Adds a verification step for high-stakes output. Used for: financial summaries, compliance checks, high-stakes outputs where a wrong answer is costly.</p>
+<p><img alt="diagram" src="assets/diagrams/ffaf47fd89ee029978c791bc6b492ab5d2e18f98.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no generic draft-critique-revise loop in the single-agent ReAct path, but the pieces exist: a verification agent restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL, and a team reviewer that scores correctness.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no generic draft→critique→revise loop in the single-agent ReAct path, but the pieces exist: a <strong>verification agent</strong> restricted to read-only tools that must show verbatim evidence and emit PASS/FAIL/PARTIAL; an <code>agent_teams</code> reviewer that scores <code>Correctness</code>/completeness with rework thresholds; and the RSI weighted-rubric judge. These run as separate review layers, not as an in-loop reflection that blocks generation.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92</code></td>
+<td>VerificationRail allowlist; agent-core/openjiuwen/harness/subagents/verification_agent.py:51 — PASS/FAIL/PARTIAL</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:26/43/279</code></td>
+<td>review dimensions + rework thresholds</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/evaluator/judger/scoring.py:193</code></td>
+<td>weighted rubric judge</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-how-does-a-framework-track-state-across-multiple-steps-in-an-agents-execution">6. How does a framework track state across multiple steps in an agent's execution</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A state object threaded through (or held per session) that each step reads/writes; conversation history is usually separate from working state; persist via checkpoints.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Working state object per session.</li>
+<li>Separate conversation history from task state.</li>
+<li>Checkpoint for persistence.</li>
+</ul>
+<p><strong>Concept.</strong> A state object (dict or dataclass) is threaded through the steps or held per session; each node reads and writes it. Conversation history is usually separate from working state. Frameworks persist state via checkpoints so a run can be resumed or audited.</p>
+<p><img alt="diagram" src="assets/diagrams/97f4d1e071ff3cdda3cd51db205f3efb4ca60511.png" /></p>
+<p><strong>In Jiuwen.</strong> State lives in three checkpointed layers: the agent layer keeps a state collection (global plus agent state) inside the session; the workflow layer keeps a different state collection split into IO, global, comp, and workflow state; and conversation history is its own structure. Each layer is checkpointed independently.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>State lives in three layers that are checkpointed independently. The agent layer uses <code>StateCollection</code> (a <code>global_state</code> + <code>agent_state</code>) inside <code>AgentSession</code>. The workflow layer uses a different <code>StateCollection</code> split into <code>io_state</code>, <code>global_state</code>, <code>comp_state</code>, and <code>workflow_state</code>. Conversation history is a separate <code>ContextMessageBuffer</code> inside <code>SessionModelContext</code>, flushed to session global state by <code>ContextEngine.save_contexts</code>. Graph execution adds a third layer — <code>GraphState</code> (step, channel snapshot, pending buffer/nodes, node versions) persisted through a <code>Store</code>/checkpointer keyed by <code>(session_id, ns)</code> and restored in <code>PregelLoop.init</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/5d5fb55024351b593e3784f22cd1f0109ed89f43.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/internal/agent.py:36</code></td>
+<td>AgentSession.<strong>init</strong> creates StateCollection; :74 create_workflow_session passes global state into InMemoryState</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/state/agent_state.py:9</code></td>
+<td>agent StateCollection; :34 get_state</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/state/workflow_state.py:12</code></td>
+<td>workflow StateCollection (io/global/comp/workflow); :100 get_workflow_state; :151 get_state</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/context.py:64</code></td>
+<td>SessionModelContext; :1519 save_state(); :1526 load_state</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/store/base.py:31</code></td>
+<td>GraphState dataclass; :41 Store ABC</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:39</code></td>
+<td>PregelLoop.init reads saved state; :44 restore path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/checkpointer/persistence.py:299</code></td>
+<td>_get_state_to_save; :352 WorkflowStorage.save</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context_engine.py:589</code></td>
+<td>save_contexts</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-would-you-pause-an-agent-mid-execution-and-resume-it-later-with-the-same-state">7. How would you pause an agent mid-execution and resume it later with the same state</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Pause needs a durable checkpoint at a safe boundary or a first-class interrupt that unwinds the run preserving state; resume reloads the checkpoint or replays the suspended step.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Durable checkpoint or interrupt signal.</li>
+<li>Preserve state while unwinding.</li>
+<li>Resume by reload or replay.</li>
+</ul>
+<p><strong>Concept.</strong> Pause requires either a durable checkpoint at a safe boundary or a first-class interrupt/suspend signal that unwinds the run while preserving state. Resume reloads the checkpoint (or replays the suspended step) and continues. The hard part is non-idempotent side effects: replay must be safe.</p>
+<p><img alt="diagram" src="assets/diagrams/1b8d886ece1cce4d3a4e8043b00debe725822b11.png" /></p>
+<p><strong>In Jiuwen.</strong> Two mechanisms. Interrupt rails abort the current tool call by raising an abort error carrying the cause; the framework re-raises it and the ReAct loop catches it, saving conversation context plus the interruption state and returning an interaction result; on resume it replays the interrupted calls with the user's input. The workflow/graph path instead uses checkpointing to pause and restore.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Two mechanisms. <em>Interrupt rails</em> abort the current tool call by raising <code>AbortError(cause=ToolInterruptException(...))</code>; the callback framework re-raises the cause, the ReAct loop catches it, and <code>ToolInterruptHandler.commit_interrupt</code> saves conversation context plus a <code>ToolInterruptionState</code> into session state, returning an <code>INTERACTION</code> result. On resume, <code>handle_resume</code> replays the interrupted tool calls with the user's <code>InteractiveInput</code>. <em>Workflow/graph</em> pause uses checkpointing: <code>CompiledGraph._invoke</code> calls <code>checkpointer.pre_workflow_execute</code> (recover or require input) and <code>post_workflow_execute</code> (save on interrupt, clear on completion); <code>PregelLoop</code> snapshots channels/pending nodes on error and restores them in <code>init</code>; provider harnesses expose explicit <code>pause()</code>/<code>resume()</code> gated on <code>HarnessCapability.PAUSE_RESUME</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:237</code></td>
+<td>_raise_interrupt; :243 raises AbortError(cause=ToolInterruptException); re-raised at agent-core/openjiuwen/core/runner/callback/framework.py:1172</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/interrupt/handler.py:279</code></td>
+<td>commit_interrupt; :310 handle_resume; :326 uses preserved state.iteration</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/interrupt/state.py:32</code></td>
+<td>ToolInterruptionState</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/checkpointer/persistence.py:803</code></td>
+<td>pre_workflow_execute; :824 recover on InteractiveInput; :860 post_workflow_execute; :876 save on TASK_STATUS_INTERRUPT</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/graph.py:315</code></td>
+<td>CompiledGraph._invoke; :326 pre; :334 pregel.run; :346 post</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:45</code></td>
+<td>_is_resume; :174 _save_state_on_error; :39 restore in init</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/context.py:1519/1526</code></td>
+<td>save_state/load_state</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2491/2516</code></td>
+<td>load_state/save_state; agent-core/openjiuwen/harness_providers/io_adapter.py:299/308 — pause()/resume()</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-how-would-you-add-human-in-the-loop-approval-before-a-specific-step-executes">8. How would you add human-in-the-loop approval before a specific step executes</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Route sensitive steps through a permission check returning allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and remember/persist rules; fail closed on unknown.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Permission check: allow/ask/deny.</li>
+<li>Pause on ask; resume with the decision.</li>
+<li>Persist allow rules; fail closed.</li>
+</ul>
+<p><strong>Concept.</strong> Route sensitive steps through a permission check that returns allow/ask/deny, pause on ask, surface a confirm payload, resume with the decision, and optionally remember or persist allow rules. Fail closed: unknown should mean "ask", not "allow".</p>
+<p><img alt="diagram" src="assets/diagrams/cc5ae504cbf5953dbce5e7fb5dabf97562f4ec4d.png" /></p>
+<p><strong>In Jiuwen.</strong> Every tool call passes through a permission interrupt rail that calls the permission engine, which merges the tiered tool policy, file guard, and net rules. If the decision is 'ask', it pauses with a confirmation payload and resumes with the user's answer, optionally remembering the rule. Unknown actions are floored to ask (fail closed).</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Tool execution passes through <code>PermissionInterruptRail</code> (subclass of <code>ConfirmInterruptRail</code> ← <code>BaseInterruptRail</code>), which overrides <code>before_tool_call</code> and intercepts <strong>every</strong> tool. On first entry it calls <code>PermissionEngine.check_permission</code>, which merges the tiered tool policy, file guard, and net guard with "strictest wins" and returns <code>ALLOW</code>/<code>ASK</code>/<code>DENY</code>. <code>ALLOW</code> approves; <code>DENY</code> returns a synthetic <code>[PERMISSION_DENIED]</code> tool result; <code>ASK</code> either hits a session auto-confirm key, delegates to a hosted confirmation callback, or raises <code>AbortError(cause=ToolInterruptException(ConfirmPayload.to_schema()))</code> to pause. Resume parses a <code>ConfirmPayload</code> (<code>approved</code>, <code>feedback</code>, <code>auto_confirm</code>, <code>persist_allow</code>); the rail can remember session-scoped or persist an allow rule. Plan-mode exit uses a separate <code>PlanApprovalRail</code>, and <code>AskUserRail</code> reuses the same mechanism for <code>ask_user</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57</code></td>
+<td>PermissionInterruptRail; :186 before_tool_call; :404 resolve_interrupt; :486 ALLOW; :494 DENY; :510-563 hosted confirm + persist; :594-598 ASK → interrupt; :729 _store_auto_confirm</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code></td>
+<td>check_permission; :414 build_permission_interrupt_rail; :426 permissions.enabled gate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588</code></td>
+<td>evaluate_tiered_policy; :502 ASK fallback; :385 DENY precedence</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/models.py:19</code></td>
+<td>PermissionLevel; :52 PermissionConfirmResponse</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/interrupt/interrupt_base.py:243</code></td>
+<td>_raise_interrupt; :248 _skip_tool; :269 _get_user_input</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/interrupt/confirm_rail.py:16</code></td>
+<td>ConfirmPayload; :57 resolve_interrupt</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/interrupt/handler.py:310</code></td>
+<td>handle_resume; :358 re-commit; :384 restore auto-confirm</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:767-782</code></td>
+<td>auto-mount when permissions["enabled"]; jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_rail.py:74 — PlanApprovalRail; agent-core/openjiuwen/harness/rails/interrupt/ask_user_rail.py:29 — AskUserRail</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-whats-the-difference-between-short-term-and-long-term-memory-in-an-agent">9. What's the difference between short-term and long-term memory in an agent</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Short-term is the live working context (recent turns, task state) for the next call; long-term is durable cross-session knowledge retrieved on demand.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Short-term: live context window.</li>
+<li>Long-term: durable, cross-session.</li>
+<li>Long-term is retrieved into the turn.</li>
+</ul>
+<p><strong>Concept.</strong> Short-term is the live working context (recent turns, current task state) needed for the next model call. Long-term is durable knowledge distilled across sessions — facts, preferences, summaries — retrieved on demand.</p>
+<p><img alt="diagram" src="assets/diagrams/9f5d070f3b25346371a845d8144e32e892e5c676.png" /></p>
+<p><strong>In Jiuwen.</strong> Short-term is the session model context with a bounded message buffer; long-term is a typed memory store (variables, user profile, semantic and episodic memory, summaries). The product adds a SQLite/FTS5 hybrid index over markdown memory files, and retrieval into the current turn happens through a memory-search tool.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Short-term is <code>SessionModelContext</code> with a bounded message buffer. Long-term is <code>LongTermMemory</code>, with a typed taxonomy (<code>VARIABLE</code>, <code>USER_PROFILE</code>, <code>SEMANTIC_MEMORY</code>, <code>EPISODIC_MEMORY</code>, <code>SUMMARY</code>). The product adds a SQLite/FTS5 hybrid index over markdown memory files.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code></td>
+<td>SessionModelContext</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11</code></td>
+<td>ContextMessageBuffer</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code></td>
+<td>LongTermMemory</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/manage/mem_model/memory_unit.py</code></td>
+<td>memory type taxonomy</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:56</code></td>
+<td>product hybrid memory index</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-how-do-you-decide-what-to-store-in-memory-versus-what-to-discard">10. How do you decide what to store in memory versus what to discard</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Keep durable, reused, preference-like, decision-relevant facts; discard transient chatter and stale/contradicted entries — usually extract candidates with an LLM, then dedupe/resolve.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Keep durable/reused/preference facts.</li>
+<li>Discard transient and contradicted.</li>
+<li>LLM extract then dedupe/resolve.</li>
+</ul>
+<p><strong>Concept.</strong> Keep durable, reused, preference-like, and decision-relevant facts; discard transient chatter, redundant restatements, and stale/contradicted entries. Most systems extract candidates with an LLM, then dedupe and resolve conflicts against existing memory.</p>
+<p><img alt="diagram" src="assets/diagrams/91722db394d5d91e4335fc9085dfa56618d33877.png" /></p>
+<p><strong>In Jiuwen.</strong> An LLM classifier decides whether a turn has key information, and extraction runs only if flagged. Writes dedupe and resolve conflicts: the memory manager searches related old memories, classifies them as redundant, conflicting, or none, deletes redundant or conflicting entries, and writes the new one. So storing is a classify-then-reconcile pipeline, not append-only.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>An LLM classifier decides whether a turn has key information, and extraction runs only if flagged. Writes dedupe and resolve conflicts: <code>FragmentMemoryManager.add_memories</code> searches related old memories, invokes <code>MemUpdateChecker</code> (REDUNDANT/CONFLICTING/NONE), deletes redundant/conflicting IDs, and adds survivors. The product's sweeper prompt explicitly treats "output [] as the norm" and forbids generic/static facts.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/process/extract/memory_analyzer.py:26</code></td>
+<td>key-information classifier</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/process/extract/generation.py:102</code></td>
+<td>extraction gated on the classifier</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/manage/index/fragment_memory_manager.py:125</code></td>
+<td>dedupe + conflict resolution</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/manage/update/mem_update_checker.py:22</code></td>
+<td>CheckResult</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/dreaming/sweeper.py:617</code></td>
+<td>discard rules</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-how-do-you-prevent-memory-from-growing-unbounded-across-a-long-session">11. How do you prevent memory from growing unbounded across a long session</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Bound on multiple axes: hard-drop/truncate oldest context, offload large blobs, compact old tool results, summarize/archive, and cap stored long-term entries.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>FIFO/truncate oldest context.</li>
+<li>Offload large blobs; compact tool results.</li>
+<li>Summarize/archive; cap long-term entries.</li>
+</ul>
+<p><strong>Concept.</strong> Bound it on multiple axes: hard-drop or truncate the oldest context, offload large blobs, compact old tool results, summarize and archive, and cap the number of stored long-term entries.</p>
+<p><img alt="diagram" src="assets/diagrams/e0932f58e732157c93b4ec34e3f572b6853ff7f7.png" /></p>
+<p><strong>In Jiuwen.</strong> A bounded FIFO buffer drops the oldest messages beyond twice the limit; budget guarding truncates oversized content with head/tail previews; offloaders move large messages and tool results out of context; compactors run at token thresholds; and long-term promotion is capped per session. Growth is bounded on several axes at once.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>A bounded FIFO buffer drops the oldest messages beyond twice the limit. Budget guarding truncates oversized content with head/tail previews. Offloaders move large messages and tool results out of context. Compactors run at token thresholds. Long-term promotion is capped per session.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:71</code></td>
+<td>drop oldest beyond 2×</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:88</code></td>
+<td>head/tail truncation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/offloader/message_offloader.py:71</code></td>
+<td>offload large messages</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:81</code></td>
+<td>tool-result budget</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/micro_compact_processor.py:47</code></td>
+<td>micro compaction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:183</code></td>
+<td>full compaction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:96</code></td>
+<td>round compaction</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/dreaming/sweeper.py:36</code></td>
+<td>per-session promotion caps</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="12-how-would-you-summarize-conversation-history-without-losing-important-details">12. How would you summarize conversation history without losing important details</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Keep recent turns verbatim; summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose; re-inject durable state.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Recent turns verbatim.</li>
+<li>Structured summary, not free prose.</li>
+<li>Re-inject durable state (plan, status, files).</li>
+</ul>
+<p><strong>Concept.</strong> Keep the most recent turns verbatim, summarize older turns into a structured note (goal, decisions, files/state, open tasks, next step) rather than free prose, and re-inject the durable state (plan, task status, key artifacts) separately so it is not lost inside a summary. Boundary markers separate summary from live turns, and the summary should be updated incrementally so each pass only processes new messages.</p>
+<p><img alt="diagram" src="assets/diagrams/b5270a3a42bf992c0913b4787ef2581583ed0d02.png" /></p>
+<p><strong>In Jiuwen.</strong> Compaction replaces the active segment with a structured summary plus a boundary system message, then re-injects high-value state as separate messages: plan and task status, recent skill reads, read-file snapshots, and the team policy. The structured form preserves details that free prose would lose.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Compaction replaces the active segment with a structured summary plus a boundary <code>SystemMessage</code>, then re-injects high-value state as separate <code>UserMessage</code> blocks: plan/task status, recent skill-read rounds, read-file snapshots, and the team collaboration policy (returned as messages so they escape <code>state_snapshot_max_chars</code> truncation). <code>FullCompactProcessor</code> uses a 9-section summary prompt and boundary markers (<code>[FULL_COMPACT_BOUNDARY]</code>, <code>[FULL_COMPACT_STATE]</code>, <code>[SESSION_MEMORY_BOUNDARY]</code>). The session-memory path runs a background updater triggered at 0.7×context window, summarizes only completed API rounds, writes to a pending file and atomically renames on commit, and records <code>notes_upto_message_id</code> so only un-summarized messages are processed next time.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:69</code></td>
+<td>BASE_COMPACT_PROMPT; :167 boundary markers; :342 _build_replacement_messages(); :774 build_reinjected_state_messages()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/util.py:242</code></td>
+<td>build_skill_reinjected_content(); :294 build_task_status_reinjected_content(); :105 build_team_policy_reinjected_messages()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/session_memory_manager.py:37</code></td>
+<td>15-section template; :738 should_update(); :824 _update_background(); :529 invalidate_session_memory_anchor()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/forked/compressor/reinjection/builders.py:29</code></td>
+<td>forked reinjection builders</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="13-memory-augmented-agent">13. Memory-augmented agent</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Context across sessions: short-term is the active window; long-term is a store of past interactions; retrieval decides what long-term memory returns.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Short-term = active context window.</li>
+<li>Long-term = persisted store.</li>
+<li>Retrieval brings memory back.</li>
+</ul>
+<p><strong>Concept.</strong> context across sessions, not just one conversation. Short-term memory is the active context window; long-term memory is a vector store/DB of past interactions; retrieval decides what long-term memory is relevant to the current turn. Used for: personal assistants, customer support.</p>
+<p><img alt="diagram" src="assets/diagrams/eddf3616a8d3de1cd02dc4f80fb42cb8137af27c.png" /></p>
+<p><strong>In Jiuwen.</strong> Short-term is a session model context with a bounded message buffer; long-term is a typed memory taxonomy, and the product adds a SQLite/FTS5 hybrid index over markdown memory files. Retrieval-into-turn is a tool the model calls.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Short-term is <code>SessionModelContext</code> with a bounded <code>ContextMessageBuffer</code>; long-term is <code>LongTermMemory</code> with a typed taxonomy, and the product adds a SQLite/FTS5 hybrid index over markdown memory files. Retrieval-into-turn is a tool the model calls (<code>memory_search</code>), and <code>MemoryRail</code> suppresses it when daily memory is auto-loaded.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/context.py:44</code></td>
+<td>SessionModelContext; agent-core/openjiuwen/core/context_engine/context/message_buffer.py:11 — ContextMessageBuffer</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code></td>
+<td>LongTermMemory</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:183/805</code></td>
+<td>product hybrid index</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code></td>
+<td>memory_search; agent-core/openjiuwen/harness/prompts/sections/memory.py:14 — when to call</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="14-how-do-you-detect-and-prevent-memory-contamination-an-agent-remembering-incorrect-facts">14. How do you detect and prevent memory contamination — an agent remembering incorrect facts?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Wrong facts written to memory compound across sessions; prevent via write gating, and fix via targeted overwrite — not full wipes.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Prevention: write only from verified outputs; tag with provenance.</li>
+<li>Fix: memory_update(id) for targeted overwrite; memory_delete_by_category for broad wipe.</li>
+<li>Gap: no confidence gate before write, no versioning, no audit loop.</li>
+</ul>
+<p><strong>Concept.</strong> Memory contamination happens when wrong or hallucinated facts are written to long-term memory and then retrieved into future turns, compounding errors. Prevention: write to memory only from verified/confirmed outputs (not raw model scratchpads); tag memory entries with provenance (source, confidence, timestamp); implement targeted invalidation — delete or overwrite specific wrong entries by key rather than wiping all memory; use versioning so you can roll back. Detection: run a periodic audit query that cross-checks stored facts against the authoritative source.</p>
+<p><img alt="diagram" src="assets/diagrams/38a9998c5918ba6813ee7b3218fcb8f9432528b4.png" /></p>
+<p><strong>In Jiuwen.</strong> LongTermMemory (agent-core/openjiuwen/core/memory/long_term_memory.py:69) stores MemoryEntry objects with category/source metadata. memory_update(id) allows targeted overwrite of an existing entry; memory_delete_by_category allows broad wipe. No confidence gate before memory_write, no versioning chain, no provenance trail, and no periodic audit query against an authoritative source.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>LongTermMemory</code> stores typed memory units with metadata fields (category, source). Memory is written by the agent via <code>MemoryRail</code> and the <code>memory_write</code> / <code>memory_update</code> tools. There is no confidence gate before writing — any output the model chooses to commit is stored. <code>memory_update</code> allows targeted overwrite of an existing entry by <code>id</code>, which is the closest analogue to targeted invalidation; a full category wipe is <code>memory_delete_by_category</code>. There is no versioning or provenance chain, no periodic audit loop, and no automatic invalidation when the retrieval pipeline returns a conflicting fact.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code></td>
+<td>LongTermMemory and entry schema</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code></td>
+<td>memory_write/memory_update/memory_delete_by_category</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/memory_forbidden_rail.py:1</code></td>
+<td>memory suppression gate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/sections/memory.py:14</code></td>
+<td>when/what to write</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

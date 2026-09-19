@@ -1,0 +1,2268 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="07-planning-memory-and-state.html">
+      
+      
+        <link rel="next" href="15-evaluation.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Agent failure modes - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-failure-modes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent failure modes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="22-agent-failure-patterns.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-tool-call-failures-and-idempotency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Tool call failures and idempotency
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-stuck-loops-and-loop-invariants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Stuck loops and loop invariants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output-validation-and-ungrounded-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Output validation and ungrounded confidence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-memory-as-a-source-of-compounding-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Memory as a source of compounding error
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-observability-and-auditing-agent-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Observability and auditing agent decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-does-structured-agent-tracing-look-like-and-why-does-print-debugging-fail-at-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What does structured agent tracing look like, and why does print-debugging fail at scale?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-termination-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Termination conditions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-tool-call-failures-and-idempotency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Tool call failures and idempotency
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-stuck-loops-and-loop-invariants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Stuck loops and loop invariants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-output-validation-and-ungrounded-confidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Output validation and ungrounded confidence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-memory-as-a-source-of-compounding-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Memory as a source of compounding error
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-observability-and-auditing-agent-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Observability and auditing agent decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-does-structured-agent-tracing-look-like-and-why-does-print-debugging-fail-at-scale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What does structured agent tracing look like, and why does print-debugging fail at scale?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-termination-conditions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Termination conditions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="07-planning-memory-and-state.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Planning, memory and state</span></a>
+<a class="topic-nav__link topic-nav__next" href="15-evaluation.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Evaluation</span></a>
+</div>
+
+<h1 id="agent-failure-modes">Agent failure modes</h1>
+<h2 id="1-tool-call-failures-and-idempotency">1. Tool call failures and idempotency</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> "What happens if a tool times out after the action already executed?" Retrying blindly on a non-idempotent call — a payment, a database write, an email send — can cause duplicate side effects.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Separate the call type — reads are idempotent and safe to retry with backoff; writes must track whether they were confirmed or merely attempted.</li>
+<li>Idempotency keys (a unique request ID passed with every write; the server deduplicates) are the standard fix.</li>
+<li>State must persist across retries: the agent needs to know that <code>payment_id=abc123</code> was <em>attempted</em> before deciding to retry, not just that the last call failed.</li>
+<li>Add a human-escalation path for any irreversible action.</li>
+</ul>
+<p><strong>Concept.</strong> A tool call can time out after its action has already executed. Reads are idempotent and safe to retry with backoff; writes must track whether they were confirmed or only attempted. The standard fix is an <strong>idempotency key</strong> — a unique request ID passed with every write, which the server uses to deduplicate. State must persist across retries so the agent knows that <code>payment_id=abc123</code> was <em>attempted</em>, not merely that the last call failed. Any irreversible action needs a human-escalation path.</p>
+<p><img alt="diagram" src="assets/diagrams/abf47dadfcf5940f288855caecc41ce40b57cb42.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen retries at the model-client layer and deduplicates repeated (tool, args) calls. It has no idempotency-key pattern and no attempted-vs-confirmed tracking, so keeping writes safe across retries is left to the developer.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Retry logic lives in the model-client layer (a per-provider retry decorator in <code>openai_model_client.py</code>). Tool calls are deduplicated at the argument level by <code>ToolCallDeduplicationRail</code>, which detects repeated <code>(tool, args)</code> hashes and warns or compacts. Idempotency keys, attempted-vs-confirmed state tracking, and a read/write tool taxonomy are not built in; <code>ToolCard</code> has no <code>idempotent</code> field, so retry safety is a design decision the developer encodes.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py</code></td>
+<td>per-provider retry decorator on API errors</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>ToolCallDeduplicationRail: repeated (tool, args) → warn/compact</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py</code></td>
+<td>ToolCard schema; no idempotent field</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code></td>
+<td>tool execution path; no confirmed-vs-attempted state</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-stuck-loops-and-loop-invariants">2. Stuck loops and loop invariants</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Agents rarely crash visibly.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Hard step cap (<code>max_iterations</code>).</li>
+<li>Divergence detection: if the last N tool calls are identical or the model output is structurally the same, abort rather than continue.</li>
+<li>State deduplication: canonicalise <code>(tool, input_hash)</code> and reject re-execution of a confirmed call.</li>
+<li>Context compaction on loop: if the agent is stuck, the context likely contains noise that is reinforcing the wrong path — compact it before continuing.</li>
+<li>A final-answer forced output at budget exhaustion.</li>
+</ul>
+<p><strong>Concept.</strong> Agents rarely crash visibly — they loop. A wrong conclusion is written back into context and reinforces itself; a bad tool call is retried unchanged. The mechanisms that prevent this are: a hard step cap (<code>max_iterations</code>); <strong>divergence detection</strong> that aborts when the last N tool calls or the output are structurally identical; <strong>state deduplication</strong> that canonicalises <code>(tool, input_hash)</code> and rejects re-execution of a confirmed call; <strong>context compaction</strong> to clear the noise that is reinforcing the wrong path; and a forced final answer at budget exhaustion.</p>
+<p><img alt="diagram" src="assets/diagrams/5d3a4e95c944a41b5b63cdd7364f468fd138e8c4.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen caps the loop and detects repeated tool rounds. The compaction guard that would break a loop is off by default, and there is no check for repeated model output.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Concrete mechanisms exist: <code>ReactAgent.max_iterations</code> defaults to 5 (the harness raises it to 15); <code>ModelAnomalyDetectionRail</code> detects consecutive identical tool-call rounds via <code>ToolLoopCompactConfig</code> (off by default; it compacts then aborts); <code>ToolCallDeduplicationRail</code> counts repeated <code>(tool, args)</code>; <code>AgenticRetriever.max_iter</code> defaults to 2. Output-similarity divergence checks and a forced final answer at budget are not included, and <code>ToolLoopCompactConfig</code> must be enabled explicitly.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations: int = Field(default=5)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:252</code></td>
+<td>harness default iterations 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code></td>
+<td>ToolLoopCompactConfig (default off); :90 loop → compact → abort</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>repeat counter/warning</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py</code></td>
+<td>max_iter=2 clamped</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-output-validation-and-ungrounded-confidence">3. Output validation and ungrounded confidence</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> A fluent answer is not a correct one, so validation is an architectural stage rather than a review step.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>For factual claims: extract each claim from the output, verify it against the retrieved source documents (NLI model or LLM-as-judge).</li>
+<li>For structured output: validate against the expected schema before acting (JSON schema, Pydantic model).</li>
+<li>For high-stakes actions: a separate verification step before the result is trusted or acted upon.</li>
+<li>Treat "the model said X" as a hypothesis, not a fact.</li>
+</ul>
+<p><strong>Concept.</strong> A fluent answer is not a correct one, so validation is an architectural stage rather than a review step. For factual claims, extract each claim and verify it against the retrieved sources (an NLI model or LLM-as-judge). For structured output, validate against the expected schema (JSON Schema, Pydantic) before acting. For high-stakes actions, insert a separate verification step before the result is trusted. Treat "the model said X" as a hypothesis, not a fact.</p>
+<p><img alt="diagram" src="assets/diagrams/8a24a029be3a35f930243f79c20760514ff965fd.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen validates tool-call structure and applies guardrails, but it does not check answer claims against retrieved context in the live path; that faithfulness check runs only offline.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Structured output validation is present through <code>StructuredAskUserRail</code> and Pydantic parsing of <code>ToolCall</code> responses in the tool-call path; the <code>SecurityRail</code> guardrail layer validates inputs and outputs for safety policy. Claim-level citation verification against retrieved context is not in the live path — the faithfulness evaluator in <code>agent_evolving/eval/</code> runs offline — and there is no general pre-action verification step; schema-guided generation constrains format but not content accuracy.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code></td>
+<td>ToolCall Pydantic parsing; schema-validated tool calls</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py</code></td>
+<td>SecurityRail content classification</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code></td>
+<td>structured output rail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/eval/</code></td>
+<td>faithfulness evaluation (offline)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-memory-as-a-source-of-compounding-error">4. Memory as a source of compounding error</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Memory is a liability as well as a feature: a wrong assumption stored early can shape every later decision.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Scope memory by task/session boundary — assumptions from session A should not contaminate session B.</li>
+<li>Invalidation: when a tool returns contradictory evidence, the previous related memory should be flagged or discarded, not silently co-exist.</li>
+<li>Immutability checkpoints: tag memories with the context that generated them; when that context is superseded, the memory is stale.</li>
+<li>Know when to compact the context window rather than accumulate it.</li>
+</ul>
+<p><strong>Concept.</strong> Memory is a liability as well as a feature: a wrong assumption stored early can quietly shape every later decision. Mitigations: scope memory by task or session so assumptions do not leak across sessions; when a tool returns contradictory evidence, flag or discard the related memory instead of letting both coexist; tag memories with the context that produced them so superseded ones can be identified as stale; and compact the context window rather than accumulate it.</p>
+<p><img alt="diagram" src="assets/diagrams/78a5619848cbe5883aca58f77dff0d1859038d6c.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen keeps memory scoped to a session and compacts long histories. It does not detect contradictions or mark memories as stale.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Memory is session-scoped: <code>session_id</code> is the isolation unit and contexts do not cross sessions. The context engine compresses history (compressors at a 0.9× token budget and a full compaction at 180k tokens), and <code>MemoryForbiddenRail</code> blocks specific write patterns. Contradiction detection, per-memory staleness tags, and targeted invalidation are not provided — compaction is all-or-nothing.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context_engine.py</code></td>
+<td>session-scoped context; recover_from_model_exception for overflow</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:104</code></td>
+<td>trigger_context_ratio=0.9</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py</code></td>
+<td>full compaction at 180k tokens</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/memory_forbidden_rail.py</code></td>
+<td>MemoryForbiddenRail</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-observability-and-auditing-agent-decisions">5. Observability and auditing agent decisions</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> If the only artifact is the final transcript, no one can audit why the agent chose one tool or path over another.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Structured trace per turn: the model's reasoning text, which tools were called with what inputs, the raw tool outputs, and the rail/guard decisions that shaped the response.</li>
+<li>Each step should have a timestamp and a session/turn identifier so you can reconstruct the exact execution path.</li>
+<li>Sampling strategy for production (full trace on errors, sampled on success).</li>
+<li>A way to replay a specific trace to reproduce a failure.</li>
+</ul>
+<p><strong>Concept.</strong> If the only artifact is the final transcript, no one can audit why the agent chose one tool or path over another. Structured tracing records, per turn: the model's reasoning text, which tools were called with what inputs, the raw tool outputs, and the rail/guard decisions that shaped the response, each stamped with a time and a session/turn identifier. Production uses a sampling strategy (full trace on errors, sampled on success) and supports replaying a specific trace to reproduce a failure.</p>
+<p><img alt="diagram" src="assets/diagrams/0b4cc1c4a0d012e2103e8326623e8dea607f832e.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen emits per-turn observable events and streaming events that a consumer can subscribe to. It ships no default log sink, does not capture raw tool input/output, and has no trace replay.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>AgentObservabilityRail</code> is always the last rail in the profile and captures per-turn observable events; the <code>harness/observability</code> module structures them, <code>JiuSwarmStreamEventRail</code> emits streaming per-turn events, and tool names and reasoning steps surface as <code>onActivity</code> events. A structured JSON-line sink, capture of raw tool input/output (only the processed result surfaces), and trace-ID-based replay are not included out of the box — events require a subscribing consumer.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/__init__.py</code></td>
+<td>AgentObservabilityRail; always last in profile</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/stream_event_rail.py</code></td>
+<td>JiuSwarmStreamEventRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/</code></td>
+<td>rail pipeline; AgentObservabilityRail appended last</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py</code></td>
+<td>tool call execution; raw I/O not persisted separately</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-what-does-structured-agent-tracing-look-like-and-why-does-print-debugging-fail-at-scale">6. What does structured agent tracing look like, and why does print-debugging fail at scale?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Emit typed events (model call, tool call, retrieval, decision) with shared trace/span IDs; print-debugging can't be queried, aggregated, or correlated at scale.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Minimum event: trace_id, span_id, event_type, payload, duration_ms.</li>
+<li>Enables: offline replay, production latency monitoring, attached eval scoring.</li>
+<li>Jiuwen: ObservabilityEvent + AgentObservabilityRail cover model/tool calls; retrieval events are not structured spans.</li>
+</ul>
+<p><strong>Concept.</strong> Print/log statements produce unstructured text: you can't query "all tool calls in session X", can't aggregate latency by tool, and can't correlate a wrong answer back to which retrieval chunk was in context. Structured tracing means emitting a typed event for every meaningful action — model call started/completed, tool called/returned, retrieval executed, decision made — with a shared trace/span ID so events from the same agent run can be grouped. Each event carries: timestamp, latency, token counts, tool name + arguments, retrieval score, model response. This enables offline debugging (replay a trace), production monitoring (alert on p99 latency), and eval (attach ground truth to a trace for scoring). The minimum viable schema: <code>trace_id</code>, <code>span_id</code>, <code>event_type</code>, <code>payload</code>, <code>duration_ms</code>.</p>
+<p><img alt="diagram" src="assets/diagrams/0bb368400fc1e9aeec6289ea5b003e19ba6923d3.png" /></p>
+<p><strong>In Jiuwen.</strong> AgentObservabilityRail (agent-core/openjiuwen/harness/observability/rail.py:355) emits typed observability events at each turn's major points — model call, tool call, final answer — and is always last in the rail profile. Events are delivered to a subscribing consumer; there is no default log sink. Retrieval events (chunk ids, scores) are not emitted as structured spans — they appear only in tool result text.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>AgentObservabilityRail</code> (<code>harness/observability/rail.py</code>) emits typed observability events at the major points of each turn — model call, tool call, final answer — and is always the last rail in the profile. Token and cost figures come from the model response's usage metadata. Events are delivered to a subscribing consumer: there is no default log sink, and retrieval details (which chunks, their scores) are not emitted as structured spans — they appear only in tool-result text, so cross-run retrieval analytics need manual instrumentation.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py:355</code></td>
+<td>AgentObservabilityRail (typed events)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:1328</code></td>
+<td>_emit_context_usage (token/usage emission)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/schema/generation_response.py:9</code></td>
+<td>GenerationResponse usage/token counts</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-termination-conditions">7. Termination conditions</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> "Stop when done" is not a termination condition; an agent needs explicit success, budget, and escalation paths.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>At least three termination paths: (1) success — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, retrieved context cited); (2) budget exhaustion — hard cap on iterations and tokens, with a graceful degraded response rather than silence; (3) human escalation — when the agent has exhausted its budget or detected irresolvable ambiguity, it hands off explicitly rather than looping or hallucinating.</li>
+<li>Confidence threshold as an optional fourth: if the model's own uncertainty estimate is above a threshold, escalate before acting.</li>
+</ul>
+<p><strong>Concept.</strong> "Stop when done" is not a termination condition. An agent needs at least three explicit paths: <strong>success</strong> (a final answer meeting a defined condition, such as required fields populated or context cited); <strong>budget exhaustion</strong> (a hard cap on iterations and tokens, with a graceful degraded response rather than silence); and <strong>human escalation</strong> (handing off when budget is exhausted or ambiguity is unresolvable). A confidence threshold can add a fourth: escalate before acting when the model's uncertainty is high.</p>
+<p><img alt="diagram" src="assets/diagrams/26d584d79e44640a0473d535c21c05ab5ee3f744.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen stops on no tool call, on iteration caps, and through optional human-approval rails. It does not return a degraded answer at budget exhaustion or escalate automatically on low confidence.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Several termination paths exist: <code>ReactAgent.max_iterations</code> is the hard iteration cap (5, or 15 in the harness); <code>PlanApprovalInterruptRail</code> and <code>StructuredAskUserRail</code> provide human-in-the-loop escalation; <code>ModelAnomalyDetectionRail</code> can abort on anomaly detection; and <code>AgentObservabilityRail</code> logs every turn. A graceful degraded response at budget exhaustion and confidence-threshold auto-escalation are not included, and the approval rails are opt-in per agent config.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations: int = Field(default=5)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:252</code></td>
+<td>harness default iterations 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code></td>
+<td>anomaly abort (off by default)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code></td>
+<td>session cost cap</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/ask_user_rail.py</code></td>
+<td>structured human escalation</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/code/rails/code_plan_approval_interrupt_rail.py</code></td>
+<td>PlanApprovalInterruptRail (opt-in)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

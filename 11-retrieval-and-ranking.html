@@ -1,0 +1,2557 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="10-rag-pipelines-and-patterns.html">
+      
+      
+        <link rel="next" href="12-query-understanding.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Retrieval & ranking - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#retrieval-and-ranking" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Retrieval & ranking
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-dense-vs-sparse-retrieval-and-fusing-both-with-reciprocal-rank-fusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-when-keyword-search-outperforms-semantic-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. When keyword search outperforms semantic search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-a-purely-semantic-system-can-fail-on-queries-with-exact-codes-ids-or-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why a purely semantic system can fail on queries with exact codes, IDs, or names
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-do-you-decide-between-retrieving-5-documents-versus-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How do you decide between retrieving 5 documents versus 20
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-would-you-design-retrieval-to-work-across-structured-data-sql-tables-and-unstructured-data-documents-in-the-same-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-reranking-adds-that-initial-retrieval-doesnt-already-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What reranking adds that initial retrieval doesn't already do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-know-if-your-reranker-is-actually-improving-results-or-just-reordering-noise-without-an-ab-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-much-latency-does-reranking-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How much latency does reranking add?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-when-is-reranking-worth-the-latency-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. When is reranking worth the latency cost?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-bi-encoder-for-retrieval-vs-cross-encoder-for-reranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Bi-encoder for retrieval vs. cross-encoder for reranking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-chunk-documents-that-mix-prose-tables-and-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you chunk documents that mix prose, tables, and code?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-dense-vs-sparse-retrieval-and-fusing-both-with-reciprocal-rank-fusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-when-keyword-search-outperforms-semantic-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. When keyword search outperforms semantic search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-a-purely-semantic-system-can-fail-on-queries-with-exact-codes-ids-or-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why a purely semantic system can fail on queries with exact codes, IDs, or names
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-do-you-decide-between-retrieving-5-documents-versus-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How do you decide between retrieving 5 documents versus 20
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-would-you-design-retrieval-to-work-across-structured-data-sql-tables-and-unstructured-data-documents-in-the-same-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-reranking-adds-that-initial-retrieval-doesnt-already-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What reranking adds that initial retrieval doesn't already do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-know-if-your-reranker-is-actually-improving-results-or-just-reordering-noise-without-an-ab-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-much-latency-does-reranking-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How much latency does reranking add?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-when-is-reranking-worth-the-latency-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. When is reranking worth the latency cost?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-bi-encoder-for-retrieval-vs-cross-encoder-for-reranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Bi-encoder for retrieval vs. cross-encoder for reranking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-chunk-documents-that-mix-prose-tables-and-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you chunk documents that mix prose, tables, and code?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="10-rag-pipelines-and-patterns.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">RAG pipelines and patterns</span></a>
+<a class="topic-nav__link topic-nav__next" href="12-query-understanding.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Query understanding</span></a>
+</div>
+
+<h1 id="retrieval-and-ranking">Retrieval and ranking</h1>
+<h2 id="1-dense-vs-sparse-retrieval-and-fusing-both-with-reciprocal-rank-fusion">1. Dense vs. sparse retrieval, and fusing both with reciprocal rank fusion</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Dense matches meaning but can miss rare exact terms; sparse (BM25) matches literal terms but fails on paraphrase; fuse both with reciprocal rank fusion.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Dense: embeddings, semantic match; weak on exact tokens.</li>
+<li>Sparse/BM25: literal term match; weak on paraphrase.</li>
+<li>Fuse with RRF: combine ranks, not raw scores.</li>
+<li>Weighting is often ignored in favor of RRF.</li>
+</ul>
+<p><strong>Concept.</strong> Dense retrieval embeds queries/documents and searches a vector index; it matches meaning but can miss rare exact terms. Sparse retrieval (BM25/TF-IDF) matches literal terms with term-frequency weighting; strong on exact tokens but fails on paraphrase. Fuse both — RRF (<code>Σ 1/(k+rank)</code>) is the robust default because it needs no score calibration.</p>
+<p><img alt="diagram" src="assets/diagrams/07d5271344ec179f14cda86a90f3fba86c36a4f0.png" /></p>
+<p><strong>In Jiuwen.</strong> Dense retrieval is the vector retriever; sparse is BM25 on the vector store (with a full-text or TF-IDF fallback on other backends). The hybrid retriever accepts an alpha weight, but the backends actually combine results with reciprocal rank fusion (rank-based), not a weighted score blend — so treat hybrid fusion here as RRF.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Dense is <code>VectorRetriever</code>; sparse is <code>SparseRetriever</code>, which on Milvus is real BM25 (<code>metric_type="BM25"</code> against a <code>SPARSE_FLOAT_VECTOR</code> field with <code>SPARSE_INVERTED_INDEX</code>). Chroma falls back to a TF-IDF text query; PG uses full-text search. <code>HybridRetriever</code> takes an <code>alpha</code> but every backend actually uses RRF: Milvus <code>RRFRanker(k=60)</code>, Chroma/PG <code>rrf_fusion(..., k=60)</code> scoring deduped text by <code>Σ 1/(k+rank)</code>. The only true weighted fusion is in the graph store (<code>WeightedRankConfig</code>).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/26b96af4829e8b82868c9ec10bfc07803e96e743.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/sparse_retriever.py:19</code></td>
+<td>SparseRetriever (BM25); :62 delegates to sparse_search</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:277</code></td>
+<td>metric_type: "BM25"; :348 native RRFRanker(k=60)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:390</code></td>
+<td>Milvus Function(BM25); :399 SPARSE_INVERTED_INDEX</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:26</code></td>
+<td>alpha (ignored by stores)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/utils/fusion.py:15/39</code></td>
+<td>rrf_fusion + 1/(k+rank)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:300</code></td>
+<td>no BM25 (TF-IDF); agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:375 — FTS</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-when-keyword-search-outperforms-semantic-search">2. When keyword search outperforms semantic search</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Keyword wins on exact identifiers, codes, rare names, jargon, and small/distinctive corpora; dense wins on paraphrase and intent. Best is hybrid.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Exact codes/IDs/names favor keyword.</li>
+<li>Paraphrase/intent favor dense.</li>
+<li>Combine both to cover each other's blind spots.</li>
+</ul>
+<p><strong>Concept.</strong> Keyword search wins when the query contains exact identifiers, codes, rare names, or domain jargon that the embedding model never learned to map, and when the corpus is small or the terms are highly distinctive. Dense search wins on paraphrase and intent. The strongest approach is a router that picks by query type (or always runs hybrid and fuses).</p>
+<p><img alt="diagram" src="assets/diagrams/eef483e02d9bb91ee4a041edd007c6f6a6060413.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's choice is static config, not query-driven: the knowledge base picks the retriever and mode from the configured index type (vector, bm25, or hybrid); the agentic retriever derives its mode from the underlying retriever, and the graph retriever validates against allowed modes. There is no classifier that decides per query whether keyword or semantic is better.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Routing is static and config-driven, not query-content-driven: <code>SimpleKnowledgeBase.retrieve</code> picks the retriever and mode from <code>config.index_type</code> (<code>vector</code> → <code>VectorRetriever</code>, <code>bm25</code> → <code>SparseRetriever</code>, else hybrid). <code>AgenticRetriever</code> derives its default mode from the underlying retriever's <code>index_type</code>, and <code>GraphRetriever</code> validates against <code>_allowed_modes</code>. The only dynamic keyword behavior is a degenerate fallback: if dense returns zero results, <code>VectorRetriever</code> (and <code>HybridRetriever</code> only in its <code>mode="vector"</code> branch) re-runs <code>sparse_search</code>. <code>QueryRewriter</code> produces an <code>intention</code> field but never uses it to switch modes.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/fe9b21fbb06c467a9e259c3725f165fccd193634.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:141</code></td>
+<td>retriever selection by index_type; :166 mode selection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:83</code></td>
+<td>dense-empty → BM25 fallback</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:97</code></td>
+<td>same fallback</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:155</code></td>
+<td>default_mode from index_type</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/graph_retriever.py:262</code></td>
+<td>_allowed_modes</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:277</code></td>
+<td>rewrite schema includes intention</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-why-a-purely-semantic-system-can-fail-on-queries-with-exact-codes-ids-or-names">3. Why a purely semantic system can fail on queries with exact codes, IDs, or names</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Opaque tokens (codes, SKUs, UUIDs, rare names) carry little semantic signal, so a semantically close but wrong chunk can outrank the exact hit — and dense results are rarely empty, so no fallback fires.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Short opaque tokens embed to near-random neighbors.</li>
+<li>A wrong-but-close chunk can rank above the exact hit.</li>
+<li>Fix: metadata/exact filtering, a sparse leg, or an exact-match boost.</li>
+</ul>
+<p><strong>Concept.</strong> Embedding models are trained on natural-language co-occurrence; short opaque tokens (error codes, SKUs, UUIDs, version strings, rare proper nouns) carry little semantic signal and get mapped to near-random neighbors. A semantically "close" but wrong chunk can outrank the exact hit, and because dense results are rarely empty, no lexical fallback fires. The fix is metadata/exact filtering, a sparse leg, or an explicit exact-match boost.</p>
+<p><img alt="diagram" src="assets/diagrams/964eab2f192bf89cd05858a0a46f23d46c26d4de.png" /></p>
+<p><strong>In Jiuwen.</strong> The stores can filter (Milvus expressions, PG JSONB containment, Chroma where-clauses, and Milvus inverted scalar indexes), but the retriever layer hardcodes filters to None and drops the filters the knowledge base passes — so metadata/exact filtering is unreachable through the normal path. The practical fix is to add a sparse leg or re-plumb filters through the retriever.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The stores <em>can</em> filter: Milvus builds <code>key == value</code> expressions (string-sanitized) and supports <code>QueryExpr</code>; PG does JSONB containment; Chroma builds a <code>where</code> dict; Milvus even creates <code>INVERTED</code> scalar indexes on <code>document_id</code>/<code>chunk_id</code>. But the retriever layer hardcodes <code>filters=None</code> and drops the <code>filters</code> kwarg the KB passes, so metadata filtering is unreachable through <code>KnowledgeBase.retrieve</code>. There is no exact-term boost, no <code>IN</code>/<code>LIKE</code> substring matching, and the lexical fallback fires only when dense output is <em>empty</em>, not when it is semantically wrong.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88</code></td>
+<td>hardcoded filters=None; :84 sparse fallback only when dense empty</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81</code></td>
+<td>hardcoded filters=None</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186</code></td>
+<td>KB passes filters, retriever swallows it</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215</code></td>
+<td>key == value filter expr; :219 QueryExpr.sanitize_str</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:474</code></td>
+<td>build_filters JSONB containment</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265</code></td>
+<td>where dict filter</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:346</code></td>
+<td>INVERTED scalar index on doc id</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-how-do-you-decide-between-retrieving-5-documents-versus-20">4. How do you decide between retrieving 5 documents versus 20</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Higher k raises recall but costs tokens/latency and can dilute; lower k is precise and cheap. Retrieve more then rerank down when you have a reranker.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>More docs → recall up, tokens/latency up.</li>
+<li>Fewer docs → precision, lower cost.</li>
+<li>Ideal: retrieve many, rerank to few (needs a wired reranker).</li>
+</ul>
+<p><strong>Concept.</strong> It is a recall-vs-precision/token/latency tradeoff. Retrieve more when the question is multi-part, aggregative, or high-stakes and recall matters; fewer when answers are localized and you want precision and low token cost. The robust pattern is retrieve a larger candidate set (e.g. 20–50), rerank to a small k (3–5), and pass only the reranked top-k to the generator — so you keep recall without paying context cost. Tune k on an eval set; do not hardcode a gut number.</p>
+<p><img alt="diagram" src="assets/diagrams/c84808df29b58bc6fd8c05df69a2bd7f6a869d26.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's top_k is a static config (default 5) with no adaptive or cost-aware policy, and no score threshold by default. Because reranking is not wired into the default knowledge-base path and the assembled context is not token-budgeted, 'retrieve 20, rerank to 5' isn't available out of the box — you'd set top_k directly and accept the token cost.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>top_k</code> is a static config (default 5) with no adaptive or cost-aware policy, and <code>score_threshold</code> defaults to <code>None</code>. There is no rerank-to-K lever in the KB path (rerankers are wired only in the graph store), and the assembled context is not token-budgeted. So "retrieve 20, rerank to 5" is not available out of the box; you would set <code>top_k</code> directly and accept the untrimmed context.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5; :47 score_threshold default None</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:64</code></td>
+<td>threshold honored only in mode="vector"</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code></td>
+<td>KB path calls no reranker</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241</code></td>
+<td>context concatenated unbounded</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-would-you-design-retrieval-to-work-across-structured-data-sql-tables-and-unstructured-data-documents-in-the-same-system">5. How would you design retrieval to work across structured data (SQL tables) and unstructured data (documents) in the same system</h2>
+<p><span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Keep paths explicit: route structured questions to a schema-aware text-to-SQL/table tool and unstructured to document retrieval, then merge and ground results.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Structured → text-to-SQL/table query (validatable).</li>
+<li>Unstructured → document retrieval.</li>
+<li>Merge and ground; don't flatten tables into text.</li>
+</ul>
+<p><strong>Concept.</strong> Keep the two paths explicit: route structured questions to a text-to-SQL/table-query tool (schema-aware, validable) and unstructured questions to document retrieval, then merge/ground the results. Do not flatten tables into text and hope; and do not let a free-form shell tool be the only SQL path, because it is unverified. An orchestrator or router picks the source(s), and the answer cites which.</p>
+<p><img alt="diagram" src="assets/diagrams/d03fe33ce1dc440e2959909db40a0de1eb17b47e.png" /></p>
+<p><strong>In Jiuwen.</strong> Retrieval is document-RAG only: parsers emit text chunks into vector/graph stores and the retrieval component fans a query across knowledge bases. Structured access is limited to the generic shell/code escape hatch; spreadsheets are ingested as row/column text documents rather than queried as tables.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Retrieval is document-RAG only: parsers emit <code>TextChunk</code>s into vector/graph stores and <code>KnowledgeRetrievalComponent</code> fans queries to one or more KBs. Structured access is limited to the generic <code>bash</code>/<code>code</code> escape hatch (<code>SysOperation.fs()/shell()/code()</code>); spreadsheets are ingested as row/column text documents rather than queried as tables. SQLite is used only for local lock/session persistence.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/sys_operation/sys_operation.py:204</code></td>
+<td>SysOperation exposes only fs/code/shell; :139 card proxies limited to fs/shell/code</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/__init__.py:42</code></td>
+<td>only Bash/PowerShell shell escape hatch; no DB tool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/code.py:34</code></td>
+<td>CodeTool.invoke (generic code, not SQL-aware)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:131</code></td>
+<td>spreadsheets flattened to text documents</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/sys_operation/local/_async_read_write_lock.py:6</code></td>
+<td>SQLite used only as a lock DB</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-what-reranking-adds-that-initial-retrieval-doesnt-already-do">6. What reranking adds that initial retrieval doesn't already do</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> First-stage retrieval optimizes recall with cheap approximate similarity; a cross-encoder reranker scores candidates jointly with the query to reorder the top-k for precision — but only over candidates retrieval already returned.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Retrieval: recall, cheap, approximate.</li>
+<li>Rerank: precision, joint query+doc scoring, expensive.</li>
+<li>Cannot recover what retrieval never returned.</li>
+</ul>
+<p><strong>Concept.</strong> First-stage retrieval optimizes recall with cheap approximate similarity over the whole corpus. A reranker scores each candidate <em>jointly with the query</em> using an expensive cross-encoder, reordering the top-k for precision. It cannot recover documents retrieval never returned.</p>
+<p><img alt="diagram" src="assets/diagrams/abc1096b19ee6ba152fefed712b7c610add93077.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has a reranker interface (cross-encoder and LLM-judge variants), but it is integrated only in the graph store; the default knowledge-base retrieve path never reranks. So reranking is available as a component, yet out of the box it does not reorder normal retrieval results.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>Reranker</code> is an abstract cross-encoder client (<code>rerank</code>/<code>rerank_sync</code> returning <code>{doc: score}</code>), implemented by <code>StandardReranker</code>, <code>DashscopeReranker</code>, and experimental <code>ChatReranker</code>. It is integrated only in the graph store: <code>milvus_support.py</code> accepts an optional <code>reranker</code> and calls it in <code>_rank_results</code>/<code>_combined_rerank</code>, and even there it is a no-op unless the caller passes <code>reranker=...</code>. Neither <code>SimpleKnowledgeBase.retrieve</code> nor <code>GraphKnowledgeBase.retrieve</code> constructs or forwards one, so RAG retrieval is first-stage-only.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:16</code></td>
+<td>RerankerConfig; :37/41 Reranker + abstract rerank</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23</code></td>
+<td>StandardReranker (/rerank); agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:22 — ChatReranker (experimental)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:458</code></td>
+<td>reranker applied only when truthy; :87 async def rerank</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:125</code></td>
+<td>no reranker in retrieve; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:251 — passes **kwargs only</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/result_ranking.py:11</code></td>
+<td>fusion rankers, distinct from cross-encoder</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-do-you-know-if-your-reranker-is-actually-improving-results-or-just-reordering-noise-without-an-ab-test">7. How do you know if your reranker is actually improving results, or just reordering noise, without an A/B test</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> You can't tell from order alone; on a labeled set, compare ranking metrics (NDCG/MRR/precision) with and without the reranker on the same candidates.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Order alone isn't evidence.</li>
+<li>Compare ranked metrics on the same candidate set.</li>
+<li>If NDCG doesn't improve, it's just reordering.</li>
+</ul>
+<p><strong>Concept.</strong> You cannot tell from the order alone. Offline, hold out a labeled set of (query, relevant docs) and compare ranking metrics (NDCG@k, MRR, precision@k) with and without the reranker on the same candidate set. If NDCG does not improve, the reranker is reordering noise. Watch for it merely promoting longer/more generic chunks. A/B is better but needs traffic; offline label-based comparison is the first check.</p>
+<p><img alt="diagram" src="assets/diagrams/9c421e22e47c55faea012c7fb16f1196ac1f39b9.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has a real reranker stack and a graph-store hook, but the only before/after evidence is a manual demo that searches twice (with and without the reranker) and prints per-rank score differences. There is no labeled evaluation or metric to prove improvement, so its value must be measured outside the repo.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is a real reranker stack (<code>StandardReranker</code>, <code>ChatReranker</code>, DashScope) and a cross-encoder re-rank hook in the graph store, but the only before/after evidence is a <strong>manual demo comparison</strong>: <code>showcase_milvus_graph_store.py</code> searches twice (<code>reranker=RERANKER</code> then <code>reranker=None</code>) and <code>_log_score_comparison</code> prints per-rank scores, a diff, and min/max ranges. No ground-truth labels, no held-out query set, no metric delta, no significance test.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/examples/store/showcase_milvus_graph_store.py:51</code></td>
+<td>_log_score_comparison; :217 reranker on; :240 reranker off</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:58</code></td>
+<td>rerank() returns relevance_score per doc</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:87</code></td>
+<td>rerank sorts in place (_combined_rerank at :467)</td>
+</tr>
+<tr>
+<td><code>agent-core/examples/retrieval/showcase_reranker.py:23</code></td>
+<td>standalone reranker demo (no baseline)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-how-much-latency-does-reranking-add">8. How much latency does reranking add?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Latency scales with candidate count and batching: a cross-encoder over ~50–100 candidates adds tens to low-hundreds of ms; an LLM-judge reranker is one call per document (O(N)).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Cross-encoder: one batched call over N candidates.</li>
+<li>LLM-judge: one call per doc — much slower.</li>
+<li>Weigh added latency against precision gain.</li>
+</ul>
+<p><strong>Concept.</strong> Reranking latency scales with the number of candidates and whether the model scores them in one batch or one-by-one. A cross-encoder over ~50–100 candidates typically adds tens to low-hundreds of milliseconds; an LLM-judge reranker is one call per document and can add seconds.</p>
+<p><img alt="diagram" src="assets/diagrams/d11bdd6606b33b28cb56745d131597426cefe527.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's reranker sends all candidates in a single request with no batching (default 10s timeout, retries with backoff); the LLM-judge variant handles one document per call, so its cost is linear in candidates and it is marked experimental. Reranking is optional and off by default, so the latency is only incurred when you enable it.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>RerankerConfig.timeout</code> defaults to 10 s, and <code>StandardReranker</code> sends <strong>all</strong> candidates in one request with <code>top_n=len(documents)</code> (no batching/concurrency), <code>max_retries=3</code> with backoff. <code>ChatReranker</code> enforces a list of size 1, so it costs one LLM call per candidate (O(N) latency) and is flagged experimental. There is no per-document timing, only the request timeout.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:22</code></td>
+<td><code>timeout</code> default 10 s</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:120</code></td>
+<td><code>top_n=len(documents)</code> single request; <code>:35</code> <code>max_retries=3</code></td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:113</code></td>
+<td>list-size-1 constraint (per-doc LLM call)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/utils/api_requests.py:55</code></td>
+<td>retry/backoff loop</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-when-is-reranking-worth-the-latency-cost">9. When is reranking worth the latency cost?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Rerank when precision@k dominates, the candidate set is bounded, and results are cacheable — not when latency/cost grow with N.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Worth it when precision@k matters more than latency.</li>
+<li>Worth it when the candidate set is bounded/cacheable.</li>
+<li>Unbounded reranking is usually not worth it.</li>
+</ul>
+<p><strong>Concept.</strong> Rerank when precision@k matters more than latency, when the candidate count is bounded, and when results can be cached. Reranking a large, unbounded candidate set is usually not worth it — the latency and cost grow with N while the precision gain does not.</p>
+<p><img alt="diagram" src="assets/diagrams/386ad0bec75e71a89ef226dfe1635d690de65380.png" /></p>
+<p><strong>In Jiuwen.</strong> Reranking is optional (reranker=None) and the product pins rerank_enabled: False. The only guard is a per-request timeout + min_score; there is no candidate cap, batch size, or cost accounting, so whether it is worth it is a caller decision.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The reranker is optional (<code>reranker=None</code> by default), and the product <code>jiuwenswarm</code> pins <code>rerank_enabled: False</code> in its external memory builder. The only guard is the per-request timeout plus <code>min_score</code>; there is no candidate cap, rerank batch size, or cost accounting — so “is it worth it” is a caller decision, not an enforced policy. There is no per-query rerank policy and no NDCG-driven decision (only the demo score-delta script).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:167</code></td>
+<td><code>reranker=None</code> optional</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/external_memory_builder.py:340</code></td>
+<td>product pins <code>rerank_enabled: False</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-bi-encoder-for-retrieval-vs-cross-encoder-for-reranking">10. Bi-encoder for retrieval vs. cross-encoder for reranking</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Bi-encoders embed query and document independently (fast, precomputable, indexable); cross-encoders feed query+document together for a precise relevance score (slow, per-pair).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Bi-encoder: independent embeddings, scalable retrieval.</li>
+<li>Cross-encoder: joint scoring, higher precision, per-pair cost.</li>
+<li>Use bi-encoder to retrieve, cross-encoder to rerank.</li>
+</ul>
+<p><strong>Concept.</strong> A bi-encoder embeds query and document independently (fast, precomputable, indexable) but cannot model their interaction. A cross-encoder feeds query+document together through the model and scores the pair, capturing fine-grained relevance at the cost of one forward pass per candidate — hence two-stage retrieval.</p>
+<p><img alt="diagram" src="assets/diagrams/fc088312f422eb4d8971c2c052819912378aa018.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen retrieves with a bi-encoder (query and documents embedded independently and compared by similarity) and reranks with a cross-encoder or an LLM judge: the standard reranker posts the query and all documents to a rerank endpoint and reads the relevance score; the chat reranker asks a yes/no judge question. Retrieval is vector-based; reranking is the expensive joint model.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Retrieval is bi-encoder (query and docs embedded independently, compared by vector similarity). Reranking is cross-encoder / LLM-as-reranker: <code>StandardReranker</code> POSTs <code>instruct+query</code> and all documents to a <code>/rerank</code> endpoint and reads <code>relevance_score</code>; <code>ChatReranker</code> (experimental) asks a chat LLM a yes/no judge question and returns <code>P(yes)/(P(yes)+P(no))</code> from <code>top_logprobs</code>; <code>DashscopeReranker</code> extends <code>StandardReranker</code> for DashScope's <code>text-rerank</code> endpoint. Scoring is query-conditioned at rerank time, unlike the bi-encoder's independent embeddings.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code></td>
+<td>independent query bi-encoder</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:28</code></td>
+<td>/rerank endpoint; :29 instruct+query template; :81 parses relevance_score</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/chat_reranker.py:83</code></td>
+<td>logprob yes/no scoring; :125 chat prompt assembly</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/dashscope_reranker.py:16</code></td>
+<td>DashScope reranker</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-how-do-you-chunk-documents-that-mix-prose-tables-and-code">11. How do you chunk documents that mix prose, tables, and code?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Prose, tables, and code need separate chunking rules: keep code blocks whole, keep table rows with their header, split prose at paragraph/sentence boundaries.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Code: keep function/block whole.</li>
+<li>Tables: header + rows together.</li>
+<li>Prose: paragraph or sentence split.</li>
+<li>Jiuwen: CharChunker/CharSplitter cut at fixed offsets with no content-type detection; HybridChunker keeps table units whole.</li>
+</ul>
+<p><strong>Concept.</strong> Uniform character or token splitting destroys the structure of tables and code. Apply content-aware chunking: detect content type (prose, Markdown table, fenced code block), then apply per-type rules — keep fenced code blocks whole (or split at the function boundary for long files), keep table rows together with their header row, and split prose at paragraph or sentence boundaries. Attach metadata to each chunk (content_type, source_section) so downstream filtering can distinguish them. For large tables or code files that exceed your chunk budget, summarize or use a structured query path (text-to-SQL, AST grep) instead of embedding the raw content.</p>
+<p><img alt="diagram" src="assets/diagrams/aefe5396416e13534a56309758de51c9819aa798.png" /></p>
+<p><strong>In Jiuwen.</strong> CharChunker/CharSplitter (agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/char_chunker.py:12) cut at fixed character offsets with no content-type detection; HybridChunker keeps parser-emitted table units (metadata.source_type in row/column) whole and delegates the rest. Chunkers propagate Document metadata and add chunk_index/total_chunks/chunk_id, but no chunker derives content type from structure. No Markdown-table/code-fence-aware splitter, and no structured-query fallback for table-heavy content.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The default is <code>CharChunker</code> → <code>CharSplitter</code>, which cuts at fixed character offsets with no content-type detection — an offset can fall inside a code block, table row, or sentence. <code>HybridChunker</code> is the one structural guard: it keeps parser-emitted table units (<code>metadata.source_type in ("row","column")</code>) whole and delegates the rest. Chunkers propagate <code>Document</code> metadata and add <code>chunk_index</code>/<code>total_chunks</code>/<code>chunk_id</code>, but no chunker derives content type from structure, there is no Markdown-header/code-fence-aware splitter, and there is no structured-query fallback for table-heavy content.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:34</code></td>
+<td>CharSplitter, fixed offset splits (:56 slicing loop)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/char_chunker.py:12</code></td>
+<td>CharChunker</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19</code></td>
+<td>HybridChunker keeps row/column units whole; :76 writes chunk_index/total_chunks/chunk_id</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/document.py:30</code></td>
+<td>TextChunk (id_, text, doc_id, metadata, embedding)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

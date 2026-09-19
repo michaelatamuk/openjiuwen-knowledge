@@ -1,0 +1,281 @@
+/* Difficulty filter + sort controls for the offline site. */
+.q-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 20px;
+}
+.q-chip {
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+  background: transparent;
+  color: var(--md-default-fg-color, #111);
+  font-size: 12px;
+  cursor: pointer;
+}
+.q-chip.active {
+  border-color: var(--md-primary-fg-color, #3f51b5);
+  color: var(--md-primary-fg-color, #3f51b5);
+  font-weight: 600;
+}
+.q-sort { margin-left: auto; }
+
+/* Difficulty badge. */
+.md-typeset .badge {
+  display: inline-block;
+  padding: 1px 8px;
+  margin-right: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--md-primary-fg-color--light, #7c8bd4);
+  color: var(--md-primary-fg-color, #3f51b5);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+/* All badges neutral; distinguish by weight/contrast, not colour. */
+.md-typeset .badge-type {
+  font-weight: 500;
+  color: var(--md-default-fg-color--light, #7a7a7a);
+}
+.md-typeset .badge-basic,
+.md-typeset .badge-intermediate,
+.md-typeset .badge-advanced {
+  font-weight: 700;
+  color: var(--md-default-fg-color, #333);
+}
+.md-typeset .badge-title {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--md-default-fg-color--light, #8a8a8a);
+}
+
+/* Code-anchor tables inside technical detail: smaller and denser. */
+.md-typeset details table {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  display: table;
+  width: 100%;
+}
+.md-typeset details table th,
+.md-typeset details table td {
+  padding: 0.25em 0.5em;
+  border: 0;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+}
+.md-typeset details table code {
+  font-size: 0.72em;
+  word-break: break-all;
+}
+
+/* Desktop sidebar only. The mobile drawer needs the full drill-down tree
+   (part labels, section headers, chevrons, Home), so everything below is
+   scoped to the desktop breakpoint. */
+@media screen and (min-width: 76.25em) {
+  /* The active Part is already shown by the header tab — drop the duplicate
+     part/title label at the top of the sidebar navigation. */
+  .md-nav--primary > .md-nav__title,
+  .md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav__link,
+  .md-nav--primary > .md-nav__list > .md-nav__item--section > .md-nav > .md-nav__title,
+  .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav > .md-nav__title {
+    display: none !important;
+  }
+
+  /* Home is a header tab (and the logo) — don't repeat it in the sidebar. */
+  .md-nav--primary > .md-nav__list > .md-nav__item:has(> .md-nav__link[href="index.html"]) {
+    display: none !important;
+  }
+
+  /* Sections: quiet group labels (not collapsible headers, not bold). They are
+     always expanded, so drop the chevron and separate groups with a hairline. */
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    margin-top: 0.5rem;
+    padding-top: 0.3rem;
+    border-top: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--md-default-fg-color--light, #8a8a8a);
+  }
+  .md-nav--primary .md-nav__item--nested:first-child > .md-nav__link {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .md-nav--primary .md-nav__item--nested > .md-nav__link .md-nav__icon {
+    display: none;
+  }
+  .md-nav--primary .md-nav__item--nested > .md-nav__link:hover {
+    color: var(--md-default-fg-color, #333);
+  }
+  /* Topics: clear, normal-weight links with room to breathe. */
+  .md-nav--primary .md-nav__item > .md-nav__link {
+    font-size: 0.72rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+  }
+}
+
+/* Material hides the top tab bar below the desktop breakpoint and moves the
+   parts into the drawer. Keep the parts visible in the header on phones. */
+@media screen and (max-width: 76.234375em) {
+  .md-header > .md-tabs,
+  .md-container > .md-tabs {
+    display: block;
+  }
+}
+
+/* Mobile: show the ENTIRE tree in the menu (parts -> sections -> topics) as one
+   scrollable list, instead of Material's drill-down overlays where each level
+   replaces the previous and you must go back. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav {
+    position: static;
+    display: block;
+    height: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    grid-template-rows: none;
+    transition: none;
+  }
+  .md-nav--primary .md-nav__title {
+    display: none;
+  }
+  .md-nav--primary .md-nav__toggle {
+    display: none;
+  }
+  .md-nav--primary .md-nav[data-md-level="1"] > .md-nav__list > .md-nav__item > .md-nav__link {
+    padding-left: 1.2rem;
+  }
+  .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item > .md-nav__link {
+    padding-left: 2.4rem;
+    font-size: 0.72rem;
+    opacity: 0.85;
+  }
+}
+
+/* Mobile full-tree menu: don't also pull the current page's table of contents
+   (the question list) into the drawer. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav--secondary {
+    display: none !important;
+  }
+}
+
+/* Mobile full-tree menu: no drill-down chevrons — everything is already shown. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link .md-nav__icon {
+    display: none;
+  }
+}
+
+/* Mobile full-tree menu: parts/sections are just group labels now (the tree is
+   always shown), so don't let them collapse/expand on tap. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+/* Mobile full-tree menu: group labels (parts, sections) should read as captions,
+   not as blue links. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__item--nested > .md-nav__link {
+    color: var(--md-default-fg-color--light, #8a8a8a) !important;
+    font-weight: 500;
+  }
+}
+
+/* Mobile full-tree menu: mark the current topic with weight, not a blue link. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__link--active {
+    color: var(--md-default-fg-color, #333) !important;
+    font-weight: 600;
+  }
+}
+
+/* Mobile full-tree menu: the active item's chevron expands the on-page TOC,
+   which we hide here — so drop the chevron too. */
+@media screen and (max-width: 76.234375em) {
+  .md-nav--primary .md-nav__link[for="__toc"] .md-nav__icon {
+    display: none;
+  }
+}
+
+/* Prev / next topic bar at the top of every topic page, so readers know other
+   topics exist without discovering the sidebar/footer. */
+.topic-nav {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin: 0 0 1.2rem;
+}
+.topic-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: 48%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--md-default-fg-color--lightest, #e0e0e0);
+  border-radius: 0.3rem;
+  text-decoration: none;
+  overflow: hidden;
+}
+.topic-nav__next {
+  text-align: right;
+  margin-left: auto;
+}
+.topic-nav__dir {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-default-fg-color--light, #8a8a8a);
+}
+.topic-nav__name {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color, #333);
+}
+.topic-nav__link--off {
+  visibility: hidden;
+}
+
+/* Prev/next topic bar is for when the sidebar is hidden (phones/tablets). On
+   desktop the sidebar already provides navigation, so hide it there. */
+@media screen and (min-width: 76.25em) {
+  .topic-nav {
+    display: none;
+  }
+}
+
+/* Mobile menu: stop the scroll area from re-anchoring / chaining, which makes
+   the scrollbar jump while moving through the tree. */
+@media screen and (max-width: 76.234375em) {
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    overflow-anchor: none;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile menu: make the sidebar scroll area the ONE scroller with an accurate
+   height, so the scrollbar doesn't vanish or snap back at the bottom. */
+@media screen and (max-width: 76.234375em) {
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-anchor: none;
+    overscroll-behavior: contain;
+  }
+  .md-nav--primary {
+    position: static;
+    display: block;
+    height: auto;
+  }
+}

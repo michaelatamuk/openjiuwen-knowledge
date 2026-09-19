@@ -1,0 +1,2584 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="index.html">
+      
+      
+        <link rel="next" href="21-agent-harness-and-rails.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Agent fundamentals & the loop - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-fundamentals-and-the-loop" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent fundamentals & the loop
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-whats-the-difference-between-a-chatbot-and-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What's the difference between a chatbot and an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-whats-the-difference-between-a-workflow-and-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What's the difference between a workflow and an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-when-should-you-use-a-deterministic-workflow-instead-of-an-autonomous-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. When should you use a deterministic workflow instead of an autonomous agent?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-whats-the-difference-between-a-linear-chain-and-a-graph-with-conditional-branches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What's the difference between a linear chain and a graph with conditional branches
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-whats-the-react-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What's the ReAct pattern?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-interleave-reasoning-and-actions-instead-of-planning-everything-upfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why interleave reasoning and actions instead of planning everything upfront?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-set-a-hard-limit-on-iterations-or-steps-within-a-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you set a hard limit on iterations or steps within a framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-what-decides-when-an-agent-stops-and-returns-a-final-answer-instead-of-calling-another-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. What decides when an agent stops and returns a final answer instead of calling another tool
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-preventing-an-agent-from-getting-stuck-in-an-infinite-tool-calling-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Preventing an agent from getting stuck in an infinite tool-calling loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-the-agent-is-stuck-tests-whether-youve-shipped-one-not-studied-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. "The agent is stuck" tests whether you've shipped one, not studied one
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-detect-and-prevent-divergence-in-an-agent-loop-not-just-cap-iterations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-are-the-explicit-termination-conditions-an-agent-needs-beyond-stop-when-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-whats-the-difference-between-a-chatbot-and-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What's the difference between a chatbot and an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-whats-the-difference-between-a-workflow-and-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What's the difference between a workflow and an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-when-should-you-use-a-deterministic-workflow-instead-of-an-autonomous-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. When should you use a deterministic workflow instead of an autonomous agent?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-whats-the-difference-between-a-linear-chain-and-a-graph-with-conditional-branches" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What's the difference between a linear chain and a graph with conditional branches
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-whats-the-react-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What's the ReAct pattern?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-why-interleave-reasoning-and-actions-instead-of-planning-everything-upfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Why interleave reasoning and actions instead of planning everything upfront?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-set-a-hard-limit-on-iterations-or-steps-within-a-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you set a hard limit on iterations or steps within a framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-what-decides-when-an-agent-stops-and-returns-a-final-answer-instead-of-calling-another-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. What decides when an agent stops and returns a final answer instead of calling another tool
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-preventing-an-agent-from-getting-stuck-in-an-infinite-tool-calling-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Preventing an agent from getting stuck in an infinite tool-calling loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-the-agent-is-stuck-tests-whether-youve-shipped-one-not-studied-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. "The agent is stuck" tests whether you've shipped one, not studied one
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-how-do-you-detect-and-prevent-divergence-in-an-agent-loop-not-just-cap-iterations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. How do you detect and prevent divergence in an agent loop — not just cap iterations?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-are-the-explicit-termination-conditions-an-agent-needs-beyond-stop-when-done" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What are the explicit termination conditions an agent needs — beyond "stop when done"?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<span class="topic-nav__link topic-nav__link--off">← Previous</span>
+<a class="topic-nav__link topic-nav__next" href="21-agent-harness-and-rails.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent harness and lifecycle hooks</span></a>
+</div>
+
+<h1 id="agent-fundamentals-and-the-loop">Agent fundamentals and the loop</h1>
+<h2 id="1-whats-the-difference-between-a-chatbot-and-an-agent">1. What's the difference between a chatbot and an agent</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A chatbot maps one input to one model reply; an agent runs a loop (model → tools → results → repeat) until a stopping condition.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Chatbot: one model turn, no tools.</li>
+<li>Agent: tool/reason loop with a stopping rule.</li>
+<li>The loop and tools, not the model, define an agent.</li>
+</ul>
+<p><strong>Concept.</strong> A chatbot maps one input to one model reply. An agent runs a loop: it calls the model, may call tools, feeds results back, and repeats until a stopping condition is met. The defining trait is the tool/reason loop and a termination rule, not the size of the model.</p>
+<p><img alt="diagram" src="assets/diagrams/46d3f7fa6d1ee0ccb7d941e4d8e6e9ccea7d560a.png" /></p>
+<p><img alt="diagram" src="assets/diagrams/de0320b3bf22bf79d58e8d6d75a0221efa72861e.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no separate chatbot class; the distinction is structural. A single model turn is the workflow LLM component, which calls the model once and has no tool branch. An agent is the ReAct loop: it calls the model, and if the reply has no tool calls it returns the answer; otherwise it executes the tools and feeds the results back for another turn.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no separate <code>Chatbot</code> class; the distinction is structural. A single model turn is the workflow LLM component, which calls <code>llm.invoke</code> once and has no tool branch. An agent is the loop in <code>ReActAgent.invoke</code>: it calls the model, and if the returned message has no tool calls it returns the answer; otherwise it executes the tools and iterates. <code>DeepAgent</code> wraps this with an outer task loop.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:524</code></td>
+<td>single model call, no tool branch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code></td>
+<td>the ReAct loop</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793</code></td>
+<td>no tool calls → final answer</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813</code></td>
+<td>execute tools and iterate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2694</code></td>
+<td>outer task loop</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-whats-the-difference-between-a-workflow-and-an-agent">2. What's the difference between a workflow and an agent</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A workflow is a pre-declared graph (you author steps/edges/branches); an agent decides its next step at runtime from model output.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Workflow: fixed topology, predictable, cheap.</li>
+<li>Agent: runtime branching on model output.</li>
+<li>A workflow can embed an agent as a node.</li>
+</ul>
+<p><strong>Concept.</strong> A workflow is a pre-declared graph: you author the steps, edges, and branches, and execution follows that topology. An agent decides its next step at runtime from model output. Workflows are predictable and cheap; agents are flexible and variable. They compose: a workflow can contain an agent node.</p>
+<p><img alt="diagram" src="assets/diagrams/34ab90ade5edd94b01e490d14152c843dcda55c8.png" /></p>
+<p><img alt="diagram" src="assets/diagrams/8b9023af7bdc842199e0add8b231a8f88e3873dd.png" /></p>
+<p><strong>In Jiuwen.</strong> The workflow engine is a Pregel-style graph machine: topology is declared up front via the start component and (conditional) connections, and execution ends at the end component. An agent loop instead branches on live tool calls. A workflow can embed an agent as one of its nodes, so the two are layers, not opposites.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The workflow engine is a Pregel-style graph machine. Topology is declared up front via the start component, connections, and conditional connections, and execution terminates when the end component produces output. An agent loop instead branches on live <code>tool_calls</code>. A workflow can embed an agent as one node, where a single executable just calls the agent's <code>invoke</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:98</code></td>
+<td>Workflow class</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:255</code></td>
+<td>graph execution driver</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:136/279/311</code></td>
+<td>set_start_comp / add_connection / add_conditional_connection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:551</code></td>
+<td>terminates when the end component produces output</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/llm/react/react_executable.py:41</code></td>
+<td>workflow node embedding an agent</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-when-should-you-use-a-deterministic-workflow-instead-of-an-autonomous-agent">3. When should you use a deterministic workflow instead of an autonomous agent?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Use a workflow when the task structure is fully known; use an agent when the next action depends on prior results in ways you cannot enumerate. Most production systems are hybrid: deterministic outer shell with agent sub-tasks where flexibility is required.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Workflow: fixed developer-defined step sequence — deterministic, bounded cost, enumerable failure modes, unit-testable.</li>
+<li>Agent: model-driven loop — model chooses tools and termination, flexible but non-deterministic and harder to test.</li>
+<li>Choose workflow: task structure known, compliance requires same path every time, cost must be bounded.</li>
+<li>Choose agent: task requires open-ended reasoning, tool selection is context-dependent, goal is underspecified.</li>
+<li>Hybrid pattern: deterministic outer workflow calling agent sub-tasks only where flexibility is genuinely required — build the workflow path first.</li>
+</ul>
+<p><strong>Concept.</strong> A <strong>workflow</strong> is a fixed, developer-defined sequence of steps — the control flow is hardcoded. An <strong>agent</strong> is a model-driven loop where the model decides which tools to call and when to stop. The distinction matters for reliability, cost, and testability.</p>
+<p><img alt="diagram" src="assets/diagrams/abe0963426d0474a1996974eb0641754eb0e1e57.png" /></p>
+<p><strong>In Jiuwen.</strong> The graph path (Pregel-based workflow engine) handles known control flow with static and conditional routers, barriers, and OR-groups. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration. Hybrid: a workflow can delegate a sub-step to an agent sub-task.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The graph path (Pregel-based workflow engine with static and conditional routers, barriers, OR-groups) handles known control flow. The agent harness (ReAct loop with rails) handles dynamic tool use. Both are first-class: the framework design guidance is explicit — use graphs for known control flow, the agent harness for flexible collaboration.</p>
+</details>
+<hr />
+<h2 id="4-whats-the-difference-between-a-linear-chain-and-a-graph-with-conditional-branches">4. What's the difference between a linear chain and a graph with conditional branches</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A linear chain always activates the next step; a graph adds routing (choose successors from state) and joining/barriers (when a merge node is ready).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Linear: static edges, fixed order.</li>
+<li>Graph: conditional edges route by state.</li>
+<li>Join/barrier gates merge nodes.</li>
+</ul>
+<p><strong>Concept.</strong> A linear chain is a fixed sequence where each step always activates the next. A graph adds branching and merging: a router selects successors based on state at runtime, and a join/barrier decides when a merge node is ready (all predecessors, or any of an exclusive group).</p>
+<p><img alt="diagram" src="assets/diagrams/b28b32b3210dcec06b0adfcd38b9c38b2f089268.png" /></p>
+<p><strong>In Jiuwen.</strong> Both use the same graph engine. A static connection becomes a simple router (one-to-many) or a barrier (many-to-one, with OR-groups for mutually exclusive predecessors). A conditional connection registers a branch router that picks successors from state at runtime. So the difference is which kind of edge you add, not a different engine.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Both are built on the same <code>PregelGraph</code>. <code>add_connection</code> registers a static edge; at compile time <code>PregelGraph._compile</code> turns static edges into <code>StaticRouter</code> (1→N) or <code>BarrierChannel</code> (N→1, with CNF OR-groups for mutually exclusive predecessors). <code>add_conditional_connection</code> registers a branch router compiled to <code>ConditionalRouter</code>, whose <code>dispatch</code> calls the user selector and emits <code>TriggerMessage</code>s only for the chosen targets. A linear chain always activates its single successor; a conditional graph activates only the selector's targets, and <code>BranchRouter</code> raises <code>COMPONENT_BRANCH_EXECUTION_ERROR</code> if none match.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/f8187e4326273ad5b0aef299c2f2d3537c7bb91f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:279</code></td>
+<td>add_connection (static); :311 — add_conditional_connection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/_workflow.py:221</code></td>
+<td>BaseWorkflow.add_connection → self._graph.add_edge; :255 — add_conditional_connection wraps BranchRouter + register_branch_targets</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/graph.py:103</code></td>
+<td>add_edge; :122 — add_conditional_edges; :267 _compile; :300 adds branches to the Pregel builder</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/builder.py:28</code></td>
+<td>add_edge (N→1 BarrierChannel, 1→N StaticRouter); :67 add_branch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/router.py:11</code></td>
+<td>StaticRouter.dispatch; :26 ConditionalRouter.dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/channels.py:104</code></td>
+<td>TriggerChannel; :129 BarrierChannel; :166 is_ready (CNF OR-groups)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/flow/branch_router.py:92</code></td>
+<td>BranchRouter.<strong>call</strong></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-whats-the-react-pattern">5. What's the ReAct pattern?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> ReAct alternates thought → action → observation, so each tool result informs the next reasoning step.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Alternates reason, act, observe.</li>
+<li>Each observation feeds the next thought.</li>
+<li>Repeats until there are no tool calls.</li>
+</ul>
+<p><strong>Concept.</strong> ReAct alternates thought → action → observation. Each action's real result informs the next thought, so the agent grounds its reasoning in observed state rather than assumptions about it.</p>
+<p><img alt="diagram" src="assets/diagrams/971c7b05dfe483d7b85ee7fc0d2cef8ab26c445c.png" /></p>
+<p><strong>In Jiuwen.</strong> The loop is exactly reason/act/observe: model call, branch on tool_calls, execute the tools, feed ToolMessages back as the next observation, and repeat until there are no tool calls. The reasoning trace is retained by copying reasoning_content into the assistant message, and the iteration number is exposed to rails.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The loop is exactly reason/act/observe: model call, branch on <code>tool_calls</code>, execute, feed <code>ToolMessage</code>s back as the next observation, repeat. The reasoning trace is retained by copying <code>reasoning_content</code> into the assistant message, and the iteration number is exposed to rails.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2766</code></td>
+<td>model call (reason)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793</code></td>
+<td>branch on tool calls</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813</code></td>
+<td>execute (act)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2787</code></td>
+<td>retain reasoning_content</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2742</code></td>
+<td>iteration exposed to rails</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:568</code></td>
+<td>ReActAgent documents the pattern</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-why-interleave-reasoning-and-actions-instead-of-planning-everything-upfront">6. Why interleave reasoning and actions instead of planning everything upfront?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A fully upfront plan cannot react to what tools return; interleaving feeds each result back so the agent adapts.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>An upfront plan executes with no feedback.</li>
+<li>Interleaving grounds each step in real results.</li>
+<li>Adapts when reality differs from the plan.</li>
+</ul>
+<p><strong>Concept.</strong> A fully upfront plan executes with no feedback, so it cannot adapt when reality differs. Interleaving feeds each observation back into the next reasoning step, which corrects drift and grounds the plan in what the tools actually returned.</p>
+<p><img alt="diagram" src="assets/diagrams/a5765913ba8c7ee5fb7b8ea765f036612234df01.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-decides based on the latest observation and is bounded by max_iterations (default 5). The deep agent's outer task loop is likewise iterative (todos updated as results arrive) rather than a fixed upfront plan.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Jiuwen's agent is a ReAct loop, not a plan-then-execute pipeline: every turn re-decides based on the latest observation and is bounded by <code>max_iterations</code> (default 5). The deep agent's outer task loop is likewise iterative — todos are updated as results arrive — rather than a fixed upfront plan.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793</code></td>
+<td>re-decides each turn from the latest observation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813</code></td>
+<td>acts, then loops on the result</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations=5 bounds the loop</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2723</code></td>
+<td>outer task loop (iterative, hard ceiling)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-do-you-set-a-hard-limit-on-iterations-or-steps-within-a-framework">7. How do you set a hard limit on iterations or steps within a framework</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Cap the loop with a max-iteration/round counter plus token/time budgets, enforced (not just reported), with a cap at each nesting level and configurable.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Max iterations/rounds, enforced.</li>
+<li>Add token and wall-clock budgets.</li>
+<li>Cap each nested loop; make caps configurable.</li>
+</ul>
+<p><strong>Concept.</strong> Cap the loop with a max-iteration/max-round counter, plus optional token and wall-clock budgets, and <em>enforce</em> them rather than only reporting. Nested loops need a cap at each level, and the caps should be configurable.</p>
+<p><img alt="diagram" src="assets/diagrams/dd8fd10099ac9e189f39b40a039059f161a10291.png" /></p>
+<p><strong>In Jiuwen.</strong> The inner ReAct loop is bounded by the agent config's max_iterations (default 5) and exits with an error result when exceeded. When the task loop is enabled, the inner ReAct ceiling is raised and the real bound moves to the outer loop, where a coordinator OR-evaluates stop evaluators; there is also a hard outer-round literal.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The inner ReAct loop is bounded by <code>ReActAgentConfig.max_iterations</code> (default 5) and exits with <code>{"result_type": "error", "output": "Max iterations reached without completion"}</code>. When <code>enable_task_loop=True</code>, DeepAgent raises the inner ReAct ceiling to <code>sys.maxsize</code> and moves the real bound to the outer task loop, where <code>LoopCoordinator.should_continue()</code> OR-evaluates a chain of <code>StopConditionEvaluator</code>s. <code>TaskCompletionRail.build_evaluators()</code> contributes <code>MaxRounds</code>/<code>Timeout</code>/<code>TokenBudget</code>/<code>CompletionPromise</code>; the <code>NoProgressAnswer</code> evaluator is added separately from <code>task_loop_no_progress_guard</code> (<code>deep_agent._build_task_loop_evaluators</code>). Independently, <code>_run_task_loop</code> hard-codes <code>max_outer_rounds = 50</code> and force-stops with <code>stop_reason: "MaxOuterRounds"</code>. Team members reuse the wiring via <code>TaskCompletionRail(max_rounds=...)</code>, and cooperative stops exist via <code>ctx.request_force_finish()</code> and <code>DeepAgent.abort()</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations: int = Field(default=5); :2740 the bounded loop; :2852 exhaustion result</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/stop_condition.py:134</code></td>
+<td>MaxRoundsEvaluator.should_stop; :143 TokenBudget; :162 Timeout</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/task_loop/loop_coordinator.py:139</code></td>
+<td>should_continue() OR-chain; :110 increment_iteration; :133 request_abort</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_completion_rail.py:168</code></td>
+<td>build_evaluators(); :178-185 build MaxRounds/Timeout/TokenBudget</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2723</code></td>
+<td>max_outer_rounds = 50; :2725 while coordinator.should_continue(); :2727-2739 force-stop; :1116 inner cap swap; :2338 _build_task_loop_evaluators; :3380 abort()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/agent_configurator.py:436</code></td>
+<td>member TaskCompletionRail(max_rounds=agent_spec.max_iterations)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/workflow/backends/budget_rail.py:88</code></td>
+<td>token-ceiling ctx.request_force_finish; agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:300 — review-round cap</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-what-decides-when-an-agent-stops-and-returns-a-final-answer-instead-of-calling-another-tool">8. What decides when an agent stops and returns a final answer instead of calling another tool</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Usually the model: no tool calls means the answer is final. Around that sit hard limits — max iterations, token/time budgets, explicit stop conditions.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>No tool calls → final answer.</li>
+<li>Hard limits: iterations, tokens, time.</li>
+<li>Outer loop: stop evaluators + completion promise.</li>
+</ul>
+<p><strong>Concept.</strong> Usually the model itself: when it emits no tool calls, the answer is final. Around that sit hard limits — max iterations, token/time budgets, and explicit stop conditions — so a confused agent does not loop forever.</p>
+<p><img alt="diagram" src="assets/diagrams/f91919515582cb53659fa3d07a9d4e5717d2d7d2.png" /></p>
+<p><strong>In Jiuwen.</strong> Two levels. Inner: in the ReAct agent, no tool calls means a final answer, bounded by max_iterations. Outer (the DeepAgent task loop): a coordinator OR-evaluates stop evaluators — max rounds, timeout, token budget, completion promise, and a no-progress answer evaluator — so the loop ends on the first condition that fires.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Two levels. Inner: in <code>ReActAgent</code>, no tool calls means a final answer, bounded by <code>max_iterations</code> (default 5). Outer (<code>DeepAgent</code> task loop): the <code>LoopCoordinator</code> OR-evaluates a chain of stop evaluators — max rounds, timeout, token budget, completion promise, and no-progress answer. Completion can also arrive as a <code>&lt;promise&gt;…&lt;/promise&gt;</code> marker extracted by <code>TaskCompletionRail</code>. A hardcoded ceiling of 50 outer rounds backstops everything.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2793</code></td>
+<td>no tool calls → final answer</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations default 5</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code></td>
+<td>inner loop</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/task_loop/loop_coordinator.py:139</code></td>
+<td>outer should_continue</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/stop_condition.py:124-331</code></td>
+<td>evaluator chain</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_completion_rail.py:403</code></td>
+<td>completion-promise extraction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2723</code></td>
+<td>hard 50-round ceiling</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-preventing-an-agent-from-getting-stuck-in-an-infinite-tool-calling-loop">9. Preventing an agent from getting stuck in an infinite tool-calling loop</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Cap iterations, detect repetition on canonicalized (tool,args), nudge or abort on no progress, and cap rounds/tokens/time.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Iteration cap.</li>
+<li>Repetition detection on canonicalized args.</li>
+<li>No-progress nudge/abort + token/time caps.</li>
+</ul>
+<p><strong>Concept.</strong> Cap iterations, detect repetition (same tool and arguments repeatedly), nudge or abort when no progress is made, and also cap rounds, tokens, and wall time. Detection should compare canonicalized arguments, not raw strings.</p>
+<p><img alt="diagram" src="assets/diagrams/e2976c86e390ddc74b4977018048d10cda77c0e4.png" /></p>
+<p><strong>In Jiuwen.</strong> The inner loop is capped by max_iterations (ReAct default 5, harness default 15). An anomaly-detection rail finds consecutive identical (tool name, canonicalized args) rounds and either folds them into a warning or aborts, and a dedup rail counts repeated read-only calls and warns. Outer caps add rounds, tokens, and time.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Inner cap <code>max_iterations</code> (ReAct default 5, harness default 15). Repetition detection: <code>ModelAnomalyDetectionRail</code> finds consecutive identical <code>(tool_name, canonical_args)</code> rounds and either folds them into a warning or aborts; <code>ToolCallDeduplicationRail</code> counts repeated read-only calls and warns. Outer guards: <code>NoProgressAnswerEvaluator</code>, <code>MaxRoundsEvaluator</code>, and the hard 50-round ceiling. Agent teams add repeat-tool and ping-pong detectors.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/6e2901e774084aaa9c66588fb0bb93cb4037fccb.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations default 5; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74/90</code></td>
+<td>tool-loop threshold + bailout</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>cross-turn repeat counter</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/stop_condition.py:181</code></td>
+<td>NoProgressAnswerEvaluator</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2723</code></td>
+<td>hard 50-round ceiling</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/reliability/detectors/repeat_tool.py:15</code></td>
+<td>repeat-tool; agent-core/openjiuwen/agent_teams/reliability/detectors/pingpong.py:12 — ping-pong</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-the-agent-is-stuck-tests-whether-youve-shipped-one-not-studied-one">10. "The agent is stuck" tests whether you've shipped one, not studied one</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> 'The agent is stuck' tests whether you've shipped one, not studied one.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>ReAct max_iterations (5; harness 15).</li>
+<li>Agentic retriever max iter (2, clamped).</li>
+<li>Anomaly rail: identical rounds → compact/abort.</li>
+<li>Dedup rail + session cost cap.</li>
+</ul>
+<p><strong>Concept.</strong> This claim is fair: diagnosing a stuck agent requires operational experience with loops, budgets, and retries rather than theory alone — though there is a knowledge question underneath the framing. Infinite tool loops, retries on a flaky API that never terminate, token spend that spikes overnight. The concrete controls are <code>max_iterations=5</code>, a token budget per session, and a circuit breaker after N consecutive tool failures: a hard iteration cap, repetition detection on canonicalized <code>(tool, args)</code>, a per-session token/cost budget, retry with backoff only for idempotent reads, and a circuit breaker on repeated failures.</p>
+<p><img alt="diagram" src="assets/diagrams/9697b9de619b0d05f8cba0f45f509f36f6ce3157.png" /></p>
+<p><strong>In Jiuwen.</strong> Concrete caps exist: ReAct max iterations (default 5, harness 15), agentic-retriever max iterations (default 2, clamped), an anomaly-detection rail (consecutive identical tool rounds trigger compaction or abort), and a tool-call dedup rail. A session cost cap is enforced.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Concrete caps exist: ReAct <code>max_iterations</code> (default 5, harness 15), <code>AgenticRetriever.max_iter</code> (default 2, clamped), <code>ModelAnomalyDetectionRail</code> (consecutive identical tool rounds → compact/abort) and <code>ToolCallDeduplicationRail</code>. A session cost cap is enforced when the provider reports cost, and <code>ModelBackupRail</code> fails over. What is <strong>missing</strong> is a circuit breaker after N consecutive failures and a durable token budget on the retrieval loop.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations: int = Field(default=5); agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code></td>
+<td>ToolLoopCompactConfig (default off); :90 bailout</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>repeat counter/warning</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171/196</code></td>
+<td>enforced session cost cap</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/model_backup.py:9</code></td>
+<td>ModelBackupRail failover (no circuit breaker)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-how-do-you-detect-and-prevent-divergence-in-an-agent-loop-not-just-cap-iterations">11. How do you detect and prevent divergence in an agent loop — not just cap iterations?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Cap iterations to stop infinite loops, but also detect meaningless cycling: track tool-call fingerprints and output-text similarity to catch repetitive steps early.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>ToolCallDeduplicationRail suppresses repeated identical calls within a session.</li>
+<li>ModelAnomalyDetectionRail detects repeated outputs (off by default).</li>
+<li>Gap: no output-text similarity comparison across turns to catch paraphrase loops.</li>
+</ul>
+<p><strong>Concept.</strong> A hard iteration cap (<code>max_iterations</code>) prevents runaway loops by time but does not detect that the agent is <em>stuck repeating itself</em>. Divergence detection is a complementary mechanism: (1) hash <code>(tool_name, canonicalised_args)</code> on each turn and compare against prior turns — if the same call recurs, the agent is spinning; (2) compare model output text similarity across consecutive turns — if the reasoning text is structurally identical, the agent is not making progress; (3) on detection, trigger a compaction step (rewrite history to remove the reinforcing noise) before continuing, rather than simply aborting. The goal is to detect the loop early and repair the context, not just stop at a budget limit.</p>
+<p><img alt="diagram" src="assets/diagrams/a2f28c1d97be76f28914e8cd647a73ae1f87f26c.png" /></p>
+<p><strong>In Jiuwen.</strong> ToolCallDeduplicationRail (jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47) suppresses repeated identical (tool, args) calls within a session. ModelAnomalyDetectionRail exists for output-pattern anomalies but is off by default. There is no output-text similarity comparison across turns, so paraphrase loops that change argument wording pass the dedup rail.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>ToolCallDeduplicationRail</code> hashes <code>(tool, args)</code> per turn and emits warnings on repeat. <code>ModelAnomalyDetectionRail</code> detects consecutive identical tool-call rounds and can trigger compact-then-abort (<code>ToolLoopCompactConfig</code>), but this config is <strong>off by default</strong> — loops generate warnings but do not abort without explicit configuration. There is no output-text-similarity divergence check (only tool-call-level detection). Compaction on loop is available via <code>FullCompactProcessor</code> but is not automatically triggered by the dedup rail.</p>
+</details>
+<hr />
+<h2 id="12-what-are-the-explicit-termination-conditions-an-agent-needs-beyond-stop-when-done">12. What are the explicit termination conditions an agent needs — beyond "stop when done"?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> An agent needs named success, budget-exceeded, and escalation exit paths — not just 'stop when done' — so every run terminates predictably and failures degrade gracefully.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Success: structured_output or answer action fires.</li>
+<li>Budget: turn/token cap, CircuitBreakerRail.</li>
+<li>Escalation: AskUserRail for human input.</li>
+<li>Gap: no graceful degraded response from any path — budget exhaustion raises rather than returns a partial result.</li>
+</ul>
+<p><strong>Concept.</strong> "Stop when done" is not a termination condition; it is an aspiration. A production agent needs at least three explicit paths: (1) <strong>success</strong> — the agent emits a final answer meeting a defined success condition (e.g., all required fields populated, context cited, schema valid); (2) <strong>budget exhaustion</strong> — hard cap on iterations and tokens, with a graceful degraded response (partial answer + "budget exceeded" notice) rather than silence or an error; (3) <strong>human escalation</strong> — when the agent cannot resolve the task within budget or detects irresolvable ambiguity, it hands off explicitly. Confidence threshold as a fourth optional path: if the model's self-assessed uncertainty is above a threshold, escalate before acting rather than produce an ungrounded answer.</p>
+<p><img alt="diagram" src="assets/diagrams/361f7c787eb7d9f172596097ecb8f0ad4e06444d.png" /></p>
+<p><strong>In Jiuwen.</strong> Success path: model emits a structured_output tool call or the ReactAgent's answer branch (react_agent.py:2793). Budget paths: turn cap (max_turns), CircuitBreakerRail trip on consecutive failures. Escalation: AskUserRail pauses and surfaces the question. Gap: no path returns a graceful degraded partial result — budget exhaustion raises an exception that propagates to the caller.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Multiple termination paths are implemented. <code>ReactAgent.max_iterations</code> is the hard iteration cap (default 5, harness 15). <code>PlanApprovalInterruptRail</code> and <code>StructuredAskUserRail</code> provide the human-in-the-loop escalation path. <code>ModelAnomalyDetectionRail</code> can abort on anomaly detection. <code>AgentObservabilityRail</code> always runs last, ensuring every turn is logged even at termination. What is <strong>absent</strong>: no graceful degraded response on budget exhaustion (the agent aborts rather than returning a partial answer), no confidence-threshold-based escalation, and <code>PlanApprovalInterruptRail</code> is opt-in per agent config.</p>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2643 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="15-evaluation.html">
+      
+      
+        <link rel="next" href="16-production-cost-and-scale.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Security & safety - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#security-and-safety" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Security & safety
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="18-security-and-safety.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-prompt-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is prompt injection?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-you-defend-against-prompt-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How do you defend against prompt injection?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-handling-untrusted-content-from-a-tool-result-or-retrieved-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Handling untrusted content from a tool result or retrieved document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-do-you-handle-a-user-trying-to-jailbreak-your-systems-guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How do you handle a user trying to jailbreak your system's guardrails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-do-you-make-sure-a-user-only-retrieves-documents-theyre-actually-authorized-to-see" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How do you make sure a user only retrieves documents they're actually authorized to see
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-prevent-an-agent-from-taking-a-destructive-or-irreversible-action-by-mistake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you prevent an agent from taking a destructive or irreversible action by mistake
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-prevent-a-model-from-generating-harmful-or-biased-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you prevent a model from generating harmful or biased content
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-preventing-sensitive-data-from-leaking-into-a-models-context-or-output-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Preventing sensitive data from leaking into a model's context or output logs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-design-a-multi-tenant-rag-system-where-each-customers-data-must-stay-isolated-from-others" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-is-constitutional-ai-and-how-does-it-reduce-the-human-labeling-bottleneck-in-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What is Constitutional AI and how does it reduce the human-labeling bottleneck in alignment?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-security-adjacent-questions-are-disguised-as-normal-engineering-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Security-adjacent questions are disguised as normal engineering questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-any-question-about-untrusted-input-is-testing-prompt-injection-awareness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Any question about untrusted input is testing prompt injection awareness
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-prompt-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is prompt injection?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-do-you-defend-against-prompt-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How do you defend against prompt injection?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-handling-untrusted-content-from-a-tool-result-or-retrieved-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Handling untrusted content from a tool result or retrieved document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-do-you-handle-a-user-trying-to-jailbreak-your-systems-guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How do you handle a user trying to jailbreak your system's guardrails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-do-you-make-sure-a-user-only-retrieves-documents-theyre-actually-authorized-to-see" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How do you make sure a user only retrieves documents they're actually authorized to see
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-prevent-an-agent-from-taking-a-destructive-or-irreversible-action-by-mistake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you prevent an agent from taking a destructive or irreversible action by mistake
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-prevent-a-model-from-generating-harmful-or-biased-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you prevent a model from generating harmful or biased content
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-preventing-sensitive-data-from-leaking-into-a-models-context-or-output-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Preventing sensitive data from leaking into a model's context or output logs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-design-a-multi-tenant-rag-system-where-each-customers-data-must-stay-isolated-from-others" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Design a multi-tenant RAG system where each customer's data must stay isolated from others
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-is-constitutional-ai-and-how-does-it-reduce-the-human-labeling-bottleneck-in-alignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What is Constitutional AI and how does it reduce the human-labeling bottleneck in alignment?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-security-adjacent-questions-are-disguised-as-normal-engineering-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Security-adjacent questions are disguised as normal engineering questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-any-question-about-untrusted-input-is-testing-prompt-injection-awareness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Any question about untrusted input is testing prompt injection awareness
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="15-evaluation.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Evaluation</span></a>
+<a class="topic-nav__link topic-nav__next" href="16-production-cost-and-scale.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Production, cost and scale</span></a>
+</div>
+
+<h1 id="security-and-safety">Security and safety</h1>
+<h2 id="1-what-is-prompt-injection">1. What is prompt injection?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Untrusted input can hijack the model (direct user input, or indirect via retrieved/tool content). Treat content as data, delimit/label it, never let it trigger privileged actions unchecked, and enforce with a permission layer.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Direct and indirect injection.</li>
+<li>Treat content as data, not instructions.</li>
+<li>Delimit/label untrusted content.</li>
+<li>Enforce privilege outside the model.</li>
+</ul>
+<p><strong>Concept.</strong> Untrusted input containing instructions that hijack the model. It is <strong>direct</strong> when the user types the malicious instruction, and <strong>indirect</strong> when it arrives inside retrieved documents, tool results, or any content the model reads.</p>
+<p><img alt="diagram" src="assets/diagrams/7541896f017731df954e0976d07cb54e3f063ec0.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen separates prompt-level from enforced defenses. Prompt-level: a safety rail injects a bilingual safety section before each call (instruction, not control). Enforced: shell command and process substitution is blocked before execution, and the permission engine merges tool policy, file guard, and net guard by strictest. Enforcement exists for actions, while content framing is weak.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Detection-side support exists but is not wired in: <code>core/security/guardrail/</code> provides <code>PromptInjectionGuardrail</code> with default regex patterns, and the auto-harness adds an input heuristic that force-finishes on “ignore previous instructions”. The configurable guardrail has <strong>no production registration</strong>, so detection is not active by default.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/0c9d421192bb3bf38c8d73776f6dc4853542ab9f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code></td>
+<td><code>PromptInjectionGuardrail</code></td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/backends.py:184</code></td>
+<td>default patterns</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119</code></td>
+<td>input heuristic → <code>request_force_finish</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-how-do-you-defend-against-prompt-injection">2. How do you defend against prompt injection?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Treat content as data, delimit untrusted content, re-check permissions, and enforce controls outside the model — prompt instructions are not a control.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Treat content as data, not instructions.</li>
+<li>Re-check permissions before privileged actions.</li>
+<li>Enforce controls outside the model (shell/permission).</li>
+</ul>
+<p><strong>Concept.</strong> Treat content as data, not instructions; delimit and label untrusted content; never let it trigger privileged actions without a permission re-check; and enforce controls outside the model (tool policy, sandboxing, egress rules). Instructions in the prompt alone are not a control.</p>
+<p><img alt="diagram" src="assets/diagrams/a3975b70c370b1562d3f9b22381902cc0b67a01b.png" /></p>
+<p><strong>In Jiuwen.</strong> Prompt-level defense is SafetyPromptRail (advice only). Enforced controls live in the shell/permission layer: substitution blocking, a tiered tool policy merged by strictest with an ASK floor for risky shell structures, and builtin deny rules for reverse shells, disk writes, shutdown, and sensitive paths.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The codebase separates prompt-level from enforced defenses. Prompt-level: <code>SafetyPromptRail</code> injects a bilingual safety section into the system prompt before each call (instruction, not control). Enforced: shell command/process substitution is blocked before execution; the permission engine merges tool policy + file guard + net guard by “strictest” and floors risky shell structures to ASK; builtin YAML denies reverse shells, disk writes, shutdown, and sensitive paths.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td><code>SafetyPromptRail</code>; <code>:38</code> injects safety section; <code>harness/prompts/sections/safety.py:14</code> static text</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29</code></td>
+<td>substitution regex; <code>:40</code> <code>check_injection</code> blocks</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code></td>
+<td>reverse-shell deny; <code>:35</code> disk; <code>:99</code> shutdown; <code>:148</code> sensitive paths</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588</code></td>
+<td>tiered policy; <code>:409</code> shell AST floor; <code>:502</code> ASK fallback; <code>shell_ast.py:82</code> parse; <code>core.py:272</code> merge</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-handling-untrusted-content-from-a-tool-result-or-retrieved-document">3. Handling untrusted content from a tool result or retrieved document</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Treat tool output and retrieved docs as untrusted data: delimit and label them, strip control/escape sequences, and never let them trigger privileged actions without re-checking permissions.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Treat as data, not instructions.</li>
+<li>Delimit and label as data.</li>
+<li>Strip control/escape sequences.</li>
+<li>Re-check permissions before privileged actions.</li>
+</ul>
+<p><strong>Concept.</strong> Treat tool output and retrieved documents as untrusted data, never as instructions. Delimit and label them as data, strip control/escape sequences, and never let them silently trigger privileged actions without re-checking permissions. Prompt injection via tool output is a real threat because it flows straight into the model context.</p>
+<p><img alt="diagram" src="assets/diagrams/fbd5a3f9f6f760c4548e2dbb976a9314fb593e9b.png" /></p>
+<p><strong>In Jiuwen.</strong> This is the weakest area. Tool results are rendered through the tool's own renderer and wrapped in a plain tool message with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist but have no production callers.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Weakest area. Tool results are rendered through the tool's own <code>render_for_llm</code> and wrapped in a plain <code>ToolMessage</code> with no data/instruction framing; after-tool rails may rewrite the result but nothing marks it untrusted. Sanitizer helpers exist (<code>sanitize.py</code>) but have no production callers. The only untrusted-data defenses are prompt-level: the auto-harness input heuristic scans all input messages (tool-role messages already in the transcript included), and the personal-context pipeline instructs its summarizer to treat supplied content as untrusted data (one internal call). There is no mandatory untrusted-tool-result seam.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/6b2ba19562ed75f76e0c140e193f1c0c37285142.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:266</code></td>
+<td>_render_tool_result; :1612 builds ToolMessage with no untrusted wrapper; :1281 after-tool rewrite adds no label</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/sanitize.py:11</code></td>
+<td>sanitize_path; :20 sanitize_user_content (no production callers)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/auto_harness/rails/security_rail.py:119</code></td>
+<td>heuristic runs before model call</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/personal_context/context_pipeline.py:9237</code></td>
+<td>prompt-level "untrusted source data, never instructions"; agent-core/openjiuwen/harness/personal_context/agent_support.py:792 — same for the subagent path</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-how-do-you-handle-a-user-trying-to-jailbreak-your-systems-guardrails">4. How do you handle a user trying to jailbreak your system's guardrails</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Assume the model can be talked around, so enforce outside it: detect and block known patterns, keep privileged actions behind a permission check the model can't bypass, sandbox tools, and log/rate-limit attempts.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Assume the model can be manipulated.</li>
+<li>Detect/block known patterns.</li>
+<li>Permission-check privileged actions.</li>
+<li>Sandbox and log.</li>
+</ul>
+<p><strong>Concept.</strong> Assume the model can be talked around, so enforce outside it: detect and block known jailbreak/injection patterns at input, keep privileged actions behind a permission check that the model cannot bypass, sandbox tools, and log/rate-limit repeated attempts. No single regex is sufficient (paraphrase, encoding, multi-turn role-play evade it), so detection is a signal, not the control.</p>
+<p><img alt="diagram" src="assets/diagrams/0176bf5c85813ee89de5b270fdf191badc649bd5.png" /></p>
+<p><strong>In Jiuwen.</strong> There is no dedicated jailbreak subsystem, but four independent mechanisms. A rule-based injection detector matches ignore/disregard-previous-instructions and role-change patterns, but the guardrail is unregistered in production. The auto-harness permission engine and shell blocking are enforced. Pattern detection exists but is not wired in.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>No dedicated jailbreak subsystem; four independent mechanisms. A <code>RuleBasedPromptInjectionBackend</code> matches <code>ignore.*previous.*instructions</code>, <code>disregard.*prior.*commands</code>, <code>system.*prompt</code>, <code>you.*are.*now</code>, <code>act.*as</code>, <code>forget.*everything</code> — but the guardrail is unregistered in production. The auto-harness <code>SecurityRail</code> heuristic (production-registered only in the auto-harness factory) scans messages for suspicious patterns and force-finishes the run. Shell command substitution is hard-blocked, and the permission engine floors risky/unknown shell structures and interpreter sinks to ASK, with builtin rules denying reverse shells, shutdown, and sensitive paths, while recursive/forced delete (<code>rm -rf</code>) is floored to ASK rather than denied.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/3ca3866534d62f739069c9b9ac3fc3cf4012b2fb.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/backends.py:184</code></td>
+<td>default injection patterns; :127 RuleBasedPromptInjectionBackend</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/rails/security_rail.py:28</code></td>
+<td>_SUSPICIOUS_PATTERNS; :129 scan + request_force_finish; agent-core/openjiuwen/auto_harness/agents/factory.py:178 — production registration path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/shell/bash/_security.py:29</code></td>
+<td>_INJECTION_PATTERNS; :40 check_injection blocks; agent-core/openjiuwen/harness/tools/shell/bash/_tool.py:378 call site; agent-core/openjiuwen/harness/tools/shell/bash/_security.py:71 destructive-command warnings</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409</code></td>
+<td>shell AST ASK floor; :502 ASK fallback; :694 interpreter-sink ASK</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code></td>
+<td>reverse-shell DENY; :99 shutdown; :148 sensitive paths</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:246</code></td>
+<td>strictest merge; agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57 PermissionInterruptRail</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-do-you-make-sure-a-user-only-retrieves-documents-theyre-actually-authorized-to-see">5. How do you make sure a user only retrieves documents they're actually authorized to see</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Enforce authorization inside retrieval: every chunk carries ACL metadata, and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), not post-hoc.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>ACL metadata on every chunk.</li>
+<li>Mandatory identity-derived filter.</li>
+<li>Pre-filter in the store, not post-hoc.</li>
+</ul>
+<p><strong>Concept.</strong> Enforce authorization inside retrieval: every chunk carries ACL metadata (owner/group/tenant), and the query includes a mandatory filter derived from the caller's identity, applied by the vector store (pre-filter), never post-hoc. Prefer the strongest isolation you can afford (per-tenant index/collection), use row-level security where available, and audit.</p>
+<p><img alt="diagram" src="assets/diagrams/f861c94b6b67903e019f6116065e56c850f1c925.png" /></p>
+<p><strong>In Jiuwen.</strong> The store layer supports metadata filters (Milvus expressions, Chroma where, PG JSONB), plus a permission engine and audit logging. But retrieval filters are dropped at the retriever boundary: concrete retrievers hardcode no filters and the abstract retrieve has no filter argument. Authorization filters are not enforced in retrieval.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The store layer supports metadata filters (Milvus expr, Chroma <code>where</code>, PG JSONB) and there is a permission engine and audit logging. But <code>RetrievalConfig.filters</code> is <strong>dropped at the retriever boundary</strong> (concrete retrievers hardcode <code>filters=None</code>; the abstract <code>Retriever.retrieve</code> has no <code>filters</code> param), and documents/chunks have <strong>no ACL field</strong>. So permission-aware retrieval is not reachable through the KB path; the permission engine guards tool/file/net execution, not retrieval.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:53</code></td>
+<td>RetrievalConfig.filters; agent-core/openjiuwen/core/retrieval/retriever/base.py:19 — no filters param; agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:186 — KB passes it; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:88/agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:81 — filters=None</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/milvus_store.py:215</code></td>
+<td>, agent-core/openjiuwen/core/retrieval/vector_store/chroma_store.py:265, agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:332 — store-level filters</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code></td>
+<td>check_permission (tool/file/net)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/document.py:30</code></td>
+<td>no ACL field on TextChunk</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-how-do-you-prevent-an-agent-from-taking-a-destructive-or-irreversible-action-by-mistake">6. How do you prevent an agent from taking a destructive or irreversible action by mistake</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations over hard blocks. Fail closed — unknown should ask.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Classify by risk.</li>
+<li>Deny known-dangerous patterns.</li>
+<li>Approve the ambiguous middle.</li>
+<li>Prefer reversible ops; fail closed.</li>
+</ul>
+<p><strong>Concept.</strong> Layer defenses: classify actions by risk, deny known-dangerous patterns, require approval for the ambiguous middle, and prefer reversible operations (dry-run, snapshot, sandbox) over hard blocks alone. Fail closed — unknown should mean "ask", not "allow".</p>
+<p><img alt="diagram" src="assets/diagrams/44cc82c8434775e9564a0a842be3fa4064f71348.png" /></p>
+<p><strong>In Jiuwen.</strong> A layered permission engine returns allow, ask, or deny, merging tool policy, file guard, and net guard by strictest. Tool policy is tiered and falls back to ask when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ask. Destructive actions can be gated by approval.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>A layered permission engine returns <code>ALLOW</code>/<code>ASK</code>/<code>DENY</code>, merging tool policy + file guard + net guard by <code>strictest</code>. Tool policy is tiered and falls back to ASK when nothing matches. Shell commands are parsed with a tree-sitter AST; too-complex or unparseable-but-risky input is floored to ASK. Builtin rules deny reverse shells, fork bombs, disk writes, and shutdown/reboot, and deny sensitive paths like <code>~/.ssh/**</code> and <code>**/.env</code>. Injection via backticks/<code>$()</code> is blocked before execution.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code></td>
+<td>check_permission merge</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:502/588</code></td>
+<td>tiered policy, ASK fallback</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82</code></td>
+<td>tree-sitter shell parse</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409</code></td>
+<td>risky-structure ASK floor</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:10/148</code></td>
+<td>builtin deny rules + sensitive paths</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/shell/bash/_security.py:40</code></td>
+<td>injection blocking</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-do-you-prevent-a-model-from-generating-harmful-or-biased-content">7. How do you prevent a model from generating harmful or biased content</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Layer defenses: a system-prompt safety instruction, input/output classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. A prompt is advice, not a control.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Safety instruction in the system prompt.</li>
+<li>Input/output moderation.</li>
+<li>Policy filters on output.</li>
+<li>Red-team refusal behavior.</li>
+</ul>
+<p><strong>Concept.</strong> Layer defenses: a safety instruction in the system prompt, input and output content classifiers/moderation, policy filters on generated output, and refusal behavior validated by red-teaming. Because a prompt is advice not a control, real safety needs an enforced output filter. Bias specifically needs measurement (bias probes, disaggregated evals) and mitigation, not just a "be safe" instruction.</p>
+<p><img alt="diagram" src="assets/diagrams/1b7f967cab1b0c14523f3000daba12275c2c86dc.png" /></p>
+<p><strong>In Jiuwen.</strong> Two layers. Prompt-level (advisory): a safety rail is production-registered and appends a static bilingual safety section to the system prompt on each call, then always allows — it never inspects or rewrites content. Enforced-but-unwired: a guardrail package provides base guardrails. Output moderation is not active.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Two layers. Prompt-level (advisory): <code>SafetyPromptRail</code> is production-registered and, on each model call, appends a static bilingual safety section to the system prompt then always returns allow — it never inspects or rewrites content. Enforced-but-unwired: <code>core/security/guardrail/</code> provides <code>BaseGuardrail</code> + backends; <code>PromptInjectionGuardrail</code> can raise <code>AbortError</code>/<code>GuardrailError</code> on risky input/output, and an optional local <code>AutoModelForSequenceClassification</code> / QwenGuard classifier exists — but none has a production caller. There is no bias, toxicity, or content-policy detector anywhere.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/6e0d4cf6d1388ac3b6dc22d77b0ebeae56dfe292.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td>SafetyPromptRail; :38 injects section; :41 always returns allow</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/sections/safety.py:14</code></td>
+<td>(CN) / :26 (EN) — static safety text; :44 build_safety_section; :57 priority</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:93</code></td>
+<td>production import of SecurityRail; :8577 _build_security_rail(); jiuwenswarm/jiuwenswarm/agents/harness/team/team_runtime_inheritance.py:248 — team members create SecurityRail()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code></td>
+<td>PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/guardrail.py:378 — raises AbortError/GuardrailError</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/backends.py:445</code></td>
+<td>LocalModelBackend (AutoModelForSequenceClassification); agent-core/openjiuwen/core/security/guardrail/context.py:207 — QwenGuardParser</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/base_security_rail.py:59</code></td>
+<td>SecurityReject/SecurityInterrupt/SecurityAlert</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-preventing-sensitive-data-from-leaking-into-a-models-context-or-output-logs">8. Preventing sensitive data from leaking into a model's context or output logs</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Detect and redact secrets before they reach the model or logs: scrub known patterns (keys, tokens, PII) from tool results and prompts, redact log fields, gate secret-like egress, and rely on provider zero-retention.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Scrub secrets before model/logs.</li>
+<li>Redact log fields (not drop whole events).</li>
+<li>Gate secret-like egress.</li>
+<li>Provider zero-retention.</li>
+</ul>
+<p><strong>Concept.</strong> Detect and redact secrets before they reach the model or the logs: scrub known patterns (API keys, tokens, PII) from tool results and prompts, redact log fields (don't just drop whole fields), gate egress of secret-like payloads, and keep a path to audit without storing the secret. Detection alone is not redaction.</p>
+<p><img alt="diagram" src="assets/diagrams/3fafea3ab450953ebbd7ba20fd146495c7050b14.png" /></p>
+<p><strong>In Jiuwen.</strong> Actual model-context redaction exists only as a demo rail that regex-redacts keys, tokens, and bearer strings in history and responses. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, and a security demo has its own redaction. Model-context redaction is not production-wide.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Actual model-context redaction exists only as a demo rail: <code>SensitivedatasanitizeRail</code> regex-redacts keys/tokens/bearer strings in history and responses, replacing with <code>[REDACTED]</code>. In production, redaction is layer-specific: structured log events redact whole sensitive fields via an allowlist, the auto-permission audit writer redacts secret-like text before appending JSONL, and the auto-permission rule engine <em>detects</em> secret-like egress payloads to force ASK/DENY rather than redact. There is no built-in sensitive-data guardrail.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/examples/security_rail_demo/SensitiveDataSanitize/rail.py:27</code></td>
+<td>sensitive regexes; :60 run_security_check; :96 _sanitize_output rewrites history/response</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/common/logging/events.py:920</code></td>
+<td>sanitize_event_for_logging; :932 sensitive field list; :951 <REDACTED>; agent-core/openjiuwen/core/common/logging/base_impl.py:114 _sanitize_message</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/persistent_audit.py:50</code></td>
+<td>secret-like pattern; :262 _sanitize_audit_text; :289 combined detection</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/auto_decision.py:35</code></td>
+<td>egress secret patterns; :82 redacted risk labels</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py</code></td>
+<td>only PromptInjectionGuardrail (no sensitive-data guardrail)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-design-a-multi-tenant-rag-system-where-each-customers-data-must-stay-isolated-from-others">9. Design a multi-tenant RAG system where each customer's data must stay isolated from others</h2>
+<p><span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Isolation choices, strongest first: a separate index/collection per tenant; a tenant partition key with mandatory pre-filtering; or row-level security. The tenant filter must be applied inside the store.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Separate index per tenant (strongest).</li>
+<li>Tenant key + mandatory pre-filter.</li>
+<li>Row-level security.</li>
+<li>Filter inside the store.</li>
+</ul>
+<p><strong>Concept.</strong> Isolation choices, strongest first: a separate index/collection (or DB) per tenant; a tenant partition key with mandatory pre-filtering; or row-level security in a relational store. The key is that the tenant filter is applied inside the vector search and cannot be forgotten by a caller. Also isolate embeddings, caches, and logs per tenant, and audit cross-tenant access.</p>
+<p><img alt="diagram" src="assets/diagrams/2242858c563d307667cf8fc82a8307ae55b0c1ec.png" /></p>
+<p><strong>In Jiuwen.</strong> The only separation primitive is the collection name derived from the knowledge-base id plus a configurable database name — this isolates knowledge bases, not tenants. If tenants share a knowledge-base id, their chunks land in the same collection with no tenant column. Multi-tenant isolation is not enforced by default.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The only separation primitive is the collection name derived from <code>kb_id</code> (<code>kb_{kb_id}_chunks</code>/<code>_triples</code>) plus a configurable <code>database_name</code> — this isolates <strong>knowledge bases, not tenants</strong>; if tenants share a <code>kb_id</code>, their chunks land in the same collection with no tenant column. The product tracks <code>user_id</code> in auth sessions but never propagates it into retrieval. There is no tenant/namespace field on documents, and the retriever drops filters, so per-tenant pre-filtering is not available.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:102</code></td>
+<td>kb_{kb_id}<em kb_id="kb_id">chunks; agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:197 — kb</em>_triples</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:75</code></td>
+<td>VectorStoreConfig(database_name, collection_name, …)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/common/auth/session_store.py:198</code></td>
+<td>user_id in auth session (not retrieval)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/gateway/app_gateway.py:660</code></td>
+<td>WS user_id for routing/sandbox (not KB scoping)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-what-is-constitutional-ai-and-how-does-it-reduce-the-human-labeling-bottleneck-in-alignment">10. What is Constitutional AI and how does it reduce the human-labeling bottleneck in alignment?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> CAI has the model critique and revise its own outputs against explicit principles, replacing most human preference labeling.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>SL-CAI: generate response → model critiques against constitution → model revises → use revised responses for SFT</li>
+<li>RL-CAI: model generates preference pairs (chosen/rejected) scored against principles → reward model → RLHF</li>
+<li>Far fewer human labels needed than standard RLHF; the constitution is explicit and auditable</li>
+<li>Easier to update behavior: edit the principle list, not retrain a black-box reward model</li>
+<li>Jiuwen gap: safety rails are static classifiers (SecurityRail, PromptInjectionGuardrail); no self-critique loop or constitutional principle file</li>
+</ul>
+<p><strong>Concept.</strong> Constitutional AI (Bai et al. 2022, Anthropic) replaces a large portion of human preference labeling with <strong>model self-critique</strong>. The pipeline has two stages. (1) <strong>SL-CAI</strong>: generate responses, have the model critique each against a list of explicit principles (the "constitution" — rules like "do not assist with illegal activities", "be honest"), then revise based on the critique. Use these revised responses for supervised fine-tuning. (2) <strong>RL-CAI</strong>: use a reward model trained on model-generated preference pairs (not human-labeled pairs) to run RLHF. The result: steering a model toward a set of principles requires far fewer human labels. The "constitution" is an <strong>explicit, auditable list</strong> — easier to update and inspect than a black-box reward model trained on opaque human ratings. Claude's alignment training is based on CAI.</p>
+<p><img alt="diagram" src="assets/diagrams/cd5aaca33f9a6730908d57a102fce72ef669fb35.png" /></p>
+<p><strong>In Jiuwen.</strong> Safety enforcement uses static classifiers: SecurityRail (agent-core/openjiuwen/auto_harness/rails/security_rail.py:48) for prompt injection, PromptInjectionGuardrail (agent-core/openjiuwen/core/security/guardrail/builtin.py:60) with an AutoModelForSequenceClassification backend (agent-core/openjiuwen/core/security/guardrail/backends.py), and SafetyPromptRail (advisory prompt-level safety). No self-critique loop, no constitutional principle list, no model-generates-then-revises pipeline. To add a principle, an operator must update the classifier weights or the system prompt, not append to a principle document.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Safety enforcement uses fixed classifiers and rails rather than a self-critique loop: <code>SecurityRail</code> (auto-harness policy rail), <code>SafetyPromptRail</code> (injects static safety text into the prompt), and the guardrail framework (<code>PromptInjectionGuardrail</code> with pluggable <code>GuardrailBackend</code>s such as rule-based and model-based prompt-injection classifiers). These are static — there is no constitutional principle list that the model iterates against and no generate-critique-revise pipeline. Adding a principle means changing a classifier or a prompt, not editing a constitution document.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/rails/security_rail.py:48</code></td>
+<td>SecurityRail (static policy rail)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td>SafetyPromptRail (static safety text)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code></td>
+<td>PromptInjectionGuardrail; agent-core/openjiuwen/core/security/guardrail/backends.py:39 — GuardrailBackend</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-security-adjacent-questions-are-disguised-as-normal-engineering-questions">11. Security-adjacent questions are disguised as normal engineering questions</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> Security-adjacent questions are disguised as normal engineering questions.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Tool results not framed as untrusted.</li>
+<li>Sanitizers exist, unused.</li>
+<li>Prompt safety is advisory.</li>
+<li>Real control is the shell/permission layer.</li>
+</ul>
+<p><strong>Concept.</strong> This claim holds: ordinary-looking engineering questions about input handling, permissions, or egress are often security probes in disguise. Content from a tool result or retrieved document is untrusted input. Treat it as data, never as instructions: delimit and label untrusted content as data, never let it trigger privileged actions without a permission re-check, enforce controls outside the model (tool policy, sandbox, egress), and remember prompt-level safety text is advice, not a control.</p>
+<p><img alt="diagram" src="assets/diagrams/bd23a2c582f0d84607fa39f87399c2cd80d3fe7e.png" /></p>
+<p><strong>In Jiuwen.</strong> This is the weakest area. Tool results are returned as a plain tool message with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory, while the enforced controls live in the shell and permission layers.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>This is the weakest area. Tool results are returned as plain <code>ToolMessage</code> with no untrusted-data framing; sanitizer helpers exist but have no production callers. Prompt-level safety is advisory (<code>SafetyPromptRail</code> always allows), while the enforced controls live in the shell/permission layer (AST ASK floor, builtin deny rules) — not in retrieval. There is no mandatory untrusted-tool-result seam.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/f2fc8022c1cc50f211ec29fab1824742dacac291.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code></td>
+<td>ToolMessage built with no untrusted wrapper; :431 parallel path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code></td>
+<td>sanitizer (no production callers)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16/41</code></td>
+<td>SafetyPromptRail (advisory, always allows)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:272</code></td>
+<td>check_permission (enforced tool/file/net)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/resources/builtin_rules.yaml:59</code></td>
+<td>reverse-shell deny</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="12-any-question-about-untrusted-input-is-testing-prompt-injection-awareness">12. Any question about untrusted input is testing prompt injection awareness</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> Any question about untrusted input is testing prompt-injection awareness.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Tool results are plain messages.</li>
+<li>Sanitizers unused; detector unregistered.</li>
+<li>Safety rail is advisory.</li>
+<li>Real control: shell/permission layer.</li>
+</ul>
+<p><strong>Concept.</strong> This claim is mostly true, with a caveat: untrusted input is primarily a prompt-injection concern, but it also covers authorization and data handling. a tool result or retrieved document can carry hidden instructions. Treat tool output and retrieved content as data, never as commands, and sanitize input before it reaches the prompt: delimit and label untrusted content as data, strip it, enforce privileged actions outside the model (tool policy, sandbox, egress), and remember that a system-prompt warning is advice, not a control.</p>
+<p><img alt="diagram" src="assets/diagrams/d8e7aec4eea44ece4306dd59b3cfb07cf003a653.png" /></p>
+<p><strong>In Jiuwen.</strong> Weakest area. Tool results are plain messages with no untrusted-data framing, the sanitizer has no production callers, the injection detector is unregistered, and the safety rail is advisory. The real controls are in the shell and permission layer (substitution blocking, AST ask floor).</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Weakest area. Tool results are plain <code>ToolMessage</code> with no untrusted-data framing, <code>sanitize.py</code> has no production callers, the injection detector is unregistered, and <code>SafetyPromptRail</code> is advisory. The real controls are in the shell/permission layer (substitution blocking, AST ASK floor, builtin deny rules).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/c5c60909f90d09df5c1b6d9691dae96044b253e9.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1612</code></td>
+<td>ToolMessage with no wrapper</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/sanitize.py:20</code></td>
+<td>no production callers</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/security/guardrail/builtin.py:60</code></td>
+<td>PromptInjectionGuardrail (unregistered)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td>advisory safety rail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:409</code></td>
+<td>shell AST ASK floor</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

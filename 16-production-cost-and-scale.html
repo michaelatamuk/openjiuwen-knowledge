@@ -1,0 +1,2732 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="18-security-and-safety.html">
+      
+      
+        <link rel="next" href="24-ai-gateway.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Production, cost & scale - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#production-cost-and-scale" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Production, cost & scale
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="16-production-cost-and-scale.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-where-cost-concentrates-embedding-is-cheap-and-one-time-generation-scales-with-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-would-you-reduce-cost-for-a-high-volume-rag-system-without-degrading-answer-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How would you reduce cost for a high-volume RAG system without degrading answer quality
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-do-you-control-cost-in-a-system-where-usage-scales-unpredictably" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How do you control cost in a system where usage scales unpredictably
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-first-cut-at-50-cost-reduction-route-simple-queries-to-a-smaller-model-reduce-top-k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. First cut at 50% cost reduction: route simple queries to a smaller model, reduce top-k
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-controlling-cost-when-an-agent-can-call-tools-repeatedly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Controlling cost when an agent can call tools repeatedly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cutting-tokens-without-losing-quality-tighter-reranking-summarizing-long-chunks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-designing-caching-for-repeated-or-semantically-similar-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Designing caching for repeated or semantically similar queries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-reducing-latency-in-a-multi-step-llm-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Reducing latency in a multi-step LLM pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-multithreading-vs-multiprocessing-which-matters-more-for-io-bound-llm-api-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-happens-to-your-architecture-at-10x-current-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What happens to your architecture at 10x current traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scaling-questions-test-whether-youve-thought-past-the-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Scaling questions test whether you've thought past the demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-whats-your-rollback-plan-if-a-prompt-or-model-update-degrades-output-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What's your rollback plan if a prompt or model update degrades output quality?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-a-stakeholder-wants-to-ship-before-your-eval-scores-are-ready-how-do-you-handle-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. A stakeholder wants to ship before your eval scores are ready, how do you handle it
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-where-cost-concentrates-embedding-is-cheap-and-one-time-generation-scales-with-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-how-would-you-reduce-cost-for-a-high-volume-rag-system-without-degrading-answer-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. How would you reduce cost for a high-volume RAG system without degrading answer quality
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-do-you-control-cost-in-a-system-where-usage-scales-unpredictably" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How do you control cost in a system where usage scales unpredictably
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-first-cut-at-50-cost-reduction-route-simple-queries-to-a-smaller-model-reduce-top-k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. First cut at 50% cost reduction: route simple queries to a smaller model, reduce top-k
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-controlling-cost-when-an-agent-can-call-tools-repeatedly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Controlling cost when an agent can call tools repeatedly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-cutting-tokens-without-losing-quality-tighter-reranking-summarizing-long-chunks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Cutting tokens without losing quality: tighter reranking, summarizing long chunks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-designing-caching-for-repeated-or-semantically-similar-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Designing caching for repeated or semantically similar queries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-reducing-latency-in-a-multi-step-llm-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Reducing latency in a multi-step LLM pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-multithreading-vs-multiprocessing-which-matters-more-for-io-bound-llm-api-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-happens-to-your-architecture-at-10x-current-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What happens to your architecture at 10x current traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scaling-questions-test-whether-youve-thought-past-the-demo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Scaling questions test whether you've thought past the demo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-whats-your-rollback-plan-if-a-prompt-or-model-update-degrades-output-quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What's your rollback plan if a prompt or model update degrades output quality?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-a-stakeholder-wants-to-ship-before-your-eval-scores-are-ready-how-do-you-handle-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. A stakeholder wants to ship before your eval scores are ready, how do you handle it
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="18-security-and-safety.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Security and safety</span></a>
+<a class="topic-nav__link topic-nav__next" href="24-ai-gateway.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Model routing &amp; gateways</span></a>
+</div>
+
+<h1 id="production-cost-and-scale">Production, cost and scale</h1>
+<h2 id="1-where-cost-concentrates-embedding-is-cheap-and-one-time-generation-scales-with-traffic">1. Where cost concentrates: embedding is cheap and one-time, generation scales with traffic</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Embedding is a one-time, change-only indexing cost; the recurring traffic-scaling cost is generation, especially input tokens from long context. Optimize generation.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Embedding = one-time indexing cost.</li>
+<li>Generation scales with traffic.</li>
+<li>Input tokens dominate with long context.</li>
+</ul>
+<p><strong>Concept.</strong> Embedding is a one-time (or change-only) indexing cost and is cheap per token; the recurring, traffic-scaling cost is generation — especially input tokens when you stuff long context. So optimization effort should go to the generation loop (fewer iterations, smaller context, cheaper model) more than to embeddings. Measure input vs output tokens separately.</p>
+<p><img alt="diagram" src="assets/diagrams/678787d15a134709bd7c3e9d506f423f68401abd.png" /></p>
+<p><strong>In Jiuwen.</strong> Embedding is batched and effectively one-time (chunked with batch size 8 and concurrency 50, run at index or update time). Generation is what is metered: usage accumulates provider-reported input, output, and total tokens, and cost tracking focuses on session generation cost. Optimization effort belongs on generation.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Embedding is batched and effectively one-time: <code>APIEmbedding</code> chunks texts (<code>max_batch_size=8</code>, <code>max_concurrent=50</code>) and <code>compute_chunk_embeddings</code> runs at index/update time. Generation is what is metered: <code>usage_cost.add_session_usage</code> accumulates provider-reported <code>input_tokens</code>/<code>output_tokens</code>/<code>total_tokens</code> (and optional costs) per session, fed by every <code>chat.usage_metadata</code> event. Core tracks KV/prompt-cache hit rates (tokens, not dollars). The only per-token dollar rates are hardcoded estimates in the auto-harness budget rail.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:45</code></td>
+<td>max_batch_size: int = 8; :46 max_concurrent: int = 50; :194 batch + gather</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:21</code></td>
+<td>compute_chunk_embeddings at index/update time</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code></td>
+<td>normalizes input/cache tokens; agent-core/openjiuwen/core/context_engine/usage/session_aggregator.py:45 — cache hit-rate aggregation</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code></td>
+<td>add_session_usage; jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:17212 — usage events</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24</code></td>
+<td>input 3e-6 / output 15e-6 USD per token; :85 cost computed</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-how-would-you-reduce-cost-for-a-high-volume-rag-system-without-degrading-answer-quality">2. How would you reduce cost for a high-volume RAG system without degrading answer quality</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Cut the dominant input-token/generation cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts/context, and summarize history.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Rerank down to a smaller k.</li>
+<li>Cache exact and semantic.</li>
+<li>Route easy queries to smaller models.</li>
+<li>Shorten prompts/context; summarize history.</li>
+</ul>
+<p><strong>Concept.</strong> Cut the dominant (input-token/generation) cost: rerank a larger candidate set down to a smaller k, cache (exact and semantic), route easy queries to smaller models, shorten prompts (fewer examples, tighter context), summarize long chunks, and cap the agent's iterations. Prefer quality-preserving levers (rerank+tighten, cache, route) over blind k reduction.</p>
+<p><img alt="diagram" src="assets/diagrams/c7f7f483bc92419e0f660f0bc31e4fb0118a1e48.png" /></p>
+<p><strong>In Jiuwen.</strong> The product tracks provider session cost and enforces a cap; core caps repetition via max iterations, a team budget ledger, and anomaly and dedup rails; conversation compaction reduces context tokens. But embedding cost is not tracked, there is no semantic or response cache, no reranker, and routing is by availability — so several standard levers are absent.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The product tracks provider-reported session cost and enforces a per-session cap; core caps repetition via <code>max_iterations</code>, team <code>BudgetLedger</code>, and anomaly/dedup rails; conversation compaction reduces context tokens. But embedding cost is never tracked, there is no semantic/response cache, no rerank-to-K lever in the KB, and no query-difficulty/cost-aware model routing.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171/196</code></td>
+<td>session cost cap</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23</code></td>
+<td>BudgetLedger</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code></td>
+<td>180k compaction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code></td>
+<td>availability routing (not cost/quality)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-how-do-you-control-cost-in-a-system-where-usage-scales-unpredictably">3. How do you control cost in a system where usage scales unpredictably</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Bound the loop (iterations/rounds/time), cap tokens per request and session, let cheap models do cheap work, cache, offload/summarize context, and surface per-run cost to budget and alert.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Bound iterations/time.</li>
+<li>Cap tokens per request/session.</li>
+<li>Cheap models for cheap work.</li>
+<li>Surface per-run cost.</li>
+</ul>
+<p><strong>Concept.</strong> Bound the loop (max iterations/rounds/time), cap tokens per request and per session, make cheap models do cheap work, cache, offload/summarize context, and surface per-run cost so it can be budgeted and alerted. Retries and huge tool outputs are common hidden cost sources.</p>
+<p><img alt="diagram" src="assets/diagrams/5daa572e4843c74dac123fdf41db6580efc6130d.png" /></p>
+<p><strong>In Jiuwen.</strong> The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, the limit is set only when provider cost metadata is available, and a check raises when over. Core limits repetition via max iterations and anomaly rails. There is no per-request token cap or time budget.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Repeated tool calls are bounded at several levels: the ReAct loop's <code>max_iterations</code> (default 5, harness 15); <code>ModelAnomalyDetectionRail</code>, which detects consecutive identical tool-call rounds and either compacts or bails out; <code>ToolCallDeduplicationRail</code>, which suppresses repeated read-only calls; and <code>ToolCallResilienceRail</code>, which bounds retries (non-idempotent tools are never retried). Team runs add a <code>BudgetLedger</code> token ceiling, and the product tracks provider-reported session cost with a per-session cap (<code>raise_if_session_cost_limit_exceeded</code>).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code></td>
+<td>raise_if_session_cost_limit_exceeded; :196 set_session_cost_limit (requires provider cost)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23</code></td>
+<td>BudgetLedger</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90</code></td>
+<td>tool-loop threshold + bailout</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-first-cut-at-50-cost-reduction-route-simple-queries-to-a-smaller-model-reduce-top-k">4. First cut at 50% cost reduction: route simple queries to a smaller model, reduce top-k</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Cheapest high-impact cuts: route easy queries to a smaller model, lower top-k, cache, shorten the prompt, and reduce the agent's iteration cap.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Route easy queries to a smaller model.</li>
+<li>Lower top-k.</li>
+<li>Cache.</li>
+<li>Shorten prompt; lower iteration cap.</li>
+</ul>
+<p><strong>Concept.</strong> The cheapest high-impact cuts: route easy queries to a smaller/cheaper model (classify query difficulty first), lower <code>top_k</code>, cache, shorten the prompt (fewer examples, tighter context), and reduce the agent's iteration cap. Start with model routing and top-k because they cut the dominant (generation/input-token) cost directly.</p>
+<p><img alt="diagram" src="assets/diagrams/99274c1c6f20b94d7c4a8e0f70d7b33e3fe5e207.png" /></p>
+<p><strong>In Jiuwen.</strong> Model selection here is about availability and endpoint distribution, not cost or query difficulty: the allocator dispatches strategies (round robin, by model name, router, intelli router), and allocation happens at member construction from a model-name hint and is immutable afterward. Difficulty-based routing to a cheaper model must be added.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Model selection is about availability and endpoint distribution, not cost or query difficulty. <code>build_model_allocator</code> dispatches four availability strategies (<code>round_robin</code>, <code>by_model_name</code>, <code>router</code>, <code>intelli_router</code>); allocation happens at member construction from a <code>model_name</code> hint and is immutable per member. <code>IntelliRouter</code> is rate-aware only through <code>tpm</code>/<code>rpm</code>. The only retrieval-size knob is the static <code>top_k</code> (default 5). There is no query-classification-to-model routing and no cost-aware top-k policy.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code></td>
+<td>build_model_allocator (4 availability strategies); :240 ByModelNameAllocator; :520 resolve_member_model (no query awareness)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/pool.py:38</code></td>
+<td>ModelPoolEntry; :278 tpm/rpm rate-aware only</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5 (only retrieval-size config)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:773</code></td>
+<td>exact embedding cache (no semantic cache)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-controlling-cost-when-an-agent-can-call-tools-repeatedly">5. Controlling cost when an agent can call tools repeatedly</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Bound the loop (iterations/rounds/time), cap tokens, use cheaper models for cheap work, cache, and surface per-run cost; retries and huge tool outputs are hidden cost sources.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Bound loop: iterations/rounds/time.</li>
+<li>Cap tokens; route cheap work to small models.</li>
+<li>Cache; watch retries and large tool outputs.</li>
+</ul>
+<p><strong>Concept.</strong> Bound the loop (max iterations/rounds/time), cap tokens, make cheap models do cheap work, cache, and surface per-run cost so it can be budgeted. Retries and huge tool outputs are common hidden cost sources.</p>
+<p><img alt="diagram" src="assets/diagrams/576f418bd616c4786498692797a567709bc9320b.png" /></p>
+<p><strong>In Jiuwen.</strong> The product tracks provider-reported session cost and enforces a per-session cap: totals accumulate under a lock, the limit is set only when provider cost metadata is available, and a check raises when exceeded. Core limits repeated calls (iteration caps and anomaly/dedup rails), and tool outputs are offloaded or compacted to control token cost.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Repeated tool calls are bounded at several levels: the ReAct loop's <code>max_iterations</code> (default 5, harness 15); <code>ModelAnomalyDetectionRail</code>, which detects consecutive identical tool-call rounds and either compacts or bails out; <code>ToolCallDeduplicationRail</code>, which suppresses repeated read-only calls; and <code>ToolCallResilienceRail</code>, which bounds retries (non-idempotent tools are never retried). Team runs add a <code>BudgetLedger</code> token ceiling, and the product tracks provider-reported session cost with a per-session cap (<code>raise_if_session_cost_limit_exceeded</code>).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/ddbd4a0f746840bd1e1c4ea0ec61564d8bed954f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code></td>
+<td>raise_if_session_cost_limit_exceeded; :196 set_session_cost_limit (requires provider cost)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations; agent-core/openjiuwen/harness/schema/config.py:252 — harness default 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/workflow/engine/budget.py:23</code></td>
+<td>BudgetLedger</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:81/90</code></td>
+<td>tool-loop threshold + bailout</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:157</code></td>
+<td>cross-turn repeat counter; agent-core/openjiuwen/harness/goal/evaluation.py:298 — max_attempts</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-cutting-tokens-without-losing-quality-tighter-reranking-summarizing-long-chunks">6. Cutting tokens without losing quality: tighter reranking, summarizing long chunks</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Retrieve fewer but better chunks (rerank a larger candidate set down to small k), summarize long chunks, and trim history.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Retrieve many, rerank to few (needs a reranker).</li>
+<li>Summarize long chunks before insertion.</li>
+<li>Trim conversation history.</li>
+</ul>
+<p><strong>Concept.</strong> Reduce prompt tokens by retrieving fewer but better chunks (rerank a larger candidate set down to a small k), summarizing long chunks/passages before insertion, and trimming conversation history. Reranking preserves quality while cutting k; summarization trades fidelity for tokens. Both beat blindly lowering k.</p>
+<p><img alt="diagram" src="assets/diagrams/35b22e61c410cc5a4a8c70644679484da9565817.png" /></p>
+<p><strong>In Jiuwen.</strong> The retrieval path exposes only top_k (default 5) and an optional score threshold, and because the default knowledge-base path never invokes a reranker, 'retrieve N, rerank to K' is absent. Token reduction instead comes from offloading and compressing context in the context engine, not from the retrieval stage.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The retrieval path exposes only <code>top_k</code> (default 5) and <code>score_threshold</code>, and threshold filtering is honored only in <code>mode="vector"</code>. Crucially, the KB path never invokes a reranker (the <code>Reranker</code> classes are wired only into graph-memory search), so "retrieve N, rerank to K" is absent. Token reduction instead happens in the context engine on the <em>conversation</em>: tool results over 50k tokens are offloaded, stale tool results beyond <code>keep_last_k=3</code> are windowed, micro-compaction clears old tool results, and full compaction LLM-summarizes at 180k. Chunk text is embedded verbatim — no chunk-level summarization.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5; :47 score_threshold</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/hybrid_retriever.py:64</code></td>
+<td>threshold rejected unless mode="vector"; :41 retrieve path has no reranker</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/graph/graph_memory/base.py:645</code></td>
+<td>reranker only in graph-memory search</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code></td>
+<td>tokens_threshold=50000; agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_window_processor.py:44 — keep_last_k=3</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/micro_compact_processor.py:24</code></td>
+<td>threshold 5; agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184 — 180k</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:227/349</code></td>
+<td>compress_range=20 + history compression</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-designing-caching-for-repeated-or-semantically-similar-queries">7. Designing caching for repeated or semantically similar queries</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, an embedding cache, and a semantic cache that embeds the query and returns a prior answer above a similarity threshold.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Exact-match response cache.</li>
+<li>Provider prefix/prompt cache.</li>
+<li>Embedding cache.</li>
+<li>Semantic cache with a similarity threshold.</li>
+</ul>
+<p><strong>Concept.</strong> Layer caches: exact-match response/prompt cache, provider prefix/prompt caching, embedding cache, and — harder — a semantic cache that embeds the query and returns a prior answer for similar queries above a similarity threshold. The semantic cache needs a threshold and invalidation strategy, and exact-match caches need a stable key including model and parameters.</p>
+<p><img alt="diagram" src="assets/diagrams/c6dc3928a4fba131b5557e02420da9d3feb31929.png" /></p>
+<p><strong>In Jiuwen.</strong> Caching is exact-match, not semantic. Core has a session KV-cache runtime with affinity and lineage identities to reuse inference KV state; the product memory index keeps a SQLite embedding cache keyed by text hash; agent evolution has its own cache. There is no semantic response cache or general provider prefix caching.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Caching is exact-match, not semantic. Core has a session KV-cache runtime with affinity/lineage identities (parent/child sessions, team members, compressors) to reuse inference KV state. The product memory index keeps a SQLite <code>embedding_cache</code> keyed by text hash, and <code>agent_evolving</code> has its own embedding cache. <code>ToolCallDeduplicationRail</code> is an exact <code>(tool_name, args-hash)</code> per-turn result cache for read-only tools. Local vLLM/transformers use prefix/prompt caches.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/82f41b4e178809cfcfdf4dc9e5bdab722df1857e.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/kv_cache/kv_cache_runtime.py:32</code></td>
+<td>KVCacheRuntime; agent-core/openjiuwen/core/kv_cache/<strong>init</strong>.py:10 — KVCacheAffinityConfig</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:31</code></td>
+<td>EMBEDDING_CACHE_TABLE; :773 text-hash lookup before embedding</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:47</code></td>
+<td>exact per-turn tool result cache</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/lazy_load.py:25</code></td>
+<td>lazy import cache; agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:221 — reusable encodings</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/ttse/stores.py:522</code></td>
+<td>embedding cache limit; agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:176 — prefix cache</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-reducing-latency-in-a-multi-step-llm-pipeline">8. Reducing latency in a multi-step LLM pipeline</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Stream tokens so time-to-first-token matters more than total; parallelize independent steps; cache prompts/embeddings; route easy steps to faster models; don't block the event loop.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Stream (optimize TTFT).</li>
+<li>Parallelize independent steps.</li>
+<li>Cache prompts/embeddings.</li>
+<li>Route easy steps to faster models.</li>
+</ul>
+<p><strong>Concept.</strong> Stream tokens so time-to-first-token matters more than total; run independent steps in parallel; cache prompts/prefixes and embeddings; route easy steps to faster/smaller models; and avoid blocking the event loop. Measure TTFT and per-stage latency to find the bottleneck.</p>
+<p><img alt="diagram" src="assets/diagrams/0fa009061ba7b7cab8222abab8913c5b5b81617d.png" /></p>
+<p><strong>In Jiuwen.</strong> End-to-end streaming is supported and TTFT is measured per model call. Shared persistent HTTP clients avoid per-call TLS setup, parallel tool execution shortens multi-tool turns, and local inference uses prompt and prefix KV caching. Streaming, connection reuse, and TTFT measurement are in place.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>End-to-end streaming is supported (ReAct <code>stream</code> → session stream iterator → WebSocket chunk frames), and TTFT is measured per model call (<code>ttft_ms</code>). Shared persistent HTTP clients avoid per-call TLS setup, parallel tool execution shortens multi-tool turns, and local inference uses prompt/prefix KV-cache reuse. <code>IntelliRouter</code> provides a reliable router across deployments, and the product caches built model objects by name.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2938</code></td>
+<td>stream entry; :1758 ttft_ms</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model.py:197</code></td>
+<td>stream first-chunk/idle timeouts</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/kv_cache/kv_cache_runtime.py:32</code></td>
+<td>session KV-cache runtime</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/symphony/retrieval/llm/vllm/client.py:176</code></td>
+<td>prepare_prefix_cache</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/intelli_router_model_client.py:32</code></td>
+<td>ReliableRouter</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/agent_adapter/interface_deep.py:6353</code></td>
+<td>model object cache by name</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-multithreading-vs-multiprocessing-which-matters-more-for-io-bound-llm-api-calls">9. Multithreading vs. multiprocessing, which matters more for I/O-bound LLM API calls</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> For I/O-bound calls, async or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>I/O-bound → concurrency, not processes.</li>
+<li>Async is most efficient.</li>
+<li>Multiprocessing only for CPU-bound work.</li>
+</ul>
+<p><strong>Concept.</strong> For I/O-bound work (network calls to LLM APIs, vector DBs), async I/O or threads beat multiprocessing: the CPU is idle while waiting, so you want concurrency, not extra processes. Async is the most efficient (no thread-per-request overhead) when your stack is async end to end; threads are the fallback for blocking SDKs. Multiprocessing only pays off for CPU-bound work (local inference, heavy parsing) because it escapes the GIL.</p>
+<p><img alt="diagram" src="assets/diagrams/a7dce77e816d5bf9a10f12b0ba6a897b61d6ace3.png" /></p>
+<p><strong>In Jiuwen.</strong> The LLM path is single-process asyncio/anyio: async HTTP clients share a process-global connection pool, and async model clients are cached process-wide with bounded limits. Blocking work is offloaded to threads. It is async-first with a shared connection pool, matching I/O-bound guidance.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The LLM path is single-process asyncio/anyio. <code>httpx.AsyncClient</code> instances share a process-global <code>AsyncConnectionPool</code> via <code>HttpXConnectorPool</code>, and <code>AsyncOpenAI</code>/<code>AsyncAnthropic</code> clients are cached process-wide with <code>httpx.Limits(max_connections=100, max_keepalive_connections=20)</code>. Blocking work is offloaded with <code>asyncio.to_thread</code>/<code>run_in_executor</code>, never <code>multiprocessing</code>. Embeddings use an <code>asyncio.Semaphore(max_concurrent)</code> (default 50), with a <code>ThreadPoolExecutor</code> only for the sync facade. <code>multiprocessing</code> appears in tests, the observability trace store, process isolation, and <code>agent_rl</code>'s offline <code>parallel_executor</code> — not as an LLM throughput strategy.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/common/clients/llm_client.py:52</code></td>
+<td>HttpXConnectorPool (AsyncConnectionPool)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:383</code></td>
+<td>process-wide _client_cache; :1118 httpx.Limits(max_connections=100, max_keepalive_connections=20)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/anthropic_model_client.py:719</code></td>
+<td>same pooling for AsyncAnthropic</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:55</code></td>
+<td>asyncio.Semaphore(max_concurrent); :120 ThreadPoolExecutor for sync path</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:5326</code></td>
+<td>asyncio.to_thread(...) offload; jiuwenswarm/jiuwenswarm/server/runtime/agent_warm_pool.py:154 — semaphore-bounded warm pool</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-what-happens-to-your-architecture-at-10x-current-traffic">10. What happens to your architecture at 10x current traffic</h2>
+<p><span class="badge badge-type">Design</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Cost scales with tokens.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Provider rate limits/429s first.</li>
+<li>Serialized tool/DB access.</li>
+<li>Memory pressure from context.</li>
+<li>Connection pools.</li>
+</ul>
+<p><strong>Concept.</strong> You hit dependencies and queues before arithmetic: provider rate limits and 429s, serialized tool/DB access, memory pressure from context, and connection pools. Costs scale roughly linearly with tokens but can super-linearly if retries or coordination rise. Fixes are caching, concurrency limits, queues/shards, backpressure, and cheaper routing — plus autoscaling at the process boundary.</p>
+<p><img alt="diagram" src="assets/diagrams/a02ada8ba84ef2055a581248203f1c890326a0af.png" /></p>
+<p><strong>In Jiuwen.</strong> The system has per-process bounded resources rather than elastic scaling: LLM HTTP concurrency is capped by a shared pool (100 connections, 20 keepalive), embeddings by a semaphore (default 50, batch 8), team sub-agent fan-out by a semaphore (default 10), and the warm pool and messaging have their own bounds. At 10x the first limits are these per-process caps.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The system has per-process bounded resources rather than elastic scaling. LLM HTTP concurrency is capped by a shared httpx pool (<code>max_connections=100</code>, keepalive 20); embeddings by a semaphore (default 50) with batch size 8; team sub-agent fan-out by a semaphore (default 10); the warm pool and message queues have their own bounds. Internal channels use bounded <code>asyncio.Queue(maxsize=...)</code>; workflow HTTP supports token-bucket rate limiting; retries/backoff exist at model and tool layers. There is no autoscaling.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/common/clients/connector_pool.py:21</code></td>
+<td>limit: 100, limit_per_host: 30; agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:1118 — pool limits</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:55</code></td>
+<td>concurrency semaphore</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:34</code></td>
+<td>max parallel sub-agents</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/tool/http/http_request_component.py:110</code></td>
+<td>HttpRateLimitConfig</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/runner/message_queue_inmemory.py:34</code></td>
+<td>bounded queue; agent-core/openjiuwen/harness/subagent_runtime/activity_events.py:53 — bounded activity queue</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:35</code></td>
+<td>backoff schedule; jiuwenswarm/jiuwenswarm/server/runtime/agent_warm_pool.py:154 — warm-pool semaphore split</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-scaling-questions-test-whether-youve-thought-past-the-demo">11. Scaling questions test whether you've thought past the demo</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> Scaling questions test whether you've thought past the demo.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Per-process bounded resources.</li>
+<li>Shared HTTP pool + embedding/sub-agent semaphores.</li>
+<li>Missing: autoscaling, distributed queues.</li>
+</ul>
+<p><strong>Concept.</strong> This claim holds: scaling questions are answered by naming the bottleneck and the first lever, which shows the system has been run past a demo. Most architectures do not survive 10x traffic. Name one lever <em>with where it fits</em>: caching repeated queries, batching concurrent requests, parallelizing independent tool calls. Identify the first bottleneck (provider rate limits, serialized tools, connection pools, context memory), then name the lever and where it sits. Mention backpressure and bounded concurrency, not just "add more servers".</p>
+<p><img alt="diagram" src="assets/diagrams/fe38b5d6bafb6ce33d080699d01b3d45d517bdca.png" /></p>
+<p><strong>In Jiuwen.</strong> Bounded resources exist per process: a shared HTTP pool (100 connections), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded async queues, and parallel tool execution with resource lanes. What is missing is autoscaling and a distributed queue.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Bounded resources exist per process: shared httpx pool (<code>max_connections=100</code>), embedding semaphore (50), sub-agent fan-out semaphore (10), bounded <code>asyncio.Queue</code>s, and parallel tool execution with resource lanes. What is missing is autoscaling, a distributed rate limiter, and any semantic response cache — so the design change at 10x is mostly "add replicas + a global limiter", which the repo does not provide.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/common/clients/connector_pool.py:21</code></td>
+<td>limit: 100, limit_per_host: 30</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:55</code></td>
+<td>concurrency semaphore</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/runner/message_queue_inmemory.py:34</code></td>
+<td>bounded queue; agent-core/openjiuwen/harness/subagent_runtime/activity_events.py:53 — bounded activity queue</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:431</code></td>
+<td>_execute_parallel_tool_tasks; :467 parallel_safe lanes</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:773</code></td>
+<td>exact embedding cache (no semantic cache)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="12-whats-your-rollback-plan-if-a-prompt-or-model-update-degrades-output-quality">12. What's your rollback plan if a prompt or model update degrades output quality?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, gate rollout on a fixed eval, and monitor quality (not just errors).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Version prompts/models.</li>
+<li>Ship behind flag/canary.</li>
+<li>One-command rollback.</li>
+<li>Gate on eval; monitor quality.</li>
+</ul>
+<p><strong>Concept.</strong> Make every change reversible and observable: version the prompt/model, ship behind a flag or canary, define a one-command rollback, and gate broad rollout on a fixed eval. Monitor quality (not just errors) so you detect the degradation, and keep the previous version warm.</p>
+<p><img alt="diagram" src="assets/diagrams/2a872457a2005995a61b90e4d6e0fa92167c3d01.png" /></p>
+<p><strong>In Jiuwen.</strong> Rollback exists for whole RSI harness packages: a rollback call refuses while tasks are active, validates the target hash, hot-reloads the prior version, and compensates if the pointer write fails, exposed over the WebSocket protocol. Behavior changes are gated by enable flags and a human accept/reject. Prompt-level versioning is weaker.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Rollback exists for whole RSI <strong>harness packages</strong>: <code>rollback(installation_id)</code> refuses while tasks are active, validates the target hash, hot-reloads the prior version, and compensates if the pointer write fails — exposed over the WebSocket protocol. Behavior is gated by <code>enable_*</code> flags and a human <code>accept</code>/<code>reject</code> activation step. But there is <strong>no prompt-level rollback</strong> and no eval-threshold release gate, so a bad prompt change is only reversible if it was packaged as a harness version.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code></td>
+<td>rollback; :682 _assert_rollback_allowed; :694 validate target hash</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/rsi/rsi_handlers.py:218/224</code></td>
+<td>versions list + rollback RPC</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448</code></td>
+<td>enable_* flags</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/stages/activate.py:118</code></td>
+<td>explicit accept/reject</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/resources/ci_gate.yaml:21</code></td>
+<td>no eval gate</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="13-a-stakeholder-wants-to-ship-before-your-eval-scores-are-ready-how-do-you-handle-it">13. A stakeholder wants to ship before your eval scores are ready, how do you handle it</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Mostly process: de-risk instead of refusing — ship behind a flag or canary, define a rollback path, cap the blast radius, agree on a minimal offline eval, and add monitoring so a quality drop is visible.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Ship behind flag/canary.</li>
+<li>Define rollback and cap blast radius.</li>
+<li>Minimal offline eval gate.</li>
+<li>Monitoring to detect drops.</li>
+</ul>
+<p><strong>Concept.</strong> This is mostly process. De-risk instead of refusing: ship behind a flag or to a small canary, define a rollback path, cap the blast radius, agree on a minimal offline eval before broad rollout, and add monitoring so a quality drop is caught quickly. Make the tradeoff explicit (what's unmeasured, what the fallback is) and put a date on the missing eval.</p>
+<p><img alt="diagram" src="assets/diagrams/151440f699ba051e3de09d166123ea5125df8f01.png" /></p>
+<p><strong>In Jiuwen.</strong> The closest code mechanisms are CI gates and explicit human activation, not an eval-score gate. The auto-harness gate runner loads gates from a config and returns pass/fail; the activate stage requires an explicit user accept/reject before an extension is hot-loaded; and product harness activation is similar. Gating is human and CI based rather than eval-score based.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The closest code mechanisms are CI gates and explicit human activation, not an eval-score gate. The auto-harness <code>CIGateRunner</code> loads gates from <code>ci_gate.yaml</code> and returns pass/fail; the activate stage requires an explicit user <code>accept</code>/<code>reject</code> before an extension is hot-loaded; and the product's RSI harness activation supports rollback (refuses while tasks are active, validates the target hash, hot-loads the old version). Behavior gating is done with <code>enable_*</code> config flags. There is no release gate tied to eval thresholds and no canary/percentage rollout.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/infra/ci_gate_runner.py:173</code></td>
+<td>load gates; :1153 run + aggregate passed</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/stages/activate.py:118</code></td>
+<td>explicit accept/reject interaction before hot-load</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/stages/merge.py:95</code></td>
+<td>static-check retry (max 3) then fail-fast</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code></td>
+<td>rollback; :682 _assert_rollback_allowed; :694 validate target hash</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448</code></td>
+<td>enable_* config flags</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

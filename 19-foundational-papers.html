@@ -1,0 +1,2379 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="01-llm-foundations.html">
+      
+      
+        <link rel="next" href="20-ai-system-stack.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Foundational papers - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#foundational-papers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Foundational papers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="19-foundational-papers.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-attention-is-all-you-need-vaswani-2017" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Attention Is All You Need (Vaswani, 2017)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-devlin-2018" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin, 2018)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-language-models-are-few-shot-learners-gpt-3-brown-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Language Models are Few-Shot Learners — GPT-3 (Brown, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-compute-optimal-large-language-models-chinchilla-hoffmann-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training Compute-Optimal Large Language Models — Chinchilla (Hoffmann, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pretraining-is-outside-the-frameworks-scope-chinchilla-aware-base-model-selection-is-an-operator-level-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pretraining is outside the framework's scope; Chinchilla-aware base-model selection is an operator-level decision.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-training-language-models-to-follow-instructions-with-human-feedback-instructgpt-ouyang-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Training Language Models to Follow Instructions with Human Feedback — InstructGPT (Ouyang, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-direct-preference-optimization-your-language-model-is-secretly-a-reward-model-rafailov-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov, 2023)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-lora-low-rank-adaptation-of-large-language-models-hu-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. LoRA: Low-Rank Adaptation of Large Language Models (Hu, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-retrieval-augmented-generation-for-knowledge-intensive-nlp-tasks-lewis-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-chain-of-thought-prompting-elicits-reasoning-in-large-language-models-wei-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-react-synergizing-reasoning-and-acting-in-language-models-yao-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. ReAct: Synergizing Reasoning and Acting in Language Models (Yao, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-denoising-diffusion-probabilistic-models-ho-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Denoising Diffusion Probabilistic Models (Ho, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-generation-is-handled-by-external-tools-toolcard-calls-diffusion-is-not-part-of-the-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image generation is handled by external tools (ToolCard calls); diffusion is not part of the framework.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-learning-transferable-visual-models-from-natural-language-supervision-clip-radford-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-flashattention-fast-and-memory-efficient-exact-attention-with-io-awareness-dao-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-switch-transformers-scaling-to-trillion-parameter-models-with-simple-and-efficient-sparsity-fedus-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity (Fedus, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture-is-opaque-to-the-framework-no-moe-aware-routing-expert-metadata-or-active-parameter-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model architecture is opaque to the framework: no MoE-aware routing, expert metadata, or active-parameter tracking.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-constitutional-ai-harmlessness-from-ai-feedback-bai-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Constitutional AI: Harmlessness from AI Feedback (Bai, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-attention-is-all-you-need-vaswani-2017" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Attention Is All You Need (Vaswani, 2017)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-devlin-2018" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin, 2018)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-language-models-are-few-shot-learners-gpt-3-brown-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Language Models are Few-Shot Learners — GPT-3 (Brown, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-training-compute-optimal-large-language-models-chinchilla-hoffmann-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training Compute-Optimal Large Language Models — Chinchilla (Hoffmann, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pretraining-is-outside-the-frameworks-scope-chinchilla-aware-base-model-selection-is-an-operator-level-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pretraining is outside the framework's scope; Chinchilla-aware base-model selection is an operator-level decision.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-training-language-models-to-follow-instructions-with-human-feedback-instructgpt-ouyang-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Training Language Models to Follow Instructions with Human Feedback — InstructGPT (Ouyang, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-direct-preference-optimization-your-language-model-is-secretly-a-reward-model-rafailov-2023" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov, 2023)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-lora-low-rank-adaptation-of-large-language-models-hu-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. LoRA: Low-Rank Adaptation of Large Language Models (Hu, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-retrieval-augmented-generation-for-knowledge-intensive-nlp-tasks-lewis-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-chain-of-thought-prompting-elicits-reasoning-in-large-language-models-wei-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-react-synergizing-reasoning-and-acting-in-language-models-yao-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. ReAct: Synergizing Reasoning and Acting in Language Models (Yao, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-denoising-diffusion-probabilistic-models-ho-2020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Denoising Diffusion Probabilistic Models (Ho, 2020)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-generation-is-handled-by-external-tools-toolcard-calls-diffusion-is-not-part-of-the-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image generation is handled by external tools (ToolCard calls); diffusion is not part of the framework.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-learning-transferable-visual-models-from-natural-language-supervision-clip-radford-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-flashattention-fast-and-memory-efficient-exact-attention-with-io-awareness-dao-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-switch-transformers-scaling-to-trillion-parameter-models-with-simple-and-efficient-sparsity-fedus-2021" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity (Fedus, 2021)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture-is-opaque-to-the-framework-no-moe-aware-routing-expert-metadata-or-active-parameter-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model architecture is opaque to the framework: no MoE-aware routing, expert metadata, or active-parameter tracking.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-constitutional-ai-harmlessness-from-ai-feedback-bai-2022" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Constitutional AI: Harmlessness from AI Feedback (Bai, 2022)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="01-llm-foundations.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">How LLMs work</span></a>
+<a class="topic-nav__link topic-nav__next" href="20-ai-system-stack.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Model serving</span></a>
+</div>
+
+<h1 id="foundational-papers">Foundational papers</h1>
+<h2 id="1-attention-is-all-you-need-vaswani-2017">1. Attention Is All You Need (Vaswani, 2017)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> The Transformer architecture — self-attention replaces RNNs/CNNs for sequence modeling.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>The Transformer architecture — self-attention replaces RNNs/CNNs for sequence modeling.</li>
+<li>Multi-head attention, positional encoding, and the encoder-decoder structure become the foundation for BERT, GPT, T5, and all subsequent LLMs.</li>
+</ul>
+<p><strong>Concept.</strong> The Transformer architecture — self-attention replaces RNNs/CNNs for sequence modeling. Multi-head attention, positional encoding, and the encoder-decoder structure become the foundation for BERT, GPT, T5, and all subsequent LLMs.</p>
+<hr />
+<h2 id="2-bert-pre-training-of-deep-bidirectional-transformers-for-language-understanding-devlin-2018">2. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin, 2018)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Masked language modeling (MLM) as a pretraining objective enables bidirectional context.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Masked language modeling (MLM) as a pretraining objective enables bidirectional context.</li>
+<li>The pretrain-then-finetune paradigm: one large pretrained model + thin task head + small labeled dataset, replacing per-task training.</li>
+<li>MLM randomly masks 15% of input tokens and trains the model to predict them — forcing bidirectional context unlike GPT's left-to-right objective.</li>
+</ul>
+<p><strong>Concept.</strong> Masked language modeling (MLM) as a pretraining objective enables bidirectional context. The pretrain-then-finetune paradigm: one large pretrained model + thin task head + small labeled dataset, replacing per-task training. MLM randomly masks 15% of input tokens and trains the model to predict them — forcing bidirectional context unlike GPT's left-to-right objective. The pretrain-then-finetune template became the foundation of modern NLP transfer learning.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>BERT-family models are used as a classifier backend for the guardrail framework: <code>LocalModelBackend._load_model</code> loads <code>AutoModelForSequenceClassification</code> (<code>core/security/guardrail/backends.py:445</code>), parsed by <code>BertBinaryParser</code> (<code>core/security/guardrail/context.py:106</code>). Jiuwen does not use BERT as a frozen embedding encoder.</p>
+</details>
+<hr />
+<h2 id="3-language-models-are-few-shot-learners-gpt-3-brown-2020">3. Language Models are Few-Shot Learners — GPT-3 (Brown, 2020)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale.</li>
+<li>At 175B parameters, few-shot performance approaches fine-tuned baselines on many benchmarks.</li>
+<li>Scale enables a model to recognize task patterns from prefix sequences and apply them at inference time.</li>
+</ul>
+<p><strong>Concept.</strong> In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale. At 175B parameters, few-shot performance approaches fine-tuned baselines on many benchmarks. Scale enables a model to recognize task patterns from prefix sequences and apply them at inference time. This changed the practitioner interface from fine-tuning to prompting.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>ICL is done through prompt construction — <code>PromptTemplate</code> (<code>core/foundation/prompt/template.py:14</code>) plus prompt sections assembled by <code>RuntimePromptRail</code> (<code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39</code>). There is no retrieval-augmented ICL (no per-query similar-demonstration selection).</p>
+</details>
+<hr />
+<h2 id="4-training-compute-optimal-large-language-models-chinchilla-hoffmann-2022">4. Training Compute-Optimal Large Language Models — Chinchilla (Hoffmann, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Compute-optimal training is ~20 tokens per parameter.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Compute-optimal training is ~20 tokens per parameter.</li>
+<li>Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen.</li>
+<li>Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters.</li>
+</ul>
+<p><strong>Concept.</strong> Compute-optimal training is ~20 tokens per parameter. Most large models (GPT-3, Gopher) were undertrained — too many parameters for the data seen. Chinchilla (70B, 1.4T tokens) outperforms Gopher (280B) with 4× fewer parameters. For a fixed compute budget, scale model size and training tokens equally. Data matters as much as parameters. Smaller model + more data outperforms larger model + less data.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<h2 id="pretraining-is-outside-the-frameworks-scope-chinchilla-aware-base-model-selection-is-an-operator-level-decision">Pretraining is outside the framework's scope; Chinchilla-aware base-model selection is an operator-level decision.</h2>
+</details>
+<hr />
+<h2 id="5-training-language-models-to-follow-instructions-with-human-feedback-instructgpt-ouyang-2022">5. Training Language Models to Follow Instructions with Human Feedback — InstructGPT (Ouyang, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> RLHF pipeline for alignment: SFT on demonstrations → reward model trained on human preferences → PPO to maximize reward.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>RLHF pipeline for alignment: SFT on demonstrations → reward model trained on human preferences → PPO to maximize reward.</li>
+<li>The paper behind ChatGPT's instruction-following.</li>
+</ul>
+<p><strong>Concept.</strong> RLHF pipeline for alignment: SFT on demonstrations → reward model trained on human preferences → PPO to maximize reward. The paper behind ChatGPT's instruction-following.</p>
+<hr />
+<h2 id="6-direct-preference-optimization-your-language-model-is-secretly-a-reward-model-rafailov-2023">6. Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov, 2023)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> DPO eliminates the separate reward model and RL loop from RLHF.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>DPO eliminates the separate reward model and RL loop from RLHF.</li>
+<li>Given (prompt, chosen, rejected) preference pairs, DPO directly optimizes the policy via a weighted cross-entropy loss — simpler, more stable, equivalent alignment.</li>
+</ul>
+<p><strong>Concept.</strong> DPO eliminates the separate reward model and RL loop from RLHF. Given (prompt, chosen, rejected) preference pairs, DPO directly optimizes the policy via a weighted cross-entropy loss — simpler, more stable, equivalent alignment.</p>
+<hr />
+<h2 id="7-lora-low-rank-adaptation-of-large-language-models-hu-2021">7. LoRA: Low-Rank Adaptation of Large Language Models (Hu, 2021)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Freeze all pretrained weights; inject two small trainable matrices A and B at each target layer (ΔW = BA, rank r ≪ hidden dim).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Freeze all pretrained weights; inject two small trainable matrices A and B at each target layer (ΔW = BA, rank r ≪ hidden dim).</li>
+<li>&lt;1% trainable parameters; multiple adapters can share one base model.</li>
+</ul>
+<p><strong>Concept.</strong> Freeze all pretrained weights; inject two small trainable matrices A and B at each target layer (ΔW = BA, rank r ≪ hidden dim). &lt;1% trainable parameters; multiple adapters can share one base model.</p>
+<hr />
+<h2 id="8-retrieval-augmented-generation-for-knowledge-intensive-nlp-tasks-lewis-2020">8. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis, 2020)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Foundational RAG paper.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Foundational RAG paper.</li>
+<li>Ground generation in a retrieved knowledge base — combine a dense retriever (DPR) with a seq2seq generator — instead of relying purely on parametric memory.</li>
+</ul>
+<p><strong>Concept.</strong> Foundational RAG paper. Ground generation in a retrieved knowledge base — combine a dense retriever (DPR) with a seq2seq generator — instead of relying purely on parametric memory.</p>
+<hr />
+<h2 id="9-chain-of-thought-prompting-elicits-reasoning-in-large-language-models-wei-2022">9. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Including step-by-step reasoning examples in the prompt (chain-of-thought few-shot) significantly improves performance on multi-step arithmetic, commonsense, and symbolic reasoning tasks.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Including step-by-step reasoning examples in the prompt (chain-of-thought few-shot) significantly improves performance on multi-step arithmetic, commonsense, and symbolic reasoning tasks.</li>
+</ul>
+<p><strong>Concept.</strong> Including step-by-step reasoning examples in the prompt (chain-of-thought few-shot) significantly improves performance on multi-step arithmetic, commonsense, and symbolic reasoning tasks.</p>
+<hr />
+<h2 id="10-react-synergizing-reasoning-and-acting-in-language-models-yao-2022">10. ReAct: Synergizing Reasoning and Acting in Language Models (Yao, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Interleave reasoning traces (Think) with tool calls (Act) and observations in the prompt.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Interleave reasoning traces (Think) with tool calls (Act) and observations in the prompt.</li>
+<li>This enables dynamic planning, error correction, and grounded retrieval within an agent loop.</li>
+</ul>
+<p><strong>Concept.</strong> Interleave reasoning traces (Think) with tool calls (Act) and observations in the prompt. This enables dynamic planning, error correction, and grounded retrieval within an agent loop.</p>
+<hr />
+<h2 id="11-denoising-diffusion-probabilistic-models-ho-2020">11. Denoising Diffusion Probabilistic Models (Ho, 2020)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time.</li>
+<li>Stable supervised objective; enables high-quality image generation.</li>
+<li>Foundation for Stable Diffusion, DALL-E 2.</li>
+</ul>
+<p><strong>Concept.</strong> Forward process adds Gaussian noise over T steps; U-Net trained to reverse it one step at a time. Stable supervised objective; enables high-quality image generation. Foundation for Stable Diffusion, DALL-E 2. Inference: start from pure noise, run reverse T steps → generated image. Latent Diffusion Models (Stable Diffusion) compress to a VAE latent space for ~8× compute reduction. Quality levers: steps, guidance scale, scheduler.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<h2 id="image-generation-is-handled-by-external-tools-toolcard-calls-diffusion-is-not-part-of-the-framework">Image generation is handled by external tools (<code>ToolCard</code> calls); diffusion is not part of the framework.</h2>
+</details>
+<hr />
+<h2 id="12-learning-transferable-visual-models-from-natural-language-supervision-clip-radford-2021">12. Learning Transferable Visual Models From Natural Language Supervision — CLIP (Radford, 2021)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space.</li>
+<li>Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG.</li>
+<li>Text and image encoders trained together; cosine similarity between text and image embeddings is semantically meaningful.</li>
+</ul>
+<p><strong>Concept.</strong> Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space. Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG. Text and image encoders trained together; cosine similarity between text and image embeddings is semantically meaningful. Underpins DALL-E 2 and Stable Diffusion text conditioning.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Cross-modal retrieval here uses provider-based multimodal embeddings (<code>DashscopeEmbedding.embed_multimodal</code>, <code>VLLMEmbedding.embed_multimodal</code>) rather than a CLIP encoder; <code>MultimodalImageRail</code> prepares image attachments for the generation model, not an embedding index.</p>
+</details>
+<hr />
+<h2 id="13-flashattention-fast-and-memory-efficient-exact-attention-with-io-awareness-dao-2022">13. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Tiled attention computation that stays in SRAM — never materializes the full NxN attention matrix in HBM.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Tiled attention computation that stays in SRAM — never materializes the full NxN attention matrix in HBM.</li>
+<li>O(N) memory, 2–4× faster, enables practical long-context (32k–1M token) training and inference.</li>
+<li>Standard attention is O(N²) in memory.</li>
+</ul>
+<p><strong>Concept.</strong> Tiled attention computation that stays in SRAM — never materializes the full NxN attention matrix in HBM. O(N) memory, 2–4× faster, enables practical long-context (32k–1M token) training and inference. Standard attention is O(N²) in memory. FlashAttention removes this constraint. Used by default in modern LLMs and serving frameworks (vLLM, TRT-LLM).</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Infrastructure concern handled by vLLM at the serving layer. Jiuwen manages long context at the application level (offloading at 50k, compaction at 180k).</p>
+</details>
+<hr />
+<h2 id="14-switch-transformers-scaling-to-trillion-parameter-models-with-simple-and-efficient-sparsity-fedus-2021">14. Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity (Fedus, 2021)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs.</li>
+<li>1.6T-parameter model at ~same compute as dense 7B; 4× speedup over T5-XXL.</li>
+<li>MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense.</li>
+</ul>
+<p><strong>Concept.</strong> Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<h2 id="model-architecture-is-opaque-to-the-framework-no-moe-aware-routing-expert-metadata-or-active-parameter-tracking">Model architecture is opaque to the framework: no MoE-aware routing, expert metadata, or active-parameter tracking.</h2>
+</details>
+<hr />
+<h2 id="15-constitutional-ai-harmlessness-from-ai-feedback-bai-2022">15. Constitutional AI: Harmlessness from AI Feedback (Bai, 2022)</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Replace most human preference labeling with model self-critique against explicit principles (the "constitution").</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Replace most human preference labeling with model self-critique against explicit principles (the "constitution").</li>
+<li>SL-CAI: generate → critique → revise → SFT.</li>
+<li>RL-CAI: model-generated preference pairs → reward model → RLHF.</li>
+</ul>
+<p><strong>Concept.</strong> Replace most human preference labeling with model self-critique against explicit principles (the "constitution"). SL-CAI: generate → critique → revise → SFT. RL-CAI: model-generated preference pairs → reward model → RLHF. Far fewer human labels; auditable principle list. The constitution is an explicit, versioned list of principles — easier to update than a latent reward model. Claude's alignment is based on CAI.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Safety is enforced by static classifiers and rails (<code>SecurityRail</code>, <code>PromptInjectionGuardrail</code>, <code>SafetyPromptRail</code>); alignment follows standard training rather than a constitution-driven self-critique loop.</p>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

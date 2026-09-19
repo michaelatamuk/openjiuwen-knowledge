@@ -1,0 +1,2522 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="21-agent-harness-and-rails.html">
+      
+      
+        <link rel="next" href="09-multi-agent-systems.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Agent frameworks - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-frameworks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent frameworks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="08-agent-frameworks.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-does-an-agent-framework-actually-give-you-that-raw-api-calls-dont" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What does an agent framework actually give you that raw API calls don't
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-whats-the-difference-between-a-graph-based-framework-like-langgraph-and-a-role-based-framework-like-crewai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-do-you-decide-between-langgraph-crewai-and-the-anthropic-agent-sdk-for-a-given-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-tradeoffs-come-with-choosing-a-heavier-framework-versus-writing-a-lighter-custom-orchestration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-when-does-a-framework-add-unnecessary-abstraction-instead-of-solving-a-real-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. When does a framework add unnecessary abstraction instead of solving a real problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-happens-when-the-frameworks-abstractions-dont-match-how-your-actual-business-logic-needs-to-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What happens when the framework's abstractions don't match how your actual business logic needs to work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-does-the-framework-decide-which-node-or-agent-runs-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How does the framework decide which node or agent runs next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-do-you-version-and-roll-back-an-agents-workflow-definition-not-just-its-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How do you version and roll back an agent's workflow definition, not just its prompts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-do-you-evaluate-whether-a-framework-will-scale-with-your-team-not-just-your-first-prototype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How do you evaluate whether a framework will scale with your team, not just your first prototype
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-does-an-agent-framework-actually-give-you-that-raw-api-calls-dont" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What does an agent framework actually give you that raw API calls don't
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-whats-the-difference-between-a-graph-based-framework-like-langgraph-and-a-role-based-framework-like-crewai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-how-do-you-decide-between-langgraph-crewai-and-the-anthropic-agent-sdk-for-a-given-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-tradeoffs-come-with-choosing-a-heavier-framework-versus-writing-a-lighter-custom-orchestration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-when-does-a-framework-add-unnecessary-abstraction-instead-of-solving-a-real-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. When does a framework add unnecessary abstraction instead of solving a real problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-what-happens-when-the-frameworks-abstractions-dont-match-how-your-actual-business-logic-needs-to-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. What happens when the framework's abstractions don't match how your actual business logic needs to work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-does-the-framework-decide-which-node-or-agent-runs-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How does the framework decide which node or agent runs next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-do-you-version-and-roll-back-an-agents-workflow-definition-not-just-its-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How do you version and roll back an agent's workflow definition, not just its prompts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-do-you-evaluate-whether-a-framework-will-scale-with-your-team-not-just-your-first-prototype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How do you evaluate whether a framework will scale with your team, not just your first prototype
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="21-agent-harness-and-rails.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent harness and lifecycle hooks</span></a>
+<a class="topic-nav__link topic-nav__next" href="09-multi-agent-systems.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Multi-agent systems</span></a>
+</div>
+
+<h1 id="agent-frameworks">Agent frameworks</h1>
+<h2 id="1-what-does-an-agent-framework-actually-give-you-that-raw-api-calls-dont">1. What does an agent framework actually give you that raw API calls don't</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Raw API = request → response. A framework adds the surrounding machinery: session/state, context management, a tool registry, a control loop, streaming, tracing, and guardrails.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Session/state across turns.</li>
+<li>Context trimming/compression.</li>
+<li>Tool registry + control loop.</li>
+<li>Streaming, tracing, guardrails.</li>
+</ul>
+<p><strong>Concept.</strong> A raw API call is request → response. A framework adds the machinery around it: a session/state object that survives across turns, a context manager that trims and compresses history, a tool registry that turns functions into model-facing schemas and dispatches calls, a provider-agnostic model client, a loop with stop conditions, error handling, and observability. You do not re-implement conversation state, schema extraction, provider quirks, and tracing for every app.</p>
+<p><img alt="diagram" src="assets/diagrams/aea232e6af6d05b3fcb089107150e84828984a0d.png" /></p>
+<p><strong>In Jiuwen.</strong> The reusable pieces are concrete classes, not a monolith: a session owns state, streaming, tracing, and interaction lifecycle; a model client wraps providers behind one invoke/stream surface; a context engine owns windowing and compression; an ability manager owns tool registration and execution; and rails provide the loop's guardrails. Together they are the plumbing you would otherwise rebuild.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The reusable pieces are concrete classes, not a monolith. <code>Session</code> owns state, streaming, tracer, and interaction lifecycle; <code>Model</code> + <code>BaseModelClient</code> wrap providers behind one <code>invoke</code>/<code>stream</code> surface; <code>ContextEngine</code> owns windowing and compression; <code>AbilityManager</code> owns tool registration and execution; <code>AgentRail</code> is the class-based lifecycle hook bus; <code>Tracer</code> plus <code>extensions/observability</code> own telemetry; <code>Workflow</code>/<code>Pregel</code> own deterministic graph execution; and <code>Runner</code> is the process-global facade binding sessions, resource registry, checkpointer, and callbacks.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/72bfdfa2e9eb30e5fca4d9dc8668288ebe593cc8.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/agent.py:33</code></td>
+<td>Session (state, stream, tracer, interaction)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/runner/runner.py:696</code></td>
+<td>Runner facade class; :408 run_agent binds session + lifecycle</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context_engine.py:28</code></td>
+<td>ContextEngine (processors, token limits, compression)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model.py:27</code></td>
+<td>Model, unified LLM entry; :94 invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58</code></td>
+<td>create_model_client provider dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:142</code></td>
+<td>AbilityManager (tool registry + execution)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:824</code></td>
+<td>AgentRail base (lifecycle hooks)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/session/tracer/tracer.py:98</code></td>
+<td>Tracer; agent-core/openjiuwen/extensions/observability/runtime.py:103 — ObservabilityRuntime</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-whats-the-difference-between-a-graph-based-framework-like-langgraph-and-a-role-based-framework-like-crewai">2. What's the difference between a graph-based framework like LangGraph and a role-based framework like CrewAI</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Graph-based makes control flow an explicit graph of nodes/edges over shared state (deterministic, inspectable); role-based makes the unit an agent with a role that collaborates (flexible, less deterministic).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Graph: explicit nodes/edges, deterministic routing.</li>
+<li>Role: agents with roles that collaborate.</li>
+<li>Trade control for flexibility.</li>
+</ul>
+<p><strong>Concept.</strong> Graph-based frameworks make control flow an explicit graph of nodes and edges over shared state; routing is deterministic, inspectable, and easy to persist. Role-based frameworks make the unit an agent with a role/persona and let agents collaborate through messages and a task board; control flow is emergent and driven by the model plus a manager. Graph = you author the topology; role = you author the team.</p>
+<p><img alt="diagram" src="assets/diagrams/aa708d9c67a3edf602db0d462bc96f21cfe039a9.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen contains both archetypes as separate subsystems: the graph side is a real Pregel engine where components compile into a graph, edges become channels, and a loop drives super-steps with static and conditional routers, barriers, and OR-groups; the role side is the agent-teams stack with members, a supervisor, and message routing. So it is not graph versus role — it has both.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>It contains both archetypes as separate subsystems. The graph side is a genuine Pregel engine: <code>Workflow</code> compiles components into a <code>PregelGraph</code>, edges become channels, and <code>PregelLoop.run_step()</code> drives super-steps with static routers, conditional routers, barriers, and CNF OR-groups for exclusive merges. The role side is <code>TeamAgent</code>, a single class that switches between <code>TeamRole.LEADER</code> and <code>TEAMMATE</code>; leadership is expressed through tools (<code>create_team_tools</code>), an event-driven <code>CoordinationKernel</code>, and an optional <code>TeamScheduler</code> that dispatches tasks from a shared board. There is no declarative bridge that compiles a team into a Pregel graph.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:98</code></td>
+<td>Workflow graph facade</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:209</code></td>
+<td>Pregel; :231 run; :255 while await loop.run_step() driver</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/builder.py:13</code></td>
+<td>PregelBuilder (add_node/add_edge/add_branch)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/router.py:11/26</code></td>
+<td>StaticRouter / ConditionalRouter</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/_workflow.py:221</code></td>
+<td>add_connection (src/target edges)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/team_agent.py:76</code></td>
+<td>TeamAgent one impl for leader/teammate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/schema/team.py:81</code></td>
+<td>TeamRole; agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92 — TeamScheduler; agent-core/openjiuwen/agent_teams/agent/coordination/kernel.py:33 — CoordinationKernel</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/runtime/manager.py:104</code></td>
+<td>TeamRuntimeManager pool/dispatch; agent-core/openjiuwen/agent_teams/tools/tool_factory.py:97 — create_team_tools</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-how-do-you-decide-between-langgraph-crewai-and-the-anthropic-agent-sdk-for-a-given-project">3. How do you decide between LangGraph, CrewAI, and the Anthropic Agent SDK for a given project</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Pick by control shape and state model: explicit graph/routing with durable state → LangGraph; role/team collaboration for fast multi-agent → CrewAI; a managed agent SDK for host-managed agents.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Explicit graph + durable state → LangGraph.</li>
+<li>Role/team collaboration → CrewAI.</li>
+<li>Managed agent SDK for hosted agents.</li>
+<li>Match the framework to the control shape.</li>
+</ul>
+<p><strong>Concept.</strong> Pick by the shape of control and the state model you need. Explicit graph/routing with durable state → LangGraph. Role/team collaboration with fast multi-agent setup → CrewAI. A managed coding/agent harness with strong tool and sandbox defaults, and you accept the vendor → the Anthropic Agent SDK (or an equivalent). Weigh state model, persistence, provider lock-in, tool ecosystem, and team familiarity.</p>
+<p><img alt="diagram" src="assets/diagrams/3cd3b22fcf456d3737dd78da5c074a1f3b7dbc29.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's design center is deterministic graphs when the flow is known (a Pregel workflow with persistence) and role-based teams when work assignment is emergent (a leader with teammates on a task board). Its answer to framework choice is: use the graph path for known control flow and the team path for flexible collaboration, rather than adopting a specific external framework.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>There is no in-repo LangGraph or CrewAI code, so this is architectural reading. Jiuwen's design center is <em>deterministic graph when the flow is known</em> (<code>Workflow</code>/<code>Pregel</code>, with persistence via <code>GraphStore</code>/checkpointer) and <em>role-based teams when work assignment is emergent</em> (<code>TeamAgent</code> + <code>TeamScheduler</code> + task board). Over both sits a provider-agnostic model client: <code>ProviderType</code> enumerates OpenAI/Anthropic/DashScope/DeepSeek/… and <code>create_model_client</code> resolves the implementation, with <code>IntelliRouterModelClient</code> for routing. For the third archetype ("bring your own agent SDK"), it ships a <code>harness_protocol</code> SPI plus <code>harness_providers</code> (<code>native</code>, <code>claudecode</code>, <code>codex</code>, <code>dsh</code>) and <code>create_harness(manifest, provider=...)</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/471e610201432eec01ca6c8e0ff05fd7862ca214.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:255</code></td>
+<td>graph driver</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:92</code></td>
+<td>TeamScheduler; agent-core/openjiuwen/agent_teams/runtime/manager.py:104 — pool/dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code></td>
+<td>ProviderType enum</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/__init__.py:58</code></td>
+<td>provider→client dispatch + registry fallback</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness_providers/factory.py:160</code></td>
+<td>create_harness(manifest, provider=...)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:98</code></td>
+<td>graph and teams coexist in one SDK</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/manifest/catalog.py:67</code></td>
+<td>declarative element catalog</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-what-tradeoffs-come-with-choosing-a-heavier-framework-versus-writing-a-lighter-custom-orchestration-layer">4. What tradeoffs come with choosing a heavier framework versus writing a lighter custom orchestration layer</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Heavy frameworks give batteries (tools, memory, permissions, teams, observability) at the cost of startup time, learning curve, config surface, and churn; light custom code is transparent but you build the plumbing.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Heavy: batteries included, more config/learning.</li>
+<li>Light: transparent, you build plumbing.</li>
+<li>Choose by team size, rate of change, control needs.</li>
+</ul>
+<p><strong>Concept.</strong> Heavy frameworks give you batteries — tools, memory, permissions, teams, observability — at the cost of startup time, learning curve, config surface, and update churn. Light custom code is transparent and fast but you rebuild context management, retries, tracing, and safety. Choose by how much of the battery you would otherwise write yourself.</p>
+<p><img alt="diagram" src="assets/diagrams/64ac3c0f67bdb91080ff59c7729e14f460ccd374.png" /></p>
+<p><strong>In Jiuwen.</strong> The light path is the core SDK: a base agent with a ReAct loop, an ability manager, optional rails, and workflow graphs — no workspace, permission engine, task loop, or teams. The heavy path is the harness: a factory assembles a deep agent with default rails, workspace, permissions, and teams. So you can start light and opt into the heavy layer.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The light path is <code>core</code>: <code>BaseAgent</code>/<code>ReActAgent</code> with <code>AbilityManager</code>, optional rails, and <code>Workflow</code> graphs — no workspace, no permission engine, no task loop, no teams. The heavy path is <code>harness</code>: <code>factory.create_deep_agent</code> assembles <code>DeepAgent</code> with default rails (security, tool resilience, task planning, skills, subagents), a task loop, a workspace, and a tiered permission engine; <code>agent_teams</code> adds multi-process teams, DB/messager transport, worktrees, and reliability monitoring. Heaviness is partly config-gated (<code>enable_task_loop</code>, <code>enable_subagent_runtime</code>, <code>enable_security_rail</code>), but the default DeepAgent assembly is substantial.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/c9c4fe969c6752cfb0b56c4e94267eb61cbbd3da.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/base.py:85</code></td>
+<td>BaseAgent; agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2492 — invoke (light path)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/application/llm_agent/llm_agent.py:96</code></td>
+<td>; agent-core/openjiuwen/core/application/workflow_agent/workflow_agent.py:11 — thin application agents</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:298</code></td>
+<td>DeepAgent; agent-core/openjiuwen/harness/factory.py:460 create_deep_agent; :394-409 default rail set</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:248-260</code></td>
+<td>enable_task_loop/enable_subagent_runtime/enable_skill_discovery defaults False</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448/452</code></td>
+<td>spec defaults enable_task_loop=True, enable_security_rail=True</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/team_agent.py:76</code></td>
+<td>team heaviness; agent-core/openjiuwen/extensions/context_evolver/ + agent-core/openjiuwen/rsi/ + agent-core/openjiuwen/auto_harness/ — optional layers</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-when-does-a-framework-add-unnecessary-abstraction-instead-of-solving-a-real-problem">5. When does a framework add unnecessary abstraction instead of solving a real problem</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> The framework adds abstraction when the app is a single model call, when its node/agent/state model forces you to reshape logic, or when the graph is actually a straight line — warning signs include fighting the framework.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Single model call doesn't need a framework.</li>
+<li>Forcing business logic into nodes/agents is a smell.</li>
+<li>A straight line disguised as a graph.</li>
+</ul>
+<p><strong>Concept.</strong> When the app is a single model call, when the framework's node/agent/state model forces you to reshape business logic to fit, or when the graph is actually a straight line. Warning signs: you fight the state schema, wrap everything in adapters, or need an escape hatch on the happy path. The abstraction pays for itself only when you actually need the loop, state, tools, and observability.</p>
+<p><img alt="diagram" src="assets/diagrams/e5366b79547cc52462a56cbca17a98850515423c.png" /></p>
+<p><strong>In Jiuwen.</strong> The base layer is deliberately thin and elective: the ReAct agent auto-creates a session when none is passed, so a minimal loop runs without the runner; the legacy base agent still offers add-tools plus invoke; and a workflow is just a graph of executables. So you can avoid the heavy abstractions when they do not fit.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The base layer is deliberately thin and elective. <code>ReActAgent.invoke</code> auto-creates a session when none is passed, so a minimal loop runs without <code>Runner</code>; the legacy <code>BaseAgent</code> still offers <code>add_tools</code> + <code>invoke</code>; <code>Workflow</code> is just a graph of <code>Executable</code>s with optional schema validation. Heavier behavior lives in <code>harness/</code> and is opt-in: <code>factory.create_deep_agent</code> adds default rails only when their config flag is on, and <code>DeepAgentConfig</code> defaults <code>enable_task_loop</code>, <code>enable_skill_discovery</code>, and <code>enable_subagent_runtime</code> to <code>False</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/d8d42dbe6ef944a51d7929e155664feb4f6088b5.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2492</code></td>
+<td>invoke auto-creates session when session is None (:2523)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/application/llm_agent/llm_agent.py:96</code></td>
+<td>LLMAgent thin controller-based agent; agent-core/openjiuwen/core/application/workflow_agent/workflow_agent.py:11 — WorkflowAgent</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/legacy/agent.py:116</code></td>
+<td>legacy BaseAgent; :222 add_tools</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:394</code></td>
+<td>default_rails, each guarded by should_add</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:448/452/469</code></td>
+<td>enable_task_loop/enable_security_rail/enable_skill_discovery defaults</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:1873</code></td>
+<td>add_rail optional, queue-based</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/workflow.py:328</code></td>
+<td>Workflow.invoke requires an explicit session</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-what-happens-when-the-frameworks-abstractions-dont-match-how-your-actual-business-logic-needs-to-work">6. What happens when the framework's abstractions don't match how your actual business logic needs to work</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Use escape hatches: implement the base interface directly, call the primitive without the wrapper, override hooks, or replace a component; if there's no seam, that's a real limitation.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Implement the base interface directly.</li>
+<li>Call the primitive (model/tool) without the wrapper.</li>
+<li>Override hooks or replace a component.</li>
+</ul>
+<p><strong>Concept.</strong> Prefer escape hatches: implement the base interface directly, call the primitive (model/tool) without the high-level wrapper, override hooks, or replace a component. If the framework has no seam, you fork it or drop it. Good frameworks make the low-level primitive reachable from the high-level API.</p>
+<p><img alt="diagram" src="assets/diagrams/85a07b6f7a10e6b6fe113c5a56b4fb61043941bc.png" /></p>
+<p><strong>In Jiuwen.</strong> There are multiple escape hatches: at the graph level you can implement the executable interface with full IO control and bypass schemas; at the model level you can call the model directly without an agent or runner; at the tool level you can wrap any function; and rails and hooks can be overridden. So mismatched abstractions can usually be bypassed rather than fought.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The framework exposes multiple escape hatches. At graph level, implement <code>Executable</code>/<code>ComponentExecutable</code> with full control over I/O and bypass schemas. At LLM level, call <code>Model.invoke</code> directly (no agent/runner required). At tool level, wrap any function with <code>LocalFunction</code>/<code>@tool</code>, including a custom <code>render</code>. At behavior level, intercept with <code>AgentRail</code> hooks or replace a rail via <code>strip_rails_by_type</code>; at assembly level, override config fields or subclass (<code>ReActAgentEvolve</code> is a shipped example). <code>_apply_extension_parts</code> hot-swaps rails/tools/prompts, and custom clients plug into the registry.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/00e51ed5eef64c00e2feb193d0bbda70f8a99561.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/executable.py:14</code></td>
+<td>on_invoke override</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/component.py:124/148</code></td>
+<td>invoke/stream overrides with raw Session+ModelContext</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model.py:94</code></td>
+<td>direct Model.invoke</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/function/function.py:48</code></td>
+<td>LocalFunction; agent-core/openjiuwen/core/foundation/tool/tool.py:14 — @tool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:824</code></td>
+<td>AgentRail; agent-core/openjiuwen/harness/deep_agent.py:1936 — strip_rails_by_type</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent_evolve.py:16</code></td>
+<td>subclassing ReActAgent</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:53</code></td>
+<td>+ agent-core/openjiuwen/core/common/clients/client_registry.py:50 — custom model backend</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2015</code></td>
+<td>_apply_extension_parts hot-swap</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-does-the-framework-decide-which-node-or-agent-runs-next">7. How does the framework decide which node or agent runs next</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A scheduler activates every node whose input channels are ready, runs them (often concurrently), routes outputs to successors, and repeats until no node is active.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Ready = input channels satisfied.</li>
+<li>Run ready nodes concurrently.</li>
+<li>Route outputs; repeat until quiescent.</li>
+</ul>
+<p><strong>Concept.</strong> In a graph framework, a scheduler activates every node whose input channels are ready, runs them (often concurrently), then routes their outputs to successors; the loop repeats until no node is active. In an agent framework, the model decides the next action by emitting tool calls. Frameworks that have both use each at its level.</p>
+<p><img alt="diagram" src="assets/diagrams/e890d2a486b06d896fe46a96d3e370047becebc6.png" /></p>
+<p><strong>In Jiuwen.</strong> Next-node selection is Pregel super-step scheduling: each step asks the channel manager for nodes whose trigger/barrier channels are satisfied, submits them to a task executor pool, collects their router outputs, flushes messages into channels, and repeats until nothing is ready. Barriers and OR-groups gate joins of mutually exclusive branches.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Workflow next-node selection is Pregel super-step scheduling: each step <code>ChannelManager.get_ready_nodes()</code> yields nodes whose trigger/barrier channels are satisfied, they are submitted to a <code>TaskExecutorPool</code>, their routers emit messages, messages are flushed into channels, and the loop repeats until the active set and buffer are empty. Agent-level dispatch is separate and LLM-driven: the ReAct loop calls the model, and if the assistant message carries <code>tool_calls</code> it hands them to <code>AbilityManager.execute</code>; if there are none it terminates with an answer. Team-level, <code>TeamScheduler</code> scans the task board and starts each idle member's earliest assigned pending task.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/6660ca48b7b15610f973cc34946fc3b347e18ff7.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/engine.py:122</code></td>
+<td>ready_nodes = manager.get_ready_nodes(); :130 end condition; :144-150 consume + executor.submit; :255 while await loop.run_step()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/channels.py:39</code></td>
+<td>flush() marks updated nodes ready; :60 get_ready_nodes</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/graph/pregel/task.py:27</code></td>
+<td>submit creates a NodeTask; :47 asyncio.wait(..., FIRST_EXCEPTION); :158 node routers produce next targets</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2740</code></td>
+<td>iteration loop; :2793 no tool_calls → answer; :2813 _execute_tool_call</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/ability_manager.py:1078</code></td>
+<td>execute (invoked from agent-core/openjiuwen/core/single_agent/agents/react_agent.py:2813)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:197</code></td>
+<td>_scan; :208 _reconcile_starts</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-how-do-you-version-and-roll-back-an-agents-workflow-definition-not-just-its-prompts">8. How do you version and roll back an agent's workflow definition, not just its prompts</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Treat the agent/workflow definition as a versioned artifact: immutable versions with a content hash, activate one, list history, roll back atomically — prompts are only a subset.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Version the whole definition, not just prompts.</li>
+<li>Immutable versions + content hash.</li>
+<li>Activate/list/rollback atomically.</li>
+</ul>
+<p><strong>Concept.</strong> Treat the agent/workflow definition as a versioned artifact: store immutable versions with a content hash, activate one, list history, and roll back atomically. Prompts are only a subset — the topology and config change too. Most frameworks do not do this for you.</p>
+<p><img alt="diagram" src="assets/diagrams/97ab35245a76ec31868a9af220821dcae9d61640.png" /></p>
+<p><strong>In Jiuwen.</strong> In the core framework this is essentially absent: a workflow card has a free-form version string and a key helper, but there is no registry, version history, graph serializer, or rollback API — the version is only part of a composite key. Real versioning and rollback exist at the product's RSI harness-package level, not for arbitrary workflow definitions.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>In the core framework this is <strong>essentially absent</strong>: <code>WorkflowCard</code> has a free-form <code>version: str = ''</code> and a <code>generate_workflow_key(id, version)</code> helper, but there is no registry, no version history, no graph serializer, and no rollback API — <code>version</code> is only part of a composite key. The real, working versioning is at the product layer in the RSI (recursive self-improvement) harness subsystem: <code>RsiHarnessActivationStore</code> persists an <code>activation.json</code> with <code>schema_version</code>, an <code>active</code> record, and an immutable <code>history</code> of installed versions, each carrying <code>installation_id</code>, <code>sha256</code>, <code>runtime_path</code>, and a monotonic <code>version_sequence</code>; <code>install(task_id)</code> copies a published engine package into a content-addressed <code>versions/baseline-&lt;sha16&gt;</code> directory and <code>rollback(installation_id)</code> re-activates any retained version (validating path, sha256, and manifest, hot-reloading, with compensation if the pointer write fails), exposed over the WebSocket protocol as <code>rsi.harness.rollback</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/base.py:21</code></td>
+<td>WorkflowCard.version: str = ''; :68 generate_workflow_key(workflow_id, workflow_version)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:296</code></td>
+<td>RsiHarnessActivationStore; :350 list_versions(); :386 snapshot(); :391 restore(); :416 commit() assigns version_sequence; :466 atomic write</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/harness_activation.py:617</code></td>
+<td>rollback(installation_id); :623 _rollback_unlocked; :682 _assert_rollback_allowed; :694 _validate_rollback_target</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rsi/materializer.py:222</code></td>
+<td>content-addressed version_id = baseline-<sha16>; :231-246 writes harness_refs.yaml</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/rsi/rsi_handlers.py:224</code></td>
+<td>_do_harness_rollback; :218 _do_harness_versions_list; :209 install</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/gateway/channel_manager/web/app_web_handlers.py:7634</code></td>
+<td>rsi.harness.rollback dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/infra/runtime_manifest.py:121</code></td>
+<td>schema_version; agent-core/openjiuwen/harness/schema/expert_harness_spec.py:122 — schema_version</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/checkpointing/manager.py:121</code></td>
+<td>restores operator state/best score (training only)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-how-do-you-evaluate-whether-a-framework-will-scale-with-your-team-not-just-your-first-prototype">9. How do you evaluate whether a framework will scale with your team, not just your first prototype</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Look for declarative registration and plugins, stable extension contracts, provider/config abstraction, schema'd config, and real docs. Be wary if every change means patching internals.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Declarative registration and plugins.</li>
+<li>Stable extension contracts.</li>
+<li>Provider/config abstraction.</li>
+<li>Schema'd config + docs.</li>
+</ul>
+<p><strong>Concept.</strong> Look for declarative registration and plugins, stable extension contracts, provider and config abstraction, schema'd configuration, and real documentation. Be wary of frameworks where every change means patching internals. Prototype speed is not the same as team-scale maintainability.</p>
+<p><img alt="diagram" src="assets/diagrams/760b6fa06927d5faa409ba04f26bb0b05a6cee8d.png" /></p>
+<p><strong>In Jiuwen.</strong> Extension is registry and manifest based rather than patch based. Provider modules declare element descriptors that a catalog registration converts into class registrations, and the deep agent can hot-load plugin, agent-template, and harness-config packages through one builder. Extension is by registration, not by patching internals.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Extension is registry/manifest based rather than patch based. Provider modules declare <code>@harness_element(kind, name, ...)</code> descriptors; <code>register_from_catalog()</code> converts the catalog into class registrations, and <code>DeepAgent.load_plugin</code> / <code>load_agent_template</code> / <code>load_harness_config</code> hot-load packages through one <code>BuildContext</code> apply path. Model providers auto-register via <code>BaseModelClient.__init_subclass__</code> into <code>ClientRegistry</code>, and team infrastructure uses <code>register_transport</code>/<code>register_storage</code> name→config registries. <code>Runner.resource_mgr</code> centralizes tool/workflow/agent/team/model/prompt managers, and the product demonstrates the pattern: <code>jiuwenswarm/jiuwenswarm/agents/swarm/registry.py</code> imports provider modules and drives registration from the manifest catalog.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/c9abcea8619a4d4e41741e42e999f2b006a467b8.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/manifest/catalog.py:67</code></td>
+<td>@harness_element; :55 list_elements(); agent-core/openjiuwen/harness/manifest/registration.py:31 — register_from_catalog</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2027</code></td>
+<td>load_plugin; :2076 load_agent_template; :2190 load_harness_config</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:53</code></td>
+<td><strong>init_subclass</strong> auto-registration; agent-core/openjiuwen/core/common/clients/client_registry.py:19/50/94</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/runner/resources_manager/resource_registry.py:13</code></td>
+<td>ResourceRegistry</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:248</code></td>
+<td>; agent-core/openjiuwen/harness/schema/deep_agent_spec.py:354 — config schema (Pydantic)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/schema/blueprint.py:99</code></td>
+<td>TransportSpec/StorageSpec registry pattern</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/swarm/registry.py:8-12</code></td>
+<td>product-side provider registration via the catalog</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

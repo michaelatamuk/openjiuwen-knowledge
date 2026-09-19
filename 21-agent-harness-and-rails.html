@@ -1,0 +1,2455 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="05-agent-fundamentals-and-the-loop.html">
+      
+      
+        <link rel="next" href="08-agent-frameworks.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Agent harness & lifecycle hooks - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-harness-and-lifecycle-hooks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent harness & lifecycle hooks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-an-agent-harness-and-what-does-it-add-over-a-raw-agent-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is an agent harness and what does it add over a raw agent loop?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-are-lifecycle-hooks-in-an-agent-harness-and-at-which-points-can-they-fire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What are lifecycle hooks in an agent harness, and at which points can they fire?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-what-concerns-belong-in-a-lifecycle-hook-versus-in-the-agent-prompt-versus-in-a-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What concerns belong in a lifecycle hook versus in the agent prompt versus in a tool?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-are-lifecycle-hooks-registered-and-assembled-for-a-specific-agent-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How are lifecycle hooks registered and assembled for a specific agent type?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-the-harness-task-loop-differ-from-a-single-agent-invocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does the harness task loop differ from a single agent invocation?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-test-a-lifecycle-hook-in-isolation-from-the-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you test a lifecycle hook in isolation from the LLM?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-what-is-the-event-bridge-model-which-events-propagate-to-the-inner-agent-and-which-stay-on-the-outer-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. What is the event bridge model — which events propagate to the inner agent and which stay on the outer harness?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-does-hot-loading-lifecycle-hooks-into-a-running-agent-work-and-when-would-you-need-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How does hot-loading lifecycle hooks into a running agent work and when would you need it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-does-a-harness-accumulate-experience-what-is-the-skill-evolution-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How does a harness accumulate experience — what is the skill evolution pipeline?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-an-agent-harness-and-what-does-it-add-over-a-raw-agent-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is an agent harness and what does it add over a raw agent loop?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-are-lifecycle-hooks-in-an-agent-harness-and-at-which-points-can-they-fire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What are lifecycle hooks in an agent harness, and at which points can they fire?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-what-concerns-belong-in-a-lifecycle-hook-versus-in-the-agent-prompt-versus-in-a-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What concerns belong in a lifecycle hook versus in the agent prompt versus in a tool?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-are-lifecycle-hooks-registered-and-assembled-for-a-specific-agent-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How are lifecycle hooks registered and assembled for a specific agent type?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-the-harness-task-loop-differ-from-a-single-agent-invocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does the harness task loop differ from a single agent invocation?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-test-a-lifecycle-hook-in-isolation-from-the-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you test a lifecycle hook in isolation from the LLM?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-what-is-the-event-bridge-model-which-events-propagate-to-the-inner-agent-and-which-stay-on-the-outer-harness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. What is the event bridge model — which events propagate to the inner agent and which stay on the outer harness?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-how-does-hot-loading-lifecycle-hooks-into-a-running-agent-work-and-when-would-you-need-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. How does hot-loading lifecycle hooks into a running agent work and when would you need it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-how-does-a-harness-accumulate-experience-what-is-the-skill-evolution-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. How does a harness accumulate experience — what is the skill evolution pipeline?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="05-agent-fundamentals-and-the-loop.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent fundamentals and the loop</span></a>
+<a class="topic-nav__link topic-nav__next" href="08-agent-frameworks.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Agent frameworks</span></a>
+</div>
+
+<h1 id="agent-harness-and-lifecycle-hooks">Agent harness and lifecycle hooks</h1>
+<h2 id="1-what-is-an-agent-harness-and-what-does-it-add-over-a-raw-agent-loop">1. What is an agent harness and what does it add over a raw agent loop?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A harness wraps a raw agent loop with every production concern the reasoning loop cannot own: outer task loop, safety and injection filtering, permission and sensitive-data enforcement, resilience, memory, observability, and config-driven capability composition.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Raw loop: one ReAct episode — model → tools → repeat → final answer.</li>
+<li>Outer task loop: drives the inner agent across multiple episodes toward a long-horizon goal.</li>
+<li>Safety layer: injects guardrails before every model call; checks permissions and detects injection before every tool call.</li>
+<li>Resilience layer: detects LLM stream stalls, loop-detects repeated tool calls, retries transient failures.</li>
+<li>Memory layer: registers memory tools and injects a memory-usage prompt section.</li>
+<li>Observability layer: structured spans for every model call and tool call; cost metering and budget enforcement.</li>
+<li>Inner loop owns reasoning; harness owns everything else. Inner default 5 iterations per episode; the outer loop is capped at 50 rounds.</li>
+</ul>
+<p><strong>Concept.</strong> A raw agent loop (ReAct) handles one reasoning episode: call model → execute tool calls → feed results back → return final answer. A harness wraps this with every production concern that cannot live inside the reasoning loop:</p>
+<p><img alt="diagram" src="assets/diagrams/32905541bc497eb5ad2a8d91bcd06cd508c93168.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, <code>DeepAgent</code> wraps a <code>ReActAgent</code> and owns every production concern around the reasoning loop, each as a separate <code>DeepAgentRail</code>: <code>SafetyPromptRail</code> injects bilingual safety guardrails before every model call; <code>PermissionInterruptRail</code> checks tool calls against a permission engine and pauses for human confirmation on sensitive or destructive operations; <code>ToolCallResilienceRail</code> retries transport/timeout failures with a per-invoke budget of 3 attempts and skips non-idempotent tools; <code>ModelAnomalyDetectionRail</code> detects repeated tool-call loops and stream stalls and uses the (0.5, 1.0, 2.0) backoff; <code>MemoryRail</code> registers memory tools and hooks <code>before_invoke</code>/<code>before_model_call</code>; <code>AgentObservabilityRail</code> (a <code>core.observability</code> element at priority 10) emits a typed span for every event. The inner <code>ReActAgent</code> defaults to 5 iterations; <code>DeepAgentConfig.max_iterations = 15</code> is the per-invoke inner limit when the task loop is off, and the outer loop is capped at <code>max_outer_rounds = 50</code>.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>DeepAgent</code> wraps <code>ReActAgent</code>. Each production concern is a separate <code>DeepAgentRail</code> class registered in the pipeline. Core rails: <code>SafetyPromptRail</code> — injects bilingual safety guidelines before every model call. <code>PermissionInterruptRail</code> — checks tool calls against a <code>PermissionEngine</code>; triggers a HITL interrupt for ASK/ASK_USER decisions; parses shell commands for dangerous patterns. <code>ToolCallResilienceRail</code> — retries transport/timeout failures with a per-invoke budget of 3 attempts (<code>DEFAULT_MAX_ATTEMPTS = 3</code>) and skips retry for non-idempotent operations (write/shell/subagent-spawn). <code>ModelAnomalyDetectionRail</code> — detects consecutive identical tool-call rounds and stream-stall patterns; its backoff schedule is <code>_DEFAULT_BACKOFF_SECONDS = (0.5, 1.0, 2.0)</code>. <code>MemoryRail</code> — registers memory tools and injects a memory-usage prompt section; it hooks <code>before_invoke</code> and <code>before_model_call</code>. <code>AgentObservabilityRail</code> — a <code>core.observability</code> element at priority 10 that emits a typed span for every lifecycle event. The inner ReAct loop defaults to <code>max_iterations = 5</code> (<code>react_agent.py:288</code>); the harness <code>DeepAgentConfig.max_iterations = 15</code> is the per-invoke inner limit when the task loop is off, and the outer loop is capped at <code>max_outer_rounds = 50</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/0011cf7dcdf84878083435e086426c7dc8e6deaa.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2692</code></td>
+<td>_run_task_loop: outer task loop in DeepAgent; :2723 max_outer_rounds = 50</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations: int = Field(default=5)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:252</code></td>
+<td>DeepAgentConfig.max_iterations = 15 (per-invoke inner limit)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:433</code></td>
+<td>DeepAgentSpec; :248 RailSpec</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td>SafetyPromptRail: bilingual safety injection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57</code></td>
+<td>PermissionInterruptRail: permission engine + HITL</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/tool_call_resilience_rail.py:24</code></td>
+<td>ToolCallResilienceRail; budget :92</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110</code></td>
+<td>ModelAnomalyDetectionRail; backoff :35</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/memory/memory_rail.py:25</code></td>
+<td>MemoryRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py:355</code></td>
+<td>AgentObservabilityRail (priority 10)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-what-are-lifecycle-hooks-in-an-agent-harness-and-at-which-points-can-they-fire">2. What are lifecycle hooks in an agent harness, and at which points can they fire?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Lifecycle hooks are callbacks registered at specific execution points; a complete hook set covers the invocation boundary, the task loop boundary, and the inner model/tool call boundary — each at a different granularity.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>10 event points total: BEFORE/AFTER_INVOKE, BEFORE/AFTER_TASK_ITERATION, BEFORE/AFTER_MODEL_CALL, BEFORE/AFTER_TOOL_CALL, ON_MODEL_EXCEPTION, ON_TOOL_EXCEPTION.</li>
+<li>Hooks at invocation level fire once per outer task; hooks at model-call level fire multiple times per outer pass.</li>
+<li>Hooks are priority-ordered — higher priority fires first within each event.</li>
+<li>Hooks can read state, inject context, block an action, or emit observability events without the agent knowing.</li>
+</ul>
+<p><strong>Concept.</strong> Lifecycle hooks are callbacks registered by lifecycle hooks at specific points in the agent's execution. They can read state, inject content into the context, block or modify an action, or emit observability events — without the agent code knowing. A well-designed hook set covers: the full invocation boundary (before/after the entire task), the task loop iteration boundary (before/after each outer pass), and the inner reasoning steps (before/after each model call and each tool call, plus exception paths). Hooks that fire only at the invocation level cannot intercept a specific tool call; hooks that fire at the model-call level fire many times per outer pass.</p>
+<p><img alt="diagram" src="assets/diagrams/3985e5e6f9b00e38b9c1a72867f9efd809261975.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, <code>DeepAgentRail</code> declares the hook points: six bridge into the inner <code>ReActAgent</code> callback manager (before/after model call, before/after tool call, on model exception, on tool exception) and four stay on the outer <code>DeepAgent</code> (before/after invoke, before/after task iteration). Rails declare a priority, and the callback manager fires higher priority first. A rail registered on the wrong event point still fires — just at the wrong granularity.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>DeepAgentRail</code> base class (<code>harness/rails/base.py</code>) declares the hook points — inner events bridged to <code>ReActAgent</code> (before/after model call, before/after tool call, on model exception, on tool exception) and outer events on <code>DeepAgent</code> (before/after invoke, before/after task iteration). Rails are priority-ordered and <strong>higher priority fires first</strong> (<code>AgentCallbackManager.register_callback</code> documents “higher = runs first”). <code>get_callbacks()</code> returns the hooks a rail registers, and the callback manager invokes them in priority order per event.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/14d3549fa82857aaeaed3dde695d80bc85900a19.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/base.py:28</code></td>
+<td>DeepAgentRail: hook declarations</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/rail/base.py:824</code></td>
+<td>AgentRail base; :465 AgentCallbackEvent</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agent_callback_manager.py:11</code></td>
+<td>AgentCallbackManager; :29 priority (“higher runs first”)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:158</code></td>
+<td>_BRIDGE_EVENTS; :180 _OUTER_ONLY_EVENTS; :188 _DEEP_EVENTS</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-what-concerns-belong-in-a-lifecycle-hook-versus-in-the-agent-prompt-versus-in-a-tool">3. What concerns belong in a lifecycle hook versus in the agent prompt versus in a tool?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Prompts advise reasoning but cannot enforce it; tools execute a domain action but carry no policy; lifecycle hooks intercept at runtime and are the only layer that can block execution — use them for safety filtering, prompt injection detection, permission gating, sensitive-data enforcement, cost metering, and observability.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Prompt: advises reasoning — 'do not return passwords' can be ignored by the model.</li>
+<li>Tool: executes on demand with a defined I/O contract — carries no policy itself.</li>
+<li>Hook: the only layer that can block: BEFORE_TOOL_CALL hooks can veto a harmful action before it executes; AFTER_MODEL_CALL hooks can detect a response that contains a secret before it reaches the user.</li>
+<li>Safety / injection: a hook inspects the full context and vetoes; a prompt cannot intercept user input at call time.</li>
+<li>Permission gating: a hook checks the tool's permission tier before execution, regardless of which task requested it.</li>
+<li>Cost and observability: must intercept after every model call — impractical to encode in every prompt or tool.</li>
+</ul>
+<p><strong>Concept.</strong> Three distinct layers, each with its own job. <strong>Prompt:</strong> reasoning guidance — what the task is, how to think about it, what format to return. Prompts advise but cannot enforce. A prompt that says "do not return passwords" can be ignored by the model. <strong>Tool:</strong> domain capability with a defined I/O contract — fetch a URL, run a query, call an API. Tools execute when the model calls them and carry no policy. <strong>Lifecycle hook:</strong> cross-cutting policy that fires unconditionally, regardless of task or tool selection. Use a hook when the concern must <em>intercept or block</em> execution, not merely advise it:</p>
+<p><img alt="diagram" src="assets/diagrams/00d4aaada70f359faca3e4bb6c53592426d74f34.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen the three layers are explicit. <code>SystemPromptBuilder</code> assembles system-prompt sections contributed by active rails — <code>SafetyPromptRail</code> (a bilingual safety section), <code>TaskPlanningRail</code> (planning instructions), <code>SkillUseRail</code> (available skills). Tools are <code>ToolCard</code> objects with a schema and a permission tier; they execute only when the model calls them and carry no policy. Rails enforce policy: <code>PermissionInterruptRail</code> runs <code>PermissionEngine.check_permission()</code> and approves, blocks, or raises a confirmation interrupt; <code>ModelAnomalyDetectionRail</code> detects loops/stalls after the model call; <code>TokenTrackingRail</code> meters usage; <code>AgentObservabilityRail</code> emits typed spans. Removing a rail removes its policy for all agents.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Prompt layer: <code>SystemPromptBuilder</code> assembles sections contributed by active rails — <code>SafetyPromptRail</code> adds a bilingual safety section, <code>TaskPlanningRail</code> adds planning instructions, <code>SkillUseRail</code> adds available-skills guidance. Tool layer: <code>ToolCard</code> defines schema, callable, and permission tier. Hook layer: <code>SafetyPromptRail</code> fires on BEFORE_MODEL_CALL (advises, cannot block); <code>PermissionInterruptRail</code> fires on BEFORE_TOOL_CALL — it reads the permission tier from <code>ToolCard</code>, runs <code>PermissionEngine.check_permission()</code>, and approves, blocks, or raises a human-confirmation interrupt (the only layer that can prevent a destructive shell command from running); <code>ModelAnomalyDetectionRail</code> fires on AFTER_MODEL_CALL to detect repeated tool-call sequences and stream stalls; <code>TokenTrackingRail</code> meters usage at AFTER_MODEL_CALL; <code>AgentObservabilityRail</code> (priority 10) emits typed spans at each event.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/580a830897b6ec4e7f74e453a32533b4711ea8a2.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/builder.py:28</code></td>
+<td>SystemPromptBuilder; rail prompt-section injection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:78</code></td>
+<td>ToolCard schema and permission tier</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/prompt_security_rail.py:16</code></td>
+<td>SafetyPromptRail (BEFORE_MODEL_CALL, advisory)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/security/tool_security_rail.py:57</code></td>
+<td>PermissionInterruptRail; PermissionEngine.check_permission() at agent-core/openjiuwen/harness/security/permission_engine/core.py:272</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110</code></td>
+<td>ModelAnomalyDetectionRail (AFTER_MODEL_CALL)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/cli/rails/token_tracker.py:15</code></td>
+<td>TokenTrackingRail: usage metering</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-how-are-lifecycle-hooks-registered-and-assembled-for-a-specific-agent-type">4. How are lifecycle hooks registered and assembled for a specific agent type?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Registration (declare a class in a manifest catalog) and assembly (resolve a spec to instances) are separate steps — capability authoring is decoupled from capability composition per agent type.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Registration: each lifecycle-hook class is declared with a name in the manifest at import time.</li>
+<li>Spec: a declarative ordered list of named lifecycle-hook types plus per-instance parameters.</li>
+<li>Assembly: spec entries are looked up in the registry, instantiated with their params, appended in order.</li>
+<li>Different agent types use different specs built from the same registry.</li>
+</ul>
+<p><strong>Concept.</strong> Registration and assembly are separate steps. Registration happens at import time: each lifecycle-hook class is declared with a name in a manifest catalog. At agent construction, a spec — a declarative list of named lifecycle-hook types plus per-instance parameters — is resolved against the registry: each entry is looked up, instantiated with its params, and appended to the pipeline in declaration order. Different agent types use different specs built from the same registry. This separates capability authoring (write the class, register it once) from capability composition (declare which classes to activate, per agent type).</p>
+<p><img alt="diagram" src="assets/diagrams/15d4c08ebb0de06b081847a78b6a7472b5f98f69.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, every built-in rail is declared once in <code>builtin_elements.py</code> with <code>harness_element(kind=ElementKind.RAIL, name=…, builder=…)</code>. At startup <code>registration.py</code> syncs this catalog into a provider registry. An agent type uses <code>DeepAgentSpec</code>, whose <code>rails</code> list holds <code>RailSpec</code> items (type + params); <code>DeepAgentSpec.build()</code> resolves each type against the registry, instantiates it with its params, and appends it. The <code>create_deep_agent</code> factory itself takes already-built rail instances. A base spec activates task-planning, security, sys-operation, and (optionally) observability; the product code agent adds <code>swarm.code_task_planning</code> and <code>swarm.team_plan_approval</code>.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>builtin_elements.py</code> declares every built-in rail with <code>harness_element(kind=ElementKind.RAIL, name=..., description=..., builder=SecurityRail)</code>. <code>registration.py</code> syncs the catalog to a provider registry at startup. <code>DeepAgentSpec.rails</code> is a list of <code>RailSpec</code>; <code>DeepAgentSpec.build()</code> looks each <code>RailSpec.type</code> up in the registry, instantiates it with <code>RailSpec.params</code>, and appends it — the <code>create_deep_agent</code> factory itself takes already-built <code>AgentRail</code> instances. A base agent spec has <code>[core.task_planning, core.security, core.sys_operation, …]</code>; the product code agent adds <code>[swarm.code_task_planning, swarm.team_plan_approval, …]</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/a103d12b433702f7ca99ef519ed81946a5b7ff69.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/manifest/builtin_elements.py:450</code></td>
+<td>harness_element(kind=…, name=…, builder=SecurityRail)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/manifest/registration.py:31</code></td>
+<td>catalog → provider registry sync (register_from_catalog)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/deep_agent_spec.py:248</code></td>
+<td>RailSpec; :433 DeepAgentSpec; :581 build()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:460</code></td>
+<td>create_deep_agent: takes rail instances</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-does-the-harness-task-loop-differ-from-a-single-agent-invocation">5. How does the harness task loop differ from a single agent invocation?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A single agent invocation runs one ReAct episode; the harness task loop calls it repeatedly, evaluating completion after each pass and giving hooks time to update working memory and check budgets between passes.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Single invocation: one ReAct episode, inner iteration limit.</li>
+<li>Task loop: BEFORE_TASK_ITERATION → inner agent → AFTER_TASK_ITERATION, repeated until done or budget exhausted.</li>
+<li>Between passes: hooks update memory, check cost quota, inject new context.</li>
+<li>Outer budget is separate from the inner max_iterations.</li>
+</ul>
+<p><strong>Concept.</strong> A single agent invocation runs one ReAct episode — the model and tools interact until the agent returns a final answer, hits its iteration limit, or encounters an error. The harness task loop calls this invocation repeatedly, evaluating whether the overall goal is complete after each pass. Between passes, task-iteration hooks fire, giving hooks time to update working memory, flush completed sub-tasks, check whether the budget allows another pass, and inject new context or instructions. This enables long-horizon tasks that require more reasoning steps than a single episode's iteration limit allows, without losing state between episodes.</p>
+<p><img alt="diagram" src="assets/diagrams/92e90f6aba8f439c4fb7a88fe702f18107e9e5f7.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, the outer task loop is <code>DeepAgent._run_task_loop()</code>. Before each pass, rails update prompt sections, check token/cost quotas, and load memories; the inner <code>ReActAgent</code> runs its episode (with <code>max_iterations</code> raised to <code>sys.maxsize</code> while the task loop is on); after each pass, rails write memory and <code>TaskCompletionRail</code> decides whether the goal is satisfied. The outer loop is capped at <code>max_outer_rounds = 50</code>, independent of the inner per-episode limit.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>DeepAgent._run_task_loop()</code> is the outer loop. Each iteration: BEFORE_TASK_ITERATION fires (rails update prompt sections, check token/cost quotas, load memories); the inner <code>ReActAgent</code> runs (with <code>max_iterations</code> raised to <code>sys.maxsize</code> when <code>enable_task_loop</code>); AFTER_TASK_ITERATION fires (rails write memory; <code>TaskCompletionRail</code> decides whether the goal is satisfied). The outer loop is capped at <code>max_outer_rounds = 50</code>.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/d5fed93e4278266b12a9b0e4d299437929c56450.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:2692</code></td>
+<td>_run_task_loop: outer task loop; :2723 max_outer_rounds = 50</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:252</code></td>
+<td>DeepAgentConfig.max_iterations = 15</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_completion_rail.py:74</code></td>
+<td>completion signal</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/memory/memory_rail.py:25</code></td>
+<td>memory rail</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-how-do-you-test-a-lifecycle-hook-in-isolation-from-the-llm">6. How do you test a lifecycle hook in isolation from the LLM?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Structure hook tests around three concerns: which invariant to assert (blocked call, counter, emitted event), which paths to exercise (happy path and exception paths), and composition (state written by hook A at one priority is visible to hook B at the next).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Mock the model client boundary — raise controlled exceptions on specific invocations to exercise ON_TOOL_EXCEPTION and ON_MODEL_EXCEPTION paths; a retry hook never tested on failure is functionally untested.</li>
+<li>Assert hook invariants, not output strings: whether a blocked call was prevented, retry/token counters, and the emitted span log — output varies when any hook modifies context.</li>
+<li>Composition test: register two hooks at known priorities and assert that state written by the higher-priority hook is visible to the lower-priority hook at the same event point.</li>
+<li>No framework test harness exists — each test constructs the agent manually with only the hooks under test.</li>
+</ul>
+<p><strong>Concept.</strong> Inject a deterministic model client at the agent's model boundary and structure tests around three concerns:</p>
+<p><img alt="diagram" src="assets/diagrams/85dd6c2c1cc2b364f6eb4881b515a5f3d8ea0550.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, the testable boundary is <code>BaseModelClient</code>. Subclass it to return deterministic responses on the happy path and raise <code>ModelException</code> on demand for exception-path tests. Wrap a <code>ToolCard</code>'s callable to raise on a specific invocation to exercise the ON_TOOL_EXCEPTION hooks. Construct <code>DeepAgent</code> with only the rails under test and the mock client, then assert on observable effects: that a blocked tool was never invoked, <code>TokenTrackingRail</code> token counters, retry counts, and the <code>AgentObservabilityRail</code> typed span list. For composition, register two rails at known priorities, write a context field in the higher-priority rail's <code>before_tool_call</code>, and assert it is visible in the lower-priority rail's <code>before_tool_call</code>.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>BaseModelClient</code> (<code>core/foundation/llm/model_clients/base_model_client.py</code>) is the injectable boundary. Subclass it: the normal path returns a fixed tool-call sequence or a final answer; the exception path raises <code>ModelException</code>. For tool exception paths, wrap the tool callable in the <code>ToolCard</code> to raise on demand. Assert on observable effects — that a blocked tool was never invoked, cumulative token counts (<code>TokenTrackingRail</code>), retry counts, and the <code>AgentObservabilityRail</code> typed span log. For composition, register two rails with a known priority order and assert the lower-priority rail's <code>before_tool_call</code> sees the context field written by the higher-priority rail. No framework test harness exists — each test constructs <code>DeepAgent</code> via <code>create_deep_agent(…)</code> manually.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/811bad8080329e2c56bc99df1d5472e578c42cfb.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/model_clients/base_model_client.py:45</code></td>
+<td>BaseModelClient: injectable mock boundary</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/factory.py:460</code></td>
+<td>create_deep_agent: model client override</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/base.py:78</code></td>
+<td>ToolCard callable wrapper: injectable error fixture</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py:355</code></td>
+<td>AgentObservabilityRail: typed span log to assert on</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-what-is-the-event-bridge-model-which-events-propagate-to-the-inner-agent-and-which-stay-on-the-outer-harness">7. What is the event bridge model — which events propagate to the inner agent and which stay on the outer harness?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Inner-agent events (model call, tool call, exceptions) bridge into the inner loop's callback manager so hooks fire at execution time; outer events (invocation boundary, task loop boundary) stay on the outer harness because the inner loop does not know it is being called repeatedly.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>9 bridged events: BEFORE/AFTER_MODEL_CALL, ON_MODEL_EXCEPTION, BEFORE/AFTER_TOOL_CALL, ON_TOOL_EXCEPTION, AFTER_REACT_ITERATION, ON_USER_MESSAGE, BEFORE_STEERING_DRAIN — routed to the inner callback manager.</li>
+<li>2 outer-only: BEFORE/AFTER_INVOKE — on the harness only.</li>
+<li>2 deep-only: BEFORE/AFTER_TASK_ITERATION — fired by the outer task loop, no inner equivalent.</li>
+<li>Registering a per-model-call hook as a per-invocation hook is a silent design error — it fires, just at the wrong rate.</li>
+</ul>
+<p><strong>Concept.</strong> The outer harness and the inner agent loop are separate event domains. Inner-agent events (model call, tool call, exceptions at those call sites) must bridge into the inner loop's callback manager because they occur during active reasoning — a security hook that blocks a specific tool call must fire at the point of execution, inside the inner loop, not before the loop starts. Outer events (full invocation boundary, task loop iteration boundary) stay on the outer harness because the inner loop does not know it is being called multiple times toward a long-horizon goal. Incorrectly wiring a hook to the wrong domain causes it to fire at the wrong granularity — a per-model-call cost meter registered as a per-invocation hook only fires once per outer pass and misses all intermediate calls.</p>
+<p><img alt="diagram" src="assets/diagrams/70571909165d4c0e75e8abc9b7e97caff2d39045.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, <code>DeepAgent</code> defines three event sets. <code>_BRIDGE_EVENTS</code> (9) are routed to the inner agent's callback manager (<code>_register_rail_selective</code>), so a security rail on BEFORE_TOOL_CALL intercepts at the actual tool execution inside the reasoning loop. <code>_OUTER_ONLY_EVENTS</code> (2) and <code>_DEEP_EVENTS</code> (2) stay on the outer harness, which the inner loop does not know about. The mismatch is silent: a cost meter registered on BEFORE_INVOKE fires once per outer pass and misses intermediate model calls.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Three event sets are defined in <code>deep_agent.py</code>: <code>_BRIDGE_EVENTS</code> (9) — BEFORE/AFTER_MODEL_CALL, ON_MODEL_EXCEPTION, BEFORE/AFTER_TOOL_CALL, ON_TOOL_EXCEPTION, AFTER_REACT_ITERATION, ON_USER_MESSAGE, BEFORE_STEERING_DRAIN — are routed to the inner agent's callback manager (<code>_register_rail_selective</code>) so rails intercept at execution time. <code>_OUTER_ONLY_EVENTS</code> (2) — BEFORE_INVOKE, AFTER_INVOKE — stay on <code>DeepAgent</code>. <code>_DEEP_EVENTS</code> (2) — BEFORE_TASK_ITERATION, AFTER_TASK_ITERATION — are fired by the outer task-loop controller. Priority ordering within each event point determines which rail fires first (higher priority first).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/b21b57888f8c9e87607d8d7a510ac9c8e355fdcc.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:158</code></td>
+<td>_BRIDGE_EVENTS (9); :180 _OUTER_ONLY_EVENTS; :188 _DEEP_EVENTS; :2283 _register_rail_selective routes bridged events to the inner agent</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agent_callback_manager.py:11</code></td>
+<td>inner callback manager</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/base.py:160</code></td>
+<td>BaseAgent.agent_callback_manager</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-how-does-hot-loading-lifecycle-hooks-into-a-running-agent-work-and-when-would-you-need-it">8. How does hot-loading lifecycle hooks into a running agent work and when would you need it?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Hot-loading binds new lifecycle hooks to a live agent without restarting it; needed when capabilities are discovered at runtime (skill libraries, mid-session permission grants, external plugins).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Standard lifecycle hooks are bound at construction and fixed; hot-loading binds new hooks into the live pipeline.</li>
+<li>New hook joins the priority order without disrupting hooks that are mid-execution.</li>
+<li>Race risk: binding a callback during an active model call needs lock protection — the hot-bind itself is not lock-protected.</li>
+<li>The surrounding hot-load routine rolls back on failure, so no manual cleanup is required.</li>
+</ul>
+<p><strong>Concept.</strong> Standard lifecycle hooks are bound at construction — the spec is resolved, instances are created, and the pipeline is fixed. Hot-loading binds new lifecycle hooks to a live agent without stopping and restarting it. This is needed when the full capability set is not known at construction time: an agent discovers a skill library during a task and must load the tools and hooks declared in it; a user grants a new permission mid-session; an external plugin is installed while the agent is running. Hot-loading must preserve the existing pipeline state — the new hook joins the priority order without disrupting hooks that are mid-execution. Because agent invocations are async, binding a new callback during an active model call creates a race; the implementation must guard against partial registration.</p>
+<p><img alt="diagram" src="assets/diagrams/7904c7d0c218861dbabd873810353a8e195bf6fb.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, hot-loading is <code>apply_expert_harness_hot()</code>: it reads an <code>ExpertHarnessSpec</code>, resolves new rails and tools, and binds each with <code>_hot_bind_rail(agent, rail)</code> — which calls <code>await agent.register_rail(rail)</code> — plus <code>_hot_bind_prompt_section()</code> for the prompt section. It wraps the binds in try/except and rolls back with <code>unapply_expert_harness_hot()</code> on failure. <code>_hot_bind_rail</code> itself is not lock-protected, so loading a skill while the agent is mid-model-call carries a race risk.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Hot-loading is implemented by <code>apply_expert_harness_hot()</code> (<code>harness/expert_harness_runtime.py</code>), which reads an <code>ExpertHarnessSpec</code>, resolves new rails and tools, and calls <code>_hot_bind_rail(agent, rail)</code> for each — which calls <code>await agent.register_rail(rail)</code> — plus <code>_hot_bind_prompt_section()</code> to inject the prompt section. <code>apply_expert_harness_hot()</code> wraps the binds in try/except and rolls back via <code>unapply_expert_harness_hot()</code> on failure. <code>_hot_bind_rail</code> itself is not lock-protected, so a rail loaded during a concurrent model call may register incompletely.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/50bc4f1174dc3b7b854bb9001ffb188a6d7466a1.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/expert_harness_runtime.py:33</code></td>
+<td>apply_expert_harness_hot(); :190 _hot_bind_rail(); :198 _hot_bind_prompt_section()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/expert_harness_spec.py:119</code></td>
+<td>ExpertHarnessSpec</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/prompts/builder.py:28</code></td>
+<td>SystemPromptBuilder</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agent_callback_manager.py:11</code></td>
+<td>live callback registration target</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-how-does-a-harness-accumulate-experience-what-is-the-skill-evolution-pipeline">9. How does a harness accumulate experience — what is the skill evolution pipeline?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> The harness observes every execution and can extract reusable patterns from those trajectories, stage them as skill experience records, and — with a configurable approval gate — persist them so future agents start with accumulated knowledge rather than from zero.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Capture: the evolution base hook collects execution spans into clean windows and applies quality gates before staging.</li>
+<li>Single-agent: the skill-evolution hook detects reusable tool/reasoning patterns and persists them via the experience store.</li>
+<li>Multi-agent: the team skill-evolution hook waits for team completion, aggregates member trajectories, and detects collaboration patterns.</li>
+<li>Approval gate: a hook routes staged records to user confirmation before persistence (auto_save=True bypasses this).</li>
+<li>Trajectory archive: a low-priority hook (priority 10) writes one canonical trajectory per invoke for offline analysis, independent of evolution.</li>
+<li>Trigger paths: passive signal scanning, periodic self-check follow-up, or explicit /evolve command — both flags opt-in.</li>
+</ul>
+<p><strong>Concept.</strong> A harness that intercepts every model call and tool call already has the data needed to improve itself: which tool sequences solved the problem, which reasoning patterns were reused, which sub-task plans worked. Skill evolution captures this data, extracts reusable patterns from it, and persists them as skill experience records that future agents load at task start. Without an evolution pipeline, every agent run starts from zero; with it, the agent population improves across sessions without retraining the underlying model. Three design decisions shape any evolution pipeline: (1) <strong>what to capture</strong> — the full execution trajectory or only successful final passes; (2) <strong>what quality gate</strong> prevents low-quality or noisy patterns from being persisted; (3) <strong>whether human approval</strong> is required before a pattern becomes a permanent skill (human-in-the-loop evolution) or whether the system auto-saves (fully autonomous evolution). The approval gate is the main lever for controlling how much the agent is trusted to modify its own future behaviour.</p>
+<p><img alt="diagram" src="assets/diagrams/a3f2ebec69c0e02a215b074ddd002bfe40ab598d.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen, <code>EvolutionRail</code> is the base class: it subscribes to a trajectory processor, collects spans into clean windows, applies quality gates, and suppresses capture while evolution work runs. <code>SkillEvolutionRail</code> extends it for single-agent experience: after each invoke it detects reusable patterns, stages candidate records, and routes them through <code>EvolutionInterruptRail</code> for user approval before <code>EvolutionStore</code> persistence — or auto-saves if <code>auto_save=True</code>. <code>TeamSkillEvolutionRail</code> aggregates member trajectories after a team completion event and generates a team skill record. <code>TrajectoryRail</code> (priority 10) archives one canonical trajectory per invoke to <code>FileTrajectoryStore</code>. Trigger flags <code>signal_trigger</code>/<code>review_trigger</code> are <code>Optional[bool] = None</code> (off by default); an explicit <code>/evolve</code> command also dispatches evolution.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>EvolutionRail</code> is the base class: it subscribes to a trajectory processor, collects execution spans into scope-local clean windows, applies quality gates, and suppresses capture during evolution work itself (to prevent skills about writing skills). <code>SkillEvolutionRail</code> extends it for single-agent experience: after each invoke it scans the trajectory for reusable patterns, stages candidate experience records, and routes them through <code>EvolutionInterruptRail</code> for user approval before <code>EvolutionStore</code> persistence — or auto-saves if <code>auto_save=True</code>. <code>TeamSkillEvolutionRail</code> extends it for multi-agent collaboration: it waits for a team completion event, aggregates trajectories from all member agents, detects the collaboration pattern, and generates a team skill record. <code>TrajectoryRail</code> (priority 10, shared tier with <code>TaskCompletionRail</code> and <code>AgentObservabilityRail</code>) archives one canonical trajectory per invoke to a <code>FileTrajectoryStore</code> for offline analysis. Trigger flags (<code>signal_trigger</code>, <code>review_trigger</code>) are declared <code>Optional[bool] = None</code> and coerced with <code>bool()</code>, i.e. off by default; an explicit <code>/evolve</code> command also dispatches evolution.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/008d40d4ab6f8767f4c7cdf80c71eb0e5d32c7b8.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/evolution/evolution_rail.py:241</code></td>
+<td>EvolutionRail base</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/evolution/skill_evolution_rail.py:141</code></td>
+<td>SkillEvolutionRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/evolution/team_skill_evolution_rail.py:137</code></td>
+<td>TeamSkillEvolutionRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/evolution/evolution_interrupt_rail.py:37</code></td>
+<td>EvolutionInterruptRail</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/evolution/trajectory_rail.py:23</code></td>
+<td>TrajectoryRail (priority 10, :32)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

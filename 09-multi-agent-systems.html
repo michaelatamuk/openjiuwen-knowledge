@@ -1,0 +1,2388 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="08-agent-frameworks.html">
+      
+      
+        <link rel="next" href="06-tools-and-function-calling.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Multi-agent systems - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multi-agent-systems" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multi-agent systems
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="09-multi-agent-systems.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-are-the-four-multi-agent-architecture-types-and-what-components-does-every-mas-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What are the four multi-agent architecture types and what components does every MAS need?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-the-difference-between-mcp-and-a2a-and-when-do-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is the difference between MCP and A2A, and when do you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-a-supervisor-pattern-and-a-peer-to-peer-pattern-in-these-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-does-a-framework-handle-communication-between-multiple-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How does a framework handle communication between multiple agents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-the-framework-handle-one-agents-output-becoming-another-agents-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does the framework handle one agent's output becoming another agent's input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-prevent-multiple-agents-from-producing-conflicting-or-redundant-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you prevent multiple agents from producing conflicting or redundant results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-debug-a-failure-when-its-unclear-which-agent-in-the-chain-caused-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you debug a failure when it's unclear which agent in the chain caused it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-when-is-a-multi-agent-system-overkill-compared-to-a-single-well-designed-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. When is a multi-agent system overkill compared to a single well-designed agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-are-the-four-multi-agent-architecture-types-and-what-components-does-every-mas-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What are the four multi-agent architecture types and what components does every MAS need?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-the-difference-between-mcp-and-a2a-and-when-do-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is the difference between MCP and A2A, and when do you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-whats-the-difference-between-a-supervisor-pattern-and-a-peer-to-peer-pattern-in-these-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-how-does-a-framework-handle-communication-between-multiple-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. How does a framework handle communication between multiple agents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-how-does-the-framework-handle-one-agents-output-becoming-another-agents-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. How does the framework handle one agent's output becoming another agent's input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-how-do-you-prevent-multiple-agents-from-producing-conflicting-or-redundant-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. How do you prevent multiple agents from producing conflicting or redundant results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-debug-a-failure-when-its-unclear-which-agent-in-the-chain-caused-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you debug a failure when it's unclear which agent in the chain caused it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-when-is-a-multi-agent-system-overkill-compared-to-a-single-well-designed-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. When is a multi-agent system overkill compared to a single well-designed agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="08-agent-frameworks.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Agent frameworks</span></a>
+<a class="topic-nav__link topic-nav__next" href="06-tools-and-function-calling.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Tools and function calling</span></a>
+</div>
+
+<h1 id="multi-agent-systems">Multi-agent systems</h1>
+<h2 id="1-what-are-the-four-multi-agent-architecture-types-and-what-components-does-every-mas-need">1. What are the four multi-agent architecture types and what components does every MAS need?</h2>
+<p><span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Centralized, decentralized, hierarchical, or hybrid — every MAS also needs agents, communication, coordination, shared memory, and environment.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Centralized: single manager, all agents report up — simple, debuggable, single point of failure</li>
+<li>Decentralized: peer-to-peer — resilient, harder to ensure consistency</li>
+<li>Hierarchical: manager agents oversee sub-agent teams (tree of authority) — handles complexity, adds delegation latency</li>
+<li>Hybrid: combines patterns; e.g. centralized orchestrator with peer-to-peer specialists beneath</li>
+<li>5 components every MAS needs: agents, communication, coordination, shared memory, environment. Jiuwen: hierarchical via SubagentRail; LongTermMemory + EphemeralMemory for shared state; no peer-to-peer pattern</li>
+</ul>
+<p><strong>Concept.</strong> Multi-agent systems (MAS) come in four structural patterns: (1) <strong>Centralized</strong> — all agents report to a single manager/supervisor that assigns tasks and aggregates results. Simple to reason about, single point of failure. (2) <strong>Decentralized</strong> — agents communicate directly with each other (peer-to-peer) with no central coordinator. Resilient but harder to ensure consistency. (3) <strong>Hierarchical</strong> — manager agents oversee sub-agent teams, which may themselves have managers — a tree of authority. Natural for complex decomposition (planner → domain-specialist teams → executors). (4) <strong>Hybrid</strong> — combines patterns; e.g., a centralized orchestrator with peer-to-peer specialist agents underneath. Every MAS needs five components regardless of architecture: <strong>agents</strong> (autonomous entities with specific roles), <strong>communication</strong> (message passing — structured output, shared state, or explicit handoff), <strong>coordination</strong> (how tasks are assigned and conflicts avoided), <strong>shared memory</strong> (knowledge and context accessible across agents), and <strong>environment</strong> (the external world or system agents act on). Choosing an architecture is a tradeoff: centralized is debuggable but bottlenecked; decentralized is resilient but harder to coordinate; hierarchical handles complexity but adds latency through multiple delegation layers.</p>
+<p><img alt="diagram" src="assets/diagrams/7f33ee9ca831e5c0d616c2a6b26e920827c65d01.png" /></p>
+<p><strong>In Jiuwen.</strong> Architecture: hierarchical via SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1) and TaskPlanningRail (agent-core/openjiuwen/harness/rails/task_planning_rail.py:1). No peer-to-peer pattern exists. 5 components: agents (SubagentSpec configs), communication (SubagentRequest/SubagentResponse schemas), coordination (TaskPlanningRail task decomposition), shared memory (LongTermMemory at agent-core/openjiuwen/core/memory/long_term_memory.py:69 + EphemeralMemory), environment (external APIs via ToolCard and MCP servers).</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The <code>SubagentRail</code> pattern is <strong>hierarchical</strong>: a top-level agent delegates to specialized sub-agents via <code>SubagentRail</code>, which itself can call further sub-agents. <code>TaskPlanningRail</code> breaks the task and generates a plan before delegation. Shared long-term memory is <code>LongTermMemory</code>; within-session state lives in the context buffer rather than a separate memory class. Delegation payloads are handled by the subagent runtime (<code>SubagentRuntimeConfig</code>/<code>SubagentInstance</code>). There is no peer-to-peer (decentralized) pattern; all coordination flows through the top-level agent.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code></td>
+<td>hierarchical delegation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/task_planning_rail.py:1</code></td>
+<td>TaskPlanningRail (planner layer)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/long_term_memory.py:69</code></td>
+<td>shared long-term memory</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/subagent_runtime/config.py:22</code></td>
+<td>SubagentRuntimeConfig (delegation payloads)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-what-is-the-difference-between-mcp-and-a2a-and-when-do-you-use-each">2. What is the difference between MCP and A2A, and when do you use each?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> MCP = one LLM + many tools (centralized control); A2A = agents talk to agents (decentralized execution). Use both together in production: MCP within agents, A2A between them.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>MCP (Model Context Protocol): standardized interface for a single LLM to access external tools — databases, browsers, APIs, code. One brain, centralized tool access.</li>
+<li>A2A (Agent-to-Agent Protocol): communication protocol for multi-agent systems — each agent has own tools/memory/reasoning; orchestrator delegates, never touches tools directly</li>
+<li>Key difference: MCP = model in control; A2A = agents in control</li>
+<li>Use MCP for single-agent assistants with broad tool access; add A2A when specialized agents need to run concurrently</li>
+<li>Jiuwen: MCP via McpServerConfig; A2A-style delegation via SubagentRail (internal, not A2A wire protocol)</li>
+</ul>
+<p><strong>Concept.</strong> <strong>MCP (Model Context Protocol)</strong> is a standardized interface for connecting a single LLM to external tools — the model stays in control, and MCP provides a universal connector layer so the model can call databases, browsers, APIs, and code tools without custom integration for each. One brain, many tools, centralized control. <strong>A2A (Agent-to-Agent Protocol)</strong> is a communication protocol for multi-agent systems — agents collaborate as peers, each with its own tools, memory, and reasoning loop; an orchestrator delegates to specialized agents rather than touching tools directly. The key difference: MCP = a single model gains tool access; A2A = a network of agents coordinate and hand off work to each other. In practice, both are often used together: MCP governs how each individual agent talks to its tools, while A2A governs how agents talk to each other. Use MCP alone for single-agent assistants that need broad tool access. Add A2A when specialized agents need to run concurrently or in sequence, each with their own tool contexts.</p>
+<p><img alt="diagram" src="assets/diagrams/6c0a558ee8c459ea6049ccd3d87b927db9b31382.png" /></p>
+<p><strong>In Jiuwen.</strong> MCP: McpServerConfig (agent-core/openjiuwen/core/foundation/tool/mcp/base.py:137) configures MCP servers; the MCP client discovers tools via tools/list and invokes via tools/call — one agent plus multiple tool providers. A2A-style delegation: SubagentRail (agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py) delegates tasks to specialized sub-agents using SubagentRequest/SubagentResponse schemas. This is internal delegation, not the A2A wire protocol — cross-deployment agent-to-agent communication is not implemented.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>MCP is supported via <code>McpServerConfig</code> (agent-core/openjiuwen/core/foundation/tool/mcp/base.py) — each server exposes tools that the agent discovers via <code>tools/list</code> and calls via <code>tools/call</code>. This is the MCP pattern: one agent, many tool providers. For A2A-style multi-agent coordination, Jiuwen uses <code>SubagentRail</code> to delegate tasks to sub-agents (planner → researcher → critic chains), but this is a framework-internal pattern rather than the A2A wire protocol. True A2A interoperability across independently deployed agents is not implemented.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/mcp/base.py:1</code></td>
+<td>McpServerConfig (MCP tool discovery + calling)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/tool/mcp/</code></td>
+<td>MCP client implementation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/subagent/subagent_rail.py:1</code></td>
+<td>internal agent delegation (not A2A protocol)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-whats-the-difference-between-a-supervisor-pattern-and-a-peer-to-peer-pattern-in-these-frameworks">3. What's the difference between a supervisor pattern and a peer-to-peer pattern in these frameworks</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A supervisor is one controller that plans and dispatches to workers (workers-as-tools), top-down; peer-to-peer has agents share a board/bus and coordinate as equals.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Supervisor: top-down, workers-as-tools.</li>
+<li>Peer-to-peer: shared board/bus, equals.</li>
+<li>Different control and failure modes.</li>
+</ul>
+<p><strong>Concept.</strong> A supervisor is one controller that plans and dispatches to workers (often workers-as-tools); control is top-down and data returns synchronously up the call stack. Peer-to-peer has agents share a board/bus and claim/communicate directly; control is distributed, needs arbitration (atomic claims, one-active-task invariants), but scales autonomy.</p>
+<p><img alt="diagram" src="assets/diagrams/421b0b0f06e4b97d24876a3151bf1d1391b89551.png" /></p>
+<p><strong>In Jiuwen.</strong> Supervisor teams are built on the multi-agent hierarchical team in two forms: agents-as-tools (each child is registered into the parent's ability manager, so the model calls a child like a tool) and a message-bus variant. Peer-to-peer runs the team's members against a shared task board with messaging, without a single controller.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Supervisor teams are built on <code>core/multi_agent</code>'s <code>HierarchicalTeam</code>, in two implementations: <strong>Agents-as-Tools</strong> (<code>hierarchical_tools</code>) registers each child <code>AgentCard</code> into the parent's <code>ability_manager</code>, so the LLM invokes a child like any tool; <strong>MessageBus</strong> (<code>hierarchical_msgbus</code>) uses <code>SupervisorAgent</code> (a <code>ReActAgent</code> + <code>CommunicableAgent</code>) whose <code>P2PAbilityManager</code> intercepts AgentCard tool calls and routes them in parallel. Peer-to-peer is the <code>agent_teams</code> leader/teammate design: <code>TeamAgent</code> is one class for both roles, all members share a persistent DB task board and mailbox, and work is claimed via a single CAS (<code>claim_task</code>) with an optional <code>TeamScheduler</code> acting only as a leader-side dispatcher in <code>scheduled</code> mode.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_tools/hierarchical_team.py:101</code></td>
+<td>_setup_hierarchy(); :108 parent_agent.ability_manager.add(child_card)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/supervisor_agent.py:20</code></td>
+<td>SupervisorAgent</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/p2p_ability_manager.py:52</code></td>
+<td>execute() partitions AgentCard calls; :199 parallel P2P dispatch</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/hierarchical_msgbus/hierarchical_team.py:87</code></td>
+<td>team invoke() → supervisor</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/database/task_dao.py:634</code></td>
+<td>claim_task() single-CAS self-claim</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/task_manager.py:1581</code></td>
+<td>one-active-task invariant</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:208</code></td>
+<td>_reconcile_starts() leader mailbox dispatch</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-how-does-a-framework-handle-communication-between-multiple-agents">4. How does a framework handle communication between multiple agents</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Either a shared blackboard (task board/state) plus a message bus, or direct messaging; messages should be persisted and ordered for auditability, with routing (direct/broadcast/mentions).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Shared board + message bus.</li>
+<li>Or direct message passing.</li>
+<li>Persist and order; support routing.</li>
+</ul>
+<p><strong>Concept.</strong> Either a shared blackboard (task board/state) plus a message bus, or direct message passing. Messages should be persistent and ordered for auditability, with routing (direct, broadcast, mentions). Direct handoffs must carry enough context and be bounded.</p>
+<p><img alt="diagram" src="assets/diagrams/f6e47f1ce74d04a2fd74503de368c5a4435c6d8f.png" /></p>
+<p><strong>In Jiuwen.</strong> The agent-teams stack uses a persisted mailbox plus an event bus: sending a message writes a message row and publishes an event on the team's topic; recipients are woken by coordination handlers that poll their unread mailbox and feed rendered text into the agent. External input routes through an interaction router with strict member targeting.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The <code>agent_teams</code> stack uses a persisted mailbox plus an event bus. <code>TeamMessageManager.send_message()</code> writes a <code>TeamMessage</code> row through <code>MessageDao</code> and then publishes a <code>MessageEvent</code>/<code>BroadcastEvent</code> on the team's messager topic; recipients are woken by coordination handlers, which poll their unread mailbox (<code>MessageHandler._process_unread_messages</code>) and feed rendered <code>&lt;team-inbound&gt;</code> text into the harness via <code>deliver_input</code>. External input enters through <code>agent-core/openjiuwen/agent_teams/interaction/router.py</code> (<code>parse_interact_str</code> → <code>resolve_targets</code>, strict <code>@member</code> routing) and <code>TeamRuntimeManager._dispatch_payload</code>. The lower-level <code>core/multi_agent</code> stack has a separate <code>TeamRuntime</code>/<code>MessageBus</code> with <code>send</code> (P2P, waits for response) and <code>publish</code> (pub/sub). Subagents are a third, synchronous channel: <code>TaskTool</code> builds a child session and returns the terminal output directly.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/message_manager.py:27</code></td>
+<td>TeamMessageManager; :60 send_message() persist-then-publish</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/database/message_dao.py:153</code></td>
+<td>MessageDao.create_message()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/coordination/handlers/message.py:181</code></td>
+<td>_process_unread_messages() → deliver_input</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/interaction/router.py:273</code></td>
+<td>resolve_targets() @member routing</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/runtime/manager.py:573</code></td>
+<td>_dispatch_payload()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/team_runtime/communicable_agent.py:105</code></td>
+<td>send() (P2P); :131 publish()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/handoff/handoff_tool.py:17</code></td>
+<td>HandoffTool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/subagent/task_tool.py:154</code></td>
+<td>TaskTool (synchronous child session, not a mailbox peer)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-how-does-the-framework-handle-one-agents-output-becoming-another-agents-input">5. How does the framework handle one agent's output becoming another agent's input</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Either a call returns the value (subagent/tool), a handoff transfers control and context, or a shared board/bus carries the artifact — the framework must define result and context propagation.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Subagent/tool call returns the value.</li>
+<li>Handoff transfers control + context.</li>
+<li>Shared board/bus carries the artifact.</li>
+</ul>
+<p><strong>Concept.</strong> Either a call returns the value (subagent/tool), or a handoff transfers control and context, or a shared board/bus carries the artifact. The framework must define how results and context propagate, and whether propagation is automatic or requires the consumer to re-read.</p>
+<p><img alt="diagram" src="assets/diagrams/71eff383daf8243635c54b6431ae5ddb8e041eeb.png" /></p>
+<p><strong>In Jiuwen.</strong> Four paths: subagent delegation (a subagent tool builds isolated inputs, runs the child, wraps its terminal output as a tool result the parent reads); handoff (transferring control and context); and message/board passing between team members. Each defines how the result and context flow to the next consumer.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Four paths. <strong>Subagent delegation:</strong> <code>TaskTool</code> builds isolated child inputs (<code>_build_subagent_inputs</code>), runs the subagent, wraps the terminal <code>output</code> into a <code>ToolOutput</code> (<code>_build_task_output</code>), and <code>render_for_llm</code> returns the answer as the tool result the parent reads. <strong>Handoff:</strong> <code>HandoffTool</code> emits a <code>HandoffSignal</code>; <code>ContainerAgent</code> appends <code>{"agent": ..., "output": result}</code> to a history, forwards <code>signal.message or inputs.input_message</code> as the next input, and seeds the next session from team history. <strong>Mailbox flow (peer):</strong> <code>send_message</code> persists a row; the recipient renders <code>&lt;team-inbound&gt;</code> and calls <code>deliver_input</code>. <strong>Shared task board:</strong> completion/dependency events wake assignees, but the work product is re-read via <code>view_task</code> rather than auto-injected. Swarmflow's <code>pipeline()</code> passes each stage's return value as the next stage's <code>prev</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/subagent/task_tool.py:657</code></td>
+<td>_build_subagent_inputs(); :726 _build_task_output(); :1005 render_for_llm()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/handoff/handoff_signal.py:47</code></td>
+<td>extract_handoff_signal()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/multi_agent/teams/handoff/container_agent.py:56</code></td>
+<td>_build_agent_input(); :112 _inject_context_history(); :249 coordinator.complete(result)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/scheduling/scheduler.py:208</code></td>
+<td>scheduled handoff as a rendered leader message</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/database/task_dao.py:634</code></td>
+<td>peer task handoff via CAS claim</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/workflow/engine/primitives.py:1495</code></td>
+<td>pipeline() passes prev between stages</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-how-do-you-prevent-multiple-agents-from-producing-conflicting-or-redundant-results">6. How do you prevent multiple agents from producing conflicting or redundant results</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Give each unit of work one owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign instead of release, dedupe dispatch, and isolate workspaces.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Single owner per task.</li>
+<li>Atomic claim; reassign not release.</li>
+<li>Dedupe dispatch; isolate workspaces.</li>
+</ul>
+<p><strong>Concept.</strong> Give each unit of work a single owner, enforce one-active-task-per-worker, arbitrate claims atomically, reassign rather than release (to avoid race windows), dedupe dispatch, and isolate workspaces so edits don't collide.</p>
+<p><img alt="diagram" src="assets/diagrams/a8da3818acf84d39cbc0774abbc606dca4c73469.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen enforces a one-active-task-per-member invariant with an atomic compare-and-swap claim, reassigns instead of releasing (to avoid a race window), makes teammate and subagent spawning idempotent, and isolates each member's workspace. Reliability detectors catch ping-pong and repeated tool use.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>One-active-task-per-member invariant, atomic compare-and-swap claim, reassign instead of release, spawn idempotency for teammates and subagents, and per-member worktree/workspace isolation. Reliability detectors catch ping-pong and repeated tools.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/task_manager.py:1581</code></td>
+<td>one-active-task-per-member</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/database/task_dao.py:634</code></td>
+<td>atomic CAS claim</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/tools/task_manager.py:1673</code></td>
+<td>reassign instead of release</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/spawn_manager.py:73</code></td>
+<td>teammate spawn idempotency</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/subagent_runtime/control.py:169</code></td>
+<td>reject live subagent re-spawn</td>
+</tr>
+<tr>
+<td><code>../../../agent-core/openjiuwen/agent_teams/worktree</code></td>
+<td>per-member worktree isolation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/reliability/</code></td>
+<td>conflict detectors</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-how-do-you-debug-a-failure-when-its-unclear-which-agent-in-the-chain-caused-it">7. How do you debug a failure when it's unclear which agent in the chain caused it</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> You need per-agent attribution: a trace/span tree where every agent, model, and tool call is a span with agent identity, plus durable conversation/task history to reconstruct order.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Per-agent span attribution.</li>
+<li>Trace model/tool calls per member.</li>
+<li>Durable history to reconstruct order.</li>
+</ul>
+<p><strong>Concept.</strong> You need per-agent attribution: a trace/span tree where every agent, model call, and tool call is a span carrying agent identity, plus durable conversation and task history to reconstruct ordering. Root-cause is then manual or LLM-assisted, not automatic.</p>
+<p><img alt="diagram" src="assets/diagrams/230cfccc00f218cf6229aeade3363ba85034edf8.png" /></p>
+<p><strong>In Jiuwen.</strong> The framework emits an OpenTelemetry span tree that attributes each LLM, tool, and agent action to a member — the agent observability rail opens per-member iteration and invoke spans, and the team observability rail stamps member id, name, and role onto team spans. Durable message and task history adds ordering, so you can find the failing agent.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The framework emits an OpenTelemetry span tree attributing each LLM/tool/agent action to a member: <code>AgentObservabilityRail</code> opens <code>agent.{member}.task_iteration.N</code> / <code>agent.{member}.invoke</code> spans, and <code>TeamObservabilityRail</code> stamps <code>agentteam.agent_id</code>, <code>member_name</code>, <code>role</code>, <code>team_id</code>, and <code>gen_ai.conversation.id</code> via an <code>AgentSpanDecoration</code>. <code>OtelTeamMonitorHandler</code> adds <code>task.{id}</code> and <code>member.*</code>/<code>msg.*</code> event spans under the team span, so task-state and message-routing timelines are visible. Dispatched subagents get their own span (<code>harness/observability/subagent.py</code>), and each span carries an <code>ExecutionSubject</code> for trajectory-lane attribution. On the product side, TraceHound replays session history and groups records per agent with token/cost attribution; the task board and per-member message history remain ground truth when spans are absent.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/23a1fb5df116ced8178b5713981ff89432d88166.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/observability/rail.py:56</code></td>
+<td>TeamObservabilityRail; :136 _build_decoration() sets agent_id/member_name/role/team/session</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py:355</code></td>
+<td>AgentObservabilityRail; :623 before_invoke()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/subagent.py:60</code></td>
+<td>install_subagent_observability_hook()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/observability/monitor_handler.py:370</code></td>
+<td>_open_task_span()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/team_agent.py:734</code></td>
+<td>observability_execution_subject()</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/trajectory/store.py:23</code></td>
+<td>TrajectoryStore protocol; :135 FileTrajectoryStore</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/agent_ws_server.py:12840</code></td>
+<td>_replay_agent_of()</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/session/session_history.py:863</code></td>
+<td>_is_member_relevant()</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-when-is-a-multi-agent-system-overkill-compared-to-a-single-well-designed-agent">8. When is a multi-agent system overkill compared to a single well-designed agent</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Multi-agent is justified when workstreams are genuinely independent, scopes differ (tools/permissions), or specialization would otherwise fight for one context; otherwise a single well-designed agent is simpler.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Justified: independent parallel workstreams.</li>
+<li>Justified: distinct tool/permission scopes.</li>
+<li>Otherwise: a single agent is simpler.</li>
+</ul>
+<p><strong>Concept.</strong> Multi-agent is justified when you need genuinely separated context/ownership: parallel independent workstreams, distinct tool/permission scopes, or specialization that would otherwise fight for one context window. It is overkill when a single agent with good tools, memory, and a clear prompt can do the job — multi-agent adds coordination cost, latency, and new failure modes (ping-pong, conflicting results) without adding "intelligence".</p>
+<p><img alt="diagram" src="assets/diagrams/83ebae9ed4a21075aab98daedcfe979824c47772.png" /></p>
+<p><strong>In Jiuwen.</strong> Multi-agent is supported but not the default: teams provide a leader/teammate model with a database task board and mailbox, and subagents provide intra-agent delegation with isolated sessions and workspaces to avoid context pollution. So the framework lets you add multi-agent when it is justified, without making it mandatory.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Supported but not the default: <code>agent_teams</code> provides a leader/teammate model with a DB task board and mailbox, and subagents provide intra-agent delegation with isolated sessions/workspaces to avoid context pollution. The product's swarm is an assembly layer composing team specs from config. A single well-designed agent is the baseline.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/subagent_runtime/control.py:169</code></td>
+<td>reject live subagent re-spawn</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/tools/subagent/task_tool.py:154-158</code></td>
+<td>TaskTool isolated subagent session</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/swarm/assembly.py:260</code></td>
+<td>product swarm assembly</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/agent/team_agent.py:76</code></td>
+<td>one TeamAgent for leader/teammate</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2417 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="13-rag-failure-modes-and-evaluation.html">
+      
+      
+        <link rel="next" href="03-llm-terms-glossary.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>ML foundations - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ml-foundations" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ML foundations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="00-ml-foundations.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-the-difference-between-ai-machine-learning-and-deep-learning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is the difference between AI, Machine Learning, and Deep Learning?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-supervised-vs-unsupervised-vs-reinforcement-learning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is supervised vs unsupervised vs reinforcement learning?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-what-is-the-bias-variance-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What is the bias-variance tradeoff?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-is-the-difference-between-a-parameter-and-a-hyperparameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What is the difference between a parameter and a hyperparameter?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-what-is-gradient-descent-and-how-does-it-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What is gradient descent, and how does it work?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-compute-cosine-similarity-between-two-vectors-without-using-a-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Compute cosine similarity between two vectors without using a library
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-given-a-confusion-matrix-calculate-precision-recall-and-f1-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Given a confusion matrix, calculate precision, recall, and F1 manually
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-implement-k-nearest-neighbors-from-scratch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Implement k-nearest neighbors from scratch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-explain-forward-pass-and-backpropagation-in-a-neural-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Explain forward pass and backpropagation in a neural network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-is-vanishingexploding-gradient-and-how-do-you-fix-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What is vanishing/exploding gradient, and how do you fix it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-what-is-the-difference-between-batch-normalization-and-layer-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. What is the difference between batch normalization and layer normalization?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-is-dropout-and-why-does-it-help-generalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What is dropout, and why does it help generalisation?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-what-is-the-difference-between-cnns-and-rnns-and-when-would-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. What is the difference between CNNs and RNNs, and when would you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-what-is-transfer-learning-and-when-is-it-useful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. What is transfer learning, and when is it useful?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-how-do-you-evaluate-a-classification-model-beyond-accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. How do you evaluate a classification model beyond accuracy?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-what-is-cross-validation-and-why-does-it-matter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. What is cross-validation, and why does it matter?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-what-is-overfitting-and-how-do-you-prevent-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. What is overfitting, and how do you prevent it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-why-does-the-transformer-use-multi-head-attention-instead-of-a-single-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Why does the Transformer use multi-head attention instead of a single head?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-is-the-difference-between-ai-machine-learning-and-deep-learning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What is the difference between AI, Machine Learning, and Deep Learning?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-supervised-vs-unsupervised-vs-reinforcement-learning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is supervised vs unsupervised vs reinforcement learning?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-what-is-the-bias-variance-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. What is the bias-variance tradeoff?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-is-the-difference-between-a-parameter-and-a-hyperparameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What is the difference between a parameter and a hyperparameter?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-what-is-gradient-descent-and-how-does-it-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. What is gradient descent, and how does it work?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-compute-cosine-similarity-between-two-vectors-without-using-a-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Compute cosine similarity between two vectors without using a library
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-given-a-confusion-matrix-calculate-precision-recall-and-f1-manually" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Given a confusion matrix, calculate precision, recall, and F1 manually
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-implement-k-nearest-neighbors-from-scratch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Implement k-nearest neighbors from scratch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-explain-forward-pass-and-backpropagation-in-a-neural-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Explain forward pass and backpropagation in a neural network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-what-is-vanishingexploding-gradient-and-how-do-you-fix-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. What is vanishing/exploding gradient, and how do you fix it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-what-is-the-difference-between-batch-normalization-and-layer-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. What is the difference between batch normalization and layer normalization?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-what-is-dropout-and-why-does-it-help-generalisation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. What is dropout, and why does it help generalisation?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-what-is-the-difference-between-cnns-and-rnns-and-when-would-you-use-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. What is the difference between CNNs and RNNs, and when would you use each?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-what-is-transfer-learning-and-when-is-it-useful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. What is transfer learning, and when is it useful?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-how-do-you-evaluate-a-classification-model-beyond-accuracy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. How do you evaluate a classification model beyond accuracy?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-what-is-cross-validation-and-why-does-it-matter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. What is cross-validation, and why does it matter?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-what-is-overfitting-and-how-do-you-prevent-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. What is overfitting, and how do you prevent it?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-why-does-the-transformer-use-multi-head-attention-instead-of-a-single-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Why does the Transformer use multi-head attention instead of a single head?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="13-rag-failure-modes-and-evaluation.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">RAG failure modes and evaluation</span></a>
+<a class="topic-nav__link topic-nav__next" href="03-llm-terms-glossary.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">LLM terms glossary</span></a>
+</div>
+
+<h1 id="ml-foundations">ML foundations</h1>
+<h2 id="1-what-is-the-difference-between-ai-machine-learning-and-deep-learning">1. What is the difference between AI, Machine Learning, and Deep Learning?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> AI is the broadest umbrella; ML is the subset that learns from data; Deep Learning is the sub-subset using multi-layer neural nets.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>AI: any technique making a machine exhibit intelligent behaviour.</li>
+<li>ML: learns patterns from data rather than hand-coded rules.</li>
+<li>DL: ML with many-layer neural nets enabling end-to-end representation learning.</li>
+</ul>
+<p><strong>Concept.</strong> Nested definitions. Artificial Intelligence is the broadest umbrella: any technique that makes a machine exhibit behaviour associated with human intelligence — search, planning, rule systems, ML. Machine Learning is the subset where the machine learns patterns from data rather than following hand-coded rules. Deep Learning is the sub-subset of ML that uses neural networks with many layers, enabling end-to-end representation learning from raw inputs like images, text, or audio without manual feature engineering. Concretely: a rule-based spam filter is AI but not ML. A logistic regression spam classifier is AI and ML but not DL. A transformer-based classifier is all three.</p>
+<p><img alt="diagram" src="assets/diagrams/7098ae948fa134d2aa1be76ba038157dd35480dc.png" /></p>
+<hr />
+<h2 id="2-what-is-supervised-vs-unsupervised-vs-reinforcement-learning">2. What is supervised vs unsupervised vs reinforcement learning?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Supervised uses labelled pairs to learn a mapping; unsupervised discovers structure without labels; RL maximises cumulative reward via trial and error.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Supervised: labelled (x, y) pairs → learn f(x)→y.</li>
+<li>Unsupervised: no labels → clusters, embeddings, density.</li>
+<li>RL: reward signal → policy that maximises return.</li>
+<li>LLM training combines all three: self-supervised pretraining, SFT, RLHF.</li>
+</ul>
+<p><strong>Concept.</strong> Supervised: labelled <code>(x, y)</code> pairs; the model learns <code>f(x)→y</code> by minimising prediction loss. Examples: classification, regression, NER. Unsupervised: no labels; the model discovers structure in the data — clusters, embeddings, density. Examples: k-means, PCA, autoencoders, contrastive embedding training. Reinforcement learning: an agent takes actions in an environment, receives scalar reward signals, and learns a policy that maximises cumulative reward — no labelled correct action. Examples: game-playing agents, RLHF for LLM alignment. LLM training combines all three: self-supervised pre-training (structurally supervised but labels come from the data itself), SFT (supervised), RLHF (RL).</p>
+<p><img alt="diagram" src="assets/diagrams/aceb3e12c844fa8bd8333c435c7153e836508acb.png" /></p>
+<hr />
+<h2 id="3-what-is-the-bias-variance-tradeoff">3. What is the bias-variance tradeoff?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Generalisation error = bias² (underfitting) + variance (overfitting) + irreducible noise; the tradeoff is between model complexity and stability.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>High bias: model too simple, misses patterns.</li>
+<li>High variance: model too complex, fits noise.</li>
+<li>Reducing bias (more complexity) tends to increase variance.</li>
+<li>Double descent: very large models can re-enter low-variance regime with enough data.</li>
+</ul>
+<p><strong>Concept.</strong> Every model's generalisation error decomposes into: bias (error from wrong assumptions — underfitting, model too simple), variance (error from sensitivity to training set fluctuations — overfitting, model too complex), and irreducible noise. High bias: model misses patterns. High variance: model fits noise. Reducing bias by adding complexity tends to increase variance and vice versa. The goal is to minimise total expected error. In modern large models, "double descent" complicates the classic picture: very high-capacity models can re-enter a low-variance regime with enough data and regularisation — which is why LLMs generalise despite billions of parameters.</p>
+<p><img alt="diagram" src="assets/diagrams/acf51b538c85e67f04d4bc2523b6619f7692c33c.png" /></p>
+<hr />
+<h2 id="4-what-is-the-difference-between-a-parameter-and-a-hyperparameter">4. What is the difference between a parameter and a hyperparameter?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Parameters are learned weights updated by gradient descent; hyperparameters are engineer-set configuration choices not changed by training.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Parameters: W, b, attention matrices — set by gradient descent.</li>
+<li>Training hyperparams: LR, batch size, epochs, dropout, LoRA rank.</li>
+<li>Inference hyperparams: temperature, top-p, max_tokens — not weights.</li>
+</ul>
+<p><strong>Concept.</strong> Parameters are the learned weights of the model — the numbers changed during training via gradient descent (<code>W</code>, <code>b</code> in a linear layer; attention projection matrices in a transformer). Training data determines their values. Hyperparameters are the configuration choices made before or during training that the training process does not change: learning rate, batch size, number of layers, dropout rate, regularisation coefficient, training epochs, LoRA rank. A common source of confusion: context window size, temperature, and top-p are inference-time hyperparameters — they do not affect weights, only how the model generates at prediction time.</p>
+<p><img alt="diagram" src="assets/diagrams/0d661d408b14b15b27b9313ed75391622888bb5d.png" /></p>
+<hr />
+<h2 id="5-what-is-gradient-descent-and-how-does-it-work">5. What is gradient descent, and how does it work?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Iterative optimisation that moves parameters in the direction of steepest loss decrease by subtracting learning_rate × gradient at each step.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Step: compute loss, compute gradient, subtract lr × grad.</li>
+<li>SGD uses mini-batches — noisy but cheap per step.</li>
+<li>Variants: momentum, Adam (adaptive per-parameter LR).</li>
+</ul>
+<p><strong>Concept.</strong> An iterative optimisation algorithm that minimises a loss function by moving parameters in the direction of steepest descent. Each step: compute the loss, compute the gradient <code>∂L/∂w</code> for each parameter, subtract <code>learning_rate × gradient</code> from each parameter. Stochastic gradient descent (SGD) does this on a mini-batch rather than the full dataset — the gradient estimate is noisy but each step is cheap and often generalises better. Key variants: SGD with momentum (accumulates gradient history to reduce oscillation), Adam (adaptive per-parameter learning rates based on gradient moments).</p>
+<hr />
+<h2 id="6-compute-cosine-similarity-between-two-vectors-without-using-a-library">6. Compute cosine similarity between two vectors without using a library</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> dot(A,B) / (|A| × |B|) — measures directional similarity, length-independent, range [-1,1].</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Dot product divided by product of magnitudes.</li>
+<li>Length-independent: normalising to unit length reduces it to a dot product.</li>
+<li>Edge cases: zero vectors, dimension mismatch.</li>
+</ul>
+<p><strong>Concept.</strong> Cosine similarity = <code>dot(A, B) / (|A| × |B|)</code>. The dot product measures shared direction; dividing by the product of magnitudes normalises to <code>[-1, 1]</code>, making the result length-independent. In retrieval, pre-normalising all vectors to unit length reduces cosine similarity to a plain dot product, which is cheaper to compute at scale.</p>
+<p><img alt="diagram" src="assets/diagrams/35537c87cbbf6a4a8be10dac6442e3a366bbab46.png" /></p>
+<hr />
+<h2 id="7-given-a-confusion-matrix-calculate-precision-recall-and-f1-manually">7. Given a confusion matrix, calculate precision, recall, and F1 manually</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Precision = TP/(TP+FP); Recall = TP/(TP+FN); F1 = harmonic mean of the two — each measures a different cost of classification error.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Precision: of predicted positives, how many are actually positive.</li>
+<li>Recall: of all actual positives, how many were caught.</li>
+<li>F1: harmonic mean; penalises imbalance between precision and recall.</li>
+<li>Multi-class: per-class TP/FP/FN, then macro/micro average.</li>
+</ul>
+<p><strong>Concept.</strong> For a binary classifier <code>[[TN, FP], [FN, TP]]</code>:
+- Precision = TP / (TP + FP) — of predicted positives, how many were actually positive
+- Recall = TP / (TP + FN) — of all actual positives, how many were caught
+- F1 = 2 × (Precision × Recall) / (Precision + Recall) — harmonic mean, penalises imbalance</p>
+<p><img alt="diagram" src="assets/diagrams/6d80c58ebd99bfe295f3a2fdb3358322f59be805.png" /></p>
+<hr />
+<h2 id="8-implement-k-nearest-neighbors-from-scratch">8. Implement k-nearest neighbors from scratch</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Lazy learner: store all training points, predict by majority vote of the k nearest examples by distance.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>No training cost, all cost at inference (O(n·d) per query).</li>
+<li>Sensitive to feature scale — normalise first.</li>
+<li>ANN indexes (HNSW, IVF) approximate KNN at scale.</li>
+</ul>
+<p><strong>Concept.</strong> KNN at inference: store all training points, then for a new query: (1) compute distance from the query to every training point, (2) sort by distance, (3) take the k smallest, (4) return majority class (classification) or mean (regression). KNN is lazy — no training cost, all cost at inference, O(n·d) per query without indexing. Sensitive to feature scale (normalise first) and irrelevant dimensions. ANN indexes (HNSW, IVF) replicate the nearest-neighbour idea at scale.</p>
+<p><img alt="diagram" src="assets/diagrams/b4ab597c3bb33984c58741c2d84c527001dc7bfc.png" /></p>
+<hr />
+<h2 id="9-explain-forward-pass-and-backpropagation-in-a-neural-network">9. Explain forward pass and backpropagation in a neural network</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Forward pass computes the prediction and loss; backpropagation applies the chain rule backwards to compute gradients for every weight.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Forward: input → layers → loss.</li>
+<li>Backward: chain rule ∂L/∂w = ∂L/∂output × ∂output/∂w.</li>
+<li>PyTorch autograd records graph forward, traverses backward.</li>
+</ul>
+<p><strong>Concept.</strong> The forward pass flows inputs through layers, applying learned weights and non-linearities, to produce a prediction and a scalar loss. Backpropagation then applies the chain rule backwards through every layer: <code>∂L/∂w = ∂L/∂output × ∂output/∂w</code> for each weight. PyTorch's autograd engine records the computation graph during the forward pass and traverses it in reverse during <code>.backward()</code>, accumulating <code>w.grad</code>. The optimiser then applies <code>w -= lr × w.grad</code>.</p>
+<p><img alt="diagram" src="assets/diagrams/ff62182dd127c73a0b82419ab61b2ce4e023aaa1.png" /></p>
+<hr />
+<h2 id="10-what-is-vanishingexploding-gradient-and-how-do-you-fix-it">10. What is vanishing/exploding gradient, and how do you fix it?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Products of many Jacobians shrink (vanishing) or grow (exploding) exponentially; fixed by ReLU, residual connections, layer norm, and gradient clipping.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Vanishing: eigenvalue &lt; 1 → early weights stop learning.</li>
+<li>Exploding: eigenvalue &gt; 1 → NaN weights.</li>
+<li>Fixes: ReLU, residuals, layer norm, He init (vanishing); gradient clipping (exploding).</li>
+<li>Transformers largely avoid both via residual + layer norm at every block.</li>
+</ul>
+<p><strong>Concept.</strong> In deep networks, gradients are products of many Jacobians chained together. Eigenvalues consistently below 1 → gradients shrink exponentially toward early layers (vanishing) — early weights stop learning. Eigenvalues consistently above 1 → gradients grow exponentially (exploding) — NaN weights.</p>
+<p><img alt="diagram" src="assets/diagrams/11cad2100859ded4b92a852d0e0896adb86719e0.png" /></p>
+<hr />
+<h2 id="11-what-is-the-difference-between-batch-normalization-and-layer-normalization">11. What is the difference between batch normalization and layer normalization?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Batch norm normalises over the batch dimension (good for CNNs); layer norm normalises over the feature dimension (standard in Transformers and LLMs).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>BatchNorm: over batch dim; needs large batches; good for CNNs.</li>
+<li>LayerNorm: over feature dim; independent of batch size; standard in Transformers.</li>
+<li>Small batch or variable-length sequence? Always LayerNorm.</li>
+</ul>
+<p><strong>Concept.</strong> Batch normalisation normalises across the batch dimension — mean and variance computed over all examples in the batch, per feature. Requires a reasonable batch size for stable statistics. Effective in CNNs and feedforward networks; struggles with small batches, variable-length sequences, and batch size 1 at inference.</p>
+<p><img alt="diagram" src="assets/diagrams/a957d1e3f196e0e5a5947f34c972b127caaec012.png" /></p>
+<hr />
+<h2 id="12-what-is-dropout-and-why-does-it-help-generalisation">12. What is dropout, and why does it help generalisation?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Randomly zeroes activations with probability p during training, forcing distributed representations and acting as an ensemble of 2^n thinned networks.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Each neuron zeroed with probability p; inference scales by 1/(1-p).</li>
+<li>Prevents co-adaptation between neurons.</li>
+<li>Applied to attention weights, FFN, and embeddings in Transformers.</li>
+<li>LoRA dropout is a key regularisation knob for PEFT fine-tuning.</li>
+</ul>
+<p><strong>Concept.</strong> Dropout randomly zeroes each neuron's activation with probability <code>p</code> (typically 0.1–0.5) on each forward pass during training. At inference, dropout is disabled and activations are scaled by <code>1/(1-p)</code> (inverted dropout). Why it works: by randomly removing neurons, the network cannot co-adapt (learn to rely on specific neurons to compensate for each other's mistakes in a memorisation-specific way) and is forced to learn redundant, distributed representations. The effect is similar to training an ensemble of <code>2^n</code> thinned networks and averaging them at inference. In transformers, dropout is applied to attention weights, FFN layers, and embeddings. In LoRA fine-tuning, dropout on the low-rank matrices is a key regularisation knob.</p>
+<p><img alt="diagram" src="assets/diagrams/25d46b7cbb064800a9b458e3408575f1378e34c7.png" /></p>
+<hr />
+<h2 id="13-what-is-the-difference-between-cnns-and-rnns-and-when-would-you-use-each">13. What is the difference between CNNs and RNNs, and when would you use each?</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> CNNs use shared spatial filters (images, 1D signals); RNNs maintain a sequential hidden state (time series, variable-length text before Transformers).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>CNN: translation-invariant, shared weights, efficient for grids.</li>
+<li>RNN/LSTM: sequential hidden state, order-aware, bottleneck on long sequences.</li>
+<li>Transformers replaced RNNs for text; CNNs dominate for images.</li>
+</ul>
+<p><strong>Concept.</strong> Convolutional Neural Networks (CNNs) apply learned filters spatially using shared weights — translation-invariant and efficient for structured grid data (images, audio spectrograms, 1D signals). Not designed for variable-length sequential dependencies. Recurrent Neural Networks (RNNs, LSTMs, GRUs) process sequences step by step, maintaining a hidden state. Designed for sequential data where order matters and length varies: time series, text (pre-transformer), audio frames. Weakness: the hidden state is a bottleneck for long sequences; vanishing gradients make long-range dependencies hard. Transformers have largely replaced RNNs for text because attention can directly attend to any position. CNNs remain dominant for image tasks.</p>
+<p><img alt="diagram" src="assets/diagrams/124bcda521c386066eac284688421186b2fd5ba9.png" /></p>
+<hr />
+<h2 id="14-what-is-transfer-learning-and-when-is-it-useful">14. What is transfer learning, and when is it useful?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Use a model trained on one task as the starting point for another — either freezing weights (feature extraction) or continuing to train them (fine-tuning).</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Feature extraction: freeze pre-trained weights, train new head.</li>
+<li>Fine-tuning: continue training all or some pre-trained weights.</li>
+<li>Every use of a foundation model is transfer learning.</li>
+</ul>
+<p><strong>Concept.</strong> Transfer learning uses a model trained on one task or dataset as the starting point for a different but related task, rather than training from scratch. Two forms: (1) feature extraction — freeze pre-trained weights, train a new task-specific head; (2) fine-tuning — continue training all or some pre-trained weights on the new task's data. Useful almost always when labelled data for the target task is limited, when compute budget is constrained, or when source and target domains are related. In the LLM context, every use of a foundation model (GPT-4, LLaMA, Claude) is transfer learning. SFT and LoRA/PEFT are explicit transfer learning from a base model to a narrower task.</p>
+<p><img alt="diagram" src="assets/diagrams/0c6dc948cfc7a71e8aa577f6c072053d59065539.png" /></p>
+<hr />
+<h2 id="15-how-do-you-evaluate-a-classification-model-beyond-accuracy">15. How do you evaluate a classification model beyond accuracy?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Accuracy is misleading on imbalanced data; use precision/recall/F1, confusion matrix, ROC-AUC, PR-AUC, and log loss for a complete picture.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Precision/Recall/F1: cost-weighted classification quality.</li>
+<li>Confusion matrix: reveals per-class error patterns.</li>
+<li>ROC-AUC: ranking quality, threshold-independent.</li>
+<li>PR-AUC: better than ROC-AUC for severely imbalanced data.</li>
+</ul>
+<p><strong>Concept.</strong> Accuracy is misleading on imbalanced datasets — a classifier that always predicts the majority class achieves 95% accuracy on a 95/5 split. Richer metrics:
+- <strong>Precision / Recall / F1</strong> — precision = TP/(TP+FP); recall = TP/(TP+FN); F1 = harmonic mean. Precision matters when false positives are costly (spam filters); recall when false negatives are costly (cancer screening).
+- <strong>Confusion matrix</strong> — reveals per-class error patterns and which classes are being confused.
+- <strong>ROC-AUC</strong> — area under the ROC curve; measures ranking quality across all thresholds. Threshold-independent.
+- <strong>PR-AUC</strong> — area under the Precision-Recall curve; better than ROC-AUC for severely imbalanced data.
+- <strong>Log loss / cross-entropy</strong> — penalises confident wrong predictions; measures calibration.
+- <strong>Calibration curve</strong> — do predicted probabilities reflect actual event rates?</p>
+<p><img alt="diagram" src="assets/diagrams/d4d6809ee84be731f1bf8e6d35d93e065a97096f.png" /></p>
+<hr />
+<h2 id="16-what-is-cross-validation-and-why-does-it-matter">16. What is cross-validation, and why does it matter?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> k-fold CV splits data into k folds and rotates the held-out set, producing a low-variance generalisation estimate that uses every sample.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Train on k-1 folds, evaluate on the held-out fold, repeat k times.</li>
+<li>Average of k scores is more reliable than a single split.</li>
+<li>Essential for honest hyperparameter tuning.</li>
+</ul>
+<p><strong>Concept.</strong> Cross-validation estimates how well a model generalises when you have limited data. In k-fold CV: split data into k equal folds; train on k-1 folds and evaluate on the held-out fold; repeat k times rotating the held-out fold; average the k evaluation scores. The result is a low-variance generalisation estimate that uses every sample for both training and evaluation. Why it matters: a single train/test split gives a noisy estimate dependent on which examples landed in the test set. CV reduces that variance. Essential for honest hyperparameter tuning — tuning on a fixed held-out set leaks information and overfits the hyperparameters to that specific split. In the LLM context: rarely used on the full model (too expensive) but useful when fine-tuning on small datasets.</p>
+<p><img alt="diagram" src="assets/diagrams/e914e001594abac993a7b248ef300718cb9c390c.png" /></p>
+<hr />
+<h2 id="17-what-is-overfitting-and-how-do-you-prevent-it">17. What is overfitting, and how do you prevent it?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Overfitting: training loss falls but validation loss rises as the model memorises noise; prevent with more data, regularisation, early stopping, or reduced capacity.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Signal: train loss ↓, val loss ↑.</li>
+<li>Prevent: more data, L2/dropout regularisation, early stopping.</li>
+<li>For LLMs: LoRA reduces trainable parameters; monitor validation perplexity.</li>
+</ul>
+<p><strong>Concept.</strong> Overfitting occurs when a model learns the training data too well — including noise and idiosyncrasies — and fails to generalise to unseen examples. Training loss decreases but validation loss increases (the classic divergence signal). Prevention:
+- <strong>More data / augmentation</strong> — the most reliable fix
+- <strong>Regularisation</strong> — L2 (weight decay) penalises large weights; L1 encourages sparsity; dropout randomly zeroes activations
+- <strong>Early stopping</strong> — stop when validation loss stops improving
+- <strong>Reduce model capacity</strong> — smaller architecture or fewer fine-tuned parameters (LoRA)
+- <strong>Cross-validation</strong> — ensures evaluation is not from a lucky split</p>
+<p><img alt="diagram" src="assets/diagrams/58b510be6f9252ddfc46936c3ba16b5ad1a29214.png" /></p>
+<hr />
+<h2 id="18-why-does-the-transformer-use-multi-head-attention-instead-of-a-single-head">18. Why does the Transformer use multi-head attention instead of a single head?</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Multiple heads run in parallel on lower-dimensional projections, each free to specialise on different relationship types simultaneously, with no extra compute cost.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Single head: one relationship type at a time.</li>
+<li>Multi-head: each head specialises (syntax, coreference, position, etc.).</li>
+<li>Same compute cost: d_model splits into h × d_k per head.</li>
+</ul>
+<p><strong>Concept.</strong> A single attention head learns one type of relationship simultaneously — for example, syntactic dependency or positional proximity. Multiple heads run in parallel on lower-dimensional projections, each free to specialise on different relationship types: one head may track subject-verb agreement, another coreference, another relative position. Concatenating and projecting the outputs lets the model integrate all those signals. The compute cost is equivalent to one full-dimensional head (because <code>d_model</code> splits into <code>h × d_k</code> heads), but the representational expressivity is higher. Evidence: ablating individual heads degrades performance on different tasks depending on which head was removed.</p>
+<p><img alt="diagram" src="assets/diagrams/20ac27f224e6a31e923f2d5d890a0c3197960d22.png" /></p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

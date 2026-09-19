@@ -1,0 +1,3225 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="17-fine-tuning-and-customization.html">
+      
+      
+        <link rel="next" href="11-retrieval-and-ranking.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>RAG pipelines & patterns - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#rag-pipelines-and-patterns" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              RAG pipelines & patterns
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-walking-through-a-rag-pipeline-end-to-end-query-to-final-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Walking through a RAG pipeline end to end, query to final answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-modular-rag-and-how-is-it-different-from-a-simple-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is Modular RAG, and how is it different from a simple RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-deciding-chunk-size-and-what-breaks-at-each-extreme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Deciding chunk size, and what breaks at each extreme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-happens-if-your-chunks-are-too-small-or-too-large" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What happens if your chunks are too small or too large
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fixed-size-vs-semantic-chunking-the-actual-retrieval-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-overlapping-vs-non-overlapping-chunks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Overlapping vs. non-overlapping chunks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-chunking-structured-content-like-tables-code-or-nested-headings-without-losing-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Chunking structured content like tables, code, or nested headings without losing structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-context-relevant-but-answer-vague-chunk-boundaries-likely-cut-the-answer-mid-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-picking-an-embedding-model-and-whether-bigger-always-means-better-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Picking an embedding model, and whether bigger always means better retrieval
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-should-queries-and-documents-use-the-same-embedding-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Should queries and documents use the same embedding model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-why-swapping-embedding-models-forces-a-full-re-embedding-of-the-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Why swapping embedding models forces a full re-embedding of the corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-multilingual-documents-multilingual-embedding-models-translate-at-query-or-index-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Multilingual documents: multilingual embedding models, translate at query or index time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-handling-multiple-document-types-and-formats-in-the-same-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Handling multiple document types and formats in the same system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-rag-vs-pasting-retrieved-text-into-a-long-context-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. RAG vs. pasting retrieved text into a long-context prompt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-simple-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Simple RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-modular-rag-with-reranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. Modular RAG with reranking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-what-is-agentic-rag-and-how-is-it-different-from-a-standard-fixed-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-how-would-you-prevent-an-agentic-rag-system-from-retrieving-in-an-unnecessary-loop-and-burning-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-how-does-an-agent-decide-when-to-retrieve-again-versus-when-it-has-enough-context-to-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. How does an agent decide when to retrieve again versus when it has enough context to answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-how-does-a-larger-context-window-change-your-retrieval-strategy-and-when-does-it-not-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20. How does a larger context window change your retrieval strategy — and when does it not help?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-walking-through-a-rag-pipeline-end-to-end-query-to-final-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Walking through a RAG pipeline end to end, query to final answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-what-is-modular-rag-and-how-is-it-different-from-a-simple-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. What is Modular RAG, and how is it different from a simple RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-deciding-chunk-size-and-what-breaks-at-each-extreme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Deciding chunk size, and what breaks at each extreme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-what-happens-if-your-chunks-are-too-small-or-too-large" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. What happens if your chunks are too small or too large
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-fixed-size-vs-semantic-chunking-the-actual-retrieval-tradeoff" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Fixed-size vs. semantic chunking, the actual retrieval tradeoff
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-overlapping-vs-non-overlapping-chunks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Overlapping vs. non-overlapping chunks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-chunking-structured-content-like-tables-code-or-nested-headings-without-losing-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Chunking structured content like tables, code, or nested headings without losing structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-context-relevant-but-answer-vague-chunk-boundaries-likely-cut-the-answer-mid-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Context relevant but answer vague: chunk boundaries likely cut the answer mid context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-picking-an-embedding-model-and-whether-bigger-always-means-better-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Picking an embedding model, and whether bigger always means better retrieval
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-should-queries-and-documents-use-the-same-embedding-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Should queries and documents use the same embedding model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-why-swapping-embedding-models-forces-a-full-re-embedding-of-the-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Why swapping embedding models forces a full re-embedding of the corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-multilingual-documents-multilingual-embedding-models-translate-at-query-or-index-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Multilingual documents: multilingual embedding models, translate at query or index time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-handling-multiple-document-types-and-formats-in-the-same-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Handling multiple document types and formats in the same system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-rag-vs-pasting-retrieved-text-into-a-long-context-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. RAG vs. pasting retrieved text into a long-context prompt
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-simple-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Simple RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-modular-rag-with-reranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. Modular RAG with reranking
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-what-is-agentic-rag-and-how-is-it-different-from-a-standard-fixed-rag-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. What is agentic RAG, and how is it different from a standard fixed RAG pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-how-would-you-prevent-an-agentic-rag-system-from-retrieving-in-an-unnecessary-loop-and-burning-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-how-does-an-agent-decide-when-to-retrieve-again-versus-when-it-has-enough-context-to-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. How does an agent decide when to retrieve again versus when it has enough context to answer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-how-does-a-larger-context-window-change-your-retrieval-strategy-and-when-does-it-not-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20. How does a larger context window change your retrieval strategy — and when does it not help?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="17-fine-tuning-and-customization.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Fine-tuning and customization</span></a>
+<a class="topic-nav__link topic-nav__next" href="11-retrieval-and-ranking.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Retrieval and ranking</span></a>
+</div>
+
+<h1 id="rag-pipelines-and-patterns">RAG pipelines and patterns</h1>
+<h2 id="1-walking-through-a-rag-pipeline-end-to-end-query-to-final-answer">1. Walking through a RAG pipeline end to end, query to final answer</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Two halves — ingestion (parse → chunk → embed → index) and query (embed → retrieve → rerank → assemble → generate); every stage is separable and can fail.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Ingestion: parse files, chunk, embed, and write vectors to the store.</li>
+<li>Query: embed the query, retrieve top-k (dense and/or sparse), rerank, assemble context.</li>
+<li>Generation sees only the assembled context; cite from it.</li>
+<li>Quality drops can come from any stage — isolate them.</li>
+</ul>
+<p><strong>Concept.</strong> Ingest: parse → chunk → embed → index. Query: embed the query → retrieve top-k (dense and/or sparse) → rerank → assemble the retrieved context into the prompt → generate → optionally cite. Each stage is separable; failures and quality drops can occur at any of them.</p>
+<p><img alt="diagram" src="assets/diagrams/05b856b35af57c9c7bb442aa05d35f68f58bba95.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen builds this from composable pieces rather than a packaged app. During ingestion it parses files, chunks them, and an indexer computes embeddings and writes them to the vector store. At query time the knowledge base lazily creates a vector, sparse, or hybrid retriever (chosen by the index type), gets the top-k chunks, and a workflow component folds them into the prompt for the model. Reranking exists but is not wired into the default knowledge-base path.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Ingestion: <code>KnowledgeBase.parse_files</code> (parser), then <code>SimpleKnowledgeBase.add_documents</code> calls <code>chunker.chunk_documents</code>, builds an <code>IndexConfig</code>, and <code>Indexer.build_index</code> computes embeddings via <code>compute_chunk_embeddings</code> and writes them to the vector store. Query: <code>SimpleKnowledgeBase.retrieve</code> lazily instantiates <code>VectorRetriever</code>/<code>SparseRetriever</code>/<code>HybridRetriever</code> by <code>index_type</code>, embeds the query, and calls <code>vector_store.search</code>. The production end-to-end wiring is the workflow <code>KnowledgeRetrievalComponent</code>, which returns <code>results</code>/<code>context</code> (texts joined by <code>\n\n</code>); a downstream <code>LLMComponent</code> formats them (e.g. <code>Context:\n{{context}}\n\nQuestion: {{query}}</code>).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96</code></td>
+<td>chunk_documents; :110 build_index(chunks=..., embed_model=...); :182 delegate to retriever</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46/73</code></td>
+<td>embed_documents / embed_multimodal set chunk.embedding</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code></td>
+<td>embed_query → vector_store.search</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109</code></td>
+<td>retrieve_multi_kb_with_source(...); :243 joins texts into context</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654</code></td>
+<td>template format feeding {{context}}/{{query}}</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-what-is-modular-rag-and-how-is-it-different-from-a-simple-rag-pipeline">2. What is Modular RAG, and how is it different from a simple RAG pipeline</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> Simple RAG is a fixed chain; Modular RAG decomposes it into swappable modules (indexing, retrieval, fusion, reranking, query rewriting, generation) that can be routed and scheduled.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Simple RAG: retrieve → stuff → generate, fixed order.</li>
+<li>Modular RAG: interchangeable modules with routing/orchestration.</li>
+<li>Lets you add rewriting, reranking, or iteration per query.</li>
+</ul>
+<p><strong>Concept.</strong> A simple RAG pipeline is a fixed linear chain (retrieve → stuff → generate). Modular RAG decomposes it into interchangeable modules — indexing, retrieval, fusion, reranking, query rewriting, generation, orchestration — with routing and scheduling, so you can swap or add modules (rewrite, rerank, iterative/multi-hop retrieval) and branch conditionally per query. It is "RAG as a configurable graph of components" rather than one hardcoded path. The cost is more moving parts and the need for a router/orchestrator.</p>
+<p><img alt="diagram" src="assets/diagrams/67c792cba29afc528a4785c18d2f7811f3d70180.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen has modular, pluggable building blocks — parsers self-register by file type, chunkers come from a registry, the retriever is chosen by index type, the vector store comes from a factory, rerankers and query rewriters are swappable classes, and an LLM-driven agentic retriever is toggled by config. But the modules are wired together manually via config and workflow components; there is no automatic router or scheduler deciding the module graph per query.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The building blocks are modular and pluggable: parsers self-register by extension, chunkers are selected from a registry, retrievers are chosen by <code>index_type</code>, the vector store comes from a factory, rerankers and query rewriters are swappable classes, and <code>RetrievalConfig.agentic</code> toggles the LLM-driven iterative retriever. But the modules are composed <strong>manually</strong> via config/KB construction — there is no per-query router/scheduler that assembles a module graph, and <code>AgenticRetriever</code> derives its mode from <code>index_type</code> rather than planning.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/auto_file_parser.py:21</code></td>
+<td>parser registry by extension</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/__init__.py:117</code></td>
+<td>chunker registry</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:141</code></td>
+<td>retriever selection by index_type; :172 agentic wrap toggle</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/store.py:16</code></td>
+<td>vector store factory; agent-core/openjiuwen/core/retrieval/common/config.py:67 — StoreType</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23</code></td>
+<td>swappable reranker</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:412</code></td>
+<td>query rewriter module</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:51</code></td>
+<td>agentic toggle</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-deciding-chunk-size-and-what-breaks-at-each-extreme">3. Deciding chunk size, and what breaks at each extreme</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Too small loses context and splits answers; too large dilutes the embedding. Start at a few hundred tokens with modest overlap.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Small chunks: precise but may lack context or split the answer.</li>
+<li>Large chunks: richer context but a diluted, multi-topic embedding.</li>
+<li>Start ~a few hundred tokens with small overlap; tune by measuring.</li>
+</ul>
+<p><strong>Concept.</strong> Chunk size trades context against precision. Too small and each chunk lacks the context to answer (and the answer may be split across chunks); too large and a chunk covers many topics, diluting the embedding and wasting the prompt budget. Practical defaults are a few hundred tokens with modest overlap, then tune against a retrieval eval. Size is usually measured in tokens (what the model sees), not characters.</p>
+<p><img alt="diagram" src="assets/diagrams/7f48972c8023cd6741ddf4a86cbe91d29170c1be.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen defaults chunk_size to 512 with chunk_overlap 50, measured in characters (char chunker) or tokens (tokenizer chunker). It validates size/overlap, clamps token chunks to the tokenizer limit, and rejects Milvus writes above 65535 characters — but there is no feedback loop telling you a size was a bad choice, so you tune it yourself and evaluate externally.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>Chunker.__init__</code> defaults <code>chunk_size=512</code>, <code>chunk_overlap=50</code>, <code>length_function=len</code>. Size is measured in characters (<code>CharChunker</code> → <code>CharSplitter</code>, <code>len()</code>) or tokens (<code>TokenizerChunker</code> → <code>IndexSentenceSplitter</code> → <code>SentenceSplitter</code>, tokenizer length). Hard validation rejects <code>chunk_size&lt;=0</code>, <code>chunk_overlap&lt;0</code>, and <code>chunk_overlap&gt;=chunk_size</code>. Token-based chunk size is silently clamped to the embedding tokenizer's <code>model_max_length</code> (<code>_resolve_chunk_size</code>), and DB caps fail at write time (Milvus text field <code>max_length=65535</code>, pgvector dims ≤2000).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:36</code></td>
+<td>defaults chunk_size=512, chunk_overlap=50; :59/64/69 validation raises</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:34</code></td>
+<td>KnowledgeBaseConfig.chunk_size/chunk_overlap</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:15</code></td>
+<td>DEFAULT_CHUNK_SIZE=200; :198 _resolve_chunk_size clamps to tokenizer.model_max_length</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/chunking.py:82</code></td>
+<td>get_chunker auto-lowers size to tokenizer max</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:375</code></td>
+<td>text field max_length=65535</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:176</code></td>
+<td>pgvector rejects dim &gt; 2000</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="4-what-happens-if-your-chunks-are-too-small-or-too-large">4. What happens if your chunks are too small or too large</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Too small: the answer splits and the answer-bearing chunk can be missed. Too large: the embedding blends topics, precision drops, and prompt cost rises.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Small: context lost, answer split, more index overhead.</li>
+<li>Large: embedding averages topics, precision down, prompt budget wasted.</li>
+<li>The code guards mechanics (invalid values, limits), not retrieval quality.</li>
+</ul>
+<p><strong>Concept.</strong> Too small: each chunk lacks the context to answer, the answer gets split across chunks, and recall of the <em>answer-bearing</em> chunk drops while index size/overhead grows. Too large: the embedding averages multiple topics so relevance dilutes, retrieval precision drops, and each hit wastes prompt tokens; it can also exceed the embedding model's max sequence length and get truncated. Both extremes lower end-to-end quality, for opposite reasons.</p>
+<p><img alt="diagram" src="assets/diagrams/853ad99e6961ab04f0b248efdf7146034f9273a0.png" /></p>
+<p><strong>In Jiuwen.</strong> The code only guards the mechanics: it rejects non-positive sizes and overlap greater than or equal to size, token chunkers silently clamp to the tokenizer max, and Milvus rejects writes over 65535 characters. What it does not do is tell you whether a chunk size hurt retrieval quality — there is no quality feedback loop, so you must measure that yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The code guards the mechanics but not the quality: construction rejects <code>chunk_size &lt;= 0</code> / <code>chunk_overlap &gt;= chunk_size</code>, token chunkers clamp size to the tokenizer max (so oversized chunks are silently truncated to the model limit), and Milvus fails the write above 65535 chars. There is no retrieval-quality feedback loop to tell you a size choice was bad.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:59/64/69</code></td>
+<td>validation raises</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:198</code></td>
+<td>_resolve_chunk_size clamps to model_max_length</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/chunking.py:82</code></td>
+<td>tokenizer-limit auto-adjust</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:378</code></td>
+<td>text max_length=65535</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-fixed-size-vs-semantic-chunking-the-actual-retrieval-tradeoff">5. Fixed-size vs. semantic chunking, the actual retrieval tradeoff</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Fixed-size is cheap and deterministic but cuts mid-sentence; structure/sentence-aware chunking keeps chunks coherent at the cost of variable size and extra processing.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Fixed-size: deterministic and cheap, but fragments mid-sentence/mid-table.</li>
+<li>Semantic/structure-aware: split on real boundaries; coherent, variable size.</li>
+<li>Best: sentence/structure-aware with a cap, not raw character windows.</li>
+</ul>
+<p><strong>Concept.</strong> Fixed-size chunking is deterministic and cheap but cuts mid-sentence or mid-table, producing fragments that embed poorly. Semantic / structure-aware chunking splits on natural boundaries (sentences, paragraphs, headings, records) so each chunk is coherent, at the cost of variable size and extra processing. Sentence-window and recursive-delimiter strategies sit between the two.</p>
+<p><img alt="diagram" src="assets/diagrams/b3e2bee0b56cfcea84d82ed50a9b9fa75a1f3e3c.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen's truly fixed-size chunker is the char chunker (raw character windows). Its token chunker is actually sentence-aware: it uses a sentence segmenter to pack whole sentences up to a token budget and sub-splits over-long ones. The hybrid chunker is a structural guard that keeps table rows/columns whole, not a semantic splitter. So structure awareness lives at parse time and in the sentence/structural chunkers, not in a generic semantic model.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>True fixed-size is <code>CharChunker</code> (raw character windows via <code>CharSplitter</code>). Token-based <code>TokenizerChunker</code> is actually sentence-boundary-aware: <code>SentenceSplitter</code> uses <code>pysbd</code> to segment and packs whole sentences up to a token budget, sub-splitting overly long sentences. <code>HybridChunker</code> is a structural guard, not a semantic splitter — it keeps <code>source_type in ("row","column")</code> units whole and delegates the rest. There is no embedding-similarity breakpoint chunker and no recursive delimiter hierarchy; <code>splitter_config</code> is accepted and normalized but not passed to <code>SentenceSplitter</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/char_chunker.py:12</code></td>
+<td>CharChunker "fixed size based on character length"; :47 builds CharSplitter</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:47</code></td>
+<td>CharSplitter.split slices text[start:end]</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/tokenizer_chunker.py:17</code></td>
+<td>TokenizerChunker builds IndexSentenceSplitter</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:92</code></td>
+<td>SentenceSplitter.<strong>call</strong> (pysbd); :142 _sentences_with_spans; :173 long-sentence sub-split</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19</code></td>
+<td>HybridChunker no-split predicate; :66 delegation</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/__init__.py:117</code></td>
+<td>only "char"/"hybrid" registered</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:98</code></td>
+<td>splitter_config normalized but not forwarded</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-overlapping-vs-non-overlapping-chunks">6. Overlapping vs. non-overlapping chunks</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A small overlap preserves meaning across a boundary; too much duplicates content, inflates the index, and returns near-identical hits.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Overlap keeps boundary-spanning answers retrievable.</li>
+<li>Too much overlap duplicates text and crowds out diverse hits.</li>
+<li>Non-overlapping is cheaper but risks losing the boundary fact.</li>
+</ul>
+<p><strong>Concept.</strong> A small overlap preserves context that straddles a boundary, improving recall for answers that span a cut; too much overlap duplicates content, inflates the index, and can return near-identical hits that crowd out diverse results. Non-overlapping is cheaper and deduplicated but risks losing boundary context.</p>
+<p><img alt="diagram" src="assets/diagrams/53054fda6a6fba9a338448b322cef262f7013d15.png" /></p>
+<p><strong>In Jiuwen.</strong> Overlap is a first-class setting (default 50). The char chunker uses a strided sliding window; the sentence/token chunker re-injects whole trailing sentences up to the overlap budget, so overlap happens on sentence boundaries. The overlapped text is duplicated across chunks rather than deduplicated, so keep it modest.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Overlap is a first-class <code>chunk_overlap</code> integer (default 50) enforced on both paths. <code>CharSplitter</code> does a strided sliding window (<code>step = chunk_size - chunk_overlap</code>). <code>SentenceSplitter</code> re-injects a suffix of whole sentences from the previous buffer up to the overlap token budget, so token chunks overlap on sentence boundaries. Overlap content is duplicated text across chunks, and chunk IDs are fresh UUIDs each run, so downstream indexing cannot distinguish overlap content.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:39</code></td>
+<td>chunk_overlap: int = 50; :69 overlap &gt;= chunk_size raises; :106 overlap not carried into metadata</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:41</code></td>
+<td>overlap clamped to [0, size-1]; :54 step = chunk_size - chunk_overlap; :56 slicing loop; :110 token path default chunk_size // 5</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:201</code></td>
+<td>_flush re-injects trailing sentences ≤ overlap; :186 long-segment window step</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="7-chunking-structured-content-like-tables-code-or-nested-headings-without-losing-structure">7. Chunking structured content like tables, code, or nested headings without losing structure</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Capture structure at parse time and carry it as metadata — keep tables intact (row/column), preserve code boundaries, and split on headings.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Preserve structure at parse time, not chunk time.</li>
+<li>Tables: keep rows/columns whole or serialize per record.</li>
+<li>Code: split on function/class boundaries and keep fences.</li>
+<li>Headings: use them as split boundaries.</li>
+</ul>
+<p><strong>Concept.</strong> Structure should be captured at parse time and carried as metadata, not thrown away before chunking. Tables should stay intact or be serialized (row/column/record), code should be split on function/class boundaries with fences preserved, and nested headings should be used as split boundaries with the heading path attached to each chunk. A generic text chunker over flattened content loses all of this.</p>
+<p><img alt="diagram" src="assets/diagrams/f20235eab1dfa0febebfc5fd0e0d39a2c7029ad9.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen preserves structure at parse time: spreadsheets emit one document per row and per column tagged with a source type, and the hybrid chunker keeps those units atomic; Word becomes heading-marked Markdown and Markdown tables. PDF and HTML flatten to text, and JSON is pretty-printed, so those lose structure. There is no code-aware or function-boundary chunker; metadata like sheet and row is carried on the chunk but not used to split code or tables beyond the row/column rule.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Structure is preserved at parse time, not chunk time. Excel emits one <code>Document</code> per data row and per column tagged <code>source_type</code> (<code>row</code>/<code>column</code>), and <code>HybridChunker</code> keeps those as atomic chunks. Word emits heading-marked Markdown (<code>#</code>, <code>##</code>, …) and Markdown tables. PDF/HTML flatten to newline-joined text; JSON is pretty-printed. Metadata (<code>source_type</code>, <code>sheet_name</code>, <code>row_index</code>, <code>column_name</code>, <code>image_path</code>, <code>title</code>) is propagated from <code>Document</code> to <code>TextChunk</code> by the chunker base. There is no Markdown-header-aware chunker, so <code>##</code> sections can still be split mid-section, and HTML heading tags are discarded before chunking.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:32</code></td>
+<td>_rows_to_documents; :75 source_type: "row"; :102 source_type: "column"</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/word_parser.py:23</code></td>
+<td>_table_to_markdown; :37 _paragraph_to_markdown (Heading N → N+1 hashes)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19</code></td>
+<td>keeps row/column units as one chunk</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/html_file_parser.py:78</code></td>
+<td>_get_text_from_soup flattens</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/txt_md_parser.py:40</code></td>
+<td>Markdown read verbatim</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:106</code></td>
+<td>metadata copied onto every TextChunk</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-context-relevant-but-answer-vague-chunk-boundaries-likely-cut-the-answer-mid-context">8. Context relevant but answer vague: chunk boundaries likely cut the answer mid context</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> If the answer spans a boundary, the retrieved chunk holds only half of it. Fix with overlap, sentence/structure-aware splitting, and neighbor expansion at serve time.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Boundary cuts produce half-answers that still rank.</li>
+<li>Overlap + sentence/structure-aware chunking reduce it.</li>
+<li>At serve time, expand a hit with its neighbors.</li>
+</ul>
+<p><strong>Concept.</strong> If the answer spans a chunk boundary, the chunk that ranks may contain only half of it, so the model sees an incomplete fact. Remedies: overlap chunks, split on sentence/structure boundaries rather than fixed characters, and at serve time expand a hit with its neighbors. Sentence-aware chunking with overlap is the common fix; fixed-character splitting is the usual culprit.</p>
+<p><img alt="diagram" src="assets/diagrams/a8568f14e102129cda875ef7b5a308db62e6fce7.png" /></p>
+<p><strong>In Jiuwen.</strong> Protection is inconsistent: the sentence chunker builds from whole sentences, carries trailing sentences for overlap, and splits over-long sentences losslessly; the hybrid chunker keeps table rows/columns whole. But the char chunker hard-cuts at fixed offsets and a whitespace normalizer can collapse newlines first. There is no serve-time neighbor expansion, so a boundary-cut chunk can be all the model sees.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Protection is inconsistent by chunker. <code>SentenceSplitter</code> builds chunks from whole <code>pysbd</code> sentences, carries trailing sentences into the next chunk for overlap, and sub-splits over-long sentences losslessly; <code>HybridChunker</code> keeps table rows/columns whole. But <code>CharChunker</code>/<code>CharSplitter</code> (whose <code>chunk_unit="char"</code> default sets the unit) hard-cut at fixed offsets, <code>WhitespaceNormalizer</code> collapses newlines and destroys paragraph structure before splitting, and downstream <code>budget_guard</code>/<code>round_level_compressor</code> truncate head/tail (dropping the middle) rather than extracting the answer span.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:119</code></td>
+<td>long-sentence sub-split; :142 _sentences_with_spans; :201 _flush overlap</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/hybrid_chunker.py:19</code></td>
+<td>keep row/column units whole</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:56</code></td>
+<td>CharSplitter fixed offsets</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_preprocessor.py:33</code></td>
+<td>WhitespaceNormalizer</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:118</code></td>
+<td>head/tail truncation; agent-core/openjiuwen/core/context_engine/processor/compressor/round_level_compressor.py:1088 — _build_head_tail_truncated_text</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="9-picking-an-embedding-model-and-whether-bigger-always-means-better-retrieval">9. Picking an embedding model, and whether bigger always means better retrieval</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Bigger isn't automatically better: fit to domain and language, use the right query/passage prefixes, pick an affordable dimension, and weigh latency/cost.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Domain + language fit beats raw size.</li>
+<li>Asymmetric models need correct query/passage prefixes.</li>
+<li>Dimension drives storage/latency; a smaller in-domain model can win.</li>
+<li>Evaluate recall on your data, not a leaderboard.</li>
+</ul>
+<p><strong>Concept.</strong> Bigger is not automatically better: retrieval quality depends on domain fit, the language, whether the model is asymmetric (query vs passage prefixes), the dimension you can afford, and latency/cost. A smaller in-domain model often beats a large general one, and dimensionality reduction (Matryoshka) can trade a little recall for large storage savings. The right way to pick is to measure recall on your own data, not to read a leaderboard.</p>
+<p><img alt="diagram" src="assets/diagrams/629303d1407f3b5459c84d242198434750e6e2bb.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen exposes an embedding interface that supports embedding queries, embedding documents, and reporting a vector dimension; the config only carries model name, base URL, and API key, with providers for OpenAI-compatible, vLLM (which adds a multimodal instruction), and Dashscope. Dimension is discovered from the first response rather than declared, and there is no model-selection helper or benchmark — you choose the model and validate it yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>An <code>Embedding</code> ABC defines <code>embed_query</code>, <code>embed_documents</code>, and a <code>dimension</code> property; <code>EmbeddingConfig</code> carries only <code>model_name</code>/<code>base_url</code>/<code>api_key</code>. Providers are <code>APIEmbedding</code> (generic HTTP), <code>OpenAIEmbedding</code> (OpenAI-compatible), <code>VLLMEmbedding</code> (extends OpenAI, adds multimodal <code>instruction</code>), and <code>DashscopeEmbedding</code>. Dimension is discovered lazily from the first response or set explicitly for Matryoshka models. Batching is provider-level (<code>max_batch_size=8</code>, <code>max_concurrent=50</code>). Model choice is entirely caller-driven — there is no model registry, benchmark, or size heuristic.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/e0a04fa543a3ba136134fb68f18fba294d11bb61.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/base_embedding.py:16</code></td>
+<td>EmbeddingConfig; :24 Embedding ABC; :29 embed_query</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/openai_embedding.py:67</code></td>
+<td>Matryoshka dimension</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:105</code></td>
+<td>Dashscope dimension</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:45</code></td>
+<td>max_batch_size=8; :46 max_concurrent=50; :175 batch splitting/concurrency</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/vllm_embedding.py:17</code></td>
+<td>VLLMEmbedding</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-should-queries-and-documents-use-the-same-embedding-model">10. Should queries and documents use the same embedding model</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Yes — both sides must use the same model, and asymmetric models need the correct role prefix on each side, or the vectors aren't comparable.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>One model embeds both queries and documents.</li>
+<li>Asymmetric models: apply query vs passage prefixes.</li>
+<li>Mixing models or dropping prefixes degrades retrieval.</li>
+</ul>
+<p><strong>Concept.</strong> Yes — queries and documents must be embedded by the same model, and for asymmetric models you must also apply the correct role prefix (e.g. <code>query:</code> vs <code>passage:</code>) to each side. Mixing models produces incomparable vectors; dropping the role prefix on an instruction-tuned model measurably degrades retrieval.</p>
+<p><img alt="diagram" src="assets/diagrams/575f19830eeec5e5fd4e33bec400f7b9613ddc57.png" /></p>
+<p><strong>In Jiuwen.</strong> In Jiuwen the knowledge base holds one embedding model instance and passes it to both the indexer (documents) and the retriever (queries), so both sides use the same model. Query embedding calls the query path and document embedding calls the document path; for one provider the query path literally reuses the document call. There is no enforced query-vs-passage prefix split, so with an instruction-tuned model you must ensure prefixes are applied consistently yourself.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>In the KB pipeline they do: one <code>embed_model</code> instance is held on the KB, passed to <code>build_index</code> for documents and to the constructed <code>VectorRetriever</code>/<code>HybridRetriever</code> for queries. Query embedding uses <code>embed_query</code>; document embedding uses <code>embed_documents</code>. For Dashscope, <code>embed_query</code> literally calls <code>embed_documents([text])</code> (the OpenAI-compatible client calls the same shared embedding method directly), so there is no query-vs-passage prefix distinction. Only <code>VLLMEmbedding.embed_multimodal</code> supports an <code>instruction</code>. Nothing validates that the retriever's model matches the indexer's (only dimension is indirectly constrained by the collection schema).</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/ec4c03e4e18edc3ad3edf347b579e43e77d985af.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code></td>
+<td>query embed_query</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46</code></td>
+<td>docs embed_documents</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:110</code></td>
+<td>index build uses self.embed_model; :144 VectorRetriever(embed_model=...); :157 HybridRetriever(embed_model=...)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/knowledge_base.py:34</code></td>
+<td>single embed_model field</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:124</code></td>
+<td>embed_query delegates to embed_documents</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/vllm_embedding.py:25</code></td>
+<td>instruction only for multimodal</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="11-why-swapping-embedding-models-forces-a-full-re-embedding-of-the-corpus">11. Why swapping embedding models forces a full re-embedding of the corpus</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Stored vectors belong to one model; a new model — even at the same dimension — is a different space, so every chunk must be re-embedded and the index rebuilt.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Vectors from different models aren't comparable.</li>
+<li>Same dimension does not mean same space.</li>
+<li>Re-embed the whole corpus and rebuild the index.</li>
+</ul>
+<p><strong>Concept.</strong> Stored vectors are the output of one specific model. A different model — even at the same dimension — projects into a different space, so old and new vectors are not comparable; distance computations become meaningless. You must re-embed every chunk (and often rebuild the index, since the vector width may change too). Good systems persist a model fingerprint/version with the index so a mismatch is detected rather than silently corrupted.</p>
+<p><img alt="diagram" src="assets/diagrams/4123cc7c508b958bae5ccc13097a4c3ad781089d.png" /></p>
+<p><strong>In Jiuwen.</strong> Embeddings are computed at index time and stored on each chunk; the vector store takes only the dimension from the embedding model and does not persist the model identity. So there is no fingerprint to detect a mismatch — swapping models silently makes old and new vectors incomparable, and the correct action is to re-embed every chunk and rebuild the index.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>At index time <code>compute_chunk_embeddings</code> calls <code>embed_model.embed_documents</code> and mutates <code>chunk.embedding</code> in place; indexers trigger it only for <code>vector</code>/<code>hybrid</code> index types. Milvus derives the collection vector <code>dim</code> from <code>embed_model.dimension</code> at schema creation and stores only the width — the model identity/name is <strong>not persisted</strong>. <code>update_index</code> deletes a doc's rows and rebuilds (re-embeds). Dimension is a hard constraint: Milvus/Chroma collections and pgvector tables are fixed-width (pgvector rejects &gt;2000). So a model swap means a manual full re-index; there is only a low-level dimension-update migration operation with an optional re-embed callback.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:21</code></td>
+<td>compute_chunk_embeddings; :46 embed_documents sets vectors</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/indexer/milvus_indexer.py:156</code></td>
+<td>embedding only for vector/hybrid; :409 dimension = embed_model.dimension; :427 schema stores dim but no model name; :209 update_index = delete + rebuild</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:294</code></td>
+<td>update_documents delete + re-add</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/vector_store/pg_store.py:129</code></td>
+<td>fixed pgvector table definition</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/vector/utils.py:264</code></td>
+<td>UpdateEmbeddingDimensionOperation</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="12-multilingual-documents-multilingual-embedding-models-translate-at-query-or-index-time">12. Multilingual documents: multilingual embedding models, translate at query or index time</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Use a multilingual/alignment embedding so queries and docs share one space; otherwise translate at index or query time and store language metadata.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Prefer a multilingual/alignment embedding model.</li>
+<li>Otherwise translate at index or query time.</li>
+<li>Store language metadata to route and evaluate per language.</li>
+</ul>
+<p><strong>Concept.</strong> Use a multilingual/alignment embedding model so queries and documents land in one space; if no good multilingual model exists for a language, translate either at index time (normalize the corpus) or query time (translate the query), and store language metadata so you can route and evaluate per language. Cross-lingual rerankers help at the top.</p>
+<p><img alt="diagram" src="assets/diagrams/2a4436e66588df49223eb8064ec2bf246b5bb47d.png" /></p>
+<p><strong>In Jiuwen.</strong> Jiuwen is effectively bilingual (Chinese/English) at the processing layer and does not translate: the sentence splitter guesses the language from a character-ratio heuristic for the segmenter, and the query rewriter only picks a Chinese or English prompt template. Embedding clients expose no language parameter, so multilingual support exists only if you choose a multilingual model yourself; no language metadata is stored and there is no routing.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Effectively bilingual zh/en at the processing layer, with no translation. <code>SentenceSplitter</code> resolves <code>lan</code> via a Chinese-character-ratio heuristic (→ zh or en) for <code>pysbd</code>; explicit codes are passed through (documented in the splitter docstrings). The query rewriter's <code>prompt_lang</code> only picks a <code>_zh.md</code>/<code>_en.md</code> template and never translates. Embedding clients expose no language parameter — multilingual support exists only if the operator picks a multilingual embedding model. No language metadata is persisted and there is no language routing.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/splitter/splitter.py:17</code></td>
+<td>lan: str = "auto"; :46 _detect_chinese(threshold=0.1); :105 builds Segmenter(language=...)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:81</code></td>
+<td>IndexSentenceSplitter(language="auto")</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/tokenizer_chunker.py:25</code></td>
+<td>language="auto"</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/query_rewriter/query_rewriter.py:228</code></td>
+<td>prompt_lang: str = "zh"; :309 template selection</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/embedding/openai_embedding.py:140</code></td>
+<td>no language field; agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:37 — multimodal, not multilingual</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="13-handling-multiple-document-types-and-formats-in-the-same-system">13. Handling multiple document types and formats in the same system</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by type, preserving format-specific structure as metadata.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>One record shape: text + metadata + id.</li>
+<li>Parser per format behind a registry.</li>
+<li>Keep format-specific structure as metadata.</li>
+</ul>
+<p><strong>Concept.</strong> Normalize everything to one record shape (text + metadata + id) at ingestion, with a parser per format behind a registry keyed by MIME/extension, and preserve format-specific structure as metadata. Chunking and indexing then operate on the uniform record. The risks are silent format gaps (a parser that drops structure) and mixed semantics (tables vs prose) needing different chunk policies.</p>
+<p><img alt="diagram" src="assets/diagrams/55ad73b83d83b0543bd8be2dfe7452634db3aa71.png" /></p>
+<p><strong>In Jiuwen.</strong> Format dispatch is an extension-keyed parser registry loaded lazily, and each parser returns documents with a common text-plus-metadata shape. Registered types cover plain text and Markdown, PDF, Word, spreadsheets and CSV, HTML, JSON, and images, so everything is normalized before chunking and indexing.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Format dispatch is an extension-keyed plugin registry loaded lazily by <code>AutoFileParser._ensure_parsers_loaded</code>; each parser returns <code>Document</code> objects with a common text+metadata shape. Registered extensions cover <code>.txt/.md/.markdown</code>, <code>.pdf</code>, <code>.docx</code>, <code>.xlsx/.csv/.tsv</code>, <code>.htm/.html</code>, <code>.json</code>, and <code>.png/.jpg/.jpeg/.webp/.gif/.jfif</code>; <code>AutoParser</code> adds URL routing (WeChat vs generic web). <code>source_type</code> (<code>row</code>/<code>column</code>/<code>web_page</code>/<code>wechat_article</code>) and <code>image_path</code> distinguish semantics. Downstream chunking/indexing is format-agnostic. Word/PDF/JSON/TXT parsers set no <code>source_type</code> (only <code>file_ext</code>), and there is no per-format chunking policy beyond <code>HybridChunker</code>'s row/column predicate.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/auto_parser.py:23</code></td>
+<td>AutoParser URL vs file routing; :48 parse</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/auto_file_parser.py:24</code></td>
+<td>@register_parser(file_extensions) registry; :98 extension dispatch; :121 enriches doc_id/title/file_path/file_ext</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/parser/txt_md_parser.py:14</code></td>
+<td>.txt/.md/.markdown; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/pdf_parser.py:16 .pdf; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/word_parser.py:63 .docx; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/excel_parser.py:131 .xlsx/.csv/.tsv; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/html_file_parser.py:89 .htm/.html; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/json_parser.py:15 .json; agent-core/openjiuwen/core/retrieval/indexing/processor/parser/image_parser.py:15 images</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:29</code></td>
+<td>uniform Document{id_, text, metadata}</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/base.py:91</code></td>
+<td>chunk_documents uniform conversion</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="14-rag-vs-pasting-retrieved-text-into-a-long-context-prompt">14. RAG vs. pasting retrieved text into a long-context prompt</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Pasting whole documents is simpler and avoids chunking errors but is expensive, slow, and noisy; retrieval pays a one-time chunking/index cost and sends only relevant, citable chunks.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Paste: simple, no chunking bugs, but costly/slow/noisy.</li>
+<li>RAG: cheaper per call, citable, scales past the window.</li>
+<li>Choose by cost, latency, and need to cite.</li>
+</ul>
+<p><strong>Concept.</strong> With a large context window you can skip retrieval and paste whole documents. That is simpler and avoids chunking errors, but it is expensive (you pay for every token every call), slow (TTFT grows with context), noisy (irrelevant text dilutes attention), and limited to what fits. RAG pays a one-time indexing cost and per-query retrieval, keeps the prompt small, and scales to corpora far larger than any window. The trade is a retrieval system and its failure modes for token efficiency and scale.</p>
+<p><img alt="diagram" src="assets/diagrams/8c5630600108a6751202b41ab3da5e7d5ef55a81.png" /></p>
+<p><strong>In Jiuwen.</strong> The knowledge base is not budgeted against the model window: the retrieval component simply concatenates result texts into a context string, bounded only by top_k — there is no token count, truncation, or window check before insertion. The context engine has real budgeting primitives, but the RAG assembly path does not use them.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The KB is not budgeted against the model window. <code>KnowledgeRetrievalExecutable._format_output</code> simply concatenates result texts with <code>"\n\n"</code> into a <code>context</code> string — the only bound is <code>top_k</code>; there is no token count, truncation, or window check before insertion. The context engine has real budgeting primitives (<code>context_window_tokens</code>, <code>effective_context_budget</code>, <code>ContextWindowUsage.occupancy_rate</code>, <code>FullCompactProcessor</code> at 180k), but those apply to the <em>conversation</em>, and retrieved text enters as ordinary messages measured only after the fact. There is no comparison or decision guidance for "retrieve top-k" vs. "paste whole document".</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:241</code></td>
+<td>_format_output joins r.text with "\n\n", unbounded; :109 bounded only by top_k</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/schema/config.py:136</code></td>
+<td>context_window_tokens; :131 max_context_message_num; :139 model_context_window_tokens</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/budget_guard.py:37</code></td>
+<td>effective_context_budget (strictest positive)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/usage/models.py:45</code></td>
+<td>ContextWindowUsage.limit_tokens / occupancy_rate</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code></td>
+<td>180k compaction threshold</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="15-simple-rag-pipeline">15. Simple RAG pipeline</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> The most common starting point: embed the query, get top-k similar docs, stuff them into the prompt, and generate.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Embed query → vector search top-k.</li>
+<li>Stuff docs into the prompt.</li>
+<li>LLM generates the answer.</li>
+</ul>
+<p><strong>Concept.</strong> the most common starting point. Query is embedded → a vector database returns top-k similar documents → documents are stuffed into a prompt → the LLM generates the answer. Used for: FAQ bots, internal document search, basic knowledge assistants.</p>
+<p><img alt="diagram" src="assets/diagrams/eb12d4a966b57def89c52dd7e15d980faa8604db.png" /></p>
+<p><strong>In Jiuwen.</strong> Implemented end to end as composable pieces rather than a packaged app: ingest via parse files, chunk documents, and build index; query via retrieve and vector store search; the workflow knowledge-retrieval component concatenates results into a context string for the LLM component.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Implemented end to end as composable pieces rather than a packaged app: ingest via <code>parse_files</code> → <code>chunk_documents</code> → <code>build_index</code>; query via <code>retrieve</code> → <code>vector_store.search</code>; the workflow <code>KnowledgeRetrievalComponent</code> concatenates results into a <code>context</code> string and <code>LLMComponent</code> formats it into the prompt. Gap: no single "simple RAG" agent, and retrieved context is inserted with no token budgeting.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:96/110/182</code></td>
+<td>ingest + retrieve</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:78</code></td>
+<td>embed query → search</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:109/243</code></td>
+<td>context assembly</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/llm/llm_comp.py:654</code></td>
+<td>prompt template</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="16-modular-rag-with-reranking">16. Modular RAG with reranking</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> The upgrade once simple RAG returns irrelevant context: retrieve a larger candidate set, rerank by relevance, and keep only the top results.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Retrieve a larger candidate set.</li>
+<li>Rerank by query relevance.</li>
+<li>Keep only the top results.</li>
+</ul>
+<p><strong>Concept.</strong> the upgrade once simple RAG returns irrelevant context. A retriever pulls a larger candidate set, a reranker reorders by actual relevance to the query, and only the top results enter the prompt. Used for: legal, medical, or research tools where retrieval accuracy affects trust.</p>
+<p><img alt="diagram" src="assets/diagrams/cc296bb652a88d184bf47e14454942bbb040c910.png" /></p>
+<p><strong>In Jiuwen.</strong> The reranker modules exist (cross-encoder, LLM judge, DashScope) but are not wired into the knowledge-base path — only the graph store calls rerank, and top-k is static. Retrieve-N-rerank-to-K is not available out of the box.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The reranker modules exist (<code>StandardReranker</code> cross-encoder, <code>ChatReranker</code> LLM-judge, <code>DashscopeReranker</code>) but are <strong>not wired into the KB path</strong> — only the graph store calls <code>rerank</code>, and <code>top_k</code> is static. So "retrieve N, rerank to K" is not available out of the box; the retrievers also drop metadata <code>filters</code>.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/base_reranker.py:37/41</code></td>
+<td>Reranker ABC</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/reranker/standard_reranker.py:23</code></td>
+<td>StandardReranker (/rerank)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/store/graph/milvus/milvus_support.py:458</code></td>
+<td>reranker applied only in graph store</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code></td>
+<td>KB path calls no reranker</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="17-what-is-agentic-rag-and-how-is-it-different-from-a-standard-fixed-rag-pipeline">17. What is agentic RAG, and how is it different from a standard fixed RAG pipeline</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-basic">basic</span></p>
+<p><strong>TL;DR.</strong> A fixed RAG pipeline retrieves once and feeds top-k to the generator; agentic RAG adds a decision loop — whether/when to retrieve, rewrite/decompose the query, and whether the evidence is enough.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Fixed: retrieve once, then generate.</li>
+<li>Agentic: decide whether/when to retrieve again.</li>
+<li>Loop until sufficient or capped.</li>
+</ul>
+<p><strong>Concept.</strong> A fixed RAG pipeline always retrieves once and feeds the top-k to the generator. Agentic RAG adds a decision loop: the model chooses whether and when to retrieve, may rewrite or decompose the query, retrieves again based on what it found, and stops when it has enough. It trades latency/cost and non-determinism for better answers on complex questions.</p>
+<p><img alt="diagram" src="assets/diagrams/bb06cf3a4988b6f14749652e4fd7a65e635b59de.png" /></p>
+<p><strong>In Jiuwen.</strong> Agentic mode is an opt-in switch (off by default). When on, the knowledge base wraps its base retriever in an agentic retriever that drives an LLM loop: retrieve, extract facts, ask whether they are sufficient, and if not issue a rewritten query — repeating up to a cap. When off, the base vector, sparse, or hybrid retriever is called once.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>RetrievalConfig.agentic</code> (default <code>False</code>) is the switch. When true, <code>SimpleKnowledgeBase.retrieve</code> wraps its base retriever in <code>AgenticRetriever(retriever=..., llm_client=...)</code>; otherwise the base <code>VectorRetriever</code>/<code>SparseRetriever</code>/<code>HybridRetriever</code> is called directly. <code>GraphKnowledgeBase</code> does the same wrapping a <code>GraphRetriever</code>. Agentic = base retrieval + LLM triple extraction + sufficiency/rewrite + multi-round RRF + optional graph expansion; it requires an <code>llm_client</code>. In the product harness the model also chooses retrieval via the <code>memory_search</code> tool.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/3fe376e8a2ef7a04b341a4be14ebe6f80d9e067f.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:51</code></td>
+<td>agentic: bool = False</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:172/182</code></td>
+<td>agentic wrap vs direct base retriever</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/graph_knowledge_base.py:218</code></td>
+<td>agentic wrap of GraphRetriever</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:113</code></td>
+<td>AgenticRetriever construction; agent-core/openjiuwen/core/retrieval/retriever/vector_retriever.py:38 — fixed single-pass (contrast)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/workflow/components/resource/knowledge_retrieval_comp.py:156</code></td>
+<td>LLM only when agentic</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/tools/memory_tools.py:167</code></td>
+<td>memory_search tool</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/deep_agent.py:225</code></td>
+<td>memory_search in builtin tools</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="18-how-would-you-prevent-an-agentic-rag-system-from-retrieving-in-an-unnecessary-loop-and-burning-cost">18. How would you prevent an agentic RAG system from retrieving in an unnecessary loop and burning cost</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, put a token/cost budget on the loop, and cache/dedupe retrieval.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Round cap + sufficiency gate.</li>
+<li>Detect repeated queries/results.</li>
+<li>Token/cost budget; cache/dedupe.</li>
+</ul>
+<p><strong>Concept.</strong> Cap the rounds, detect repeated queries/results, require a sufficiency signal to continue, and put a token/cost budget on the retrieval loop itself. Cache retrieval results and dedupe identical queries. Alert on loops.</p>
+<p><img alt="diagram" src="assets/diagrams/0bf7e7cbe913f56d5eae36f38223636ababc3593.png" /></p>
+<p><strong>In Jiuwen.</strong> Caps exist (the agentic retriever's max iterations default 2 and is clamped; graph hops default 2), and the sufficiency break avoids a needless round. Tool-layer rails catch loops: the anomaly-detection rail compacts consecutive identical tool rounds and aborts, and the dedup rail warns on repeated calls. There is no retrieval-result cache.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Caps exist (<code>AgenticRetriever.max_iter</code> default 2 clamped, <code>graph_hops</code>/<code>max_length</code> default 2), and the sufficiency break avoids a needless round. Harness rails catch loops at the tool layer: <code>ModelAnomalyDetectionRail</code> compacts consecutive identical tool rounds and aborts after a threshold, and <code>ToolCallDeduplicationRail</code> caches/exact-suppresses repeated read calls. The ReAct loop is capped at <code>max_iterations</code>. But there is no retrieval-specific token/cost budget, and the harness rails are not applied to the retrieval agent's own LLM calls.</p>
+<p><strong>Implementation diagram</strong></p>
+<p><img alt="diagram" src="assets/diagrams/26ca31d8ac339af71467579c4118dfb47e0520bb.png" /></p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:133/241/287</code></td>
+<td>max_iter and turn-cap breaks</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:74</code></td>
+<td>ToolLoopCompactConfig (default off); :386 compact-or-bailout</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/tool_dedup_rail.py:25/109/157</code></td>
+<td>cacheable whitelist + per-turn cache + repeat warning</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/single_agent/agents/react_agent.py:288</code></td>
+<td>max_iterations=5</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/context_headroom_rail.py:64</code></td>
+<td>60%/80% token-window directives</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="19-how-does-an-agent-decide-when-to-retrieve-again-versus-when-it-has-enough-context-to-answer">19. How does an agent decide when to retrieve again versus when it has enough context to answer</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Ask the model a sufficiency question — is the evidence enough, and if not what's the next query? Stop when sufficient or the cap is hit.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Sufficiency judgment on accumulated evidence.</li>
+<li>If not sufficient, produce the next query.</li>
+<li>Stop on sufficient/no-next-question or the cap.</li>
+</ul>
+<p><strong>Concept.</strong> Ask the model a sufficiency question — given the query and the evidence so far, is it enough to answer, and if not what is the next query? Stop when sufficient or when the hop/round cap is hit. Judging sufficiency on the evidence (not just a scratchpad) matters.</p>
+<p><img alt="diagram" src="assets/diagrams/d87522fc4f4f9c9d8d89e9291e0877d7ad62ec8c.png" /></p>
+<p><strong>In Jiuwen.</strong> This is the agentic retriever's rewrite step: a prompt receives the query, the accumulated facts, and the rewrite history, and returns a sufficiency flag plus an optional next question. If it is sufficient or there is no next question, the rewrite returns nothing and the loop breaks; otherwise the next question drives another retrieval round.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>This is <code>AgenticRetriever._rewrite</code>: <code>_REWRITE_PROMPT</code> receives the query, the accumulated <code>TripleMemory.triples_str</code>, and the rewrite history, and returns <code>{"sufficient": bool, "next_question": str|null}</code>. If sufficient or no next question, <code>_rewrite</code> returns <code>None</code>, which breaks the loop; otherwise the next question is appended. The hard stop is <code>turn &gt;= max_iter</code> before <code>_rewrite</code> is called.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:51</code></td>
+<td>_REWRITE_PROMPT JSON contract; :326 _rewrite; :341 history formatting; :364 sufficient/next_question; :244/290 append-and-continue</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/triple_memory.py:16</code></td>
+<td>triples_str fed to the prompt</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:67</code></td>
+<td>prompt to differentiate/simplify later questions</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="20-how-does-a-larger-context-window-change-your-retrieval-strategy-and-when-does-it-not-help">20. How does a larger context window change your retrieval strategy — and when does it not help?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> A larger context window raises the recall ceiling but doesn't replace retrieval precision; 'lost in the middle' degrades mid-context evidence, and more tokens cost more.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>More tokens → higher recall ceiling, but mid-context evidence is underweighted.</li>
+<li>Strategy: rerank and threshold first; reserve window for multi-doc synthesis.</li>
+<li>Jiuwen: top_k fixed at 5, not adaptive; no lost-in-the-middle boundary reordering.</li>
+</ul>
+<p><strong>Concept.</strong> A larger context window lets you stuff more retrieved documents into the prompt, potentially reducing the need for aggressive top-k filtering. But it does not solve retrieval precision: the model still has to attend to the right passage inside a long context, and "lost in the middle" research shows models systematically underweight evidence in the middle of long contexts. More tokens also mean more cost per call and higher latency. Strategy: use retrieval precision (reranking, score thresholds) as the primary filter, and reserve long-context capacity for cases where multiple documents must be read together (multi-hop reasoning, synthesis tasks). Do not trade retrieval quality for window stuffing.</p>
+<p><img alt="diagram" src="assets/diagrams/6d0071af2d36e13a491b5bc16bbf06b3a6b55a78.png" /></p>
+<p><strong>In Jiuwen.</strong> top_k is fixed at 5 (agent-core/openjiuwen/core/retrieval/common/config.py:46) and is not adaptive to the deployed model's context window. Long-context management is handled by the context engine (tool_result_budget_processor 50k offload, tool_result_window keep_last_k=3, full_compact_processor 180k compaction), not by retrieval config. No boundary reordering to mitigate lost-in-the-middle effects.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>AgenticRetriever</code> (iterative multi-hop) and <code>VectorRetriever</code> (single-shot) both retrieve into <code>top_k</code> (default 5) regardless of the deployed model's context window — window size is not a retrieval config parameter. Long contexts are managed by the context engine: tool-result offloading (&gt;50k tokens), <code>keep_last_k</code> windowing, and full compaction at 180k. There is no adaptive top-k that scales with available context budget, and no "lost-in-the-middle" reordering (placing high-relevance chunks at boundaries).</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5 (fixed, not window-adaptive)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/retriever/agentic_retriever.py:326</code></td>
+<td>iterative retriever does not scale k</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/offloader/tool_result_budget_processor.py:34</code></td>
+<td>50k offload threshold</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code></td>
+<td>180k compaction</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>

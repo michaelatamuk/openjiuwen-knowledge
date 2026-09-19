@@ -1,0 +1,2384 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Offline build of the Jiuwen AI-Engineering Knowledge Base">
+      
+      
+      
+      
+        <link rel="prev" href="02-prompting-and-output-control.html">
+      
+      
+        <link rel="next" href="17-fine-tuning-and-customization.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Choosing models & tradeoffs - Jiuwen Knowledge Base</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="assets/site.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#choosing-models-and-tradeoffs" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-header__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jiuwen Knowledge Base
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Choosing models & tradeoffs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch light/dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch light/dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18V6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-2.69L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_2">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="index.html" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="05-agent-fundamentals-and-the-loop.html" class="md-tabs__link">
+          
+  
+  
+  Building with agents
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="01-llm-foundations.html" class="md-tabs__link">
+          
+  
+  
+  Under the hood
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Jiuwen Knowledge Base" class="md-nav__button md-logo" aria-label="Jiuwen Knowledge Base" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Jiuwen Knowledge Base
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building with agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Building with agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="05-agent-fundamentals-and-the-loop.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent fundamentals & the loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="21-agent-harness-and-rails.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent harness & lifecycle hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="08-agent-frameworks.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent frameworks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="09-multi-agent-systems.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-agent systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What the agent uses
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What the agent uses
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="06-tools-and-function-calling.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools & function calling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="07-planning-memory-and-state.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Planning, memory & state
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Making agents reliable
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Making agents reliable
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="22-agent-failure-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent failure modes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="15-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="18-security-and-safety.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security & safety
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="16-production-cost-and-scale.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production, cost & scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="24-ai-gateway.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model routing & gateways
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Under the hood
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Under the hood
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    The model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="01-llm-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How LLMs work
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="19-foundational-papers.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundational papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="20-ai-system-stack.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model serving
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with the model
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Working with the model
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="02-prompting-and-output-control.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompting & output control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="04-choosing-models-and-approaches.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing models & tradeoffs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-deciding-when-a-problem-actually-needs-an-llm-versus-a-simpler-rule-based-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deciding when a problem actually needs an LLM versus a simpler rule-based system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-larger-model-vs-smaller-faster-one-for-a-given-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Larger model vs. smaller, faster one for a given task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-when-the-best-model-is-the-wrong-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. When the "best" model is the wrong choice
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-compare-two-approaches-tests-tradeoff-reasoning-tied-to-numbers-not-a-correct-pick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-youre-given-a-vague-ai-system-design-brief-with-no-stated-constraints-what-do-you-ask-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. You're given a vague AI system design brief with no stated constraints — what do you ask first?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-gathering-constraints-before-designing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Gathering constraints before designing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-make-a-defensible-model-selection-decision-what-does-the-evaluation-actually-look-like" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you make a defensible model selection decision — what does the evaluation actually look like?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-measuring-the-tradeoff-empirically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Measuring the tradeoff empirically
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-what-are-the-architectural-layers-of-a-modern-ai-product" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. What are the architectural layers of a modern AI product?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-planning-for-10x-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Planning for 10x traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-what-to-cut-first-under-a-budget-constraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. What to cut first under a budget constraint
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="17-fine-tuning-and-customization.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fine-tuning & customization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval internals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Retrieval internals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="10-rag-pipelines-and-patterns.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG pipelines & patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="11-retrieval-and-ranking.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval & ranking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="12-query-understanding.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Query understanding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="14-rag-system-design.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG system design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="13-rag-failure-modes-and-evaluation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG failure modes & evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Background
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="00-ml-foundations.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ML foundations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="03-llm-terms-glossary.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM terms glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-deciding-when-a-problem-actually-needs-an-llm-versus-a-simpler-rule-based-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Deciding when a problem actually needs an LLM versus a simpler rule-based system
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-larger-model-vs-smaller-faster-one-for-a-given-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Larger model vs. smaller, faster one for a given task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-when-the-best-model-is-the-wrong-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. When the "best" model is the wrong choice
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-compare-two-approaches-tests-tradeoff-reasoning-tied-to-numbers-not-a-correct-pick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-youre-given-a-vague-ai-system-design-brief-with-no-stated-constraints-what-do-you-ask-first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. You're given a vague AI system design brief with no stated constraints — what do you ask first?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-gathering-constraints-before-designing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Gathering constraints before designing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-how-do-you-make-a-defensible-model-selection-decision-what-does-the-evaluation-actually-look-like" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. How do you make a defensible model selection decision — what does the evaluation actually look like?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-measuring-the-tradeoff-empirically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Measuring the tradeoff empirically
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-what-are-the-architectural-layers-of-a-modern-ai-product" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. What are the architectural layers of a modern AI product?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-planning-for-10x-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Planning for 10x traffic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-what-to-cut-first-under-a-budget-constraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. What to cut first under a budget constraint
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<div class="topic-nav">
+<a class="topic-nav__link topic-nav__prev" href="02-prompting-and-output-control.html"><span class="topic-nav__dir">← Previous</span><span class="topic-nav__name">Prompting and output control</span></a>
+<a class="topic-nav__link topic-nav__next" href="17-fine-tuning-and-customization.html"><span class="topic-nav__dir">Next →</span><span class="topic-nav__name">Fine-tuning and customization</span></a>
+</div>
+
+<h1 id="choosing-models-and-tradeoffs">Choosing models and tradeoffs</h1>
+<h2 id="1-deciding-when-a-problem-actually-needs-an-llm-versus-a-simpler-rule-based-system">1. Deciding when a problem actually needs an LLM versus a simpler rule-based system</h2>
+<p><span class="badge badge-type">Compare</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Use rules when logic is enumerable, must be auditable, or needs exact reproducibility (validation, pattern routing, permissions, arithmetic, parsing). Use an LLM when the task is semantic or open-ended.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Rules: enumerable, auditable, reproducible.</li>
+<li>LLM: semantic, ambiguous, open-ended.</li>
+<li>Prefer rules; add the LLM where needed.</li>
+</ul>
+<p><strong>Concept.</strong> Use a rule-based/deterministic system when the logic is enumerable, must be auditable, or needs exact reproducibility (validation, routing by known patterns, permission checks, arithmetic, parsing). Use an LLM when the task is semantic, open-ended, or handles ambiguity that rules cannot enumerate (summarization, intent, extraction from messy text). Rules for control, LLM for meaning; often both.</p>
+<p><img alt="diagram" src="assets/diagrams/8ad87aa43f3e7cfa39c57a16a4a3c26b8566b81a.png" /></p>
+<p><strong>In Jiuwen.</strong> The codebase deliberately routes many decisions through deterministic code. The permission engine is a pure rule and AST engine — its docstring notes the model is not used on the permission path — evaluating tiered regex rules and a shell AST before falling back to ask. Safety-critical decisions are rule-based, not model-based.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The codebase deliberately routes many decisions through deterministic code. The permission engine is a pure rule/AST engine — its docstring notes the model is not used on the permission path — evaluating tiered regex rules and a tree-sitter shell AST before falling back to ASK. The product's auto-permission layer has deterministic routes that hard-block/ask by URL scheme, egress fields, and capability side-effects before any reviewer is consulted. Lexical/deterministic retrieval coexists with vector paths (SQLite FTS5 BM25, RRF rank fusion), and structured JSON is extracted with deterministic parsers. Conversely, memory extraction uses an LLM key-information classifier because judging "is this worth remembering" is semantic.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/core.py:193</code></td>
+<td>docstring: LLM not used on the permission path</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/security/permission_engine/toolguard/tool_policy.py:588</code></td>
+<td>rule-based tiered policy; agent-core/openjiuwen/harness/security/permission_engine/toolguard/shell_ast.py:82 — deterministic parse</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/permissions/auto_decision.py:73</code></td>
+<td>deterministic_guard_route; :116 deterministic_domain_route</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/agents/harness/common/memory/internal.py:165</code></td>
+<td>bm25_rank_to_score; jiuwenswarm/jiuwenswarm/agents/harness/common/memory/manager.py:1044 FTS BM25</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/utils/fusion.py:15</code></td>
+<td>rrf_fusion; agent-core/openjiuwen/core/foundation/store/index/simple_memory_index.py:348 sort by score</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/context_engine/context/message_buffer.py:74</code></td>
+<td>deterministic drop beyond 2×</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/rsi/harness_rsi/auto_harness/infra/parsers.py:147</code></td>
+<td>deterministic JSON extraction</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/memory/process/extract/memory_analyzer.py:26</code></td>
+<td>LLM classifier (semantic)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="2-larger-model-vs-smaller-faster-one-for-a-given-task">2. Larger model vs. smaller, faster one for a given task</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Match capability to difficulty: a large model for reasoning/ambiguity, a small/fast one for classification, extraction, routing, and formatting; measure quality per task and weigh latency and cost.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Large for reasoning/ambiguity.</li>
+<li>Small/fast for classification/extraction/routing.</li>
+<li>Measure quality per task; weigh latency/cost.</li>
+</ul>
+<p><strong>Concept.</strong> Match model capability to task difficulty: use a large model for reasoning/ambiguity and a small/fast one for classification, extraction, routing, and formatting. Measure quality per task and weigh latency and cost; route by task, and fall back to the larger model only when needed. A leaderboard score is a prior, not a per-task decision.</p>
+<p><img alt="diagram" src="assets/diagrams/dd5563d6e052d9bcf4fae828491a201d943a8eca.png" /></p>
+<p><strong>In Jiuwen.</strong> Model selection here is about availability and endpoint distribution, not task quality. A team can declare a pool of endpoints or a router config, and allocators pick an entry by rotation or an explicit model-name hint at member construction. Capability-based routing by task difficulty must be added by the caller.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Model selection here is about availability and endpoint distribution, not task quality. A team can declare a <code>model_pool</code> of endpoints or a <code>ModelRouterConfig</code>/<code>IntelliRouterConfig</code> convenience shape; allocators (<code>RoundRobinModelAllocator</code>, <code>ByModelNameAllocator</code>, <code>Router</code>, <code>IntelliRouter</code>) pick an entry by rotation or an explicit <code>model_name</code> hint supplied per agent/task. IntelliRouter is rate-aware only through <code>tpm</code>/<code>rpm</code> budgets. The <code>ModelPoolEntry</code> metadata comment ("weights, affinity hints") is documented but not implemented.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/pool.py:38</code></td>
+<td>ModelPoolEntry; :133 ModelRouterConfig; :241 IntelliRouterDeployment; :314 IntelliRouterConfig; :278 tpm/rpm rate-aware; :95 "weights/affinity hints" (documented, not implemented)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/allocator.py:176</code></td>
+<td>round-robin; :240 by-model-name; :452 IntelliRouter; :559 build_model_allocator; :28 allocation-vs-reliability docstring</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/schema/config.py:242</code></td>
+<td>/ agent-core/openjiuwen/harness/schema/deep_agent_spec.py:441 — per-agent/task model config</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="3-when-the-best-model-is-the-wrong-choice">3. When the "best" model is the wrong choice</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> "Best" is relative to a constraint, not an absolute quality score.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>A model too slow or too expensive to ship is not the right choice</li>
+<li>Justify against the constraint it satisfies or violates</li>
+</ul>
+<p><strong>Concept.</strong> Define "best" relative to a constraint, not as an absolute quality score. A model that is too slow or too expensive to ship at scale is not the right choice regardless of its accuracy; the justification is the constraint it satisfies or violates.</p>
+<hr />
+<h2 id="4-compare-two-approaches-tests-tradeoff-reasoning-tied-to-numbers-not-a-correct-pick">4. "Compare two approaches" tests tradeoff reasoning tied to numbers, not a correct pick</h2>
+<p><span class="badge badge-type">Claim</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>Claim, not a question.</strong> The heading is an assertion about what these questions probe; the notes below assess whether it holds.</p>
+<p><strong>TL;DR.</strong> 'Compare two approaches' tests tradeoff reasoning tied to numbers, not a correct pick.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>top_k defaults 5, no adaptive policy.</li>
+<li>Reranking absent from the KB path.</li>
+<li>Model allocation is availability-based.</li>
+<li>Session cost tracked and capped.</li>
+</ul>
+<p><strong>Concept.</strong> This claim holds: the expected answer is a constraint-driven tradeoff with numbers, not a single correct pick. RAG vs. fine-tuning, 7B vs. 70B, top-5 vs. top-20 retrieval. "It depends" without naming the constraint (latency budget, cost per query, accuracy floor) is not enough; put a number on it — e.g. "at a 200ms budget, reranking 20 docs is not viable, so cap retrieval at 5." State the constraint, then the decision it forces, then the number. Tie retrieval size to latency/tokens, model size to accuracy floor vs cost, and reranking to the latency it buys in precision.</p>
+<p><img alt="diagram" src="assets/diagrams/05e403ee71c2ddfc9e280ece288ce292f189063b.png" /></p>
+<p><strong>In Jiuwen.</strong> The relevant knobs are static and named: top-k defaults to 5 with no adaptive policy, reranking is not in the knowledge-base path, and model allocation is availability-based rather than cost or accuracy based, so routing easy queries to a smaller model is not automatic. Session cost is tracked and capped.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The relevant knobs are static and named: <code>top_k</code> defaults to 5 (no adaptive policy), reranking is not in the KB path, and model allocation is availability-based, not cost/accuracy-based — so "smaller model for easy queries" is not automatic. Session cost is tracked and capped when the provider reports cost.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:46</code></td>
+<td>top_k: int = 5 static</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/simple_knowledge_base.py:182</code></td>
+<td>no reranker in KB retrieve</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/allocator.py:559</code></td>
+<td>build_model_allocator (availability strategies, not cost/accuracy)</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:171</code></td>
+<td>enforced session cost cap</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="5-youre-given-a-vague-ai-system-design-brief-with-no-stated-constraints-what-do-you-ask-first">5. You're given a vague AI system design brief with no stated constraints — what do you ask first?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Extract the four binding constraints before proposing any architecture: latency budget, query volume, accuracy floor, and cost envelope.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Latency budget — real-time (≤200ms) or async? Rules out reranking and large-model calls in the critical path</li>
+<li>Query volume — p50/p99 RPS? Rules out expensive retrievers per query at scale</li>
+<li>Accuracy floor — what is the cost of a wrong answer? Rules out small/fast models for high-stakes tasks</li>
+<li>Cost envelope — $/query budget? Forces routing, caching, and smaller models when tight</li>
+<li>Propose an architecture only after these constraints are known</li>
+</ul>
+<p><strong>Concept.</strong> Before proposing any architecture, extract the four constraints that determine every significant tradeoff: (1) <strong>latency budget</strong> — is this real-time (≤200ms) or async? (2) <strong>query volume</strong> — requests per second, peak vs average; (3) <strong>accuracy floor</strong> — is a wrong answer a minor inconvenience or a safety/legal risk? (4) <strong>cost envelope</strong> — is this internal tooling or a consumer product at scale? These four drive every meaningful decision: latency budget rules out reranking or large-model calls in the critical path; accuracy floor rules out smaller models; volume rules out expensive retrievers. Propose an architecture only after these constraints are known.</p>
+<p><img alt="diagram" src="assets/diagrams/273ba137de748e5a5a1094f191d56ba73e713030.png" /></p>
+<p><strong>In Jiuwen.</strong> The four constraint levers are each separately configurable: latency via ModelClientConfig.timeout (agent-core/openjiuwen/core/foundation/llm/schema/config.py:102); volume via IntelliRouterDeployment tpm/rpm (agent-core/openjiuwen/agent_teams/models/pool.py:278); accuracy via score_threshold (agent-core/openjiuwen/core/retrieval/common/config.py:47); cost via the auto-harness BudgetRail dollar cap (agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24). The operator sets them per use case.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The deployment surface exposes these constraints as distinct configuration layers. Latency: <code>ModelClientConfig.timeout</code> per call, agent <code>max_turns</code>. Volume/concurrency: <code>IntelliRouterDeployment</code> <code>tpm</code>/<code>rpm</code> caps, <code>APIEmbedding</code> <code>max_concurrent</code>. Accuracy tradeoff: <code>score_threshold</code> (retrieval), <code>temperature</code>, <code>max_tokens</code>. Cost: the auto-harness <code>BudgetRail</code> (per-session dollar cap). The operator sets them per use case.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:102</code></td>
+<td>ModelClientConfig.timeout (latency)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_teams/models/pool.py:278</code></td>
+<td>tpm/rpm (volume)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/common/config.py:47</code></td>
+<td>score_threshold (accuracy lever)</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/rails/budget_rail.py:24</code></td>
+<td>dollar cap (cost)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="6-gathering-constraints-before-designing">6. Gathering constraints before designing</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Extract the four binding constraints — latency budget, query volume, accuracy floor, and cost envelope — before proposing any architecture.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>A tight latency budget rules out reranking or large-model calls in the critical path</li>
+<li>A high accuracy floor rules out smaller models</li>
+<li>High query volume rules out expensive retrievers</li>
+<li>In Jiuwen these are manual levers: timeout, tpm/rpm, score_threshold, budget cap</li>
+</ul>
+<p><strong>Concept.</strong> Before proposing an architecture, extract the four constraints that determine every significant tradeoff: <strong>latency budget</strong> — real-time (≤200ms) or async?; <strong>query volume</strong> — requests per second, peak versus average; <strong>accuracy floor</strong> — is a wrong answer a minor inconvenience or a safety/legal risk?; and <strong>cost envelope</strong> — internal tooling or a consumer product at scale? These four drive every meaningful decision: a tight latency budget rules out reranking or large-model calls in the critical path, a high accuracy floor rules out smaller models, and high volume rules out expensive retrievers.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>Latency is set via <code>ModelClientConfig.timeout</code>; volume via <code>IntelliRouterDeployment</code> <code>tpm</code>/<code>rpm</code>; accuracy via <code>score_threshold</code>; cost via the auto-harness <code>BudgetRail</code> dollar cap. The operator sets them per use case.</p>
+</details>
+<hr />
+<h2 id="7-how-do-you-make-a-defensible-model-selection-decision-what-does-the-evaluation-actually-look-like">7. How do you make a defensible model selection decision — what does the evaluation actually look like?</h2>
+<p><span class="badge badge-type">Mechanism</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Define an eval set, run all candidates, record quality + latency + cost, plot the curves, and pick the knee — not the highest-accuracy option.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Eval set must be representative of the actual use-case distribution, not cherry-picked examples</li>
+<li>Run every candidate on the same eval set; record quality score, latency, and cost per query</li>
+<li>Plot cost-accuracy and latency-accuracy curves to find the knee: where extra spend buys diminishing quality gain</li>
+<li>Pick the option that meets the requirement with minimum overhead — not the top-accuracy option</li>
+<li>Jiuwen gap: evaluators measure quality only; cost and latency are not correlated to eval scores in the pipeline</li>
+</ul>
+<p><strong>Concept.</strong> "There's a tradeoff" is not an answer — it is the beginning of one. A defensible selection looks like: (1) define a representative eval set covering the actual use-case distribution (not cherry-picked examples); (2) run every candidate model (or configuration) on the same eval set; (3) record accuracy/quality score AND latency AND cost per query; (4) plot the cost-accuracy and latency-accuracy curves; (5) identify the <strong>knee of the curve</strong> — the point where additional cost or latency buys diminishing quality gain; (6) choose the option that meets the requirement with the least overhead, not the option with the highest absolute accuracy. Critically: the choice is a decision that follows from the requirement, not from intuition or a leaderboard.</p>
+<p><img alt="diagram" src="assets/diagrams/ca630e75b7187b71287dc7416fd4ded2649dfff7.png" /></p>
+<p><strong>In Jiuwen.</strong> Quality measurement: ExactMatchMetric and LLMAsJudgeMetric (agent-core/openjiuwen/agent_evolving/evaluator/metrics/). Session costs are tracked separately in jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101 via add_session_usage. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>agent_evolving/evaluator/</code> provides metrics such as <code>ExactMatchMetric</code> and <code>LLMAsJudgeMetric</code> for quality measurement. <code>dev_tools/tune/Trainer</code> supports <code>early_stop_score</code> for automated quality gating. Gaps: cost and latency are not recorded <em>alongside</em> quality in the eval pipeline — there is no built-in cost-accuracy curve generation. Session costs are tracked in <code>usage_cost.py</code> but not correlated to per-query eval scores.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/exact_match.py:12</code></td>
+<td>ExactMatchMetric</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/agent_evolving/evaluator/metrics/llm_as_judge.py:17</code></td>
+<td>LLMAsJudgeMetric</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/dev_tools/tune/trainer/trainer.py:38</code></td>
+<td>early_stop_score</td>
+</tr>
+<tr>
+<td><code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code></td>
+<td>session cost (not per-eval-query)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="8-measuring-the-tradeoff-empirically">8. Measuring the tradeoff empirically</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-advanced">advanced</span></p>
+<p><strong>TL;DR.</strong> Operationalize the tradeoff: eval set, per-candidate quality/latency/cost, curves, and the knee.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Define a representative eval set and run every candidate on it</li>
+<li>Record quality score, latency, and cost per query</li>
+<li>Plot cost-accuracy and latency-accuracy curves and find the knee</li>
+<li>Pick the option meeting the requirement with minimum overhead</li>
+</ul>
+<p><strong>Concept.</strong> Define a representative eval set, run every candidate on it, and record quality score, latency, and cost per query. Plot the cost–accuracy and latency–accuracy curves, find the knee (the point of diminishing returns), and pick the option that meets the requirement with the minimum overhead — not the highest-accuracy option.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p><code>agent_evolving/evaluator/</code> provides metrics such as <code>ExactMatchMetric</code> and <code>LLMAsJudgeMetric</code>; session costs are tracked in <code>usage_cost.py</code>. Cost and latency are tracked separately from quality scores, so the cost-accuracy curve is assembled by the operator.</p>
+</details>
+<hr />
+<h2 id="9-what-are-the-architectural-layers-of-a-modern-ai-product">9. What are the architectural layers of a modern AI product?</h2>
+<p><span class="badge badge-type">Design</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Data → Model → Inference → Retrieval (RAG) → Orchestration → Safety → Infrastructure. Every production AI product runs all 7 simultaneously; most developers interact only with Layer 5.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Layer 1 Data: collection, cleaning, storage (vector DB/object store/data lake), versioning</li>
+<li>Layer 2 Model: base, fine-tuned, embedding, multimodal</li>
+<li>Layer 3 Inference: tokenizer, context window, temperature, KV cache, quantization</li>
+<li>Layer 4 RAG: vector store, retriever, reranker, context injection</li>
+<li>Layers 5-7: orchestration (prompt+memory+tools+agent loop), safety (guardrails+alignment+filter), infrastructure (GPU+LB+API GW+observability). Jiuwen covers Layers 4-6 directly.</li>
+</ul>
+<p><strong>Concept.</strong> A production AI system has seven functional layers, each independently scalable and debuggable: <strong>(1) Data Layer</strong> — raw collection, cleaning/deduplication/filtering, storage (vector DB, object store, data lake), and versioning (what data trained which model). <strong>(2) Model Layer</strong> — base model (raw language prediction), fine-tuned model (task-specific behavior), embedding model (text→vectors), multimodal model (text+image+audio). <strong>(3) Inference Layer</strong> — tokenizer, context window management, temperature/sampling controls, KV cache (reuse past token computations), quantization (reduce weight precision for speed/memory). <strong>(4) Retrieval Layer</strong> — vector store, retriever, reranker, context injection. <strong>(5) Orchestration Layer</strong> — prompt template, conversation memory, tools/function calling, agent loop (plan → act → observe → repeat), orchestration framework. <strong>(6) Safety Layer</strong> — guardrails, alignment (RLHF/CAI), content filter, hallucination detection. <strong>(7) Infrastructure Layer</strong> — GPU cluster (inference compute), load balancer, API gateway (auth/rate limiting/billing), observability (logs, latency, token counts, traces). Every production AI product runs all 7 layers simultaneously. Most developers interact only with Layer 5. The practical test: if something breaks, can you identify which layer it's in?</p>
+<p><img alt="diagram" src="assets/diagrams/596803976c5e2d9db77510d12bf828c3ab72d6fe.png" /></p>
+<p><strong>In Jiuwen.</strong> The framework covers Layers 4-6 directly. Layer 4: agent-core/openjiuwen/core/retrieval/ (vector, hybrid, graph, agentic retrievers). Layer 5: core/foundation/prompt/template.py (prompt), core/context_engine/ (memory + context), core/foundation/tool/base.py (tools), core/single_agent/agents/react_agent.py (ReAct loop). Layer 6: auto_harness/rails/security_rail.py, core/security/guardrail/builtin.py, harness/rails/subagent/verification_rail.py. Layer 7 infrastructure is delegated: Milvus, vLLM, provider APIs, harness/observability/rail.py. Layers 1-3 (data pipeline, base model training, inference engine) are external.</p>
+<details>
+<summary><b>Under the hood</b></summary>
+<p><strong>Implementation</strong></p>
+<p>The framework maps onto Layers 4–6 directly and delegates the rest. <strong>Layer 4</strong>: full retrieval pipeline (vector, hybrid, graph, agentic retrievers). <strong>Layer 5</strong>: <code>PromptTemplate</code>, <code>ContextEngine</code>, <code>ToolCard</code> system, <code>ReActAgent</code> loop, framework rails. <strong>Layer 6</strong>: <code>SecurityRail</code>, <code>PromptInjectionGuardrail</code>, <code>VerificationRail</code>. Layer 7 infrastructure is provided by Milvus (vector store), vLLM (local inference), provider APIs (OpenAI, Anthropic), and the harness observability rail. Layers 1–3 (data pipeline, base model training, inference engine) are handled outside the framework.</p>
+<p><strong>Code anchors</strong></p>
+<table>
+<thead>
+<tr>
+<th>Code anchor</th>
+<th>What it points to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent-core/openjiuwen/core/retrieval/</code></td>
+<td>full retrieval pipeline</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/core/foundation/prompt/template.py</code></td>
+<td>; agent-core/openjiuwen/core/context_engine/; agent-core/openjiuwen/core/foundation/tool/base.py; agent-core/openjiuwen/core/single_agent/agents/react_agent.py</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/auto_harness/rails/security_rail.py</code></td>
+<td>; agent-core/openjiuwen/core/security/guardrail/builtin.py; agent-core/openjiuwen/harness/rails/subagent/verification_rail.py</td>
+</tr>
+<tr>
+<td><code>agent-core/openjiuwen/harness/observability/rail.py</code></td>
+<td>; Milvus + vLLM + provider APIs (external)</td>
+</tr>
+</tbody>
+</table>
+</details>
+<hr />
+<h2 id="10-planning-for-10x-traffic">10. Planning for 10x traffic</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Scale decisions are made before the demo: identify the bottleneck and the first scaling lever for each stage.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>First levers: caching, batching, and latency under load</li>
+<li>Bottleneck is generation, retrieval, or orchestration</li>
+<li>Each stage has a different first scaling lever</li>
+</ul>
+<p><strong>Concept.</strong> Scaling is decided before the demo, not after. The first levers are caching, batching, and confirming that latency holds under load. Identify the bottleneck — generation, retrieval, or orchestration — and the first scaling lever for each.</p>
+<hr />
+<h2 id="11-what-to-cut-first-under-a-budget-constraint">11. What to cut first under a budget constraint</h2>
+<p><span class="badge badge-type">Concept</span> <span class="badge badge-intermediate">intermediate</span></p>
+<p><strong>TL;DR.</strong> Embedding is one-time; generation scales with traffic, so cut generation first.</p>
+<p><strong>Key points.</strong></p>
+<ul>
+<li>Route simple queries to a smaller model, lower top-k, add semantic caching</li>
+<li>Safety and guardrail layers are the last to cut</li>
+<li>Know which components degrade gracefully versus break the system</li>
+</ul>
+<p><strong>Concept.</strong> Know which components cost the most and which degrade gracefully versus break the system. Embedding is one-time; generation scales with traffic — so cut generation first: route simple queries to a smaller model, lower top-k, add semantic caching. Safety and guardrail layers are the last thing to cut, because they prevent unsafe output.</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.expand", "search.highlight", "search.suggest", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="assets/site.js"></script>
+      
+    
+  </body>
+</html>
