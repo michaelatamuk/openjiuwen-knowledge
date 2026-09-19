@@ -25,7 +25,7 @@
 
 **Implementation**
 
-Layer 4: `agent-core/openjiuwen/core/retrieval/` (vector, hybrid, graph, agentic). Layer 5: `harness/prompts/template.py`, `core/context_engine/`, `core/foundation/tool/base.py`, `core/agentic/react_agent.py`. Layer 6: `harness/rails/security_rail.py`, `guardrail_rail.py`, `subagent/verification_rail.py`. Layer 7: Milvus (vector store), vLLM (inference), `harness/observability/event.py`. Layers 1-3 are external.
+Layer 4: `core/retrieval/retriever/` (vector, hybrid, graph, agentic). Layer 5: `core/foundation/prompt/template.py`, `core/context_engine/`, `core/foundation/tool/base.py`, `core/single_agent/agents/react_agent.py`. Layer 6: `harness/rails/security/` (prompt/tool security), `core/security/guardrail/builtin.py`, `harness/rails/subagent/verification_rail.py`. Layer 7: Milvus (vector store), vLLM (inference), `harness/observability/` and `extensions/observability/`. Layers 1-3 are external.
 
 </details>
 
@@ -51,7 +51,7 @@ Layer 4: `agent-core/openjiuwen/core/retrieval/` (vector, hybrid, graph, agentic
 
 **Implementation**
 
-`ProviderUsage` (`core/context_engine/usage/provider_usage.py:14`) normalizes `cached_input_tokens` from provider usage metadata. `session_aggregator.py:45` tracks cache hit rates. `full_compact_processor.py:184` compacts at 180 k tokens — this indirectly stabilizes prefixes. The framework observes hits; it does not control caching.
+`request_usage_from_metadata` (`core/context_engine/usage/provider_usage.py:14`) reads `cache_read_tokens` into `RequestKVCacheUsage` (`core/context_engine/usage/models.py:55`); `SessionKVCacheAggregator` (`core/context_engine/usage/session_aggregator.py:45`) aggregates the cache hit rate. `FullCompactProcessorConfig.trigger_total_tokens` defaults to 180k (`full_compact_processor.py:184`), which indirectly stabilizes prefixes. The framework observes hits; it does not control provider-side caching.
 
 </details>
 
@@ -76,7 +76,7 @@ Layer 4: `agent-core/openjiuwen/core/retrieval/` (vector, hybrid, graph, agentic
 
 **Implementation**
 
-`agent_rl/online/backends/sft/trainer.py` is the SFT stage that produces instruct-model-like behavior from demonstration data. `PromptInjectionGuardrail` (`harness/rails/guardrail_rail.py`) provides inference-time safety supplement. The framework does not tag served models as base vs instruct in the config schema — `ProviderType + model_name` selects a model.
+Jiuwen does not run the base→instruct alignment pipeline; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than full alignment. `PromptInjectionGuardrail` (`core/security/guardrail/builtin.py:60`) provides an inference-time safety supplement. Served models are selected by `ProviderType` + `model_name`; the config schema does not tag base vs instruct.
 
 </details>
 
@@ -109,7 +109,7 @@ Layer 4: `agent-core/openjiuwen/core/retrieval/` (vector, hybrid, graph, agentic
 
 **Implementation**
 
-Model clients (`core/foundation/llm/model_clients/openai_model_client.py:865`) send requests and receive streamed responses. `ProviderUsage` (`provider_usage.py:14`) captures input, output, and cached tokens from response metadata. `ObservabilityHandler` (`harness/observability/event.py:1`) logs model call events. `usage_cost.py:101` is the session billing meter. Steps 1-3 (API gateway, load balancer, tokenization) are the provider's infrastructure.
+Model clients send and stream the request via `invoke`/`stream` (`openai_model_client.py:1491`/`:1665`). `request_usage_from_metadata` (`provider_usage.py:14`) captures input, output, and cache token counts from response metadata. `OtelCallbackHandler` (`extensions/observability/callback_handler.py:371`) logs model-call events, and `jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101` is the session billing meter. Steps 1-3 (API gateway, load balancer, tokenization) are the provider's infrastructure.
 
 </details>
 

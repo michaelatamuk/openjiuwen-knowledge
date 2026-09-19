@@ -34,7 +34,7 @@
 
 **Implementation**
 
-BERT-family models appear as frozen embedding encoders and finetuned classifiers (`AutoModelForSequenceClassification` in `guardrail_rail.py`).
+BERT appears only as a classifier backend for the guardrail framework: `LocalModelBackend._load_model` loads `AutoModelForSequenceClassification` (`core/security/guardrail/backends.py:445`), parsed by `BertBinaryParser` (`core/security/guardrail/context.py:106`). Jiuwen does not use BERT as a frozen embedding encoder.
 
 </details>
 
@@ -59,7 +59,7 @@ BERT-family models appear as frozen embedding encoders and finetuned classifiers
 
 **Implementation**
 
-`RuntimePromptRail` and `PromptTemplate` are the ICL interface at inference time. No retrieval-augmented ICL (no similar-demonstration selection per query).
+ICL is done through prompt construction — `PromptTemplate` (`core/foundation/prompt/template.py:14`) plus prompt sections assembled by `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39`). There is no retrieval-augmented ICL (no per-query similar-demonstration selection).
 
 </details>
 
@@ -223,7 +223,7 @@ No diffusion integration; image generation tools appear as external `ToolCard` c
 
 **Implementation**
 
-Embedding pipeline is text-only; CLIP-based cross-modal retrieval is absent. `MultimodalImageRail` routes images to generation, not to an embedding index.
+CLIP-based cross-modal retrieval is absent. Jiuwen has provider-based multimodal embeddings (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
 
 </details>
 
@@ -266,7 +266,7 @@ Infrastructure concern handled by vLLM at the serving layer. Jiuwen manages long
 - 1.6T-parameter model at ~same compute as dense 7B; 4× speedup over T5-XXL.
 - MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense.
 
-**Concept.** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as dense 7B; 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
+**Concept.** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
 
 <details markdown="1">
 <summary><b>Under the hood</b></summary>
@@ -298,7 +298,7 @@ Model architecture opaque to framework; no MoE-aware routing, expert metadata, o
 
 **Implementation**
 
-Safety uses static classifiers (`SecurityRail`, `PromptInjectionGuardrail`, `GuardianRail`); no self-critique loop, no constitution file.
+Safety uses static classifiers and rails (`SecurityRail`, `PromptInjectionGuardrail`, `SafetyPromptRail`); there is no self-critique loop and no constitution file.
 
 </details>
 

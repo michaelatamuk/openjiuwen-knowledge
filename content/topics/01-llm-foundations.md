@@ -6,20 +6,20 @@
 
 **General:** A token is the model's atomic unit — typically a sub-word produced by a BPE/unigram vocabulary — so one word may be one or several tokens, and rare/long words and code fragment heavily. This is also why models miscount letters and struggle with character-level tasks.
 
-**Jiuwen:** The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `TiktokenCounter` maps known model names to tiktoken encodings (falling back to `cl100k_base` for unknown models), and `TiktokenModelCounter` loads a model-native BPE vocabulary. `TokenizerManager` downloads HuggingFace/tiktoken artifacts per model/family.
+**Jiuwen:** The framework counts **tokens**, never words, via a pluggable `TokenCounter`: `TiktokenCounter` maps known model names to tiktoken encodings (falling back to `cl100k_base` for unknown models), and `TiktokenModelCounter` loads a model-native BPE vocabulary. `TokenizerArtifactManager` (`core/context_engine/token/tokenizer_manager.py:23`) resolves and downloads HuggingFace/tiktoken artifacts per model/family.
 
 ```mermaid
 flowchart LR
     TEXT["text"] --> TC["TokenCounter"]
     TC --> TK["TiktokenCounter: model→encoding, cl100k fallback, len//3 fallback"]
     TC --> TM["TiktokenModelCounter: model-native BPE"]
-    TC --> TOK["TokenizerManager: HF/tiktoken artifacts"]
+    TC --> TOK["TokenizerArtifactManager: HF/tiktoken artifacts"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:225</code> model→encoding map; <code>:287</code> <code>count()</code> with <code>len(text)//3</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86</code> — model-native tiktoken BPE<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34</code> — <code>TokenizerSpec</code>; <code>:50</code> fallback policy chain<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:60</code> — resolves/downloads tokenizer artifacts</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:225</code> model→encoding map; <code>:287</code> <code>count()</code> with <code>len(text)//3</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_model_counter.py:86</code> — model-native tiktoken BPE<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_spec.py:34</code> — <code>TokenizerSpec</code>; <code>:50</code> fallback policy chain<br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tokenizer_manager.py:23</code> — resolves/downloads tokenizer artifacts</sub>
 
 </details>
 
@@ -59,7 +59,7 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:287</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/base_embedding.py:24</code> — <code>Embedding</code> ABC; <code>:29</code> <code>embed_query</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46</code> — <code>embed_documents</code></sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/token/tiktoken_counter.py:212</code> — <code>TiktokenCounter</code>; <code>:287</code> fallback<br>&bull; <code>agent-core/openjiuwen/core/foundation/store/base_embedding.py:24</code> — <code>Embedding</code> ABC; <code>:30</code> <code>embed_query</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/indexer/embed_chunks.py:46</code> — <code>embed_documents</code></sub>
 
 </details>
 
@@ -86,7 +86,7 @@ flowchart LR
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> enum: the model-client provider boundary, no architecture logic<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865</code> — builds hosted request params, delegates computation<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_logit_selection/client.py:227</code> — <code>torch.no_grad()</code> forward; logit extraction only, no attention code<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175</code> — <code>AutoModelForCausalLM.from_pretrained(...)</code>; attention delegated<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:527</code> — <code>torch.softmax(...)</code> is sampling, not attention</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> enum: the model-client provider boundary, no architecture logic<br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:1491</code> — builds hosted request params, delegates computation<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_logit_selection/client.py:227</code> — <code>torch.no_grad()</code> forward; logit extraction only, no attention code<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/client.py:175</code> — <code>AutoModelForCausalLM.from_pretrained(...)</code>; attention delegated<br>&bull; <code>agent-core/openjiuwen/symphony/retrieval/llm/transformers_prefix_cached_generation/generation.py:527</code> — <code>torch.softmax(...)</code> is sampling, not attention</sub>
 
 </details>
 
@@ -364,7 +364,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110-117</code> — repeated stream output / timeouts / tool-call loops (degeneracy, not factual errors)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92-108</code> — <code>VerificationRail</code> tool allowlist; <code>:165-196</code> blocks disallowed tools, requires evidence<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:26-58</code> — LLM reviewer dimension "CORRECTNESS"<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:39-80</code> — guardrail detection backends; <code>agent-core/openjiuwen/core/security/guardrail/context.py:115-202</code> confidence thresholds → risk levels<br>&bull; <code>agent-core/openjiuwen/harness/tools/web/paid_search.py:221-222</code> — extracts citation URLs (no claim linkage)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/tools/skill.py:284</code> — "then cite only the refs you actually read"</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/rails/model_anomaly_detection_rail.py:110-117</code> — repeated stream output / timeouts / tool-call loops (degeneracy, not factual errors)<br>&bull; <code>agent-core/openjiuwen/harness/rails/subagent/verification_rail.py:92-108</code> — <code>VerificationRail</code> tool allowlist; <code>:165-196</code> blocks disallowed tools, requires evidence<br>&bull; <code>agent-core/openjiuwen/agent_teams/verification/reviewer.py:127</code> — <code>VerificationReviewer</code> (LLM reviewer, correctness/completeness)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:39-80</code> — guardrail detection backends; <code>agent-core/openjiuwen/core/security/guardrail/context.py:115-202</code> confidence thresholds → risk levels<br>&bull; <code>agent-core/openjiuwen/harness/tools/web/paid_search.py:221-222</code> — extracts citation URLs (no claim linkage)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/tools/skill.py:284</code> — "then cite only the refs you actually read"</sub>
 
 </details>
 
@@ -436,7 +436,7 @@ flowchart TD
 
 **General:** BERT (Devlin et al. 2018) made two contributions. First, the **masked language model (MLM)** pretraining objective: randomly mask 15% of input tokens and train the model to predict them. Unlike GPT's left-to-right objective, MLM forces the model to attend to both left and right context simultaneously — producing richer bidirectional representations. Second, and more broadly important, it demonstrated the **pretrain-then-finetune paradigm** at scale: pretrain one large encoder on unlabeled text, then add a thin task-specific head and finetune on a small labeled dataset. This template — one general pretrained model, many downstream tasks — replaced the prior approach of training a separate model per task and became the foundation of modern transfer learning for NLP and beyond.
 
-**Jiuwen:** BERT-family models appear in two roles. As encoder-only **classifiers**: `guardrail_rail.py` loads `AutoModelForSequenceClassification` (a finetuned BERT-style model) for harmful-content classification. As **embedding models**: sentence transformers (also BERT-derived) are used frozen for document embedding — pretrained, not finetuned within this codebase. The SFT path in `agent_rl/` is the finetune stage but applies to decoder-only generation models, not BERT encoders.
+**Jiuwen:** BERT-family models appear only as an encoder classifier for the guardrail framework: `LocalModelBackend._load_model` loads `AutoModelForSequenceClassification` (`core/security/guardrail/backends.py:445`), parsed by `BertBinaryParser` (`core/security/guardrail/context.py:106`). Jiuwen does not use BERT as a frozen embedding encoder; document embeddings come from API/sentence-transformer embedders. Fine-tuning under `agent_evolving/agent_rl/` targets decoder-only models, not BERT encoders.
 
 ```mermaid
 flowchart TD
@@ -451,7 +451,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:445</code> — <code>AutoModelForSequenceClassification</code> (finetuned BERT-family)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:174</code> — <code>model_type</code> accepts <code>"bert"</code><br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/sentence_transformer_embedding.py:1</code> — frozen pretrained encoder for embeddings<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — finetune stage (decoder-only models)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/backends.py:445</code> — <code>AutoModelForSequenceClassification</code> (finetuned BERT-family)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:174</code> — <code>model_type</code> accepts <code>"bert"</code><br>&bull; <code>agent-core/openjiuwen/symphony/experience/embed.py:64</code> — <code>EmbeddingClient</code> (local sentence-transformers; not a BERT encoder)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — finetune stage (decoder-only models)</sub>
 
 </details>
 
@@ -463,7 +463,7 @@ flowchart TD
 
 **General:** In-context learning (ICL) is the ability of a large language model to perform a new task from examples placed directly in the prompt — **without any weight update**. GPT-3 (Brown et al. 2020, 175B parameters) demonstrated that this capability emerges at scale: smaller GPT versions showed weak few-shot performance, but at 175B, few-shot accuracy on many benchmarks approached fine-tuned baselines. The mechanism: pretraining on diverse text implicitly teaches the model to recognize task patterns from prefix sequences; a few in-context examples "activate" the relevant completion behavior at inference time. The practical implication: prompting became the primary interface for steering LLMs, not per-task fine-tuning — changing how practitioners think about deploying models.
 
-**Jiuwen:** At inference time, `PromptTemplate` and `PromptSection` are the ICL interface: few-shot examples and system instructions are injected as prompt sections at runtime by `RuntimePromptRail`. The SFT path in `agent_rl/` does bake improvements into weights (reducing reliance on ICL), but day-to-day agent behavior is primarily shaped by prompt construction. There is no demonstration retrieval (no system that selects the most relevant few-shot examples by similarity to the current query — so-called "retrieval-augmented ICL").
+**Jiuwen:** Prompt construction is the inference-time interface for ICL: `PromptTemplate` (`core/foundation/prompt/template.py:14`) and prompt sections (`PromptSection`, `core/single_agent/prompts/builder.py:24`), with system/dynamic prompt state assembled by `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39`). Few-shot examples are placed in the prompt by the caller; there is no demonstration retrieval (no system selects the most relevant few-shot examples by similarity to the query). SFT under `agent_evolving/agent_rl/` instead bakes improvements into weights. There is no demonstration retrieval (no system that selects the most relevant few-shot examples by similarity to the current query — so-called "retrieval-augmented ICL").
 
 ```mermaid
 flowchart TD
@@ -479,7 +479,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/harness/prompts/template.py:1</code> — <code>PromptTemplate</code> / <code>PromptSection</code><br>&bull; <code>agent-core/openjiuwen/harness/rails/runtime_prompt_rail.py:1</code> — <code>RuntimePromptRail</code> (dynamic injection)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT (weight update path)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/prompt/template.py:1</code> — <code>PromptTemplate</code> / <code>PromptSection</code><br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39</code> — <code>RuntimePromptRail</code> (dynamic prompt state)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT (weight update path)</sub>
 
 </details>
 
@@ -506,7 +506,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT uses fixed base model (no pretraining)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:1</code> — offline RL config (no data-to-parameter ratio policy)<br>&bull; Chinchilla scaling law: compute-optimal at ≈20 tokens/parameter (no framework equivalent)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT uses fixed base model (no pretraining)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/config/offline_config.py:220</code> — offline RL config (no data-to-parameter ratio policy)<br>&bull; Chinchilla scaling law: compute-optimal at ≈20 tokens/parameter (no framework equivalent)</sub>
 
 </details>
 
@@ -576,7 +576,7 @@ flowchart TD
 
 **General:** CLIP (Contrastive Language-Image Pretraining, Radford et al. 2021) trains an image encoder and a text encoder **jointly** via contrastive learning on 400M internet (image, text) pairs. The training objective: push the embedding of a matching (image, text) pair close together in a shared vector space, push mismatched pairs apart. The result is a **shared embedding space** where cosine similarity between a text embedding and an image embedding is semantically meaningful — enabling zero-shot image classification, text-to-image retrieval, and image-to-text retrieval without task-specific labeling. CLIP underpins DALL-E 2's text-to-image alignment, Stable Diffusion's text conditioning, and multimodal RAG systems that index images alongside text. For practitioners: CLIP-based retrieval lets you run a text query against an image index (or vice versa) using the same vector search infrastructure as text-only RAG.
 
-**Jiuwen:** The embedding pipeline (`APIEmbedding`, `SentenceTransformerEmbedding`) handles text only — no image encoder, no multimodal embedding path. `DocumentChunk` has no image-content field. CLIP-based retrieval is absent; image-text cross-modal search is not supported. Multimodal input exists in a different dimension: `MultimodalImageRail` handles image inputs from users, but passes them to the generation model directly, not to a shared embedding index.
+**Jiuwen:** CLIP-based cross-modal retrieval is absent (no CLIP encoder). Jiuwen does have a provider-based multimodal embedding path — `DashscopeEmbedding.embed_multimodal` (`core/retrieval/embedding/dashscope_embedding.py:199`) and `VLLMEmbedding.embed_multimodal` (`core/retrieval/embedding/vllm_embedding.py:32`) embed image+text via `MultimodalDocument` (`core/retrieval/common/document.py:50`) — but it uses provider embedding APIs, not CLIP. `MultimodalImageRail` prepares image attachments for the generation model; it is not an embedding index.
 
 ```mermaid
 flowchart TD
@@ -593,7 +593,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/sentence_transformer_embedding.py:1</code> — text-only encoder<br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:1</code> — text-only API embedding<br>&bull; <code>agent-core/openjiuwen/harness/rails/multimodal_image_rail.py:1</code> — image input → generation (not retrieval)<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:1</code> — no image chunk type</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/api_embedding.py:1</code> — API embedding<br>&bull; <code>agent-core/openjiuwen/core/retrieval/embedding/dashscope_embedding.py:199</code> — <code>embed_multimodal</code> (provider multimodal embedding)<br>&bull; <code>jiuwenswarm/jiuwenswarm/agents/harness/common/rails/multimodal_image_rail.py:21</code> — prepares image attachments for the generation model<br>&bull; <code>agent-core/openjiuwen/core/retrieval/indexing/processor/chunker/text_splitter.py:1</code> — no image chunk type</sub>
 
 </details>
 
@@ -607,7 +607,7 @@ flowchart TD
 
 **General:** Denoising Diffusion Probabilistic Models (DDPM, Ho et al. 2020) define two processes. **Forward**: add Gaussian noise to an image over T steps until the image is pure noise (a known distribution). **Reverse**: train a neural network (U-Net) to denoise one step at a time — predict the noise added at each step and subtract it. At inference: sample pure noise, run the reverse process T times, get a generated image. The insight is that denoising is a stable, well-defined supervised objective. **Latent Diffusion Models** (Stable Diffusion) extend this by running the forward/reverse process in a compressed **latent space** (encoded by a VAE) rather than pixel space — reducing compute by ~8×. DALL-E 2 uses diffusion in the CLIP embedding space. For practitioners: generation quality levers (number of denoising steps, guidance scale, scheduler type) directly map to the reverse diffusion process.
 
-**Jiuwen:** Jiuwen is a language agent framework with no image generation capability or diffusion model integration. Image generation tools (DALL-E, Stable Diffusion API) would be invoked as external tool calls via `ToolCard` definitions. The SVG avatar system in `jiuwenswarm-bee` uses procedural animation, not diffusion-based generation.
+**Jiuwen:** Jiuwen is a language agent framework with no image generation capability and no diffusion integration; image generation, if needed, is an external tool/service called through a tool definition, not something the framework implements.
 
 ```mermaid
 flowchart TD
@@ -624,7 +624,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; Framework: no diffusion model integration; image generation via external <code>ToolCard</code> call<br>&bull; <code>jiuwenswarm-bee/src/avatar/</code> — procedural SVG animation (not diffusion)</sub>
+<sub><strong>Anchors:</strong><br>&bull; Framework: no diffusion model integration; image generation via external <code>ToolCard</code> call</sub>
 
 </details>
 
@@ -636,7 +636,7 @@ flowchart TD
 
 **General:** During autoregressive decoding, the transformer computes key (K) and value (V) vectors for every token in every layer. For the input prefix these computations don't change as new tokens are generated — so they can be cached. The **KV cache** stores K and V tensors for all processed tokens so far: on each decode step only the new token's K/V is computed, and the cached values are reused. Without KV cache, generating N tokens from a prompt of P tokens costs O((P+N)²) compute; with it, the decode phase amortizes to O(P+N). **Prompt caching** (Anthropic, OpenAI, Google) extends this across API calls: if your request begins with a cached prefix, you pay ~10% of the normal input token cost for those cached tokens. Practical implication: put your stable system prompt and long context at the *beginning* of the message, and put the variable user query at the *end* — this maximizes cache hits across repeated calls.
 
-**Jiuwen:** The context engine is cache-aware: `ProviderUsage` (agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14) normalizes `cached_input_tokens` from provider usage metadata, and `session_aggregator.py:45` tracks cache hit rates in tokens. The framework can only observe whether the provider reported a cache hit; it does not control the provider-side KV cache. Indirectly, the context engine's full-compaction and offloading strategy keeps long stable prefixes (system prompt, background context) at the top of the prompt, which improves cache-hit rate on re-queries.
+**Jiuwen:** The context engine is cache-aware: `request_usage_from_metadata` (`core/context_engine/usage/provider_usage.py:14`) reads `cache_read_tokens` into `RequestKVCacheUsage` (`core/context_engine/usage/models.py:55`), and `SessionKVCacheAggregator` (`session_aggregator.py:45`) aggregates the cache hit rate. The framework can only observe whether the provider reported a cache hit; it does not control the provider-side KV cache. Indirectly, the context engine's full-compaction and offloading strategy keeps long stable prefixes (system prompt, background context) at the top of the prompt, which improves cache-hit rate on re-queries.
 
 ```mermaid
 flowchart TD
@@ -647,14 +647,14 @@ flowchart TD
     DECODE --> OUT["output tokens"]
     CACHE_HIT["prompt cache hit (provider-side)"] --> COST["~10% of normal input token cost for cached prefix"]
     STRAT["strategy"] --> ORDER["stable prefix first (system prompt), variable query last"]
-    JIW["Jiuwen"] --> OBS["ProviderUsage: cached_input_tokens + session_aggregator hit-rate"]
+    JIW["Jiuwen"] --> OBS["request_usage_from_metadata: cache_read_tokens + session_aggregator hit-rate"]
     JIW -.->|"does not control"| PROV["provider-side KV cache policy"]
 ```
 
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — normalizes <code>cached_input_tokens</code> from usage metadata<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/session_aggregator.py:45</code> — cache hit-rate aggregation (tokens, not dollars)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — prefix-preserving compaction (indirectly improves cache locality)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — normalizes <code>cache_read_tokens</code> from usage metadata<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/session_aggregator.py:45</code> — cache hit-rate aggregation (tokens, not dollars)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/processor/compressor/full_compact_processor.py:184</code> — prefix-preserving compaction (indirectly improves cache locality)</sub>
 
 </details>
 
@@ -666,7 +666,7 @@ flowchart TD
 
 **General:** A **base model** is pretrained on next-token prediction over a massive text corpus — it learns language, world knowledge, and code, but has no "assistant" persona. It will complete text in any style it has seen, including harmful ones. An **instruct model** (chat model) is a base model that has passed through one or more alignment stages: (1) **SFT** — supervised fine-tuning on demonstration data of helpful responses; (2) **Reward modeling** — a model trained to score responses by human preference rankings; (3) **RLHF or DPO** — policy optimization toward the reward model. The result is a model that follows instructions, declines harmful requests, and maintains a consistent persona. Base models (Llama-3-8B, Mistral-7B-base) are released for researchers to apply custom alignment; production systems virtually always use the instruct/chat variant.
 
-**Jiuwen:** The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. The SFT path in `agent_rl/online/backends/sft/trainer.py` is the stage that transforms a base model into an instruct model, but it applies to the model being fine-tuned, not to the model being served. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
+**Jiuwen:** The framework consumes models by `ProviderType` + `model_name` string — there is no base/instruct distinction in the config schema. Jiuwen does not perform base→instruct alignment; that happens before serving. Its only training code is `SFTTrainingExecutor` (`agent_evolving/agent_rl/online/backends/sft/trainer.py`), an online-RL SFT executor rather than a full alignment pipeline. `PromptInjectionGuardrail` and `SecurityRail` apply safety classification at inference time as a supplement to alignment — they do not substitute for RLHF/DPO training.
 
 ```mermaid
 flowchart TD
@@ -683,7 +683,7 @@ flowchart TD
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:1</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — inference-time safety supplement</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/schema/config.py:13</code> — <code>ProviderType</code> (no instruct/base flag)<br>&bull; <code>agent-core/openjiuwen/agent_evolving/agent_rl/online/backends/sft/trainer.py:44</code> — SFT stage (produces instruct-like model from base)<br>&bull; <code>agent-core/openjiuwen/core/security/guardrail/builtin.py:1</code> — inference-time safety supplement</sub>
 
 </details>
 
@@ -695,7 +695,7 @@ flowchart TD
 
 **General:** (1) **API Gateway** — TLS termination, API key validation, rate limiting (429 if exceeded), billing meter starts. (2) **Load Balancer** — routes to a GPU cluster; identical requests have different latency because different clusters are selected. (3) **Tokenization** — your text is converted to token IDs ("Hello world" → [15339, 1917]); this is where your cost is locked in for input. (4) **Model Router** (provider-internal) — large requests route to a multi-GPU cluster; small requests to an optimized single GPU. (5) **Inference Engine** — *Prefill phase*: all input tokens processed in parallel (fast). *Decode phase*: one output token generated per step (this loop is why streaming exists). KV cache avoids recomputing past token representations; FlashAttention reduces memory pressure. (6) **Post-Processing** — tokens decoded to text; safety classifier runs (every major provider has this). (7) **Response and Billing** — JSON response returned via load balancer and TLS; output tokens cost 3–5× more than input tokens per provider pricing. (8) **Logging** — every call logged: latency, token count, model, safety flags; feeds abuse detection and capacity planning. **Inference (step 5) accounts for ~95% of total latency.**
 
-**Jiuwen:** The framework operates from step 4 onward. Model clients (`openai_model_client.py`, `anthropic_model_client.py`) send the request and receive the streamed response; they do not control tokenization, routing, or prefill/decode internally. `ProviderUsage` captures `input_tokens`, `output_tokens`, and `cached_input_tokens` from step 7's usage metadata. `ObservabilityHandler` logs model call events for step 8 equivalents. Steps 1–3 (gateway, load balancer, tokenization) are the provider's infrastructure.
+**Jiuwen:** The framework operates from step 4 onward. Model clients build the request and send/stream it via `invoke`/`stream` (`openai_model_client.py:1491`/`:1665`); they do not control tokenization, routing, or prefill/decode. `request_usage_from_metadata` captures `input_tokens`, `output_tokens`, and `cache_read_tokens` from step 7's usage metadata. `OtelCallbackHandler` (`extensions/observability/callback_handler.py:371`) logs model-call events for step 8 equivalents. Steps 1–3 (gateway, load balancer, tokenization) are the provider's infrastructure.
 
 ```mermaid
 sequenceDiagram
@@ -717,7 +717,7 @@ sequenceDiagram
 <details>
 <summary>Anchors</summary>
 
-<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:865</code> — builds and sends request (step 4+)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — captures usage metadata from step 7<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — billing meter equivalent (step 7)<br>&bull; <code>agent-core/openjiuwen/harness/observability/rail.py:1</code> — observability events (step 8 equivalent)</sub>
+<sub><strong>Anchors:</strong><br>&bull; <code>agent-core/openjiuwen/core/foundation/llm/model_clients/openai_model_client.py:1491</code> — <code>invoke</code> (sends request, step 4+)<br>&bull; <code>agent-core/openjiuwen/core/context_engine/usage/provider_usage.py:14</code> — captures usage metadata from step 7<br>&bull; <code>jiuwenswarm/jiuwenswarm/server/runtime/usage_cost.py:101</code> — billing meter equivalent (step 7)<br>&bull; <code>agent-core/openjiuwen/extensions/observability/callback_handler.py:371</code> — observability events (step 8 equivalent)</sub>
 
 </details>
 

@@ -10,7 +10,7 @@
 
 **Definition:** Masked language modeling (MLM) as a pretraining objective enables bidirectional context. The pretrain-then-finetune paradigm: one large pretrained model + thin task head + small labeled dataset, replacing per-task training. MLM randomly masks 15% of input tokens and trains the model to predict them — forcing bidirectional context unlike GPT's left-to-right objective. The pretrain-then-finetune template became the foundation of modern NLP transfer learning.
 
-**Jiuwen:** BERT-family models appear as frozen embedding encoders and finetuned classifiers (`AutoModelForSequenceClassification` in `guardrail_rail.py`).
+**Jiuwen:** BERT appears only as a classifier backend for the guardrail framework: `LocalModelBackend._load_model` loads `AutoModelForSequenceClassification` (`core/security/guardrail/backends.py:445`), parsed by `BertBinaryParser` (`core/security/guardrail/context.py:106`). Jiuwen does not use BERT as a frozen embedding encoder.
 
 ---
 
@@ -18,7 +18,7 @@
 
 **Definition:** In-context learning (ICL) — performing new tasks from prompt examples without weight update — emerges at scale. At 175B parameters, few-shot performance approaches fine-tuned baselines on many benchmarks. Scale enables a model to recognize task patterns from prefix sequences and apply them at inference time. This changed the practitioner interface from fine-tuning to prompting.
 
-**Jiuwen:** `RuntimePromptRail` and `PromptTemplate` are the ICL interface at inference time. No retrieval-augmented ICL (no similar-demonstration selection per query).
+**Jiuwen:** ICL is done through prompt construction — `PromptTemplate` (`core/foundation/prompt/template.py:14`) plus prompt sections assembled by `RuntimePromptRail` (`jiuwenswarm/jiuwenswarm/agents/harness/common/rails/runtime_prompt_rail.py:39`). There is no retrieval-augmented ICL (no per-query similar-demonstration selection).
 
 ---
 
@@ -78,7 +78,7 @@
 
 **Definition:** Joint image-text pretraining via contrastive learning on 400M pairs creates a shared embedding space. Enables zero-shot image classification, text-to-image retrieval, and multimodal RAG. Text and image encoders trained together; cosine similarity between text and image embeddings is semantically meaningful. Underpins DALL-E 2 and Stable Diffusion text conditioning.
 
-**Jiuwen:** Embedding pipeline is text-only; CLIP-based cross-modal retrieval is absent. `MultimodalImageRail` routes images to generation, not to an embedding index.
+**Jiuwen:** CLIP-based cross-modal retrieval is absent. Jiuwen has provider-based multimodal embeddings (`DashscopeEmbedding.embed_multimodal`, `VLLMEmbedding.embed_multimodal`) but no CLIP encoder. `MultimodalImageRail` prepares image attachments for the generation model, not for an embedding index.
 
 ---
 
@@ -92,7 +92,7 @@
 
 ## 14. Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity (Fedus, 2021)
 
-**Definition:** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as dense 7B; 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
+**Definition:** Mixture of Experts with single-expert routing (k=1) scales model capacity without proportional FLOPs. 1.6T-parameter model at ~same compute as an 11B dense model (T5-XXL); 4× speedup over T5-XXL. MoE: N expert FFN layers + router activates k per token → total params = N×k, FLOPs ≈ k-expert dense. Practitioner implication: total parameter count overstates compute cost for MoE models.
 
 **Jiuwen:** Model architecture opaque to framework; no MoE-aware routing, expert metadata, or active-parameter tracking.
 
@@ -102,6 +102,6 @@
 
 **Definition:** Replace most human preference labeling with model self-critique against explicit principles (the "constitution"). SL-CAI: generate → critique → revise → SFT. RL-CAI: model-generated preference pairs → reward model → RLHF. Far fewer human labels; auditable principle list. The constitution is an explicit, versioned list of principles — easier to update than a latent reward model. Claude's alignment is based on CAI.
 
-**Jiuwen:** Safety uses static classifiers (`SecurityRail`, `PromptInjectionGuardrail`, `GuardianRail`); no self-critique loop, no constitution file.
+**Jiuwen:** Safety uses static classifiers and rails (`SecurityRail`, `PromptInjectionGuardrail`, `SafetyPromptRail`); there is no self-critique loop and no constitution file.
 
 ---
